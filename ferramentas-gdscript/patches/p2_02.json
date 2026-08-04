@@ -1,0 +1,51 @@
+{
+"220": {"o":["Um setor específico da unidade","Uma etapa burocrática da triagem","Uma atitude profissional, e não um lugar ou momento","Uma atribuição exclusiva do enfermeiro","Um protocolo padronizado de classificação de risco na entrada"],"c":2},
+
+"225": {"o":["Uma certeza","Uma hipótese e sua consequência","Uma ordem","Uma comparação entre dois fatos reais","Uma concessão"],"c":1},
+
+"226": {"o":["Narrativo","Descritivo","Injuntivo (instrucional)","Dissertativo","Argumentativo, com defesa de tese"],"c":2},
+
+"231": {"o":["Personificação (prosopopeia)","Metonímia","Eufemismo","Pleonasmo","Catacrese, por falta de termo próprio"],"c":0},
+
+"235": {"o":["Metáfora","Comparação explícita (símile)","Metonímia","Hipérbole","Antítese, por oposição de ideias"],"c":1},
+
+"246": {"o":["Ela chegou tarde","O plantão noturno foi tranquilo","Trabalhou muito","Saiu logo depois do turno da tarde","Não veio ninguém"],"c":1},
+
+"266": {"o":["Separar sujeito e predicado","Introduzir enumeração, citação ou esclarecimento","Encerrar o período interrogativo em discurso direto","Substituir o ponto final","Isolar o vocativo"],"c":1},
+
+"277": {"o":["Contém erro de concordância","Não se sabe a quem se refere o possessivo 'seu'","Falta vírgula","Há erro de regência","O verbo principal do período está empregado de modo impróprio"],"c":1},
+
+"279": {"o":["Sinonímia","Hiperônimo e hipônimo","Antonímia","Paronímia entre os termos","Homonímia"],"c":1},
+
+"283": {"o":["Pronome apassivador","Índice de indeterminação do sujeito","Objeto indireto","Partícula expletiva","Conjunção integrante iniciando oração subordinada"],"c":1},
+
+"295": {"o":["Descentralização, atendimento integral e participação da comunidade","Universalidade, equidade e integralidade","Regionalização, gratuidade e hierarquização","Municipalização, privatização e regulação","Autonomia, resolutividade e financiamento tripartite entre os entes federados"],"c":0},
+
+"297": {"o":["Ordenar a formação de recursos humanos na área de saúde","Fixar o piso salarial de todas as categorias profissionais","Regulamentar planos privados exclusivamente","Legislar sobre direito do trabalho","Administrar o sistema previdenciário"],"c":0},
+
+"325": {"o":["Substituir o Conselho de Saúde","Registrar e qualificar as informações da atenção primária","Realizar a regulação de leitos hospitalares da rede municipal","Controlar a folha de pagamento das equipes","Emitir laudos de vigilância sanitária"],"c":1},
+
+"363": {"o":["Apenas na caderneta do usuário","Na caderneta e no sistema de informação do PNI","Apenas no livro de registro da sala de vacinação","Somente ao final do mês, em bloco","Apenas em campanhas nacionais"],"c":1},
+
+"368": {"o":["Isoniazida por 6 a 9 meses ou esquema com rifapentina","Esquema RIPE por 6 meses","Apenas isolamento respiratório","Rifampicina em dose única","Antibiótico de amplo espectro por dez dias consecutivos"],"c":0},
+
+"372": {"o":["HBsAg reagente","Anti-HBc total reagente com HBsAg não reagente","Anti-HBs reagente com anti-HBc não reagente","HBeAg reagente","Anti-HBc IgM reagente"],"c":2},
+
+"379": {"o":["Número de casos dividido pela população exposta, em determinado período","Número de óbitos dividido pelo número de casos","Número de casos novos dividido pela população total do país no mesmo ano","Número de internações dividido por leitos","Número de notificações dividido por profissionais"],"c":0},
+
+"382": {"o":["Vigilância sanitária","Investigação epidemiológica de surtos","Assistência farmacêutica","Auditoria em saúde","Regulação assistencial de leitos e consultas"],"c":1},
+
+"388": {"o":["Adrenalina, por via intramuscular no vasto lateral da coxa","Hidrocortisona, por via endovenosa","Anti-histamínico, por via oral","Adrenalina, por via subcutânea na face lateral do músculo deltoide","Salbutamol inalatório"],"c":0},
+
+"391": {"o":["Febre, taquicardia e leucocitose em paciente com foco infeccioso definido","Frequência respiratória elevada, alteração do estado mental e pressão sistólica reduzida","Dor torácica com sudorese fria, náusea e irradiação para o membro superior esquerdo do paciente","Oligúria, icterícia e edema periférico de instalação progressiva","Hipotermia, bradicardia e cianose central em paciente com sepse grave"],"c":1},
+
+"403": {"o":["Anemia leve","Intoxicação por monóxido de carbono","Febre","Taquicardia sinusal sustentada no monitor","Hiperglicemia"],"c":1},
+
+"425": {"o":["Em qualquer momento da internação hospitalar, independentemente do tempo decorrido desde a admissão","Geralmente após quarenta e oito a setenta e duas horas da admissão, sem evidência na entrada","Somente após a alta hospitalar, no período de acompanhamento ambulatorial","Apenas em pacientes submetidos a procedimentos cirúrgicos de grande porte","Somente em pacientes internados em unidades de terapia intensiva"],"c":1},
+
+"449": {"o":["Proliferativa, inflamatória e de remodelação do tecido lesado","Inflamatória, proliferativa e de remodelação (maturação)","Remodelação, inflamatória e proliferativa","Hemostática, necrótica e fibrótica","Exsudativa, purulenta e cicatricial"],"c":1},
+
+"450": {"o":["Evolução normal da cicatrização","Processo infeccioso, exigindo avaliação e conduta específica","Excesso de umidade apenas","Uso inadequado de cobertura oclusiva, apenas, sem processo infeccioso","Tecido de granulação saudável"],"c":1},
+
+"455": {"o":["De forma autônoma, sem supervisão","Sob supervisão do enfermeiro, cabendo-lhe atividades de nível médio","Somente em ambiente hospitalar","Apenas em situações de urgência","Como substituto do enfermeiro na realização da consulta de enfermagem"],"c":1}
+}

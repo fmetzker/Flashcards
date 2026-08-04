@@ -1,0 +1,31 @@
+{
+"728": {"o":["Localiza-se sobre as proeminências ósseas, apresentando bordas bem delimitadas e profundidade variável da lesão","Resulta da exposição à umidade e a irritantes, com bordas difusas e sem relação com proeminências ósseas","Apresenta necrose profunda com exposição de tecido subcutâneo desde o início","Evolui sem dor, por comprometimento precoce das terminações nervosas locais","Ocorre exclusivamente em pacientes acamados com mobilidade preservada"],"c":1},
+
+"732": {"o":["Romper todas as flictenas e manter a lesão exposta ao ar para secagem","Limpar suavemente, avaliar as flictenas conforme protocolo e aplicar cobertura que mantenha o meio úmido","Aplicar substâncias caseiras, como manteiga ou pasta de dente, sobre toda a área queimada da pele do paciente","Usar gelo diretamente sobre a lesão para reduzir a dor e a progressão térmica","Manter a lesão descoberta e seca até a avaliação pelo serviço especializado"],"c":1},
+
+"733": {"o":["Punção venosa periférica em membro superior","Punção arterial radial para gasometria","Sondagem vesical","Aspiração traqueal","Coleta de hemocultura"],"c":1},
+
+"746": {"o":["Insulina e glucagon","Hormônios T3 e T4, que regulam o metabolismo","Cortisol e aldosterona","Hormônio antidiurético","Paratormônio exclusivamente, sem outros hormônios"],"c":1},
+
+"772": {"o":["Verificar apenas o ritmo cardíaco apresentado no monitor multiparâmetro","Checar pulso e pressão, garantir via aérea e oxigenação, realizar ECG e identificar a causa","Suspender a monitorização após a estabilização inicial dos sinais vitais","Iniciar dieta oral precocemente para reduzir o catabolismo do paciente","Transferir imediatamente o paciente para outro serviço, sem aguardar a sua estabilização clínica"],"c":1},
+
+"774": {"o":["Fixar todos os eletrodos na parede abdominal, abaixo do rebordo costal","Posicioná-los em regiões infraclaviculares e no hemitórax, evitando proeminências ósseas","Concentrar todos os eletrodos sobre o esterno, para captar melhor o sinal elétrico cardíaco","Fixá-los sobre a roupa do paciente, quando não for possível expor o tórax","Aplicá-los sobre curativos e eletrodos de desfibrilação já instalados"],"c":1},
+
+"784": {"o":["Aplicado exclusivamente por via intramuscular na região glútea","Infiltrado ao redor e no fundo da lesão, aplicando-se o restante por via intramuscular","Administrado por via endovenosa lenta, previamente diluído em solução fisiológica isotônica","Aplicado somente após trinta dias, junto com a última dose da vacina","Substituído por antibioticoterapia de amplo espectro por dez dias"],"c":1},
+
+"796": {"o":["Idêntico ao da população geral, sem qualquer adaptação epidemiológica","Específico, com antecipação de vacinas e ampliação de faixas etárias, pela vulnerabilidade","Restrito a campanhas anuais realizadas nas aldeias por equipes itinerantes","Definido localmente por cada distrito sanitário, sem qualquer parâmetro nacional de referência","Sem previsão no Programa Nacional de Imunizações, por competência estadual"],"c":1},
+
+"797": {"o":["Aplicar normalmente, já que pequenas variações não afetam a estabilidade","Segregar e identificar como suspeita, aguardando avaliação técnica antes de usar ou descartar","Descartar imediatamente todo o lote armazenado, sem necessidade de qualquer avaliação técnica prévia","Congelar os frascos para interromper a degradação do imunobiológico","Utilizar apenas em adultos, por apresentarem menor risco de evento adverso"],"c":1},
+
+"811": {"o":["Úlcera cutânea de bordas elevadas, indolor, de evolução crônica","Vesículas agrupadas dolorosas","Exantema generalizado","Icterícia e hepatomegalia","Lesões restritas à mucosa nasal desde o início do quadro, sem lesão cutânea"],"c":0},
+
+"818": {"o":["Antes de 37 semanas completas de gestação","Antes de 40 semanas","Após 42 semanas","Antes de 20 semanas","Entre 37 e 39 semanas completas de idade gestacional"],"c":0},
+
+"828": {"o":["Pode ser realizada a qualquer momento, mediante simples solicitação verbal da pessoa interessada","Está sujeita a requisitos legais, manifestação de vontade e prazo mínimo até o procedimento","É procedimento vedado no âmbito do SUS, disponível apenas na rede privada","Exige autorização expressa do cônjuge em todas as situações previstas em lei","É permitida somente a pessoas com idade superior a quarenta anos completos"],"c":1},
+
+"837": {"o":["Ser encaminhada ao serviço especializado somente se houver alguma doença de base já associada ao quadro","Ter o caso investigado, com avaliação alimentar, social e clínica, e acompanhamento mais frequente","Aguardar a próxima consulta de rotina para confirmar a tendência observada na curva","Receber suplementação nutricional imediata, independentemente da avaliação clínica","Ser retirada do acompanhamento de puericultura e encaminhada à assistência social"],"c":1},
+
+"843": {"o":["Deixar a pessoa sozinha em ambiente reservado até a crise ceder","Permanecer com a pessoa, oferecer ambiente calmo e orientar a respiração de forma pausada","Realizar contenção mecânica preventiva, pelo risco de agitação psicomotora no curso da crise aguda","Administrar sedativo antes de qualquer avaliação clínica da situação","Confrontar as queixas apresentadas, demonstrando que não há risco real"],"c":1},
+
+"844": {"o":["Queixas de dor crônica sem qualquer causa clínica identificada em avaliação recente do paciente","Lesões em estágios diferentes de cicatrização, desnutrição, higiene precária e isolamento","Perda de memória isolada, com preservação das atividades de vida diária","Uso de múltiplos medicamentos prescritos por diferentes especialistas","Dificuldade de locomoção compatível com o grau de fragilidade apresentado"],"c":1}
+}

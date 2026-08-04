@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.DS_Store
+
+# gerado por gerar-offline.ps1 a partir do index.html e de banco/ — meio mega
+# de conteúdo duplicado, refeito com um comando
+offline.html
+
+# config local do Claude Code (servidor de preview) — não é parte do app
+.claude/

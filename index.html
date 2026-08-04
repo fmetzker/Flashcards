@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Prova 20/09">
+<meta name="theme-color" content="#0E7C66">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Prova 20/09 — Enfermeiro / Volta Redonda</title>
+<style>
+:root{
+  --tinta:#16232E;
+  --tinta2:#54646F;
+  --papel:#F5F7F4;
+  --card:#FFFFFF;
+  --verde:#0E7C66;
+  --verde-luz:#DCEDE7;
+  --ambar:#B0740E;
+  --ambar-luz:#F6EBD5;
+  --coral:#BC3B34;
+  --coral-luz:#F7E2E0;
+  --traco:#D8DFDA;
+  --display:ui-rounded,"SF Pro Rounded",system-ui,sans-serif;
+  --corpo:-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",sans-serif;
+  --dado:ui-monospace,"SF Mono",Menlo,monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--papel);color:var(--tinta);font-family:var(--corpo);
+  font-size:17px;line-height:1.45;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-text-size-adjust:100%;
+}
+.tela{display:none;max-width:560px;margin:0 auto;padding:18px 18px 130px}
+.tela.ativa{display:block}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.015em}
+h1{font-size:26px;font-weight:700}
+h2{font-size:19px;font-weight:600}
+.sub{color:var(--tinta2);font-size:14px;margin-top:2px}
+.dado{font-family:var(--dado);font-variant-numeric:tabular-nums}
+
+/* topo */
+.topo{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:18px}
+.contagem{text-align:right;line-height:1}
+.contagem b{font-family:var(--dado);font-size:34px;display:block;color:var(--verde)}
+.contagem span{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--tinta2)}
+
+/* cartela de dias — assinatura */
+.cartela{
+  background:var(--card);border:1px solid var(--traco);border-radius:14px;
+  padding:14px;margin-bottom:16px;
+}
+/* O tamanho do quadrado é definido em pixels pelo JS (ver ajustarGrade), não
+   por aspect-ratio nem padding-top percentual. As duas técnicas de CSS puro
+   dependem de como cada motor resolve percentual dentro de uma grade com
+   linha automática, e o comportamento diverge entre navegadores — inclusive
+   no Safari do iPhone, que é o alvo real do app — causando ora estouro
+   horizontal, ora retângulos em vez de quadrados. Medir e fixar em px não
+   deixa margem para ambiguidade. */
+.grade{display:grid;gap:5px;margin-top:10px}
+.dia{box-sizing:border-box;border-radius:3px;background:#EDF1EE;border:1px solid transparent}
+.dia.cheio{background:var(--verde)}
+.dia.parcial{background:var(--ambar);opacity:.55}
+/* nome "passada", não "vazio": ".vazio" já é a classe genérica de tela sem
+   dados (linha abaixo), com padding próprio — um <div class="dia vazio">
+   herdava esse padding e virava um retângulo enorme em vez de um quadrado */
+.dia.passada{background:#fff;border-color:var(--traco)}
+.dia.hoje{outline:2px solid var(--tinta);outline-offset:1px}
+.dia.prova{background:var(--coral)}
+.legenda{display:flex;gap:14px;margin-top:10px;font-size:11px;color:var(--tinta2)}
+.legenda i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:-1px}
+
+/* meta */
+.barra{height:9px;background:#E7ECE8;border-radius:99px;overflow:hidden;margin-top:9px}
+.barra i{display:block;height:100%;background:var(--verde);border-radius:99px;transition:width .35s}
+.linha{display:flex;justify-content:space-between;align-items:baseline}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--traco);border-radius:14px;padding:14px;margin-bottom:12px}
+.rotulo{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--tinta2);font-weight:600}
+
+/* botoes */
+.acoes{position:fixed;left:0;right:0;bottom:0;padding:12px 18px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top,var(--papel) 72%,transparent);display:none}
+.acoes.ativa{display:block}
+.acoes .interno{max-width:560px;margin:0 auto;display:flex;gap:9px}
+button{font-family:var(--corpo);font-size:17px;border:none;border-radius:12px;padding:15px 16px;
+  background:var(--tinta);color:#fff;font-weight:600;flex:1;cursor:pointer}
+button:active{transform:scale(.985)}
+button.verde{background:var(--verde)}
+button.ambar{background:var(--ambar)}
+button.fantasma{background:transparent;color:var(--tinta2);border:1px solid var(--traco);font-weight:500}
+button.pequeno{font-size:15px;padding:11px 12px}
+button:focus-visible{outline:3px solid var(--tinta);outline-offset:2px}
+
+/* menu */
+.menu{display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap}
+.menu button{flex:0 0 auto;font-size:14px;padding:8px 13px;background:#fff;color:var(--tinta2);
+  border:1px solid var(--traco);font-weight:500;border-radius:99px}
+.menu button.on{background:var(--tinta);color:#fff;border-color:var(--tinta)}
+
+/* questao */
+.cabQ{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:12px;color:var(--tinta2)}
+.tag{background:var(--verde-luz);color:var(--verde);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600}
+.enunciado{font-size:17.5px;line-height:1.5;margin-bottom:16px}
+.alt{display:flex;gap:11px;align-items:flex-start;background:var(--card);border:1px solid var(--traco);
+  border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,background .15s}
+.bolha{flex:0 0 30px;height:30px;border-radius:50%;border:2px solid var(--traco);display:flex;
+  align-items:center;justify-content:center;font-family:var(--dado);font-size:13px;font-weight:600;
+  color:var(--tinta2);transition:all .2s}
+.alt .txt{flex:1;font-size:16px;line-height:1.4;padding-top:3px}
+.alt.certa{border-color:var(--verde);background:var(--verde-luz)}
+.alt.certa .bolha{background:var(--verde);border-color:var(--verde);color:#fff}
+.alt.errada{border-color:var(--coral);background:var(--coral-luz)}
+.alt.errada .bolha{background:var(--coral);border-color:var(--coral);color:#fff}
+.alt.morta{opacity:.5}
+.expl{background:var(--card);border:1px solid var(--traco);border-left:3px solid var(--verde);
+  border-radius:10px;padding:13px;margin-top:14px;font-size:15px;line-height:1.5}
+.expl .fonte{margin-top:8px;font-size:12px;color:var(--tinta2);font-family:var(--dado)}
+
+/* stats */
+.stat{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--traco);font-size:15px}
+.stat:last-child{border-bottom:none}
+.stat .n{font-family:var(--dado);font-size:15px}
+.mini{height:6px;width:88px;background:#E7ECE8;border-radius:99px;overflow:hidden;margin-left:10px}
+.mini i{display:block;height:100%;background:var(--verde)}
+.mini i.baixo{background:var(--coral)}
+.mini i.medio{background:var(--ambar)}
+.alerta{background:var(--coral-luz);border:1px solid #F0C9C6;color:#8A2C26;border-radius:12px;padding:12px;font-size:14.5px;margin-bottom:12px}
+.ok{background:var(--verde-luz);border-color:#BEDDD4;color:#0B5A4A}
+
+/* materias e topicos */
+.materia{background:var(--card);border:1px solid var(--traco);border-radius:14px;margin-bottom:9px;overflow:hidden}
+.cabM{display:flex;flex-wrap:wrap;align-items:center;gap:6px 9px;width:100%;padding:13px 14px;background:none;
+  border:none;border-radius:0;color:var(--tinta);font-size:15.5px;font-weight:600;text-align:left;flex:none}
+.cabM:active{transform:none;background:#F7F9F7}
+.cabM .seta{flex:0 0 10px;color:var(--tinta2);font-size:10px;transition:transform .2s}
+.materia.aberta .cabM .seta{transform:rotate(90deg)}
+.cabM .nome{flex:1 1 55%;line-height:1.3}
+.cabM .num{font-family:var(--dado);font-size:12px;color:var(--tinta2);font-weight:500;white-space:nowrap}
+.corpoM{display:none;padding:2px 14px 12px;border-top:1px solid var(--traco)}
+.materia.aberta .corpoM{display:block}
+/* no celular a linha não cabe numa faixa só: o nome ocupa a primeira e os
+   números, a barra e o botão descem para a segunda */
+.topico{display:flex;flex-wrap:wrap;align-items:center;gap:7px 9px;padding:10px 0;
+  border-bottom:1px solid var(--traco);font-size:14.5px}
+.topico:last-of-type{border-bottom:none}
+.topico .nome{flex:1 1 100%;line-height:1.3}
+.topico .estudar{margin-left:auto}
+.topico.abrivel{cursor:pointer}
+.topico .seta{flex:0 0 10px;color:var(--tinta2);font-size:10px;transition:transform .2s;align-self:flex-start;margin-top:3px}
+.topico.abrivel .nome{flex:1 1 calc(100% - 19px)}
+.grupoT.aberta > .topico .seta{transform:rotate(90deg)}
+.corpoT{display:none;margin:0 0 4px 19px;padding-left:11px;border-left:2px solid var(--traco)}
+.grupoT.aberta .corpoT{display:block}
+.subtopico{display:flex;flex-wrap:wrap;align-items:center;gap:7px 9px;padding:8px 0;font-size:13.5px;color:var(--tinta2)}
+.subtopico + .subtopico{border-top:1px solid var(--traco)}
+.subtopico .nome{flex:1 1 100%;line-height:1.3;color:var(--tinta)}
+.subtopico .num{font-family:var(--dado);font-size:11.5px;white-space:nowrap}
+.subtopico .mini{width:44px;margin-left:0}
+.subtopico .estudar{margin-left:auto;font-size:12px;padding:5px 10px}
+.topico .num{font-family:var(--dado);font-size:12px;color:var(--tinta2);white-space:nowrap}
+.topico .mini,.cabM .mini{width:52px;margin-left:0}
+.estudar{flex:0 0 auto;font-size:13px;padding:6px 11px;background:transparent;color:var(--verde);
+  border:1px solid var(--verde-luz);font-weight:600;border-radius:99px}
+.tag.suave{background:#EDF1EE;color:var(--tinta2)}
+.cabQ .chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex:1;min-width:0}
+
+.crono{font-family:var(--dado);font-size:15px;font-weight:600}
+.crono.urgente{color:var(--coral)}
+.vazio{text-align:center;color:var(--tinta2);padding:40px 20px;font-size:15px}
+label{display:block;font-size:14px;color:var(--tinta2);margin:14px 0 5px}
+input[type=number]{width:100%;font-family:var(--dado);font-size:17px;padding:12px;border:1px solid var(--traco);border-radius:10px;background:#fff}
+.aviso{font-size:13px;color:var(--tinta2);line-height:1.45;margin-top:10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ============ INÍCIO ============ -->
+<div class="tela ativa" id="tela-inicio">
+  <div class="topo">
+    <div>
+      <h1 id="cabecalho-cargo">–</h1>
+      <div class="sub" id="cabecalho-sub">–</div>
+    </div>
+    <div class="contagem"><b id="dias-falta">–</b><span>dias</span></div>
+  </div>
+
+  <div class="cartela">
+    <div class="linha"><div class="rotulo">Cartela até a prova</div><div class="dado" id="cartela-info" style="font-size:12px;color:var(--tinta2)"></div></div>
+    <div class="grade" id="grade"></div>
+    <div class="legenda">
+      <span><i style="background:var(--verde)"></i>meta batida</span>
+      <span><i style="background:var(--ambar);opacity:.55"></i>parcial</span>
+      <span><i style="background:#fff;border:1px solid var(--traco)"></i>zerado</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="linha"><div class="rotulo">Meta de hoje</div><div class="dado" id="meta-texto">0/35</div></div>
+    <div class="barra"><i id="meta-barra" style="width:0%"></i></div>
+    <div class="linha" style="margin-top:11px;font-size:13px;color:var(--tinta2)">
+      <span id="fila-info">–</span><span id="streak-info" class="dado">–</span>
+    </div>
+  </div>
+
+  <div id="alerta-area"></div>
+
+  <div class="card">
+    <div class="rotulo">Banco</div>
+    <div class="stat"><span>Questões no app</span><span class="n" id="n-banco">0</span></div>
+    <div class="stat"><span>Já vistas</span><span class="n" id="n-vistas">0</span></div>
+    <div class="stat"><span>Acurácia geral</span><span class="n" id="n-acuracia">–</span></div>
+    <div class="stat"><span>No caderno de erros</span><span class="n" id="n-erros">0</span></div>
+  </div>
+
+  <div class="menu">
+    <button onclick="ir('materias')">Matérias</button>
+    <button onclick="ir('stats')">Estatísticas</button>
+    <button onclick="ir('simulado-inicio')">Simulado</button>
+    <button onclick="ir('ajustes')">Ajustes</button>
+  </div>
+</div>
+
+<!-- ============ MATÉRIAS ============ -->
+<div class="tela" id="tela-materias">
+  <h1>Matérias</h1>
+  <div class="sub" id="materias-sub">–</div>
+  <div id="materias-corpo" style="margin-top:16px"></div>
+</div>
+
+<!-- ============ ESTUDO ============ -->
+<div class="tela" id="tela-estudo">
+  <div class="cabQ">
+    <span class="chips">
+      <span class="tag suave" id="q-materia">–</span>
+      <span class="tag" id="q-tag">–</span>
+    </span>
+    <span class="dado" id="q-contador">0/0</span>
+  </div>
+  <div class="enunciado" id="q-enunciado"></div>
+  <div id="q-alts"></div>
+  <div id="q-expl"></div>
+</div>
+
+<!-- ============ SIMULADO: INÍCIO ============ -->
+<div class="tela" id="tela-simulado-inicio">
+  <h1>Simulado</h1>
+  <div class="sub" id="simulado-sub">–</div>
+  <div class="card" style="margin-top:16px" id="simulado-composicao"></div>
+  <div class="aviso">O simulado usa questões sorteadas do banco, inclusive as que você já viu. Não altera o Leitner do estudo diário.</div>
+  <div id="simulado-aviso"></div>
+</div>
+
+<!-- ============ SIMULADO: PROVA ============ -->
+<div class="tela" id="tela-simulado">
+  <div class="cabQ">
+    <span class="crono" id="s-crono">3:00:00</span>
+    <span class="dado" id="s-contador">1/70</span>
+  </div>
+  <div class="enunciado" id="s-enunciado"></div>
+  <div id="s-alts"></div>
+</div>
+
+<!-- ============ SIMULADO: RESULTADO ============ -->
+<div class="tela" id="tela-resultado">
+  <h1>Resultado</h1>
+  <div id="resultado-corpo"></div>
+</div>
+
+<!-- ============ ESTATÍSTICAS ============ -->
+<div class="tela" id="tela-stats">
+  <h1>Estatísticas</h1>
+  <div class="sub">Acurácia por bloco do edital</div>
+  <div id="stats-corpo" style="margin-top:16px"></div>
+</div>
+
+<!-- ============ AJUSTES ============ -->
+<div class="tela" id="tela-ajustes">
+  <h1>Ajustes</h1>
+
+  <div class="rotulo">Perfil</div>
+  <div class="aviso">Estudando: <strong id="perfil-atual">–</strong></div>
+  <div style="display:flex;gap:9px;margin-top:10px;align-items:center">
+    <select id="perfil-lista" style="flex:1;font-family:var(--corpo);font-size:15px;padding:11px 12px;border:1px solid var(--traco);border-radius:10px;background:#fff"></select>
+  </div>
+  <div style="display:flex;gap:9px;margin-top:9px">
+    <button class="pequeno fantasma" onclick="criarPerfil()">Novo perfil</button>
+    <button class="pequeno fantasma" onclick="renomearPerfilAtual()">Renomear</button>
+    <button class="pequeno fantasma" id="perfil-apagar" style="color:var(--coral);border-color:#E9C4C1" onclick="apagarPerfilAtual()">Apagar</button>
+  </div>
+  <div class="aviso">Cada perfil tem progresso, meta e concurso próprios, guardados só neste aparelho.</div>
+
+  <div style="margin-top:24px" class="rotulo">Conta</div>
+  <div id="conta-corpo"></div>
+
+  <label for="in-meta" style="margin-top:24px">Meta diária de questões</label>
+  <input type="number" id="in-meta" min="5" max="200" step="5">
+  <div class="aviso">45 min por dia ≈ 35 questões, contando a leitura das explicações.</div>
+
+  <div style="margin-top:24px" class="rotulo">Backup</div>
+  <div class="aviso" id="backup-info">–</div>
+  <div style="display:flex;gap:9px;margin-top:10px">
+    <button class="pequeno fantasma" onclick="exportar()">Baixar arquivo</button>
+    <button class="pequeno fantasma" onclick="copiarProgresso()">Copiar texto</button>
+  </div>
+  <div style="display:flex;gap:9px;margin-top:9px">
+    <button class="pequeno fantasma" onclick="document.getElementById('arq').click()">Restaurar de arquivo</button>
+    <button class="pequeno fantasma" onclick="colarProgresso()">Restaurar de texto</button>
+  </div>
+  <input type="file" id="arq" accept="application/json" style="display:none" onchange="importar(this)">
+  <div id="ajustes-msg" class="aviso"></div>
+
+  <div style="margin-top:24px" class="rotulo">Uso offline</div>
+  <div class="aviso" id="offline-msg">–</div>
+
+  <div style="margin-top:28px" class="rotulo">Zona de risco</div>
+  <button class="pequeno fantasma" style="margin-top:10px;color:var(--coral);border-color:#E9C4C1" onclick="zerar()">Apagar todo o progresso</button>
+</div>
+
+<!-- ============ AÇÕES FIXAS ============ -->
+<div class="acoes ativa" id="acoes">
+  <div class="interno" id="acoes-interno"></div>
+</div>
+
+<script>
+/* =======================================================================
+   CONCURSO, MATÉRIAS E BANCO
+
+   O concurso é uma receita em concursos.json: cargo, banca, data, composição
+   da prova e regra de aprovação. Nada disso vive mais no código — cadastrar
+   um segundo concurso não exige programação.
+
+   A questão pertence a uma MATÉRIA, nunca a um concurso. É isso que permite
+   duas pessoas em concursos diferentes estudarem o mesmo acervo de Português
+   ou de Imunização, cada uma com seu progresso. O concurso só diz quais
+   matérias entram em cada bloco da prova e quantas questões cada bloco tem.
+
+   Cada matéria é um arquivo banco/<matéria>.json, um objeto por linha:
+   id = SHA-1 do enunciado truncado em 10 hex; é ele, e não a posição no
+        array, que amarra o progresso salvo à questão
+   m  = matéria (as três do edital)   t = tópico   s = subtópico, opcional
+   q  = enunciado   o = 5 alternativas   c = índice da correta (0-4)
+   e  = explicação   f = fonte
+   ======================================================================= */
+let BANCO = [], CONCURSO = null, BLOCOS = [], ORDEM_MATERIAS = [];
+const porId = {}, MATERIAS = {}, blocoDaMateria = {};
+
+/* Toda leitura de dado passa por aqui. Na versão normal vem por fetch; na
+   versão de arquivo único, gerada por gerar-offline.ps1, os mesmos dados vêm
+   embutidos em window.DADOS e nenhuma requisição é feita — é isso que faz o
+   app abrir com duplo clique, sem servidor e sem rede. */
+async function pega(caminho){
+  if(window.DADOS && DADOS[caminho]) return DADOS[caminho];
+  const r = await fetch(caminho);
+  if(!r.ok) throw new Error(caminho+" respondeu "+r.status);
+  return r.json();
+}
+
+async function carregarConfig(){
+  const cfg = await pega("concursos.json");
+  if(!cfg.concursos || !cfg.concursos.length) throw new Error("concursos.json não tem nenhum concurso");
+  CONCURSO = cfg.concursos.find(c=>c.id === E.concurso) || cfg.concursos[0];
+  E.concurso = CONCURSO.id;
+  BLOCOS = CONCURSO.blocos;
+  const mats = await pega("banco/materias.json");
+  mats.forEach(m=>{ MATERIAS[m.id] = m; });
+  ORDEM_MATERIAS = mats.map(m=>m.id);
+  BLOCOS.forEach(b=> b.materias.forEach(m=>{ blocoDaMateria[m] = b.id; }));
+}
+
+/* carrega só as matérias que o concurso escolhido cobra */
+async function carregarBanco(){
+  /* na ordem de materias.json, não na ordem dos blocos: é a ordem em que as
+     matérias aparecem na tela */
+  const usadas = ORDEM_MATERIAS.filter(m=>blocoDaMateria[m]);
+  const partes = await Promise.all(usadas.map(m=>pega("banco/"+m+".json")));
+  BANCO = partes.reduce((tudo,p)=>tudo.concat(p), []);
+  BANCO.forEach(q=>{ porId[q.id] = q; });
+}
+
+const blocoDe = q => blocoDaMateria[q.m];
+const nomeBloco = id => (BLOCOS.find(b=>b.id===id)||{}).nome || id;
+
+/* =======================================================================
+   PERFIS
+   Vários perfis no mesmo aparelho — cada pessoa com seu progresso e seu
+   concurso-alvo, sem conta e sem rede. O índice mora numa chave fixa; cada
+   perfil tem a sua própria, no mesmo formato que o estado sempre teve.
+
+   vr:perfis           -> {atual:"p1", lista:[{id,nome}, ...]}
+   vr:perfil:<id>       -> o estado (mesmo JSON de sempre)
+   vr-enf-2026 (legado) -> chave única de antes desta fase; migrada para
+                           vr:perfil:p1 na primeira execução e depois
+                           deixada em paz (não é apagada — custa nada manter
+                           como rede de segurança).
+   ======================================================================= */
+const CHAVE_PERFIS = "vr:perfis";
+const CHAVE_LEGADA = "vr-enf-2026";
+const chavePerfil = id => "vr:perfil:"+id;
+
+/* cria o índice na primeira vez que esta versão roda. Se havia progresso na
+   chave antiga (de antes da Fase 2), ele vira o perfil "p1" — ninguém perde
+   histórico só por causa da atualização. */
+function carregarPerfis(){
+  try{
+    const t = localStorage.getItem(CHAVE_PERFIS);
+    if(t) return JSON.parse(t);
+  }catch(e){ /* localStorage indisponível: cai no perfil único abaixo */ }
+
+  const perfis = {atual:"p1", lista:[{id:"p1", nome:"Perfil 1"}]};
+  try{
+    const legado = localStorage.getItem(CHAVE_LEGADA);
+    if(legado) localStorage.setItem(chavePerfil("p1"), legado);
+    localStorage.setItem(CHAVE_PERFIS, JSON.stringify(perfis));
+  }catch(e){ /* sem storage, o índice só vive nesta sessão — ver ler()/salvar() */ }
+  return perfis;
+}
+function salvarPerfis(p){
+  try{ localStorage.setItem(CHAVE_PERFIS, JSON.stringify(p)); }catch(e){}
+}
+
+let PERFIS = carregarPerfis();
+const CHAVE = chavePerfil(PERFIS.atual);
+let memoria = null;                      // fallback se localStorage falhar
+
+function ler(){
+  try{ const t = localStorage.getItem(CHAVE); return t ? JSON.parse(t) : null; }
+  catch(e){ return memoria; }
+}
+function salvar(){
+  try{ localStorage.setItem(CHAVE, JSON.stringify(E)); }
+  catch(e){ memoria = E; }
+}
+const padrao = {meta:35, cartoes:{}, dias:{}, simulados:[], ultimoBackup:null, versaoEstado:0, concurso:null,
+  /* ids de eventos gerados por ESTE perfil, para o pull não contar de novo o
+     que este aparelho já somou em acertos/erros/dias na hora da resposta —
+     ver o bloco SINCRONIZAÇÃO, mais abaixo */
+  eventosProprios: []};
+let E = Object.assign({}, padrao, ler()||{});
+
+function nomePerfilAtual(){
+  const p = PERFIS.lista.find(p=>p.id===PERFIS.atual);
+  return p ? p.nome : "Perfil";
+}
+
+/* trocar, criar e renomear recarregam a página de propósito: o app já faz um
+   boot completo do zero (carregarConfig → carregarBanco → migrarParaIds →
+   pintar), e reaproveitar isso é mais simples e mais seguro do que
+   reinicializar cada variável de estado à mão. */
+function trocarPerfil(id){
+  if(id === PERFIS.atual) return;
+  PERFIS.atual = id;
+  salvarPerfis(PERFIS);
+  location.reload();
+}
+function criarPerfil(){
+  const nome = prompt("Nome do novo perfil:");
+  if(!nome || !nome.trim()) return;
+  const id = "p"+Date.now().toString(36);
+  PERFIS.lista.push({id, nome:nome.trim()});
+  PERFIS.atual = id;
+  salvarPerfis(PERFIS);
+  location.reload();
+}
+function renomearPerfilAtual(){
+  const atual = PERFIS.lista.find(p=>p.id===PERFIS.atual);
+  const nome = prompt("Novo nome do perfil:", atual ? atual.nome : "");
+  if(!nome || !nome.trim() || !atual) return;
+  atual.nome = nome.trim();
+  salvarPerfis(PERFIS);
+  pintarAjustes();
+}
+function apagarPerfilAtual(){
+  if(PERFIS.lista.length <= 1){ alert("Este é o único perfil — não dá para apagar."); return; }
+  const atual = PERFIS.lista.find(p=>p.id===PERFIS.atual);
+  if(!confirm("Apagar o perfil \""+(atual?atual.nome:"")+"\" e todo o progresso dele? Não tem volta.")) return;
+  try{ localStorage.removeItem(chavePerfil(PERFIS.atual)); }catch(e){}
+  PERFIS.lista = PERFIS.lista.filter(p=>p.id!==PERFIS.atual);
+  PERFIS.atual = PERFIS.lista[0].id;
+  salvarPerfis(PERFIS);
+  location.reload();
+}
+
+/* =======================================================================
+   CONTA — Fase 3b
+   Login opcional por e-mail e senha, contra o Supabase Auth (GoTrue) direto
+   por fetch, sem SDK e sem CDN. Sem conta, o app funciona exatamente como na
+   Fase 2 — nada aqui é obrigatório.
+
+   A sessão fica presa ao PERFIL local, não numa chave global: trocar de
+   perfil no mesmo aparelho não pode herdar a sessão de outra pessoa. Como
+   trocar de perfil recarrega a página (ver trocarPerfil), isso sai de graça —
+   basta a sessão morar sob a chave do perfil.
+
+   O cadastro é fechado: o gatilho exigir_convite (supabase/schema.sql) recusa
+   e-mail fora da lista de convidados. O erro que o servidor manda nesse caso
+   aparece cru na tela — não tento adivinhar o formato exato da mensagem sem
+   um projeto real para testar contra.
+   ======================================================================= */
+const chaveSessao = id => "vr:sessao:"+id;
+function lerSessao(){
+  try{ const t = localStorage.getItem(chaveSessao(PERFIS.atual)); return t ? JSON.parse(t) : null; }
+  catch(e){ return null; }
+}
+function salvarSessao(s){ try{ localStorage.setItem(chaveSessao(PERFIS.atual), JSON.stringify(s)); }catch(e){} }
+function apagarSessaoSalva(){ try{ localStorage.removeItem(chaveSessao(PERFIS.atual)); }catch(e){} }
+
+let SUPA = null;      // {url, anonKey} — null enquanto não carrega ou se supabase.json não existir
+let SESSAO = lerSessao();
+
+/* supabase.json vem com valores de exemplo até você colar os de verdade —
+   nesse estado a conta fica indisponível em vez de tentar falar com uma URL
+   que não existe. */
+function supaConfigurado(){
+  return !!(SUPA && SUPA.url && SUPA.anonKey && SUPA.url.indexOf("SEU-PROJETO") < 0);
+}
+
+async function carregarSupabase(){
+  try{ SUPA = await pega("supabase.json"); }
+  catch(e){ SUPA = null; }   // arquivo ausente não é erro fatal: conta é opcional
+}
+
+async function chamarAuth(caminho, corpo){
+  const r = await fetch(SUPA.url+"/auth/v1/"+caminho, {
+    method: "POST",
+    headers: {"Content-Type":"application/json", "apikey": SUPA.anonKey},
+    body: JSON.stringify(corpo)
+  });
+  const dado = await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(dado.error_description || dado.msg || dado.error || ("o servidor respondeu "+r.status));
+  return dado;
+}
+function salvarSessaoDe(dado){
+  SESSAO = {
+    access_token: dado.access_token,
+    refresh_token: dado.refresh_token,
+    expires_at: Date.now() + (dado.expires_in||3600)*1000,
+    email: dado.user ? dado.user.email : (SESSAO ? SESSAO.email : null)
+  };
+  salvarSessao(SESSAO);
+}
+async function entrar(email, senha){
+  salvarSessaoDe(await chamarAuth("token?grant_type=password", {email, password:senha}));
+}
+/* devolve "logado" se a conta já entra em uso na hora, ou "confirme" se o
+   projeto exigir confirmação por e-mail antes do primeiro login — depende de
+   uma configuração do painel do Supabase que não dá para saber daqui */
+async function criarConta(email, senha){
+  const dado = await chamarAuth("signup", {email, password:senha});
+  if(dado.access_token){ salvarSessaoDe(dado); return "logado"; }
+  return "confirme";
+}
+async function sair(){
+  if(SESSAO && SUPA){
+    try{
+      await fetch(SUPA.url+"/auth/v1/logout", {
+        method:"POST",
+        headers:{"apikey":SUPA.anonKey, "Authorization":"Bearer "+SESSAO.access_token}
+      });
+    }catch(e){ /* mesmo se o servidor não responder, a sessão local é apagada abaixo */ }
+  }
+  SESSAO = null;
+  apagarSessaoSalva();
+}
+/* renova sem interromper o boot: se o refresh_token também expirou ou foi
+   revogado, desloga silenciosamente em vez de travar a abertura do app */
+async function renovarSessao(){
+  if(!SESSAO || !SESSAO.refresh_token) return;
+  try{ salvarSessaoDe(await chamarAuth("token?grant_type=refresh_token", {refresh_token: SESSAO.refresh_token})); }
+  catch(e){ SESSAO = null; apagarSessaoSalva(); }
+}
+async function verificarSessao(){
+  if(!supaConfigurado() || !SESSAO) return;
+  if(Date.now() > SESSAO.expires_at - 5*60*1000) await renovarSessao();
+}
+
+/* =======================================================================
+   SINCRONIZAÇÃO — Fase 3c
+   Fila local de eventos → empurra pro Postgres → puxa o que outro aparelho
+   da mesma conta gravou → aplica por cima do estado local.
+
+   Duas decisões que valem o comentário:
+
+   ACERTOS/ERROS/DIAS SÃO SOMADOS, NÃO SOBRESCRITOS, e por isso precisam de
+   E.eventosProprios: uma lista dos ids que ESTE perfil já gerou. `caixa` e
+   `prox` são "estado atual" — dá pra sobrescrever pelo evento mais recente,
+   igual a view estado_cartao faz no banco. Mas acertos/erros são contagem
+   acumulada; se cada pull incrementasse de novo, os eventos que este mesmo
+   aparelho empurrou voltariam no pull seguinte e seriam contados duas vezes.
+   Por isso só incrementa quando o id do evento não está na lista do que já
+   foi contado aqui. Cresce ao longo do tempo, mas devagar — poucos milhares
+   de ids curtos em anos de uso, para um grupo de 5 a 10 pessoas.
+
+   CAIXA/PROX SÓ TROCAM SE O EVENTO FOR MAIS NOVO (por `ts`, não por
+   `criado_em`): sem isso, um evento atrasado de outro aparelho — que chegou
+   depois só porque a rede demorou — poderia sobrescrever uma resposta mais
+   recente dada bem aqui.
+   ======================================================================= */
+function uuidv4(){
+  const buf = new Uint8Array(16);
+  if(window.crypto && crypto.getRandomValues) crypto.getRandomValues(buf);
+  else for(let i=0;i<16;i++) buf[i] = Math.floor(Math.random()*256);
+  buf[6] = (buf[6] & 0x0f) | 0x40;   // versão 4
+  buf[8] = (buf[8] & 0x3f) | 0x80;   // variante
+  const h = [...buf].map(b=>b.toString(16).padStart(2,"0"));
+  return h.slice(0,4).join("")+"-"+h.slice(4,6).join("")+"-"+h.slice(6,8).join("")+"-"+h.slice(8,10).join("")+"-"+h.slice(10,16).join("");
+}
+
+const chaveFila       = id => "vr:fila:"+id;
+const chaveFilaSim    = id => "vr:fila-sim:"+id;
+const chaveCursorEv   = id => "vr:cursor-eventos:"+id;
+const chaveCursorSim  = id => "vr:cursor-simulados:"+id;
+function lerLista(chaveFn){ try{ const t = localStorage.getItem(chaveFn(PERFIS.atual)); return t ? JSON.parse(t) : []; }catch(e){ return []; } }
+function salvarLista(chaveFn, lista){ try{ localStorage.setItem(chaveFn(PERFIS.atual), JSON.stringify(lista)); }catch(e){} }
+function lerCursor(chaveFn){ try{ return localStorage.getItem(chaveFn(PERFIS.atual)); }catch(e){ return null; } }
+function salvarCursor(chaveFn, v){ try{ localStorage.setItem(chaveFn(PERFIS.atual), v); }catch(e){} }
+
+let FILA = lerLista(chaveFila);            // eventos de resposta ainda não confirmados no servidor
+let FILA_SIM = lerLista(chaveFilaSim);     // simulados ainda não confirmados
+let CURSOR_EV = lerCursor(chaveCursorEv);
+let CURSOR_SIM = lerCursor(chaveCursorSim);
+let sincronizando = false;
+
+async function chamarRest(caminho, opcoes){
+  const r = await fetch(SUPA.url+"/rest/v1/"+caminho, Object.assign({
+    headers: Object.assign({
+      "apikey": SUPA.anonKey,
+      "Authorization": "Bearer "+SESSAO.access_token,
+      "Content-Type": "application/json"
+    }, (opcoes && opcoes.headers) || {})
+  }, opcoes || {}));
+  if(r.status === 401){    // token expirado no meio do caminho: renova e tenta uma vez de novo
+    await renovarSessao();
+    if(!SESSAO) throw new Error("sessão expirou");
+    return chamarRest(caminho, opcoes);
+  }
+  return r;
+}
+
+async function empurrarUm(tabela, obj){
+  const r = await chamarRest(tabela, {method:"POST", headers:{"Prefer":"return=minimal"}, body: JSON.stringify(obj)});
+  if(r.status === 201 || r.status === 409) return;   // 409 = já estava lá — idempotente, não é erro
+  throw new Error(tabela+": o servidor respondeu "+r.status);
+}
+
+/* aplica por cima do estado local um evento vindo de outro lugar (pode ser
+   deste mesmo aparelho, revisitado no pull — ver eventosProprios acima) */
+function aplicarEventoRemoto(ev){
+  const c = E.cartoes[ev.questao_id] || {caixa:1, acertos:0, erros:0, prox:hoje(), ts:null};
+  if(E.eventosProprios.indexOf(ev.id) < 0){
+    if(ev.resultado === "sabia") c.acertos++; else c.erros++;
+    const dia = ev.ts.slice(0,10);
+    E.dias[dia] = (E.dias[dia]||0) + 1;
+  }
+  if(!c.ts || ev.ts > c.ts){ c.caixa = ev.caixa_depois; c.prox = ev.prox; c.ts = ev.ts; }
+  E.cartoes[ev.questao_id] = c;
+}
+
+async function puxarEventos(){
+  let pagina;
+  do{
+    const filtro = CURSOR_EV ? "&criado_em=gt."+encodeURIComponent(CURSOR_EV) : "";
+    const r = await chamarRest("eventos_resposta?select=id,questao_id,ts,resultado,caixa_depois,prox,criado_em&order=criado_em.asc&limit=500"+filtro);
+    if(!r.ok) throw new Error("puxar eventos: o servidor respondeu "+r.status);
+    pagina = await r.json();
+    pagina.forEach(ev=>{ aplicarEventoRemoto(ev); CURSOR_EV = ev.criado_em; });
+    if(pagina.length){ salvarCursor(chaveCursorEv, CURSOR_EV); }
+  }while(pagina.length === 500);
+}
+async function puxarSimulados(){
+  let pagina;
+  do{
+    const filtro = CURSOR_SIM ? "&criado_em=gt."+encodeURIComponent(CURSOR_SIM) : "";
+    const r = await chamarRest("simulados?select=id,data,acertos,total,concurso,criado_em&order=criado_em.asc&limit=500"+filtro);
+    if(!r.ok) throw new Error("puxar simulados: o servidor respondeu "+r.status);
+    pagina = await r.json();
+    pagina.forEach(s=>{
+      if(!E.simulados.some(x=>x.id===s.id)){
+        E.simulados.push({id:s.id, data:s.data, acertos:s.acertos, total:s.total, concurso:s.concurso});
+      }
+      CURSOR_SIM = s.criado_em;
+    });
+    if(pagina.length){ salvarCursor(chaveCursorSim, CURSOR_SIM); }
+  }while(pagina.length === 500);
+}
+
+/* dispara em segundo plano — nunca lança erro pra fora, nunca trava a
+   navegação. Chamar de novo enquanto uma sincronização está em andamento
+   não faz nada; a fila persiste até a próxima chamada dar certo. */
+async function sincronizar(){
+  if(sincronizando || !supaConfigurado() || !SESSAO) return;
+  sincronizando = true;
+  pintarStatusSync();
+  try{
+    while(FILA.length){
+      await empurrarUm("eventos_resposta", FILA[0]);
+      E.eventosProprios.push(FILA[0].id);
+      FILA.shift();
+      salvarLista(chaveFila, FILA);
+    }
+    while(FILA_SIM.length){
+      await empurrarUm("simulados", FILA_SIM[0]);
+      FILA_SIM.shift();
+      salvarLista(chaveFilaSim, FILA_SIM);
+    }
+    await puxarEventos();
+    await puxarSimulados();
+    salvar();
+  }catch(e){
+    console.warn("sincronização não completou: "+e.message);   // tenta de novo na próxima chamada
+  }finally{
+    sincronizando = false;
+    pintarStatusSync();
+  }
+}
+/* atualiza só o texto de status, sem repintar a tela inteira de Ajustes —
+   sincronizar() pode terminar enquanto a pessoa está estudando, não em Ajustes */
+function pintarStatusSync(){
+  const el = document.getElementById("conta-status");
+  if(!el) return;
+  if(sincronizando){ el.textContent = "sincronizando…"; return; }
+  const pendentes = FILA.length + FILA_SIM.length;
+  el.textContent = pendentes ? pendentes+" resposta(s) aguardando envio" : "sincronizado";
+}
+window.addEventListener("online", ()=>sincronizar());
+
+/* Migração única para ids estáveis.
+   Até a Fase 0 o progresso era indexado pela posição da questão no array:
+   E.cartoes[137] queria dizer "a 138ª questão do BANCO". Com o banco
+   crescendo e sendo corrigido por mais de uma pessoa, a posição deixou de
+   ser confiável — inserir uma questão no meio embaralhava o histórico em
+   silêncio. banco/indice-legado.json guarda os ids na ordem antiga e permite
+   converter o progresso já salvo sem perder nada. */
+async function migrarParaIds(){
+  if(E.versaoEstado >= 1) return;
+  const chaves = Object.keys(E.cartoes);
+  if(chaves.some(k => /^\d+$/.test(k))){
+    let legado;
+    try{
+      legado = await pega("banco/indice-legado.json");
+    }catch(e){
+      return;   // sem o mapa não se mexe em nada: tenta de novo no próximo boot
+    }
+    const novos = {};
+    let perdidos = 0;
+    chaves.forEach(k=>{
+      const id = /^\d+$/.test(k) ? legado[Number(k)] : k;
+      if(id && porId[id]) novos[id] = E.cartoes[k]; else perdidos++;
+    });
+    E.cartoes = novos;
+    if(perdidos) console.warn(perdidos+" cartão(ões) sem correspondência no banco atual");
+  }
+  E.versaoEstado = 1;
+  salvar();
+}
+
+const hoje = () => new Date().toISOString().slice(0,10);
+const dia = txt => new Date(txt+"T00:00:00");
+function diasAte(){ return Math.max(0, Math.ceil((dia(CONCURSO.data) - new Date())/86400000)); }
+
+/* Leitner com teto: nenhum intervalo passa de 1/3 dos dias restantes */
+const INTERVALOS = [0,1,3,7,14];
+function proximaData(caixa){
+  const d = diasAte();
+  const teto = d<=10 ? 1 : Math.max(1, Math.floor(d/3));
+  const inter = Math.min(INTERVALOS[Math.max(0,Math.min(4,caixa-1))], teto);
+  const dt = new Date(); dt.setDate(dt.getDate()+inter);
+  return dt.toISOString().slice(0,10);
+}
+
+function fila(){
+  const h = hoje();
+  const revisar = [], novas = [];
+  BANCO.forEach(q=>{
+    const c = E.cartoes[q.id];
+    if(!c) novas.push(q.id);
+    else if(c.prox <= h) revisar.push(q.id);
+  });
+  revisar.sort((a,b)=> (E.cartoes[a].caixa) - (E.cartoes[b].caixa));
+  return {revisar, novas};
+}
+function feitasHoje(){ return E.dias[hoje()] || 0; }
+
+/* =======================================================================
+   NAVEGAÇÃO
+   ======================================================================= */
+function ir(nome){
+  document.querySelectorAll(".tela").forEach(t=>t.classList.remove("ativa"));
+  document.getElementById("tela-"+nome).classList.add("ativa");
+  window.scrollTo(0,0);
+  if(nome==="inicio") pintarInicio();
+  if(nome==="materias") pintarMaterias();
+  if(nome==="stats") pintarStats();
+  if(nome==="ajustes") pintarAjustes();
+  if(nome==="simulado-inicio") pintarSimuladoInicio();
+  rodape(nome);
+}
+function rodape(nome){
+  const box = document.getElementById("acoes"), alvo = document.getElementById("acoes-interno");
+  box.classList.add("ativa"); alvo.innerHTML = "";
+  const b=(txt,fn,cls)=>{const x=document.createElement("button");x.textContent=txt;x.onclick=fn;if(cls)x.className=cls;alvo.appendChild(x);};
+  if(nome==="inicio"){
+    const f = fila(), total = f.revisar.length + Math.max(0, E.meta - feitasHoje());
+    b(total>0 ? "Estudar agora" : "Estudar mesmo assim", ()=>iniciarSessao("normal"), "verde");
+  } else if(nome==="estudo"){
+    box.classList.remove("ativa");
+  } else if(nome==="simulado-inicio"){
+    b("Voltar", ()=>ir("inicio"), "fantasma");
+    if(BANCO.length>=20) b("Começar simulado", iniciarSimulado, "verde");
+  } else if(nome==="simulado"){
+    box.classList.remove("ativa");
+  } else {
+    b("Voltar ao início", ()=>ir("inicio"), "fantasma");
+  }
+}
+
+/* =======================================================================
+   TELA INICIAL
+   ======================================================================= */
+const GRADE_COLUNAS = 11, GRADE_GAP = 5;
+
+/* mede a largura disponível e fixa colunas e linhas no mesmo tamanho em
+   pixels — é isso que garante o quadrado sem depender de aspect-ratio */
+function ajustarGrade(g){
+  const largura = g.getBoundingClientRect().width;
+  if(!largura) return;   // tela ainda escondida (não é a ativa): recalcula quando pintarInicio() rodar de novo
+  const tam = Math.floor((largura - GRADE_GAP*(GRADE_COLUNAS-1)) / GRADE_COLUNAS);
+  g.style.gridTemplateColumns = "repeat("+GRADE_COLUNAS+","+tam+"px)";
+  g.style.gridAutoRows = tam+"px";
+}
+window.addEventListener("resize", ()=>{
+  if(document.getElementById("tela-inicio").classList.contains("ativa")){
+    ajustarGrade(document.getElementById("grade"));
+  }
+});
+
+function pintarInicio(){
+  document.getElementById("cabecalho-cargo").textContent = CONCURSO.cargo;
+  document.getElementById("cabecalho-sub").textContent =
+    [CONCURSO.orgao, CONCURSO.banca, "prova "+CONCURSO.data.slice(8)+"/"+CONCURSO.data.slice(5,7)]
+      .filter(Boolean).join(" · ");
+  document.getElementById("dias-falta").textContent = diasAte();
+  const f = feitasHoje();
+  document.getElementById("meta-texto").textContent = f+"/"+E.meta;
+  document.getElementById("meta-barra").style.width = Math.min(100, f/E.meta*100)+"%";
+
+  const q = fila();
+  document.getElementById("fila-info").textContent =
+    q.revisar.length+" para revisar · "+q.novas.length+" ainda não vistas";
+
+  let seq=0; const d=new Date();
+  for(let i=0;i<200;i++){
+    const k=d.toISOString().slice(0,10);
+    if(i===0 && !(E.dias[k]>=E.meta)){ d.setDate(d.getDate()-1); continue; }
+    if(E.dias[k]>=E.meta){ seq++; d.setDate(d.getDate()-1); } else break;
+  }
+  document.getElementById("streak-info").textContent = seq>0 ? seq+" dias seguidos" : "sem sequência";
+
+  // cartela
+  const g = document.getElementById("grade"); g.innerHTML="";
+  const ini = dia(CONCURSO.inicio || hoje()), fim = dia(CONCURSO.data);
+  let n=0;
+  for(let d2=new Date(ini); d2<=fim; d2.setDate(d2.getDate()+1)){
+    n++;
+    const k = d2.toISOString().slice(0,10);
+    const el = document.createElement("div"); el.className="dia";
+    const feito = E.dias[k]||0;
+    if(k === CONCURSO.data) el.className="dia prova";
+    else if(feito >= E.meta) el.className="dia cheio";
+    else if(feito > 0) el.className="dia parcial";
+    else if(k < hoje()) el.className="dia passada";
+    if(k===hoje()) el.classList.add("hoje");
+    el.title = k+" · "+feito+" questões";
+    g.appendChild(el);
+  }
+  document.getElementById("cartela-info").textContent = n+" dias";
+  ajustarGrade(g);
+
+  const vistas = Object.keys(E.cartoes).length;
+  let ac=0, tot=0, erros=0;
+  Object.values(E.cartoes).forEach(c=>{ac+=c.acertos;tot+=c.acertos+c.erros;if(c.caixa<=2&&c.erros>0)erros++;});
+  document.getElementById("n-banco").textContent = BANCO.length;
+  document.getElementById("n-vistas").textContent = vistas;
+  document.getElementById("n-acuracia").textContent = tot? Math.round(ac/tot*100)+"%" : "–";
+  document.getElementById("n-erros").textContent = erros;
+
+  // alerta de área em risco
+  const box = document.getElementById("alerta-area"); box.innerHTML="";
+
+  if(vistas > 0){
+    const dias = E.ultimoBackup ? Math.floor((new Date(hoje()) - new Date(E.ultimoBackup))/86400000) : 999;
+    if(dias >= 7){
+      const bk = document.createElement("div"); bk.className="alerta";
+      bk.textContent = E.ultimoBackup
+        ? "Faz "+dias+" dias que você não faz backup do progresso. Ajustes → Backup."
+        : "Você ainda não fez backup do progresso. Ajustes → Backup.";
+      box.appendChild(bk);
+    }
+  }
+  BLOCOS.forEach(bl=>{
+    let acc=0, t=0;
+    BANCO.forEach(q2=>{ if(blocoDe(q2)!==bl.id) return; const c=E.cartoes[q2.id]; if(c){acc+=c.acertos;t+=c.acertos+c.erros;} });
+    if(t>=8 && acc/t < 0.4){
+      const d3=document.createElement("div"); d3.className="alerta";
+      d3.textContent = "Atenção: "+bl.nome+" está em "+Math.round(acc/t*100)+"% de acerto."+
+        (CONCURSO.aprovacao.nenhumBlocoZerado ? " Zerar um bloco elimina, mesmo com nota alta no resto." : "");
+      box.appendChild(d3);
+    }
+  });
+}
+
+/* =======================================================================
+   MATÉRIAS, TÓPICOS E SUBTÓPICOS
+   Três níveis, na leitura do edital: a matéria é o bloco da prova
+   (Português, Legislação do SUS, Conhecimentos Específicos de Enfermagem),
+   o tópico é o assunto dentro dela e o subtópico é o detalhe. Português e
+   SUS não têm subtópico — já estão no nível certo com dois.
+   Esta tela mostra a divisão inteira, inclusive o que ainda não foi visto,
+   e deixa estudar qualquer um dos três níveis isoladamente.
+   ======================================================================= */
+const vazio = () => ({total:0, vistas:0, ac:0, resp:0});
+
+function resumoDoBanco(){
+  const dados = {};
+  BANCO.forEach(q=>{
+    const d  = dados[q.m] = dados[q.m] || Object.assign(vazio(), {topicos:{}});
+    const dt = d.topicos[q.t] = d.topicos[q.t] || Object.assign(vazio(), {subs:{}});
+    const ds = q.s ? (dt.subs[q.s] = dt.subs[q.s] || vazio()) : null;
+    const c = E.cartoes[q.id];
+    [d, dt, ds].forEach(n=>{
+      if(!n) return;
+      n.total++;
+      if(c){ n.vistas++; n.ac += c.acertos; n.resp += c.acertos + c.erros; }
+    });
+  });
+  return dados;
+}
+
+/* barra de acerto; devolve null quando ainda não há resposta registrada */
+function miniBarra(d){
+  if(!d.resp) return null;
+  const p = Math.round(d.ac/d.resp*100);
+  const cx = document.createElement("span");
+  cx.style.cssText = "display:flex;align-items:center;gap:7px";
+  const n = document.createElement("span");
+  n.className = "num"; n.textContent = p+"%";
+  const mini = document.createElement("span"); mini.className = "mini";
+  const i = document.createElement("i");
+  i.className = p<50?"baixo":(p<70?"medio":"");
+  i.style.width = p+"%";
+  mini.appendChild(i); cx.appendChild(n); cx.appendChild(mini);
+  return cx;
+}
+
+/* o que está expandido, só enquanto a aba vive; a chave do tópico é
+   "matéria|tópico" para não confundir tópicos homônimos de matérias diferentes */
+const abertas = {};
+
+/* ordena do maior para o menor, desempatando pelo nome */
+const porTamanho = mapa => Object.keys(mapa)
+  .sort((x,y)=> mapa[y].total - mapa[x].total || x.localeCompare(y,"pt"));
+
+/* uma linha com nome, barra de acerto, contagem e botão de estudar */
+function linhaNivel(cls, rotulo, d, aoEstudar){
+  const linha = document.createElement("div"); linha.className = cls;
+  const nome = document.createElement("span"); nome.className = "nome"; nome.textContent = rotulo;
+  linha.appendChild(nome);
+  const barra = miniBarra(d);
+  if(barra) linha.appendChild(barra);
+  const num = document.createElement("span"); num.className = "num";
+  num.textContent = d.vistas+"/"+d.total;
+  linha.appendChild(num);
+  const bt = document.createElement("button");
+  bt.className = "estudar"; bt.textContent = "Estudar";
+  bt.onclick = aoEstudar;
+  linha.appendChild(bt);
+  return linha;
+}
+
+function pintarMaterias(){
+  const dados = resumoDoBanco();
+  const c = document.getElementById("materias-corpo");
+  c.innerHTML = "";
+  const mats = ORDEM_MATERIAS.filter(m=>dados[m]);
+  let nTopicos = 0, nSubs = 0;
+  mats.forEach(m=>{
+    const ts = dados[m].topicos;
+    nTopicos += Object.keys(ts).length;
+    Object.keys(ts).forEach(t=>{ nSubs += Object.keys(ts[t].subs).length; });
+  });
+  document.getElementById("materias-sub").textContent =
+    mats.length+" matérias · "+nTopicos+" tópicos · "+nSubs+" subtópicos · "+BANCO.length+" questões";
+
+  mats.forEach(mid=>{
+    const d = dados[mid];
+    const cx = document.createElement("div");
+    cx.className = "materia" + (abertas[mid] ? " aberta" : "");
+
+    const cab = document.createElement("button");
+    cab.className = "cabM";
+    cab.onclick = ()=>{ abertas[mid] = !abertas[mid]; cx.classList.toggle("aberta"); };
+    const seta = document.createElement("span"); seta.className="seta"; seta.textContent="▶";
+    const nome = document.createElement("span"); nome.className="nome";
+    nome.textContent = (MATERIAS[mid]||{}).nome || mid;
+    cab.appendChild(seta); cab.appendChild(nome);
+    const barra = miniBarra(d);
+    if(barra) cab.appendChild(barra);
+    const num = document.createElement("span"); num.className="num";
+    num.textContent = d.vistas+"/"+d.total;
+    cab.appendChild(num);
+    cx.appendChild(cab);
+
+    const corpo = document.createElement("div"); corpo.className="corpoM";
+    porTamanho(d.topicos).forEach(t=>{
+      const dt = d.topicos[t];
+      const temSub = Object.keys(dt.subs).length > 0;
+      const chave = mid+"|"+t;
+
+      const linha = linhaNivel("topico", t, dt, ev=>{
+        ev.stopPropagation();
+        iniciarSessao("filtro", {m:mid, t:t});
+      });
+
+      if(!temSub){ corpo.appendChild(linha); return; }
+
+      /* tópico com subtópicos: a linha inteira abre e fecha */
+      const grupo = document.createElement("div");
+      grupo.className = "grupoT" + (abertas[chave] ? " aberta" : "");
+      linha.classList.add("abrivel");
+      const seta2 = document.createElement("span");
+      seta2.className = "seta"; seta2.textContent = "▶";
+      linha.insertBefore(seta2, linha.firstChild);
+      linha.onclick = ()=>{ abertas[chave] = !abertas[chave]; grupo.classList.toggle("aberta"); };
+      grupo.appendChild(linha);
+
+      const dentro = document.createElement("div"); dentro.className = "corpoT";
+      porTamanho(dt.subs).forEach(s=>{
+        dentro.appendChild(linhaNivel("subtopico", s, dt.subs[s], ev=>{
+          ev.stopPropagation();
+          iniciarSessao("filtro", {m:mid, t:t, s:s});
+        }));
+      });
+      grupo.appendChild(dentro);
+      corpo.appendChild(grupo);
+    });
+
+    const tudo = document.createElement("button");
+    tudo.className = "pequeno fantasma";
+    tudo.style.cssText = "width:100%;margin-top:11px";
+    tudo.textContent = "Estudar toda a matéria";
+    tudo.onclick = ()=>iniciarSessao("filtro", {m:mid});
+    corpo.appendChild(tudo);
+
+    cx.appendChild(corpo);
+    c.appendChild(cx);
+  });
+}
+
+/* =======================================================================
+   SESSÃO DE ESTUDO
+   ======================================================================= */
+let S = null;
+function iniciarSessao(modo, filtro){
+  const q = fila();
+  let lista = [];
+  if(modo==="erros"){
+    lista = Object.keys(E.cartoes).filter(id=>porId[id] && E.cartoes[id].caixa<=2 && E.cartoes[id].erros>0);
+  } else if(modo==="filtro"){
+    /* uma matéria ou um tópico isolado: vale a mesma ordem do estudo normal —
+       o que está vencido primeiro, depois o que nunca foi visto */
+    const alvo = BANCO.filter(x =>
+      x.m===filtro.m &&
+      (!filtro.t || x.t===filtro.t) &&
+      (!filtro.s || x.s===filtro.s));
+    const h = hoje(), rev = [], nov = [];
+    alvo.forEach(x=>{
+      const c = E.cartoes[x.id];
+      if(!c) nov.push(x.id); else if(c.prox <= h) rev.push(x.id);
+    });
+    rev.sort((a,b)=> E.cartoes[a].caixa - E.cartoes[b].caixa);
+    lista = rev.concat(nov).slice(0, E.meta);
+    /* nada vencido e nada novo: revisa adiantado em vez de não fazer nada */
+    if(lista.length===0) lista = alvo.map(x=>x.id).slice(0, E.meta);
+  } else {
+    const restam = Math.max(0, E.meta - feitasHoje()) || E.meta;
+    lista = q.revisar.slice(0, Math.ceil(restam*0.5));
+    lista = lista.concat(q.novas.slice(0, restam - lista.length));
+    if(lista.length===0) lista = q.revisar.concat(q.novas).slice(0, E.meta);
+  }
+  if(lista.length===0){ alert("Nada na fila. Adicione mais questões ao banco."); return; }
+  S = {lista, pos:0, respondida:false};
+  ir("estudo"); mostrarQuestao();
+}
+
+function embaralhaOrdem(n){
+  const p = Array.from({length:n}, (_,i)=>i);
+  for(let i=p.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [p[i],p[j]]=[p[j],p[i]]; }
+  return p;
+}
+
+function mostrarQuestao(){
+  const id = S.lista[S.pos], q = porId[id];
+  S.respondida = false;
+  S.perm = embaralhaOrdem(q.o.length);
+  /* o chip apagado mostra o nível de cima quando ele existe: com subtópico,
+     "Imunização · Rede de frio"; sem, só o tópico */
+  const suave = document.getElementById("q-materia");
+  suave.textContent = q.s ? q.t : "";
+  suave.style.display = q.s ? "" : "none";
+  document.getElementById("q-tag").textContent = q.s || q.t;
+  document.getElementById("q-contador").textContent = (S.pos+1)+"/"+S.lista.length;
+  document.getElementById("q-enunciado").textContent = q.q;
+  document.getElementById("q-expl").innerHTML = "";
+  const box = document.getElementById("q-alts"); box.innerHTML="";
+  S.perm.forEach((orig,i)=>{
+    const el = document.createElement("div"); el.className="alt";
+    el.innerHTML = '<div class="bolha">'+"ABCDE"[i]+'</div><div class="txt"></div>';
+    el.querySelector(".txt").textContent = q.o[orig];
+    el.onclick = ()=>responder(i);
+    box.appendChild(el);
+  });
+  document.getElementById("acoes").classList.remove("ativa");
+}
+
+function responder(escolha){
+  if(S.respondida) return;
+  S.respondida = true;
+  const id = S.lista[S.pos], q = porId[id];
+  const alts = document.querySelectorAll("#q-alts .alt");
+  alts.forEach((el,i)=>{
+    el.onclick=null;
+    if(S.perm[i]===q.c) el.classList.add("certa");
+    else if(i===escolha) el.classList.add("errada");
+    else el.classList.add("morta");
+  });
+  const certo = S.perm[escolha]===q.c;
+  const ex = document.getElementById("q-expl");
+  ex.innerHTML = '<div class="expl"><div class="corpo"></div><div class="fonte"></div></div>';
+  ex.querySelector(".corpo").textContent = q.e;
+  ex.querySelector(".fonte").textContent = q.f;
+
+  const alvo = document.getElementById("acoes-interno"); alvo.innerHTML="";
+  document.getElementById("acoes").classList.add("ativa");
+  const b=(txt,fn,cls)=>{const x=document.createElement("button");x.textContent=txt;x.onclick=fn;if(cls)x.className=cls;alvo.appendChild(x);};
+  if(certo){
+    b("Chutei", ()=>registrar(id,"chutei"), "ambar");
+    b("Sabia", ()=>registrar(id,"sabia"), "verde");
+  } else {
+    b("Entendi, seguir", ()=>registrar(id,"errei"));
+  }
+  ex.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+
+/* resultado: "sabia" | "chutei" | "errei" — os três valores que o schema do
+   Postgres aceita (supabase/schema.sql). Antes da Fase 3c isto era booleano e
+   colapsava chutei/errei no mesmo caso; agora o motivo real chega ao evento. */
+function registrar(id, resultado){
+  const c = E.cartoes[id] || {caixa:1, acertos:0, erros:0, prox:hoje(), ts:null};
+  if(resultado === "sabia"){ c.caixa = Math.min(5, c.caixa+1); c.acertos++; }
+  else { c.caixa = 1; c.erros++; }
+  const agora = new Date().toISOString();
+  c.prox = proximaData(c.caixa);
+  c.ts = agora;
+  E.cartoes[id] = c;
+  E.dias[hoje()] = (E.dias[hoje()]||0)+1;
+
+  if(supaConfigurado() && SESSAO){
+    const ev = {id:uuidv4(), questao_id:id, ts:agora, resultado, caixa_depois:c.caixa, prox:c.prox};
+    FILA.push(ev);
+    salvarLista(chaveFila, FILA);
+    sincronizar();   // em segundo plano; se falhar, o evento fica na fila e tenta de novo depois
+  }
+  salvar();
+  S.pos++;
+  if(S.pos >= S.lista.length){ ir("inicio"); return; }
+  mostrarQuestao();
+}
+
+/* =======================================================================
+   SIMULADO
+   ======================================================================= */
+let SIM = null, timer = null;
+const totalProva = () => BLOCOS.reduce((s,b)=>s+b.questoes, 0);
+const disponivel = bl => BANCO.filter(q=>blocoDe(q)===bl.id).length;
+
+function pintarSimuladoInicio(){
+  const horas = CONCURSO.duracaoMin/60;
+  document.getElementById("simulado-sub").textContent =
+    totalProva()+" questões · "+(horas%1 ? CONCURSO.duracaoMin+" minutos" : horas+(horas===1?" hora":" horas"))+
+    " · sem gabarito até o fim";
+
+  const comp = document.getElementById("simulado-composicao");
+  comp.innerHTML = "";
+  const linha = (rot,val)=>{
+    const d=document.createElement("div"); d.className="stat";
+    const a=document.createElement("span"); a.textContent=rot;
+    const b=document.createElement("span"); b.className="n"; b.textContent=val;
+    d.appendChild(a); d.appendChild(b); comp.appendChild(d);
+  };
+  BLOCOS.forEach(bl=>linha(bl.nome, bl.questoes));
+  linha("Aprovação", CONCURSO.aprovacao.minimoTotal +
+    (CONCURSO.aprovacao.nenhumBlocoZerado ? " + nenhum bloco zerado" : ""));
+
+  const falta = BLOCOS.filter(bl=>disponivel(bl) < bl.questoes)
+    .map(bl=>bl.nome+" ("+disponivel(bl)+" de "+bl.questoes+")");
+  const av = document.getElementById("simulado-aviso");
+  av.innerHTML = falta.length
+    ? '<div class="alerta">Banco ainda incompleto para o simulado cheio: '+falta.join(" · ")+'. O simulado vai rodar com o que existe.</div>'
+    : '<div class="alerta ok">Banco suficiente para simulado completo de '+totalProva()+' questões.</div>';
+}
+function sorteia(bl){
+  const pool = BANCO.filter(q=>blocoDe(q)===bl.id);
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  return pool.slice(0,Math.min(bl.questoes,pool.length)).map(q=>q.id);
+}
+function iniciarSimulado(){
+  const lista = BLOCOS.reduce((tudo,bl)=>tudo.concat(sorteia(bl)), []);
+  if(lista.length<5){ alert("Banco pequeno demais."); return; }
+  SIM = {lista, pos:0, respostas:new Array(lista.length).fill(null),
+         perms: lista.map(id=>embaralhaOrdem(porId[id].o.length)),
+         fim: Date.now()+CONCURSO.duracaoMin*60*1000};
+  ir("simulado"); mostrarSim();
+  clearInterval(timer);
+  timer = setInterval(()=>{
+    const r = SIM.fim - Date.now();
+    if(r<=0){ clearInterval(timer); finalizarSimulado(); return; }
+    const h=Math.floor(r/3600000), m=Math.floor(r%3600000/60000), s=Math.floor(r%60000/1000);
+    const el = document.getElementById("s-crono");
+    el.textContent = h+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+    el.classList.toggle("urgente", r < 15*60*1000);
+  },1000);
+}
+function mostrarSim(){
+  const q = porId[SIM.lista[SIM.pos]], perm = SIM.perms[SIM.pos];
+  document.getElementById("s-contador").textContent = (SIM.pos+1)+"/"+SIM.lista.length;
+  document.getElementById("s-enunciado").textContent = q.q;
+  const box = document.getElementById("s-alts"); box.innerHTML="";
+  perm.forEach((orig,i)=>{
+    const el = document.createElement("div"); el.className="alt";
+    if(SIM.respostas[SIM.pos]===i){ el.style.borderColor="var(--tinta)"; }
+    el.innerHTML = '<div class="bolha">'+"ABCDE"[i]+'</div><div class="txt"></div>';
+    if(SIM.respostas[SIM.pos]===i){ const b=el.querySelector(".bolha"); b.style.background="var(--tinta)"; b.style.borderColor="var(--tinta)"; b.style.color="#fff"; }
+    el.querySelector(".txt").textContent = q.o[orig];
+    el.onclick = ()=>{ SIM.respostas[SIM.pos]=i; mostrarSim(); };
+    box.appendChild(el);
+  });
+  const alvo = document.getElementById("acoes-interno"); alvo.innerHTML="";
+  document.getElementById("acoes").classList.add("ativa");
+  const b=(txt,fn,cls)=>{const x=document.createElement("button");x.textContent=txt;x.onclick=fn;if(cls)x.className=cls;alvo.appendChild(x);};
+  if(SIM.pos>0) b("Anterior", ()=>{SIM.pos--;mostrarSim();}, "fantasma");
+  if(SIM.pos < SIM.lista.length-1) b("Próxima", ()=>{SIM.pos++;mostrarSim();});
+  else b("Entregar prova", finalizarSimulado, "verde");
+}
+function finalizarSimulado(){
+  clearInterval(timer);
+  const por = {};
+  BLOCOS.forEach(bl=>{ por[bl.id] = {a:0, t:0}; });
+  let acertos=0;
+  SIM.lista.forEach((id,k)=>{
+    const q=porId[id], b=blocoDe(q); por[b].t++;
+    const escolha = SIM.respostas[k];
+    if(escolha!==null && SIM.perms[k][escolha]===q.c){ acertos++; por[b].a++; }
+  });
+  const regra = CONCURSO.aprovacao;
+  const zerou = BLOCOS.some(bl=>por[bl.id].t>0 && por[bl.id].a===0);
+  const aprovado = acertos >= regra.minimoTotal && !(regra.nenhumBlocoZerado && zerou);
+  const simulado = {id:uuidv4(), data:hoje(), acertos, total:SIM.lista.length, concurso:CONCURSO.id};
+  E.simulados.push(simulado);
+  if(supaConfigurado() && SESSAO){
+    FILA_SIM.push(simulado);
+    salvarLista(chaveFilaSim, FILA_SIM);
+    sincronizar();
+  }
+  salvar();
+  const c = document.getElementById("resultado-corpo");
+  c.innerHTML =
+    '<div class="'+(aprovado?"alerta ok":"alerta")+'" style="margin-top:16px">'+
+    (aprovado ? "Aprovado nas regras do edital: " : "Reprovado nas regras do edital: ")+
+    acertos+" de "+SIM.lista.length+(zerou?" — e há bloco zerado.":".")+'</div>'+
+    '<div class="card">'+
+      BLOCOS.map(bl=>'<div class="stat"><span>'+bl.nome+'</span><span class="n">'+por[bl.id].a+"/"+por[bl.id].t+'</span></div>').join("")+
+    '</div>'+
+    '<div class="aviso">Regra do edital: mínimo de '+regra.minimoTotal+' pontos no total'+
+    (regra.nenhumBlocoZerado ? " e nenhum bloco zerado" : "")+". "+(regra.desempate||"")+'</div>';
+  ir("resultado");
+}
+
+/* =======================================================================
+   ESTATÍSTICAS
+   ======================================================================= */
+/* A divisão completa em matérias e tópicos vive na tela Matérias. Aqui o
+   trabalho é outro: ranquear o que está mais fraco, do pior para o melhor,
+   considerando só o que já foi respondido. */
+function pintarStats(){
+  /* ranqueia pelo nível mais fino que a questão tem: o subtópico quando
+     existe, senão o tópico. É onde dá para agir. */
+  const itens = {};
+  BANCO.forEach(q=>{
+    const c = E.cartoes[q.id]; if(!c) return;
+    const k = (q.s || q.t) + " " + q.m;
+    itens[k] = itens[k] || {a:0, t:0, rotulo:(q.s || q.t), acima:(q.s ? q.t : (MATERIAS[q.m]||{}).nome || q.m)};
+    itens[k].a += c.acertos; itens[k].t += c.acertos + c.erros;
+  });
+  const chaves = Object.keys(itens).filter(k=>itens[k].t>0)
+    .sort((x,y)=>(itens[x].a/itens[x].t)-(itens[y].a/itens[y].t));
+  const c = document.getElementById("stats-corpo");
+  c.innerHTML = "";
+  if(chaves.length===0){
+    c.innerHTML = '<div class="vazio">Responda algumas questões e as estatísticas aparecem aqui, do assunto mais fraco para o mais forte. A divisão completa está em Matérias.</div>';
+    return;
+  }
+  const card = document.createElement("div"); card.className = "card";
+  chaves.forEach(k=>{
+    const d = itens[k];
+    const linha = document.createElement("div"); linha.className = "stat";
+    const esq = document.createElement("span");
+    const nome = document.createElement("div"); nome.textContent = d.rotulo;
+    const acima = document.createElement("div");
+    acima.style.cssText = "font-size:11.5px;color:var(--tinta2)";
+    acima.textContent = d.acima;
+    esq.appendChild(nome); esq.appendChild(acima);
+    linha.appendChild(esq);
+    linha.appendChild(miniBarra({ac:d.a, resp:d.t}));
+    card.appendChild(linha);
+  });
+  c.appendChild(card);
+  const bt = document.createElement("button");
+  bt.className = "pequeno"; bt.style.width = "100%";
+  bt.textContent = "Revisar só o caderno de erros";
+  bt.onclick = ()=>iniciarSessao("erros");
+  c.appendChild(bt);
+}
+
+/* =======================================================================
+   PERFIS — interface
+   ======================================================================= */
+function pintarPerfis(){
+  document.getElementById("perfil-atual").textContent = nomePerfilAtual();
+
+  const sel = document.getElementById("perfil-lista");
+  sel.innerHTML = "";
+  PERFIS.lista.forEach(p=>{
+    const op = document.createElement("option");
+    op.value = p.id; op.textContent = p.nome;
+    if(p.id === PERFIS.atual) op.selected = true;
+    sel.appendChild(op);
+  });
+  sel.onchange = ()=>trocarPerfil(sel.value);
+
+  document.getElementById("perfil-apagar").style.display =
+    PERFIS.lista.length <= 1 ? "none" : "";
+}
+
+/* =======================================================================
+   CONTA — interface
+   Três estados possíveis: indisponível (versão offline ou não configurada),
+   deslogado (formulário) e logado (e-mail + Sair). Nada aqui é obrigatório
+   para o app funcionar — ver o comentário no bloco CONTA mais acima.
+   ======================================================================= */
+function pintarConta(){
+  const c = document.getElementById("conta-corpo");
+
+  if(window.DADOS){
+    c.innerHTML = '<div class="aviso">Não disponível nesta versão de arquivo único, que não tem rede. Use a versão publicada para ter conta.</div>';
+    return;
+  }
+  if(!supaConfigurado()){
+    c.innerHTML = '<div class="aviso">Sincronização ainda não configurada.</div>';
+    return;
+  }
+  if(SESSAO){
+    c.innerHTML =
+      '<div class="aviso">Conectado como <strong></strong></div>'+
+      '<div class="aviso" id="conta-status">–</div>'+
+      '<div style="display:flex;gap:9px;margin-top:9px">'+
+        '<button class="pequeno fantasma" id="conta-sincronizar">Sincronizar agora</button>'+
+        '<button class="pequeno fantasma" id="conta-sair">Sair</button>'+
+      '</div>';
+    c.querySelector("strong").textContent = SESSAO.email || "–";
+    pintarStatusSync();
+    document.getElementById("conta-sair").onclick = async ()=>{ await sair(); pintarConta(); };
+    document.getElementById("conta-sincronizar").onclick = ()=>sincronizar();
+    return;
+  }
+
+  const estilo = "width:100%;font-family:var(--corpo);font-size:15px;padding:11px 12px;"+
+                 "border:1px solid var(--traco);border-radius:10px;background:#fff;margin-top:8px";
+  c.innerHTML =
+    '<input type="email" id="conta-email" placeholder="e-mail" autocomplete="username" style="'+estilo+'">'+
+    '<input type="password" id="conta-senha" placeholder="senha" autocomplete="current-password" style="'+estilo+'">'+
+    '<div style="display:flex;gap:9px;margin-top:9px">'+
+      '<button class="pequeno fantasma" id="conta-entrar">Entrar</button>'+
+      '<button class="pequeno fantasma" id="conta-criar">Criar conta</button>'+
+    '</div>'+
+    '<div class="aviso" id="conta-erro"></div>'+
+    '<div class="aviso">É só para sincronizar entre aparelhos — sem conta o app funciona igual.</div>';
+
+  const campoEmail = document.getElementById("conta-email");
+  const campoSenha = document.getElementById("conta-senha");
+  const erro = document.getElementById("conta-erro");
+
+  const aoClicar = (botao, fn) => async ()=>{
+    erro.textContent = ""; erro.style.color = "";
+    const email = campoEmail.value.trim(), senha = campoSenha.value;
+    if(!email || !senha){ erro.textContent = "Preencha e-mail e senha."; return; }
+    botao.disabled = true;
+    try{ await fn(email, senha); }
+    catch(e){ erro.textContent = e.message; }
+    finally{ botao.disabled = false; }
+  };
+
+  const btEntrar = document.getElementById("conta-entrar");
+  const btCriar  = document.getElementById("conta-criar");
+  btEntrar.onclick = aoClicar(btEntrar, async (email, senha)=>{
+    await entrar(email, senha);
+    pintarConta();
+  });
+  btCriar.onclick = aoClicar(btCriar, async (email, senha)=>{
+    const resultado = await criarConta(email, senha);
+    if(resultado === "confirme"){
+      erro.style.color = "var(--verde)";
+      erro.textContent = "Conta criada — confirme pelo e-mail e depois entre.";
+    } else pintarConta();
+  });
+}
+
+/* =======================================================================
+   AJUSTES
+   ======================================================================= */
+function pintarAjustes(){
+  pintarPerfis();
+  pintarConta();
+  document.getElementById("in-meta").value = E.meta;
+  document.getElementById("in-meta").onchange = function(){
+    E.meta = Math.max(5, parseInt(this.value)||35); salvar();
+  };
+  let grava=true; try{ localStorage.setItem("t","1"); localStorage.removeItem("t"); }catch(e){ grava=false; }
+  document.getElementById("ajustes-msg").textContent = grava
+    ? "O progresso está sendo salvo neste aparelho."
+    : "Este ambiente não permite salvar dados: o progresso vale só enquanto a aba estiver aberta. Publicado num endereço https, salva normalmente.";
+
+  document.getElementById("backup-info").textContent = E.ultimoBackup
+    ? "Último backup em "+E.ultimoBackup.split("-").reverse().join("/")+". Faça um por semana e guarde o arquivo ou o texto fora do aparelho."
+    : "Nenhum backup feito ainda. Faça um por semana e guarde o arquivo ou o texto fora do aparelho.";
+
+  const off = document.getElementById("offline-msg");
+  if(window.DADOS) off.textContent = "Esta é a versão de arquivo único: o banco está embutido, e ela abre sem servidor e sem internet. Gerada por gerar-offline.ps1.";
+  else if(!("serviceWorker" in navigator)) off.textContent = "Este navegador não guarda o app para uso offline.";
+  else if(location.protocol === "file:") off.textContent = "Aberto como arquivo local, sem o banco embutido — não vai carregar. Use o offline.html, ou publique os arquivos num endereço https.";
+  else navigator.serviceWorker.getRegistration().then(r=>{
+    off.textContent = r ? "App guardado no aparelho: funciona sem internet." : "Ainda não guardado. Abra o app uma vez com internet para concluir.";
+  });
+}
+function marcarBackup(){ E.ultimoBackup = hoje(); salvar(); }
+function exportar(){
+  const blob = new Blob([JSON.stringify(E)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "progresso-"+hoje()+".json";
+  a.click();
+  marcarBackup(); pintarAjustes();
+}
+function copiarProgresso(){
+  const txt = JSON.stringify(E);
+  const feito = ()=>{ marcarBackup(); pintarAjustes(); alert("Progresso copiado. Cole num e-mail ou nas Notas e guarde."); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(feito).catch(()=>caixaTexto(txt));
+  } else caixaTexto(txt);
+}
+function caixaTexto(txt){
+  const ta = document.createElement("textarea");
+  ta.value = txt; ta.style.cssText="position:fixed;top:10%;left:5%;width:90%;height:50%;z-index:99;font-size:12px";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); }catch(e){}
+  alert("Selecione o texto, copie e guarde. Toque em OK para fechar.");
+  ta.remove(); marcarBackup(); pintarAjustes();
+}
+function colarProgresso(){
+  const txt = prompt("Cole aqui o texto do backup:");
+  if(!txt) return;
+  try{ E = Object.assign({}, padrao, JSON.parse(txt)); salvar(); alert("Progresso restaurado."); ir("inicio"); }
+  catch(e){ alert("Texto inválido."); }
+}
+function importar(input){
+  const f = input.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{ try{ E = Object.assign({}, padrao, JSON.parse(r.result)); salvar(); alert("Progresso restaurado."); ir("inicio"); }
+                   catch(e){ alert("Arquivo inválido."); } };
+  r.readAsText(f);
+}
+function zerar(){
+  if(confirm("Apagar todo o progresso do perfil \""+nomePerfilAtual()+"\"? Não tem volta.")){
+    E = JSON.parse(JSON.stringify(padrao)); salvar(); ir("inicio");
+  }
+}
+
+/* guarda o app no aparelho para funcionar sem internet */
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  window.addEventListener("load", ()=>{
+    navigator.serviceWorker.register("sw.js").catch(()=>{});
+  });
+}
+
+/* =======================================================================
+   BOOT
+   O banco deixou de ser código e passou a ser dado: sem ele carregado, não
+   há tela para pintar. Por isso o app só arranca depois do fetch.
+   ======================================================================= */
+function falhaBoot(msg){
+  document.body.innerHTML =
+    '<div style="max-width:560px;margin:0 auto;padding:28px 20px;font-family:-apple-system,system-ui,sans-serif">'+
+    '<h1 style="font-size:22px;margin:0 0 10px">Não foi possível carregar o banco de questões</h1>'+
+    '<p id="boot-msg" style="color:#54646F;line-height:1.5"></p></div>';
+  document.getElementById("boot-msg").textContent = msg;
+}
+
+carregarConfig()
+  .then(carregarBanco)
+  .then(migrarParaIds)
+  .then(carregarSupabase)   // conta é opcional: nunca rejeita a promise
+  .then(verificarSessao)    // idem — desloga em silêncio se a sessão não presta mais
+  .then(()=>{ salvar(); ir("inicio"); sincronizar(); })   // idem — puxa em segundo plano, não bloqueia a tela
+  .catch(err=>{
+    falhaBoot(location.protocol === "file:"
+      ? "O app foi aberto como arquivo local. Desde que o banco passou a viver em banco/*.json, o navegador bloqueia a leitura desses arquivos por segurança. Publique a pasta num endereço http ou https e abra por lá."
+      : "Erro ao ler a configuração ou o banco: "+err.message+". Confira se concursos.json e a pasta banco/ foram publicados junto e recarregue a página.");
+  });
+</script>
+</body>
+</html>

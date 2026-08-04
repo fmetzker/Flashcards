@@ -1,0 +1,39 @@
+{
+  "concursos": [
+    {
+      "id": "vr-enf-2026",
+      "cargo": "Enfermeiro",
+      "orgao": "Volta Redonda",
+      "banca": "FEVRE",
+      "edital": "003/2026-SMA",
+      "data": "2026-09-20",
+      "inicio": "2026-07-28",
+      "duracaoMin": 180,
+      "blocos": [
+        {
+          "id": "lp",
+          "nome": "Português",
+          "questoes": 10,
+          "materias": ["portugues"]
+        },
+        {
+          "id": "sus",
+          "nome": "Legislação do SUS",
+          "questoes": 10,
+          "materias": ["sus"]
+        },
+        {
+          "id": "esp",
+          "nome": "Conhecimentos específicos",
+          "questoes": 50,
+          "materias": ["enfermagem"]
+        }
+      ],
+      "aprovacao": {
+        "minimoTotal": 35,
+        "nenhumBlocoZerado": true,
+        "desempate": "Em caso de empate, vale primeiro a nota de Conhecimentos Específicos."
+      }
+    }
+  ]
+}

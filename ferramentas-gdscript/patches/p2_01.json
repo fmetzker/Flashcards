@@ -1,0 +1,51 @@
+{
+"21": {"o":["Nível de menor complexidade, destinado a casos simples","Porta de entrada preferencial, coordenadora do cuidado e ordenadora das redes","Serviço de referência para urgências e emergências de média complexidade do território","Instância exclusiva de vigilância epidemiológica","Componente hospitalar da Rede de Atenção à Saúde"],"c":1},
+
+"23": {"o":["Acolhimento com classificação de risco","Clínica ampliada e compartilhada entre os profissionais","Cogestão dos processos de trabalho","Ambiência dos espaços de cuidado","Racionamento de leitos por ordem de chegada"],"c":4},
+
+"33": {"o":["Vigilância sanitária e epidemiológica e saúde do trabalhador","Somente assistência hospitalar de média complexidade","Somente a atenção básica e a vigilância sanitária no território","Assistência hospitalar e previdência social","Apenas ações de imunização"],"c":0},
+
+"41": {"o":["Intramuscular profunda, no músculo vasto lateral da coxa","Subcutânea, no deltoide","Intradérmica, na inserção inferior do deltoide direito","Intradérmica, no antebraço esquerdo","Oral, em duas gotas"],"c":2},
+
+"53": {"o":["Internação do paciente durante toda a fase intensiva do tratamento","Observação da ingestão do medicamento por profissional de saúde","Visita domiciliar mensal para entrega da medicação","Coleta diária de escarro","Isolamento respiratório por seis meses"],"c":1},
+
+"57": {"o":["Em até 72 horas, preferencialmente nas primeiras 2 horas","Em até 7 dias","Somente após o resultado do teste rápido realizado no caso-fonte","Em até 24 horas, obrigatoriamente","Apenas em exposição sexual"],"c":0},
+
+"61": {"o":["18 a 60 anos, anualmente","20 a 59 anos, a cada 2 anos","25 a 64 anos, a cada 3 anos após dois exames anuais normais","30 a 70 anos, a cada 5 anos","A partir da primeira relação sexual, com repetição anual indefinida"],"c":2},
+
+"65": {"o":["Notificar compulsoriamente, independentemente de boletim de ocorrência","Notificar apenas se a mulher registrar queixa na delegacia especializada","Encaminhar sem registrar, para preservar o sigilo","Notificar somente em caso de violência sexual","Aguardar autorização judicial"],"c":0},
+
+"83": {"o":["Iniciar compressões torácicas","Realizar a manobra de Heimlich (compressões abdominais)","Aguardar a tosse espontânea da vítima por até cinco minutos","Ventilar com bolsa-válvula-máscara","Realizar cricotireoidostomia"],"c":1},
+
+"94": {"o":["Uso de respirador N95 e quarto privativo com pressão negativa","Máscara cirúrgica e distância mínima de cerca de 1 metro","Avental e luvas em todo contato","Óculos de proteção apenas","Quarto privativo com antessala obrigatória"],"c":1},
+
+"102": {"o":["Perfusão arterial","Sensibilidade protetora plantar","Força muscular","Reflexo aquileu","Temperatura cutânea das extremidades"],"c":1},
+
+"111": {"o":["Risco de queda","Risco de desenvolver lesão por pressão","Grau de dor","Nível de consciência","Risco nutricional isolado do paciente internado"],"c":1},
+
+"117": {"o":["Evitar falar sobre o assunto para não induzir o ato","Perguntar direta e acolhedoramente sobre a ideação e avaliar o risco","Minimizar o relato para reduzir a ansiedade","Encaminhar sem acolher, para não criar vínculo","Prometer sigilo absoluto sobre todo o relato, em qualquer circunstância"],"c":1},
+
+"125": {"o":["Fisiológicas, de segurança, de amor, de estima e de realização","Psicobiológicas, psicossociais e psicoespirituais","Primárias, secundárias e terciárias","Individuais, familiares e coletivas","Vitais, sociais e culturais"],"c":1},
+
+"149": {"o":["Acesso de primeiro contato, longitudinalidade, integralidade e coordenação","Hierarquização, regionalização, equidade e universalidade do acesso aos serviços","Acolhimento, vínculo, humanização e ambiência","Territorialização, adscrição, cogestão e resolutividade","Prevenção, promoção, reabilitação e cura"],"c":0},
+
+"150": {"o":["Longitudinalidade","Territorialização e adscrição da clientela","Ordenação da rede","Resolutividade","Participação da comunidade nos conselhos locais"],"c":1},
+
+"163": {"o":["Pentavalente e hepatite B","Tríplice viral, febre amarela e varicela","BCG e VIP","Rotavírus humano e poliomielite oral atenuada","dT e dTpa"],"c":1},
+
+"168": {"o":["Gestantes e puérperas","Idosos a partir de 60 anos","Crianças de seis meses a menores de seis anos de idade","Profissionais de saúde","Adultos saudáveis de 20 a 40 anos sem comorbidades"],"c":4},
+
+"175": {"o":["Dor articular intensa e incapacitante","Plaquetopenia grave","Icterícia precoce","Prurido isolado","Hemorragia digestiva alta com hematêmese"],"c":0},
+
+"176": {"o":["Notificar o Ministério da Saúde","Confirmar o diagnóstico e estabelecer a definição de caso","Iniciar imediatamente a vacinação de bloqueio em todo o território","Interditar o serviço envolvido","Coletar amostras de todos os contatos"],"c":1},
+
+"191": {"o":["Decúbito dorsal horizontal","Posição lateral de segurança (recuperação)","Trendelenburg","Posição de Fowler alta, com apoio para o dorso","Decúbito ventral"],"c":1},
+
+"193": {"o":["Na primeira ou nas duas primeiras horas após a ingestão","Após 6 horas da ingestão","Somente no dia seguinte","Em qualquer momento, com igual eficácia","Apenas por sonda nasogástrica, após doze horas da ingestão"],"c":0},
+
+"214": {"o":["Desbridamento enzimático de tecido desvitalizado","Vasoconstrição local","Anestesia da lesão","Esterilização completa do leito e das bordas da ferida","Bloqueio da granulação"],"c":0},
+
+"216": {"o":["Início insidioso e curso progressivo","Início agudo, curso flutuante e alteração da atenção","Ausência de fator desencadeante","Evolução irreversível em todos os casos diagnosticados","Preservação total da consciência"],"c":1},
+
+"217": {"o":["O hospital psiquiátrico especializado como porta de entrada preferencial da rede","Serviços Residenciais Terapêuticos e estratégias de desinstitucionalização","Manicômios judiciários","Ambulatórios de especialidades exclusivamente","Internação compulsória como regra"],"c":1}
+}

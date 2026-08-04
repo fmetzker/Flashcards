@@ -1,0 +1,51 @@
+{
+"756": {"o":["Aplicar choque imediatamente com carga máxima do desfibrilador","Checar conexões e cabos, aumentar o ganho e mudar a derivação","Suspender as compressões torácicas por um minuto para observar","Administrar amiodarona em bolus antes de qualquer conferência","Aguardar novo traçado por cinco minutos antes de nova conduta"],"c":1},
+
+"758": {"o":["Lentamente, em dez minutos, com monitorização contínua do traçado","Em bolus rápido, seguido de flush de solução salina, em veia calibrosa","Por via intramuscular profunda, no músculo vasto lateral da coxa","Por via oral, em dose única, com o paciente monitorizado no leito","Diluída em quinhentos mililitros de solução salina, em infusão lenta"],"c":1},
+
+"759": {"o":["É idoso e apresenta comorbidades cardiovasculares associadas","Fez uso recente de inibidor de fosfodiesterase, como sildenafila","Tem diabetes mellitus de longa data com controle irregular","Está ansioso e refere piora da dor com o estresse emocional","Tem histórico de tabagismo prolongado com carga tabágica alta"],"c":1},
+
+"760": {"o":["Em todos os pacientes, de rotina, desde a admissão na unidade","Há hipoxemia, com saturação abaixo do alvo recomendado","Apenas nos pacientes idosos com comorbidades associadas","Somente após a realização da trombólise farmacológica","Apenas quando houver dispneia intensa referida pelo paciente"],"c":1},
+
+"763": {"o":["Incompatibilidade ABO, com febre, dor lombar, hipotensão e hemoglobinúria","Reação alérgica leve com urticária e prurido durante a infusão do hemocomponente","Sobrecarga volêmica isolada, com dispneia e estase jugular","Contaminação bacteriana da bolsa, com febre alta após a infusão","Febre tardia surgida sete dias após a transfusão realizada"],"c":0},
+
+"766": {"o":["Dificulta o transporte da vítima até a unidade de referência do território","Aumenta o risco de lesão por pressão e desconforto, sem benefício adicional","Impede a monitorização dos sinais vitais durante o deslocamento","Reduz a eficácia da imobilização cervical realizada com o colar","Compromete a via aérea da vítima em todas as situações de trauma"],"c":1},
+
+"768": {"o":["Em qualquer idade, sempre associada a febre baixa e prolongada","Entre 6 meses e 5 anos, associada à elevação da temperatura","Apenas em recém-nascidos, nas primeiras semanas de vida","Somente acima dos dez anos, na fase escolar da criança","Sem qualquer relação com a elevação da temperatura corporal"],"c":1},
+
+"770": {"o":["Normalizar rapidamente a pressão arterial até valores considerados baixos para a idade gestacional atual","Reduzir a pressão de forma controlada, evitando queda abrupta que comprometa a perfusão placentária","Manter a pressão arterial elevada até o momento do parto, para garantir a perfusão","Restringir rigorosamente a oferta de líquidos por via oral e endovenosa","Adiar o tratamento anti-hipertensivo até que a gestação atinja o termo"],"c":1},
+
+"773": {"o":["Traçado em linha reta no monitor, sem qualquer atividade elétrica detectável","Presença de atividade elétrica organizada no monitor sem pulso palpável","Ritmo chocável, com indicação imediata de desfibrilação elétrica","Fibrilação ventricular grosseira identificada em duas derivações","Bradicardia sinusal com pulso central presente e bem palpável"],"c":1},
+
+"775": {"o":["De rotina em todos os pacientes, desde a admissão na unidade de emergência do serviço hospitalar","Com cautela, na dor refratária, por mascarar sintomas e reduzir a absorção de antiagregantes","Como primeira medida analgésica, antes de qualquer outra intervenção terapêutica","Somente por via intramuscular, para prolongar a duração do efeito analgésico","Apenas em pacientes jovens, pelo risco de depressão respiratória nos idosos"],"c":1},
+
+"776": {"o":["É possível apenas pelo exame físico neurológico bem conduzido","Exige exame de imagem, pois o quadro clínico pode ser semelhante","É feita pelo valor da pressão arterial aferida na admissão","Depende da idade do paciente e dos antecedentes clínicos","É irrelevante para a definição da conduta terapêutica inicial"],"c":1},
+
+"780": {"o":["Prematuridade isolada, sem qualquer outra condição clínica associada ao recém-nascido avaliado","História de invaginação intestinal, malformação intestinal não corrigida e imunodeficiência","Aleitamento materno exclusivo no momento previsto para a aplicação da dose","Uso de antibiótico por infecção respiratória nos últimos sete dias","Diarreia leve sem sinais de desidratação no dia da administração"],"c":1},
+
+"786": {"o":["Reação esperada da vacina, prevista na bula do imunobiológico aplicado na unidade","Falha de técnica, como antissepsia ou via de administração inadequada","Contraindicação definitiva a doses futuras da mesma vacina","Imunidade insuficiente conferida pela dose que foi aplicada","Necessidade de revacinação imediata com outro lote disponível"],"c":1},
+
+"790": {"o":["A contraindicação de todas as vacinas previstas no calendário nacional de vacinação do adulto","A situação imunológica, com avaliação criteriosa das vacinas de agentes vivos atenuados","A aplicação de dose dupla de todas as vacinas previstas no calendário","O adiamento indefinido do calendário até a recuperação imunológica","O uso exclusivo de imunoglobulinas em substituição às vacinas"],"c":1},
+
+"792": {"o":["Ambiente compartilhado com a sala de procedimentos e curativos da unidade básica de saúde do território","Área exclusiva, com fluxo definido, superfícies laváveis, câmara refrigerada e materiais organizados","Armazenamento das vacinas junto a medicamentos diversos na mesma geladeira","Uso de geladeira doméstica sem monitoramento contínuo de temperatura","Acesso livre de qualquer pessoa ao interior da sala durante o expediente"],"c":1},
+
+"793": {"o":["Tríplice viral, pneumocócica de reforço e meningocócica C de reforço","Pentavalente e rotavírus humano, em dose de reforço aos doze meses","BCG e hepatite B, aplicadas ainda na maternidade e reforçadas depois","dTpa e influenza sazonal, aplicadas no mesmo atendimento da consulta","Hepatite A e varicela, com intervalo mínimo entre as duas aplicações"],"c":0},
+
+"794": {"o":["Alcançar a meta de cobertura em todas as vacinas e em todos os territórios","Vacinar apenas durante as campanhas nacionais de multivacinação anuais","Aplicar a mesma vacina em todas as faixas etárias da população adscrita","Manter estoque uniforme de imunobiológicos em todas as unidades da rede","Vacinar somente a população urbana residente na área de abrangência"],"c":0},
+
+"795": {"o":["Dispensável, bastando o registro da data e do nome da vacina aplicada no cartão","Obrigatório, pois permite rastrear eventos adversos e investigar falhas","Necessário apenas durante as campanhas nacionais de vacinação","Feito apenas para as vacinas recentemente incorporadas ao calendário","Substituído pelo registro da data de aplicação no cartão do usuário"],"c":1},
+
+"798": {"o":["Contraindicar definitivamente todas as vacinas do calendário infantil previstas para aquela faixa etária","Ser notificada e investigada, avaliando-se a continuidade do esquema quanto ao componente pertussis","Ser considerada evento esperado e dispensada de registro no sistema de vigilância","Motivar o reinício de todo o esquema vacinal desde a primeira dose aplicada","Ser tratada apenas com antitérmico, sem notificação ou investigação posterior"],"c":1},
+
+"799": {"o":["Ausência de alterações de sensibilidade e de força muscular nas extremidades","Perda de sensibilidade nas extremidades, sem deformidade visível ao exame","Presença de deformidade visível, como garra, reabsorção óssea ou lagoftalmo","Apenas alteração estética da pele, com manchas hipocrômicas residuais","Somente dor neuropática referida ao longo do trajeto do nervo acometido"],"c":2},
+
+"800": {"o":["É administrada no domicílio pelo próprio paciente, com registro no cartão","É tomada mensalmente na unidade de saúde, sob observação do profissional","Ocorre semanalmente na unidade, junto com a avaliação dermatológica","É dispensável após o terceiro mês de tratamento supervisionado","É aplicada por via injetável intramuscular na unidade de referência"],"c":1},
+
+"801": {"o":["Apenas uma consulta de avaliação clínica ao final do tratamento supervisionado do paciente","Baciloscopia de controle mensal, com atenção especial ao segundo, quarto e sexto meses","Radiografia de tórax semanal durante toda a fase intensiva do esquema","Hemocultura mensal para monitorar a resposta ao esquema terapêutico","Nenhum exame de controle, bastando o relato do paciente na consulta"],"c":1},
+
+"802": {"o":["Falta a uma consulta agendada sem justificativa ou comunicação prévia à unidade de saúde de origem","Deixa de comparecer por trinta dias consecutivos ou mais após a data prevista para o retorno","Atrasa a tomada de uma dose supervisionada no serviço de saúde de referência","Interrompe a medicação por três dias por intolerância gastrointestinal","Transfere o acompanhamento para outra unidade de saúde do mesmo município"],"c":1},
+
+"805": {"o":["Microcefalia e outras alterações do sistema nervoso central","Cardiopatia congênita isolada, sem outras malformações associadas","Surdez neurossensorial exclusivamente, identificada na triagem","Malformação renal isolada detectada na ultrassonografia","Apenas baixo peso ao nascer, sem outras repercussões clínicas"],"c":0},
+
+"806": {"o":["Febre persistente por vários meses, com picos vespertinos diários e sudorese","Dor articular persistente por mais de três meses, com impacto funcional","Exantema recorrente apenas, sem outras manifestações associadas","Plaquetopenia prolongada com risco de sangramento espontâneo","Icterícia progressiva acompanhada de dor em hipocôndrio direito"],"c":1}
+}

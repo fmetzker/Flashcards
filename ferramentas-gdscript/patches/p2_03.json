@@ -1,0 +1,51 @@
+{
+"459": {"o":["Pertence à instituição, que pode negar acesso ao paciente","As informações pertencem ao paciente, cabendo à instituição sua guarda e sigilo","Pode ser divulgado em redes sociais, desde que o rosto do paciente esteja devidamente ocultado","Deve ser descartado após a alta","Pode ser acessado por qualquer funcionário"],"c":1},
+
+"460": {"o":["É permitida sempre que o paciente não for identificável pelo rosto na imagem publicada","Constitui infração ética, ainda que haja tentativa de ocultar a identidade","É permitida com autorização verbal","É permitida para fins educativos, sem restrição","Depende apenas da política da instituição"],"c":1},
+
+"462": {"o":["Pode ser exercida em qualquer situação assistencial, sem qualquer exceção prevista em norma vigente","Não se aplica em urgência ou emergência, nem quando não houver outro profissional disponível","Depende de autorização prévia do conselho regional a cada situação concreta","É vedada em qualquer hipótese pelo Código de Ética da categoria","Só produz efeitos no âmbito dos serviços privados de assistência à saúde"],"c":1},
+
+"467": {"o":["Substituir o julgamento clínico do enfermeiro","Padronizar a linguagem de diagnósticos, intervenções e resultados","Definir a escala de trabalho","Classificar a gravidade dos pacientes na triagem dos serviços de urgência","Determinar o dimensionamento de pessoal"],"c":1},
+
+"474": {"o":["Reduzir a dor da aplicação","Prevenir lipodistrofia e garantir absorção previsível","Aumentar a velocidade de absorção do medicamento aplicado","Permitir doses maiores","Evitar hipoglicemia noturna"],"c":1},
+
+"479": {"o":["Prescrever imediatamente a terapia de reposição de nicotina para o usuário","Perguntar sobre o consumo, avaliar a motivação e o grau de dependência","Encaminhar direto ao especialista","Solicitar espirometria","Aguardar que o usuário peça ajuda"],"c":1},
+
+"482": {"o":["A criação do Sistema Único de Saúde e a definição de todos os seus princípios e diretrizes gerais de organização","A proteção e os direitos das pessoas com transtornos mentais e o redirecionamento do modelo assistencial","O exercício profissional da enfermagem nos serviços substitutivos de atenção psicossocial","A política nacional de medicamentos e a dispensação de psicofármacos na rede pública","O financiamento da atenção básica e a transferência de recursos aos fundos municipais"],"c":1},
+
+"489": {"o":["Encaminhar todos os casos identificados ao serviço especializado de referência","Oferecer retaguarda especializada e suporte técnico às equipes, ampliando sua resolutividade","Substituir a equipe da atenção básica no acompanhamento de todos os casos de saúde mental do território","Centralizar o cuidado no CAPS, que passa a coordenar o plano terapêutico","Restringir o cuidado aos casos graves, com encaminhamento dos demais"],"c":1},
+
+"498": {"o":["Idade avançada isolada, a partir dos oitenta anos completos","Perda de peso não intencional, fadiga, redução da força de preensão e lentidão da marcha","Presença de duas ou mais doenças crônicas em acompanhamento regular","Uso contínuo de qualquer medicamento que tenha sido prescrito nos últimos seis meses de acompanhamento","Morar sozinho e ter rede de apoio social reduzida no território"],"c":1},
+
+"501": {"o":["Perda de massa e força muscular, com impacto funcional","Aumento da massa gorda apenas","Redução isolada da densidade mineral óssea, sem outras alterações","Perda de memória","Alteração da acuidade visual"],"c":0},
+
+"505": {"o":["Confirmar o posicionamento da sonda e elevar a cabeceira","Diluir a dieta em água fria","Manter o paciente em decúbito horizontal","Infundir rapidamente a dieta prescrita para evitar a contaminação","Aspirar a sonda com ar sob pressão"],"c":0},
+
+"517": {"o":["Filtração do sangue nos rins","Troca gasosa entre alvéolos e capilares pulmonares","Produção das células sanguíneas na medula óssea vermelha","Coagulação do sangue","Digestão de nutrientes"],"c":1},
+
+"533": {"o":["A ausência de unidades básicas de saúde instaladas nos territórios de maior vulnerabilidade social","Fatores socioculturais que associam o cuidado à fragilidade, somados a horários incompatíveis","A vedação legal ao atendimento de homens adultos na atenção primária","A falta de profissionais habilitados para o atendimento da população masculina","A exigência de encaminhamento especializado prévio para qualquer consulta"],"c":1},
+
+"535": {"o":["Da equipe de atenção básica do território","Da EMAD exclusivamente","Do hospital de referência","Do SAMU","Da vigilância epidemiológica municipal do território"],"c":0},
+
+"540": {"o":["Classificação de risco nas portas de entrada de urgência","Comunicação de más notícias ao paciente e à família","Avaliação da dor","Prevenção de quedas","Estadiamento de feridas"],"c":1},
+
+"548": {"o":["Pálido e frio","Róseo ou vermelho vivo, úmido e brilhante","Escurecido e ressecado","Preto e endurecido","Com secreção purulenta abundante e odor fétido"],"c":1},
+
+"555": {"o":["20 a 50 J","120 a 200 J, conforme o fabricante","360 J obrigatoriamente, em qualquer aparelho","400 a 500 J","Sempre 100 J"],"c":1},
+
+"557": {"o":["Queda facial, debilidade dos braços e alteração da fala","Pupilas, reflexos e força global","Frequência cardíaca, pressão arterial e saturação de oxigênio","Nível de consciência apenas","Marcha, equilíbrio e coordenação"],"c":0},
+
+"558": {"o":["1 hora","3 horas","4 horas e 30 minutos","8 horas","12 horas do início dos sintomas"],"c":2},
+
+"563": {"o":["Bradicardia e hipertensão arterial com boa perfusão de extremidades","Desvio contralateral da traqueia, ausência de murmúrio, turgência jugular e instabilidade","Dor abdominal difusa com vômitos e defesa da parede abdominal","Estridor laríngeo com disfagia e dificuldade progressiva para deglutir","Edema de membros inferiores acompanhado de estase jugular e hepatomegalia dolorosa à palpação"],"c":1},
+
+"572": {"o":["Retardar a saída do bebê até a chegada ao serviço de referência","Apoiar o períneo, controlar a saída do polo cefálico, secar e aquecer o recém-nascido","Realizar tração vigorosa do cordão para acelerar a saída da placenta","Puxar o bebê pelos ombros durante a contração para abreviar o expulsivo","Solicitar que a gestante caminhe pelo local para favorecer a descida da apresentação fetal"],"c":1},
+
+"573": {"o":["Reintroduzir manualmente o cordão na cavidade uterina e aguardar a evolução espontânea do trabalho de parto","Posicionar a gestante para reduzir a compressão, elevar a apresentação e acionar parto de urgência","Estimular a deambulação para favorecer a progressão do trabalho de parto","Aguardar a resolução espontânea, monitorando os batimentos cardíacos fetais","Administrar ocitocina para acelerar o período expulsivo e reduzir a compressão"],"c":1},
+
+"590": {"o":["Evitar o contato com aves domésticas e a manipulação de penas e de excretas desses animais","Evitar carne crua ou malpassada, higienizar frutas e verduras e evitar fezes de gatos","Suspender o consumo de leite e derivados durante toda a gestação","Evitar banho de mar e de rio em áreas sem tratamento de esgoto","Restringir a exposição solar prolongada nos horários de maior radiação"],"c":1},
+
+"591": {"o":["Precaução padrão apenas, por não haver transmissão entre pessoas","Precaução de contato, tratamento do caso e dos contatos e higienização de roupas de cama","Precaução por aerossóis com uso de respirador pela equipe assistencial","Isolamento respiratório em quarto privativo até o desaparecimento completo do prurido noturno","Nenhuma precaução adicional, além da higienização das mãos habitual"],"c":1},
+
+"596": {"o":["Internação hospitalar para observação e hidratação venosa","Hidratação oral orientada, sintomáticos e retorno para reavaliação, com sinais de alarme","Hidratação venosa em expansão rápida com solução cristaloide isotônica","Uso de anti-inflamatório não esteroidal associado a analgésico comum","Transfusão de plaquetas sempre que a contagem estiver abaixo do valor de corte estabelecido"],"c":1}
+}

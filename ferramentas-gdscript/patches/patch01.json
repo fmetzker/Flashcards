@@ -1,0 +1,51 @@
+{
+"27": {"o":["A liberação verbal do plantonista de origem, com registro posterior no prontuário do paciente","A aceitação formal e a garantia de vaga na unidade de destino","O consentimento assinado da família, dispensada a comunicação ao serviço de destino","A chegada do acompanhante ao setor","A autorização do setor administrativo responsável pelo faturamento do transporte sanitário"],"c":1},
+
+"35": {"o":["Advertência verbal, multa, censura, suspensão e cassação do exercício profissional","Advertência escrita, transferência compulsória de unidade e demissão por justa causa","Multa, prisão simples e cassação do registro profissional junto ao conselho regional","Suspensão do exercício, aposentadoria compulsória e multa fixada pelo conselho federal","Censura pública, advertência verbal e detenção prevista na legislação penal"],"c":0},
+
+"36": {"o":["Pode ser quebrado a pedido de qualquer familiar que acompanhe o paciente na internação","Deve ser mantido, salvo nos casos previstos em lei ou por justa causa","Deixa de ser exigível após a morte do paciente, quando cessa a relação profissional","Cabe apenas ao enfermeiro responsável, não se estendendo aos técnicos e auxiliares","É facultativo no ambiente hospitalar"],"c":1},
+
+"37": {"o":["Apenas aos enfermeiros com registro ativo no conselho regional de sua jurisdição","Aos enfermeiros e aos técnicos de enfermagem, excluídos auxiliares e atendentes","Enfermeiros, técnicos, auxiliares, obstetrizes, parteiras e atendentes de enfermagem","Apenas aos profissionais vinculados ao serviço público de saúde nas três esferas","Apenas aos profissionais que atuam em instituições hospitalares e ambulatoriais"],"c":2},
+
+"40": {"o":["Verificação de sinais vitais e realização de curativos simples em pacientes clinicamente estáveis","Administração de medicamentos por via oral conforme prescrição médica registrada","Cuidados diretos a pacientes graves com risco de vida e de maior complexidade técnica","Preparo do leito hospitalar e organização do material da unidade do paciente","Coleta de material para exames laboratoriais de rotina em pacientes internados"],"c":2},
+
+"59": {"o":["Padrão apenas, por não haver transmissão interpessoal documentada","De contato, mantida por sete dias após o início do tratamento","Por gotículas, até 24 horas de antibioticoterapia eficaz","Por aerossóis, com quarto privativo e pressão negativa, até a alta","Reversa, com quarto privativo, durante todo o período de internação"],"c":2},
+
+"63": {"o":["Somando 7 dias e 3 meses ao primeiro dia da última menstruação referida","Somando 7 dias ao primeiro dia da DUM, subtraindo 3 meses e somando 1 ano","Subtraindo 7 dias e somando 9 meses ao primeiro dia da última menstruação","Somando 10 dias e 9 meses ao último dia da última menstruação referida","Somando 14 dias ao primeiro dia da DUM e, em seguida, 9 meses completos"],"c":1},
+
+"68": {"o":["É vedada ao enfermeiro, cabendo exclusivamente ao profissional médico","Pode ser realizada pelo enfermeiro, intercalada com a consulta médica","Só é permitida ao enfermeiro com título de especialista em obstetrícia","Substitui integralmente o acompanhamento médico durante toda a gestação","Restringe-se à verificação de sinais vitais e ao registro do peso materno"],"c":1},
+
+"73": {"o":["Apenas o peso aferido mensalmente até o segundo ano de vida","Peso, comprimento/estatura e perímetro cefálico em curvas","Apenas o perímetro torácico aferido nas consultas de rotina","Frequência cardíaca e respiratória registradas a cada consulta","Índice de Apgar seriado nas primeiras consultas de puericultura"],"c":1},
+
+"77": {"o":["Assistolia e atividade elétrica sem pulso identificadas no monitor","Fibrilação ventricular e taquicardia ventricular sem pulso","Bradicardia sinusal sintomática e assistolia com linha isoelétrica","Atividade elétrica sem pulso e fibrilação atrial de alta resposta","Assistolia e taquicardia sinusal com pulso central palpável"],"c":1},
+
+"104": {"o":["É opcional e pode ser substituída pelo tratamento medicamentoso isolado","É a base do tratamento, podendo ser associada ao apoio medicamentoso","Aplica-se somente a fumantes de baixo grau de dependência nicotínica","É realizada exclusivamente por profissionais médicos capacitados pelo INCA","É restrita à atenção hospitalar especializada em pneumologia"],"c":1},
+
+"105": {"o":["Um, imediatamente antes da incisão cirúrgica, com toda a equipe presente","Dois, na entrada do paciente na sala e na saída para a recuperação","Três: antes da indução anestésica, antes da incisão e antes da saída da sala","Quatro, incluindo a visita pré-operatória realizada na véspera da cirurgia","Cinco, um para cada etapa do procedimento cirúrgico realizado na sala"],"c":2},
+
+"115": {"o":["Pode ser realizada por qualquer profissional da equipe, sem registro em prontuário","É medida excepcional, com prescrição e registro, após esgotadas alternativas menos restritivas","É a primeira medida indicada diante de agitação psicomotora em ambiente hospitalar","Dispensa monitoramento clínico depois de aplicada, desde que o paciente esteja contido","É proibida em qualquer circunstância pela legislação de saúde mental vigente"],"c":1},
+
+"116": {"o":["Abstinência total como única meta terapêutica aceitável para todos os usuários","Respeito à autonomia, com metas pactuadas e redução dos riscos associados ao uso","Internação compulsória como primeira conduta diante do uso abusivo de substâncias psicoativas","Afastamento do usuário da atenção básica até a interrupção completa do uso","Interrupção do vínculo terapêutico enquanto o usuário mantiver o consumo"],"c":1},
+
+"118": {"o":["Substituir o prontuário eletrônico do cidadão nos serviços da atenção básica","Instrumentalizar o acompanhamento longitudinal e a avaliação multidimensional","Controlar a dispensação de medicamentos de uso contínuo na farmácia básica da unidade","Registrar exclusivamente as vacinas aplicadas a partir dos sessenta anos","Autorizar internações e procedimentos de média complexidade na rede pública"],"c":1},
+
+"121": {"o":["Em até trinta dias contados da data do afastamento do trabalhador acidentado","Até o primeiro dia útil seguinte ao acidente e, em caso de óbito, de imediato","Somente quando houver afastamento superior a quinze dias do posto de trabalho","Apenas pelo próprio trabalhador acidentado, no momento do retorno ao serviço","Somente nos casos em que resultar sequela permanente comprovada por perícia"],"c":1},
+
+"124": {"o":["Prolongar a vida a qualquer custo, com uso de todos os recursos disponíveis","Promover conforto e qualidade de vida, com controle de sintomas e apoio à família","Suspender toda a medicação em curso ao início do acompanhamento domiciliar","Restringir a atuação da equipe à fase terminal, nas últimas quarenta e oito horas","Transferir o paciente para o hospital de referência ao primeiro sintoma de desconforto"],"c":1},
+
+"127": {"o":["Investigar surtos de doenças infecciosas ocorridos no território","Inspecionar e licenciar estabelecimentos de interesse à saúde","Registrar os óbitos ocorridos no município no sistema de informação","Executar as campanhas de vacinação previstas no calendário nacional","Notificar os nascidos vivos ao sistema de informação correspondente"],"c":1},
+
+"128": {"o":["No atendimento clínico e cirúrgico de animais domésticos do território","No controle de vetores, reservatórios e animais de interesse à saúde pública","Na dispensação de medicamentos de uso veterinário à população cadastrada","Na vigilância dos alimentos industrializados comercializados no município","No registro das doenças crônicas não transmissíveis na população adulta"],"c":1},
+
+"144": {"o":["Definir e coordenar o sistema nacional de laboratórios de saúde pública e de hemocentros","Executar serviços de vigilância epidemiológica, sanitária, saúde do trabalhador e saneamento básico","Elaborar normas para regular as relações entre o SUS e os serviços privados contratados em todo o país","Coordenar a rede estadual de hemocentros e a política de sangue e hemoderivados","Estabelecer o Plano Nacional de Saúde e as diretrizes da política nacional"],"c":1},
+
+"147": {"o":["Médico, enfermeiro, cirurgião-dentista e agentes comunitários de saúde do território","Médico, enfermeiro, auxiliar ou técnico de enfermagem e agentes comunitários de saúde","Enfermeiro, técnico de enfermagem e agentes comunitários de saúde vinculados à equipe local","Médico e enfermeiro apenas, com apoio eventual do núcleo ampliado de saúde da família","Médico, enfermeiro, farmacêutico e agentes comunitários de saúde com carga horária integral"],"c":1},
+
+"153": {"o":["Médico e enfermeiro, ambos com capacitação em suporte avançado de vida","Condutor socorrista e técnico ou auxiliar de enfermagem","Enfermeiro e técnico de enfermagem, sob supervisão da regulação médica","Condutor socorrista e médico intervencionista escalado para o plantão","Dois técnicos de enfermagem habilitados para o atendimento pré-hospitalar"],"c":1},
+
+"155": {"o":["Serviço de atenção primária com funcionamento ininterrupto no território","Componente pré-hospitalar fixo, entre a atenção básica e a rede hospitalar","Serviço exclusivamente de internação de curta permanência, com leitos próprios","Componente da vigilância em saúde responsável pelo monitoramento de agravos","Centro de reabilitação vinculado à rede de cuidados à pessoa com deficiência"],"c":1},
+
+"156": {"o":["A restrição da presença do acompanhante ao período expulsivo do trabalho de parto na maternidade","A ampliação do direito da mulher a acompanhante e a atenção às pessoas em situação de rua","A padronização da cesariana eletiva a partir da trigésima nona semana de gestação","A limitação do pré-natal de risco habitual à atenção ambulatorial especializada","A dispensa da estratificação de risco gestacional nas unidades de atenção básica"],"c":1},
+
+"157": {"o":["Excluir as gestantes de alto risco do acompanhamento realizado na atenção básica","Definir o acompanhamento adequado e a vinculação ao serviço de referência para o parto","Restringir o número de consultas de pré-natal conforme a classificação obtida","Substituir os exames laboratoriais previstos na rotina do pré-natal de risco habitual","Classificar apenas as gestantes adolescentes e as com idade acima de trinta e cinco anos"],"c":1}
+}
