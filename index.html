@@ -103,8 +103,15 @@ button:focus-visible{outline:3px solid var(--tinta);outline-offset:2px}
   border:1px solid var(--traco);font-weight:500;border-radius:99px}
 .menu button.on{background:var(--tinta);color:#fff;border-color:var(--tinta)}
 
+/* fechar a questão/simulado e voltar ao início — a barra de ações fica
+   escondida até responder (é o espaço reservado para Chutei/Sabia depois),
+   então sem isto não havia como sair no meio */
+button.fechar{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;
+  background:transparent;color:var(--tinta2);border:1px solid var(--traco);
+  font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center}
+
 /* questao */
-.cabQ{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:12px;color:var(--tinta2)}
+.cabQ{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;font-size:12px;color:var(--tinta2)}
 .tag{background:var(--verde-luz);color:var(--verde);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600}
 .enunciado{font-size:17.5px;line-height:1.5;margin-bottom:16px}
 .alt{display:flex;gap:11px;align-items:flex-start;background:var(--card);border:1px solid var(--traco);
@@ -237,6 +244,7 @@ input[type=number]{width:100%;font-family:var(--dado);font-size:17px;padding:12p
 <!-- ============ ESTUDO ============ -->
 <div class="tela" id="tela-estudo">
   <div class="cabQ">
+    <button class="fechar" aria-label="Voltar ao início" onclick="sairDoEstudo()">✕</button>
     <span class="chips">
       <span class="tag suave" id="q-materia">–</span>
       <span class="tag" id="q-tag">–</span>
@@ -260,6 +268,7 @@ input[type=number]{width:100%;font-family:var(--dado);font-size:17px;padding:12p
 <!-- ============ SIMULADO: PROVA ============ -->
 <div class="tela" id="tela-simulado">
   <div class="cabQ">
+    <button class="fechar" aria-label="Sair do simulado" onclick="sairDoSimulado()">✕</button>
     <span class="crono" id="s-crono">3:00:00</span>
     <span class="dado" id="s-contador">1/70</span>
   </div>
@@ -1066,6 +1075,10 @@ function pintarMaterias(){
    SESSÃO DE ESTUDO
    ======================================================================= */
 let S = null;
+/* sai a qualquer momento, respondida ou não: a resposta já dada continua
+   salva normalmente (registrar() já gravou), só a sessão em si é abandonada */
+function sairDoEstudo(){ S = null; ir("inicio"); }
+
 function iniciarSessao(modo, filtro){
   const q = fila();
   let lista = [];
@@ -1186,6 +1199,15 @@ function registrar(id, resultado){
    SIMULADO
    ======================================================================= */
 let SIM = null, timer = null;
+/* diferente de sairDoEstudo: aqui nada foi salvo ainda (só finalizarSimulado
+   grava), então sair sem confirmar jogaria fora respostas de verdade — e o
+   cronômetro continuaria rodando escondido se não parar o interval aqui */
+function sairDoSimulado(){
+  if(!confirm("Sair do simulado agora? As respostas dadas não serão salvas.")) return;
+  clearInterval(timer);
+  SIM = null;
+  ir("inicio");
+}
 const totalProva = () => BLOCOS.reduce((s,b)=>s+b.questoes, 0);
 const disponivel = bl => BANCO.filter(q=>blocoDe(q)===bl.id).length;
 
