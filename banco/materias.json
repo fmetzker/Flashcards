@@ -1,5 +1,6 @@
 [
 {"id":"portugues","nome":"Língua Portuguesa"},
 {"id":"sus","nome":"Legislação do SUS"},
-{"id":"enfermagem","nome":"Conhecimentos Específicos de Enfermagem"}
+{"id":"enfermagem","nome":"Conhecimentos Específicos de Enfermagem"},
+{"id":"matematica","nome":"Matemática"}
 ]

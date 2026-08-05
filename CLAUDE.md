@@ -21,6 +21,7 @@ Edital 003/2026-SMA · banca FEVRE · cargo Enfermeiro.
 | `fase1-materias.ps1` | Ferramenta da Fase 1: reagrupou os tópicos em matérias |
 | `fase1b-topicos.ps1` | Ferramenta da Fase 1b: subdividiu as matérias em tópicos reais |
 | `fase1c-tres-materias.ps1` | Ferramenta da Fase 1c: reduziu as matérias às três do edital |
+| `incorporar-propostas.ps1` | Ferramenta da Fase 4c: transforma proposta aprovada em questão de verdade |
 | `servidor.ps1` | Servidor local para testar em `http://localhost:8080` |
 | `gerar-offline.ps1` | Gera `offline.html`: o app inteiro num arquivo só |
 | `offline.html` | **Gerado** — abre com duplo clique, sem servidor e sem rede |
@@ -95,13 +96,18 @@ inventar rótulos novos; a árvore só é útil enquanto os níveis se mantêm p
 
 ## Matéria, tópico e subtópico
 
-**Matéria é o bloco do edital.** São três, e só três:
+**Matéria é o bloco do edital.** Eram três, e só três, enquanto só havia um
+concurso (o vestibular de enfermeiro). Com o suporte a múltiplos concursos, o
+banco é a união das matérias de **todos** os concursos cadastrados em
+`concursos.json` — hoje quatro, porque o CAAQ-CDM (Marinha) acrescentou
+`matematica`:
 
 | id | nome | questões | tópicos | subtópicos |
 |---|---|--:|--:|--:|
 | `portugues` | Língua Portuguesa | 99 | 23 | — |
 | `sus` | Legislação do SUS | 99 | 10 | — |
 | `enfermagem` | Conhecimentos Específicos de Enfermagem | 654 | 17 | 114 |
+| `matematica` | Matemática | 24 | 6 | — |
 
 Dentro delas, dois níveis: **tópico** (Imunização, Urgência, Saúde da Mulher) e
 **subtópico** (Rede de frio, Calendário vacinal). Português e SUS param no
@@ -176,29 +182,34 @@ Aprovação: 35 pontos **e** nenhuma área zerada.
 
 ## Estado atual e trabalho pendente
 
-Banco com **852 questões** (99 lp, 99 sus, 654 esp).
+Banco com **876 questões** (99 lp, 99 sus, 654 esp, 24 matemática).
 
-**Fases 0 a 3c, 4a e 4b concluídas.** O projeto está migrando de app de prova
-única para plataforma com contas, banco compartilhado por matéria e concurso
-escolhido por cada pessoa. O plano completo está em `FASES.md`. A Fase 0 deu id
-estável a cada questão, tirou o banco do `index.html` e converteu o progresso de
-índice de array para id; a Fase 1 reagrupou os 85 tópicos em matérias e
-transformou o concurso em dado; a Fase 1b subdividiu essas matérias em tópicos
-reais; a Fase 1c reduziu as matérias às três do edital, virando uma árvore de
-três níveis; a Fase 2 deu suporte a múltiplos perfis no mesmo aparelho; a Fase
-3a criou o schema do Supabase (RLS, allowlist, log append-only); a Fase 3b deu
-login opcional por e-mail e senha, com sessão presa ao perfil local; a Fase 3c
-deu o motor de sincronização — fila local, push idempotente, pull incremental
-com merge por evento mais recente; a Fase 4a deu o formulário de proposta de
-questão; a Fase 4b deu a tela de revisão (aprovar/rejeitar), com o banco
-continuando estático — a questão só entra de verdade depois de revisada e
-passar pelo `validar.py` (Fase 4c), nunca direto. Sem o `supabase.json`
-preenchido com um projeto de verdade, a conta fica indisponível e o app
-funciona exatamente como na Fase 2. Projeto real criado e `supabase.json`
-preenchido; RLS e o gatilho de convite conferidos contra ele; `schema.sql` da
-4a/4b (tabelas `propostas`/`revisores`, function `sou_revisor`, gatilho
-`marcar_revisor`) ainda não confirmado contra o projeto — ver `FASES.md`.
-A próxima etapa é a Fase 4c (script de incorporação ao banco).
+**Fases 0 a 4c concluídas**, mais o suporte a múltiplos concursos por perfil. O
+projeto migrou de app de prova única para plataforma com contas, banco
+compartilhado por matéria e concurso escolhido por cada pessoa. O plano
+completo está em `FASES.md`. A Fase 0 deu id estável a cada questão, tirou o
+banco do `index.html` e converteu o progresso de índice de array para id; a
+Fase 1 reagrupou os 85 tópicos em matérias e transformou o concurso em dado; a
+Fase 1b subdividiu essas matérias em tópicos reais; a Fase 1c reduziu as
+matérias às três do edital, virando uma árvore de três níveis; a Fase 2 deu
+suporte a múltiplos perfis no mesmo aparelho; a Fase 3a criou o schema do
+Supabase (RLS, allowlist, log append-only); a Fase 3b deu login opcional por
+e-mail e senha, com sessão presa ao perfil local; a Fase 3c deu o motor de
+sincronização — fila local, push idempotente, pull incremental com merge por
+evento mais recente; a Fase 4a deu o formulário de proposta de questão; a Fase
+4b deu a tela de revisão (aprovar/rejeitar); a Fase 4c fechou o ciclo com
+`incorporar-propostas.ps1`, que grava a proposta aprovada em
+`banco/<matéria>.json` — commit e `validar.py` continuam manuais depois. O
+banco em si continua estático o tempo todo: a proposta nunca escreve direto
+nele. Depois disso, o perfil ganhou suporte a mais de um concurso ao mesmo
+tempo, com um em foco e os demais só inscritos.
+
+Projeto Supabase real criado, `supabase.json` preenchido, e o `schema.sql`
+inteiro (Fases 3a a 4c: RLS, allowlist, `propostas`/`revisores`,
+`sou_revisor`, `marcar_revisor`, `incorporada_em`) confirmado contra o projeto
+— `conferir.sql` roda sem nenhum `FALHOU` nem `WARNING`. Sem o `supabase.json`
+preenchido, a conta fica indisponível e o app funciona exatamente como na
+Fase 2.
 
 **Viés de comprimento — resolvido.** A resposta certa costumava ser visivelmente
 mais longa que os distratores, o que permitia acertar sem saber o conteúdo. Foram

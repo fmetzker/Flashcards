@@ -553,19 +553,50 @@ com cuidado, não executado.
   precisou subir de posição no arquivo (seção 7.1, antes de `propostas`) —
   o Postgres exige que a function já exista na hora de criar a policy.
 
-**Pendente para você, junto com o que já estava pendente da 4a:** rodar
-`schema.sql` de novo (idempotente — inclui `sou_revisor`/`marcar_revisor`
-além de `propostas`/`revisores`) e o bloco 10 pra virar revisor.
+**Confirmado contra o projeto real.** `schema.sql` rodado ("sucesso"),
+`conferir.sql` rodado depois e conferido linha a linha: nenhum `FALHOU` nem
+`WARNING` em nenhuma seção. Fluxo completo de convite → criar conta → virar
+revisor → relogar (pra `verificarRevisor()` rodar de novo) testado e
+confirmado pelo usuário.
 
 ---
 
-### Fase 4c — Incorporação ao banco
+### Fase 4c — Incorporação ao banco · **concluída**
 
-**Modelo sugerido:** Sonnet 5, esforço medium.
+**Modelo usado:** Sonnet 5, esforço medium.
 
-- [ ] `incorporar-propostas.ps1`: puxa as aprovadas (chave secreta, rodado só
-      localmente, nunca no app), calcula o id, grava no arquivo de matéria —
-      e para aí; commit e `validar.ps1` continuam manuais
+- [x] `schema.sql` (8.3): coluna `incorporada_em` em `propostas` — sem ela o
+      script não teria como distinguir "aprovada" de "aprovada e já
+      incorporada", e reincorporaria a mesma proposta a cada execução
+- [x] `incorporar-propostas.ps1`: puxa as aprovadas com `incorporada_em is
+      null` (chave secreta — pedida por variável de ambiente ou colada na
+      hora, sem eco no terminal, nunca gravada em arquivo; roda só
+      localmente, nunca no app); calcula o id (mesma função sha1 truncada de
+      sempre); pula duplicata (id já existe no banco); grava a linha nova em
+      `banco/<matéria>.json` **sem reescrever o arquivo inteiro** — só insere
+      antes do `]` final, pra manter o diff pequeno e não arriscar
+      reformatar as 852 questões existentes; marca `incorporada_em` de volta
+      no Supabase depois de gravar cada matéria; para aí — commit e
+      `validar.py`/`validar.ps1` continuam manuais, igual a acrescentar
+      qualquer outra questão
+- [x] `-DryRun`: mostra o que seria incorporado sem gravar nada nem marcar
+      nada no Supabase
+
+**Por que a chave secreta é segura aqui, mesmo sendo a que ignora RLS:** o
+script é uma ferramenta de manutenção, roda só na máquina de quem mantém o
+projeto, nunca dentro do app. É o mesmo motivo pelo qual dá pra usar
+`git push` sem commitar a chave SSH — a chave existe fora do repositório, só
+na hora de rodar.
+
+**Verificação.** Sintaxe conferida com o parser do PowerShell. A lógica de
+inserção testada isolada contra uma cópia de `banco/portugues.json` num
+diretório temporário: duas questões novas inseridas, arquivo resultante
+continua JSON válido (101 questões, as 99 originais + 2), e a linha
+pré-existente mais próxima da inserção comparada byte a byte com o original —
+UTF-8 idêntico, sem corrupção de acento. `validar.ps1` rodado contra o
+repositório de verdade depois do `schema.sql` (8.3) e do script novo: sem
+erros, 852 questões, mesmos vieses de antes (nada mudou no banco em si, só a
+ferramenta foi acrescentada).
 
 ---
 

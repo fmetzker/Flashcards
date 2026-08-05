@@ -400,6 +400,20 @@ end $$;
 
 
 -- ----------------------------------------------------------------------------
+-- 8.3 Marca de incorporada — Fase 4c
+--
+-- `status = 'aprovada'` diz que um revisor decidiu aceitar; não diz se
+-- `incorporar-propostas.ps1` já transformou isso numa questão de verdade em
+-- banco/<matéria>.json. Sem esta coluna o script não teria como saber o que
+-- já processou e reincorporaria a mesma proposta a cada execução.
+--
+-- Preenchida pelo próprio script (com a chave secreta, que ignora RLS — não
+-- precisa de policy de update aqui). Fica nula enquanto pendente ou recusada.
+-- ----------------------------------------------------------------------------
+alter table public.propostas add column if not exists incorporada_em timestamptz;
+
+
+-- ----------------------------------------------------------------------------
 -- 9. Convide as pessoas do grupo
 --
 -- Edite e execute. Só quem estiver aqui consegue criar conta.

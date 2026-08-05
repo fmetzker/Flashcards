@@ -34,6 +34,35 @@
         "nenhumBlocoZerado": true,
         "desempate": "Em caso de empate, vale primeiro a nota de Conhecimentos Específicos."
       }
+    },
+    {
+      "id": "caaq-cdm",
+      "cargo": "Condutor de Máquinas (CAAQ-CDM)",
+      "orgao": "Marinha do Brasil — CIAGA",
+      "banca": "CIAGA",
+      "edital": "PS CAAQ-CDM (edital 01/2025 já venceu — prova era 12/03/2025; data abaixo é provisória até sair o edital novo)",
+      "data": "2027-03-12",
+      "inicio": "2027-01-06",
+      "duracaoMin": 120,
+      "blocos": [
+        {
+          "id": "port",
+          "nome": "Português",
+          "questoes": 10,
+          "materias": ["portugues"]
+        },
+        {
+          "id": "mat",
+          "nome": "Matemática",
+          "questoes": 10,
+          "materias": ["matematica"]
+        }
+      ],
+      "aprovacao": {
+        "minimoTotal": 1,
+        "nenhumBlocoZerado": true,
+        "desempate": "Classificatório por soma das notas; em caso de empate, vale primeiro a maior nota em Matemática, depois em Português, depois a maior idade, e por fim sorteio (item 10.2 do edital)."
+      }
     }
   ]
 }
