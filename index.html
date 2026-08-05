@@ -299,6 +299,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
     <button onclick="ir('ajustes')">Ajustes</button>
     <button id="menu-propor" style="display:none" onclick="ir('propor')">Propor questão</button>
     <button id="menu-revisar" style="display:none" onclick="ir('revisar')">Revisar propostas</button>
+    <button id="menu-aprovar" style="display:none" onclick="ir('aprovar')">Aprovar contas</button>
   </div>
 </div>
 
@@ -427,6 +428,26 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   <h1>Revisar propostas</h1>
   <div class="sub" id="revisar-sub">–</div>
   <div id="revisar-corpo" style="margin-top:16px"></div>
+</div>
+
+<!-- ============ AGUARDANDO APROVAÇÃO ============ -->
+<div class="tela" id="tela-espera">
+  <h1>Conta aguardando aprovação</h1>
+  <div class="sub">Sua conta foi criada, mas ainda precisa ser liberada por quem administra o app.</div>
+  <div class="card" style="margin-top:16px">
+    <div class="aviso" id="espera-msg">–</div>
+    <div style="display:flex;gap:9px;margin-top:12px">
+      <button class="pequeno fantasma" id="espera-checar">Verificar de novo</button>
+      <button class="pequeno fantasma" id="espera-sair">Sair</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APROVAR CONTAS ============ -->
+<div class="tela" id="tela-aprovar">
+  <h1>Aprovar contas</h1>
+  <div class="sub" id="aprovar-sub">–</div>
+  <div id="aprovar-corpo" style="margin-top:16px"></div>
 </div>
 
 <!-- ============ AÇÕES FIXAS ============ -->
@@ -680,13 +701,15 @@ let E = Object.assign({}, padrao, ler()||{});
    IDENTIDADE LOCAL, mais acima — precisam existir antes do estado, que
    agora é chaveado pela conta.
 
-   O cadastro é fechado: o gatilho exigir_convite (supabase/schema.sql) recusa
-   e-mail fora da lista de convidados. O erro que o servidor manda nesse caso
-   aparece cru na tela — não tento adivinhar o formato exato da mensagem sem
-   um projeto real para testar contra.
+   O cadastro é ABERTO: qualquer pessoa cria conta. O controle acontece
+   depois, na aprovação — a conta nasce 'pendente' e a RLS nega tudo até um
+   aprovador liberar (ver verificarSituacao/exigeAprovacao e a seção 2.1 do
+   schema.sql). O erro que o servidor manda aparece cru na tela.
    ======================================================================= */
 let SUPA = null;      // {url, anonKey} — null enquanto não carrega ou se supabase.json não existir
 let SOU_REVISOR = false;   // só sabido depois de perguntar ao servidor — ver verificarRevisor()
+let SOU_APROVADOR = false; // idem — ver verificarAprovador()
+let SITUACAO = null;       // 'pendente' | 'aprovado' | 'rejeitado' | null (sem resposta) — ver verificarSituacao()
 
 /* supabase.json vem com valores de exemplo até você colar os de verdade —
    nesse estado a conta fica indisponível em vez de tentar falar com uma URL
@@ -768,6 +791,38 @@ async function verificarRevisor(){
     const r = await chamarRest("rpc/sou_revisor", {method:"POST", body:"{}"});
     if(r.ok) SOU_REVISOR = (await r.json()) === true;
   }catch(e){ /* falha ao perguntar: trata como não-revisor, não trava nada */ }
+}
+
+/* mesma ideia de verificarRevisor(), para quem aprova contas novas */
+async function verificarAprovador(){
+  SOU_APROVADOR = false;
+  if(!supaConfigurado() || !SESSAO) return;
+  try{
+    const r = await chamarRest("rpc/sou_aprovador", {method:"POST", body:"{}"});
+    if(r.ok) SOU_APROVADOR = (await r.json()) === true;
+  }catch(e){ /* idem: falhar aqui só esconde o botão, não libera nada */ }
+}
+
+/* "minha conta já foi liberada?" — o cadastro é aberto, mas a conta nasce
+   pendente e não enxerga nada até um aprovador soltar (ver seção 2.1 do
+   schema.sql). Quem manda é a RLS no servidor; isto aqui é só para saber
+   qual tela mostrar.
+
+   Sem resposta do servidor (offline, por exemplo) SITUACAO fica null, e o
+   boot trata null como "deixa entrar": quem já usava o app não pode ficar
+   preso na tela de espera só porque o avião decolou. Se a conta de fato não
+   estiver aprovada, a RLS nega tudo do mesmo jeito — a tela erra, o dado
+   não. */
+async function verificarSituacao(){
+  SITUACAO = null;
+  if(!supaConfigurado() || !SESSAO || !CONTA_ID) return;
+  try{
+    const r = await chamarRest("perfis?select=status&id=eq."+encodeURIComponent(CONTA_ID));
+    if(r.ok){
+      const linhas = await r.json();
+      if(linhas && linhas.length) SITUACAO = linhas[0].status;
+    }
+  }catch(e){ /* offline: segue com null, ver comentário acima */ }
 }
 
 /* =======================================================================
@@ -1032,6 +1087,8 @@ function ir(nome){
   document.getElementById("tela-"+nome).classList.add("ativa");
   window.scrollTo(0,0);
   if(nome==="login") pintarLogin();
+  if(nome==="espera") pintarEspera();
+  if(nome==="aprovar") pintarAprovar();
   if(nome==="inicio") pintarInicio();
   if(nome==="materias") pintarMaterias();
   if(nome==="stats") pintarStats();
@@ -1055,7 +1112,7 @@ function rodape(nome){
     if(BANCO.length>=20) b("Começar simulado", iniciarSimulado, "verde");
   } else if(nome==="simulado"){
     box.classList.remove("ativa");
-  } else if(nome==="login"){
+  } else if(nome==="login" || nome==="espera"){
     box.classList.remove("ativa");
   } else {
     b("Voltar ao início", ()=>ir("inicio"), "fantasma");
@@ -1107,6 +1164,7 @@ function pintarInicio(){
   // propostas (RLS), então o botão nem aparece
   document.getElementById("menu-propor").style.display = (supaConfigurado() && SESSAO) ? "" : "none";
   document.getElementById("menu-revisar").style.display = (supaConfigurado() && SESSAO && SOU_REVISOR) ? "" : "none";
+  document.getElementById("menu-aprovar").style.display = (supaConfigurado() && SESSAO && SOU_APROVADOR) ? "" : "none";
 
   pintarFocoConcurso();
   document.getElementById("cabecalho-cargo").textContent = CONCURSO.cargo;
@@ -1722,7 +1780,7 @@ function pintarLogin(){
       '<button class="pequeno fantasma" id="login-criar">Criar conta</button>'+
     '</div>'+
     '<div class="aviso" id="login-erro"></div>'+
-    '<div class="aviso">Cadastro fechado — só quem foi convidado consegue criar conta.</div>';
+    '<div class="aviso">Contas novas passam por aprovação antes de liberar o estudo.</div>';
 
   const campoEmail = document.getElementById("login-email");
   const campoSenha = document.getElementById("login-senha");
@@ -2017,9 +2075,108 @@ async function decidirProposta(id, status){
 }
 
 /* =======================================================================
+   AGUARDANDO APROVAÇÃO
+   Tela cheia, sem rodapé, igual à de login: o cadastro é aberto, mas a conta
+   nasce pendente e não enxerga nada até um aprovador liberar. Quem barra de
+   verdade é a RLS (conta_aprovada(), schema.sql 2.1) — esta tela só explica
+   o que está acontecendo em vez de mostrar um app vazio e quebrado.
+   ======================================================================= */
+function pintarEspera(){
+  document.getElementById("espera-msg").textContent =
+    SITUACAO === "rejeitada" || SITUACAO === "rejeitado"
+      ? "Seu acesso foi recusado. Se acha que é engano, fale com quem administra o app."
+      : "Assim que liberarem, é só tocar em \"Verificar de novo\" ou reabrir o app."
+        + (SESSAO && SESSAO.email ? " Conta: "+SESSAO.email : "");
+
+  document.getElementById("espera-checar").onclick = async ()=>{
+    await verificarSituacao();
+    if(SITUACAO === "aprovado") location.reload();
+    else pintarEspera();
+  };
+  document.getElementById("espera-sair").onclick = async ()=>{ await sair(); location.reload(); };
+}
+
+/* =======================================================================
+   APROVAR CONTAS
+   Visível só pra quem SOU_APROVADOR confirmou true. Mesmo desenho da tela de
+   revisar propostas: lista o que está pendente e decide. Quem assina a
+   decisão é o servidor (gatilho proteger_status_perfil) — nunca o cliente.
+   ======================================================================= */
+async function pintarAprovar(){
+  const c = document.getElementById("aprovar-corpo");
+  c.innerHTML = "";
+  const carregando = document.createElement("div"); carregando.className = "vazio"; carregando.textContent = "Carregando…";
+  c.appendChild(carregando);
+
+  let pendentes;
+  try{
+    const r = await chamarRest("perfis?status=eq.pendente&order=atualizado_em.asc&select=id,nome,email,atualizado_em");
+    if(!r.ok) throw new Error("o servidor respondeu "+r.status);
+    pendentes = await r.json();
+  }catch(e){
+    c.innerHTML = "";
+    const erro = document.createElement("div"); erro.className = "aviso";
+    erro.textContent = "Não foi possível carregar: "+e.message;
+    c.appendChild(erro);
+    return;
+  }
+
+  document.getElementById("aprovar-sub").textContent =
+    pendentes.length + (pendentes.length===1 ? " conta aguardando" : " contas aguardando");
+  c.innerHTML = "";
+  if(!pendentes.length){
+    const vazio = document.createElement("div"); vazio.className = "vazio";
+    vazio.textContent = "Nenhuma conta aguardando aprovação.";
+    c.appendChild(vazio);
+    return;
+  }
+
+  pendentes.forEach(p=>{
+    const card = document.createElement("div"); card.className = "card"; card.style.marginBottom = "12px";
+
+    const email = document.createElement("div");
+    email.style.cssText = "font-size:15.5px;font-weight:600;word-break:break-all";
+    email.textContent = p.email || "(sem e-mail)";
+    card.appendChild(email);
+
+    if(p.nome){
+      const nome = document.createElement("div"); nome.className = "aviso"; nome.style.marginTop = "2px";
+      nome.textContent = p.nome;
+      card.appendChild(nome);
+    }
+
+    const acoes = document.createElement("div");
+    acoes.style.cssText = "display:flex;gap:9px;margin-top:11px";
+    const btOk = document.createElement("button");
+    btOk.className = "pequeno verde"; btOk.textContent = "Aprovar";
+    btOk.onclick = ()=>decidirConta(p.id, "aprovado", p.email);
+    const btNao = document.createElement("button");
+    btNao.className = "pequeno fantasma"; btNao.textContent = "Recusar";
+    btNao.onclick = ()=>decidirConta(p.id, "rejeitado", p.email);
+    acoes.appendChild(btOk); acoes.appendChild(btNao);
+    card.appendChild(acoes);
+
+    c.appendChild(card);
+  });
+}
+
+async function decidirConta(id, status, email){
+  const verbo = status === "aprovado" ? "Liberar o acesso de" : "Recusar o acesso de";
+  if(!confirm(verbo+" "+(email||"esta conta")+"?")) return;
+  try{
+    // aprovado_por/aprovado_em vêm do gatilho no servidor, não daqui
+    const r = await chamarRest("perfis?id=eq."+id, {method:"PATCH", headers:{"Prefer":"return=minimal"}, body: JSON.stringify({status})});
+    if(!r.ok) throw new Error("o servidor respondeu "+r.status);
+    pintarAprovar();
+  }catch(e){
+    alert("Não foi possível registrar a decisão: "+e.message);
+  }
+}
+
+/* =======================================================================
    AJUSTES
    ======================================================================= */
-/* marcar/desmarcar quais concursos este perfil estuda. Mudar a lista muda o
+/* marcar/desmarcar quais concursos esta conta estuda. Mudar a lista muda o
    BANCO (união das matérias), então precisa recarregar — diferente de trocar
    o foco, que só repinta. */
 function pintarConcursos(){
@@ -2153,15 +2310,26 @@ function falhaBoot(msg){
    renovarSessao). */
 function exigeLogin(){ return !window.DADOS && !SESSAO; }
 
+/* Logado, mas ainda não liberado. `null` (servidor não respondeu) NÃO conta
+   como pendente de propósito: ficar offline não pode trancar quem já usava o
+   app. Isso não abre brecha — a RLS nega os dados de qualquer jeito; só a
+   tela erra, e ela se corrige no próximo boot com rede. */
+function exigeAprovacao(){
+  return !window.DADOS && !!SESSAO && SITUACAO && SITUACAO !== "aprovado";
+}
+
 carregarConfig()
   .then(carregarBanco)
   .then(migrarParaIds)
   .then(carregarSupabase)   // arquivo ausente não é erro fatal, mas sem ele ninguém consegue logar
   .then(verificarSessao)    // desloga em silêncio se a sessão salva não presta mais
+  .then(verificarSituacao)  // pendente/aprovado/rejeitado — decide entre tela de espera e app
   .then(verificarRevisor)   // precisa terminar antes do menu pintar, senão o botão pisca
+  .then(verificarAprovador) // idem
   .then(()=>{
     salvar();
     if(exigeLogin()) ir("login");
+    else if(exigeAprovacao()) ir("espera");
     else { ir("inicio"); sincronizar(); }   // puxa em segundo plano, não bloqueia a tela
   })
   .catch(err=>{

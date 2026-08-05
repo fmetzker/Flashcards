@@ -55,10 +55,12 @@ begin
 end;
 $$;
 
+-- DESLIGADO: o cadastro deixou de ser fechado. Qualquer pessoa pode criar
+-- conta; o controle passou a ser DEPOIS do cadastro, via perfis.status
+-- (seção 2.1) — a conta nasce 'pendente' e não enxerga nada até um aprovador
+-- liberar. A função e a tabela `convidados` ficam de pé, sem uso, para o caso
+-- de você querer voltar ao modelo fechado: basta recriar o gatilho abaixo.
 drop trigger if exists exigir_convite on auth.users;
-create trigger exigir_convite
-  before insert on auth.users
-  for each row execute function public.exigir_convite();
 
 
 -- ----------------------------------------------------------------------------
@@ -95,6 +97,9 @@ create policy "perfil próprio: atualizar"
 
 -- Cria o perfil sozinho quando a conta nasce, para não depender de o cliente
 -- lembrar de fazer isso logo depois do cadastro.
+-- O e-mail é copiado para cá porque auth.users não é legível pela API, e a
+-- tela de aprovação precisa mostrar QUEM está pedindo acesso. Não vaza nada:
+-- a RLS de perfis só deixa ver a própria linha, ou todas se for aprovador.
 create or replace function public.criar_perfil()
 returns trigger
 language plpgsql
@@ -102,10 +107,11 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.perfis (id, nome)
+  insert into public.perfis (id, nome, email)
   values (
     new.id,
-    coalesce(nullif(new.raw_user_meta_data->>'nome', ''), split_part(new.email, '@', 1))
+    coalesce(nullif(new.raw_user_meta_data->>'nome', ''), split_part(new.email, '@', 1)),
+    new.email
   )
   on conflict (id) do nothing;
   return new;
@@ -116,6 +122,151 @@ drop trigger if exists criar_perfil on auth.users;
 create trigger criar_perfil
   after insert on auth.users
   for each row execute function public.criar_perfil();
+
+
+-- ----------------------------------------------------------------------------
+-- 2.1 Aprovação de contas
+--
+-- O cadastro é aberto (o gatilho exigir_convite foi desligado na seção 1),
+-- mas a conta nasce 'pendente' e não enxerga NADA até um aprovador liberar.
+-- O portão fica no servidor, não na tela: cada tabela de dados exige
+-- conta_aprovada() na policy. Esconder o botão no app não protegeria nada.
+--
+-- Precisa vir ANTES das seções 3, 4 e 8: as policies de lá chamam
+-- conta_aprovada(), e o Postgres exige que a função já exista na hora de
+-- criar a policy. Mesma lição que a seção 7.1 aprendeu com sou_revisor().
+-- ----------------------------------------------------------------------------
+
+-- e-mail para a tela de aprovação (ver comentário em criar_perfil, acima)
+alter table public.perfis add column if not exists email text;
+
+-- Guardado assim, em bloco, e não com um simples "add column ... default":
+-- adicionar a coluna preenche TODAS as linhas existentes com 'pendente', o
+-- que trancaria pra fora quem já usava o app. O backfill para 'aprovado'
+-- precisa rodar junto, e só na primeira vez — este arquivo é idempotente e
+-- feito para ser reexecutado, e um update solto aprovaria, a cada execução,
+-- todo mundo que estivesse esperando na fila naquele momento.
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'perfis' and column_name = 'status'
+  ) then
+    alter table public.perfis
+      add column status text not null default 'pendente'
+        check (status in ('pendente','aprovado','rejeitado')),
+      add column aprovado_por uuid references auth.users(id),
+      add column aprovado_em  timestamptz;
+    -- quem já tinha conta antes desta mudança entrou quando o cadastro era
+    -- fechado por convite: já estava autorizado, não faz sentido barrar agora
+    update public.perfis set status = 'aprovado';
+  end if;
+end $$;
+
+-- backfill de e-mail para as contas criadas antes desta coluna existir
+update public.perfis p
+   set email = u.email
+  from auth.users u
+ where u.id = p.id and p.email is null;
+
+create index if not exists perfis_por_status on public.perfis (status, atualizado_em);
+
+
+-- Quem pode aprovar contas. Mesmo desenho de `revisores`: RLS ligada, zero
+-- policies, revoke all — ninguém lê a lista pela API, nem as policies que
+-- dependem dela (por isso sou_aprovador() é security definer).
+create table if not exists public.aprovadores (
+  user_id   uuid primary key references auth.users(id) on delete cascade,
+  criado_em timestamptz not null default now()
+);
+
+alter table public.aprovadores enable row level security;
+revoke all on public.aprovadores from anon, authenticated;
+
+create or replace function public.sou_aprovador()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (select 1 from public.aprovadores where user_id = auth.uid());
+$$;
+
+grant execute on function public.sou_aprovador() to authenticated;
+
+-- "Minha conta já foi liberada?" — security definer pelo mesmo motivo de
+-- sou_revisor(): uma policy que consultasse perfis direto rodaria com o
+-- privilégio de quem está consultando e cairia na RLS da própria perfis,
+-- criando recursão. Aqui a função lê com privilégio elevado e devolve só um
+-- booleano.
+create or replace function public.conta_aprovada()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1 from public.perfis where id = auth.uid() and status = 'aprovado'
+  );
+$$;
+
+grant execute on function public.conta_aprovada() to authenticated;
+
+
+-- Só aprovador muda status — e a assinatura de quem decidiu vem do servidor.
+-- Sem isto, qualquer pessoa poderia se auto-aprovar com um PATCH direto na
+-- API: a policy "perfil próprio: atualizar" existe justamente para deixar a
+-- pessoa editar o próprio perfil (nome, meta), e status mora na mesma linha.
+create or replace function public.proteger_status_perfil()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.status is distinct from old.status then
+    if not public.sou_aprovador() then
+      raise exception 'Só um aprovador pode mudar o status de uma conta'
+        using errcode = 'insufficient_privilege';
+    end if;
+    new.aprovado_por := auth.uid();
+    new.aprovado_em  := now();
+  end if;
+  -- e-mail é identidade, não campo editável: é por ele que o aprovador
+  -- reconhece quem está pedindo acesso, então não pode ser forjado pelo
+  -- cliente. Só congela quando já tem valor — senão bloquearia o próprio
+  -- backfill das contas criadas antes desta coluna existir (acima), que
+  -- preenche justamente de null para o e-mail de verdade.
+  if old.email is not null then new.email := old.email; end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists proteger_status_perfil on public.perfis;
+create trigger proteger_status_perfil
+  before update on public.perfis
+  for each row execute function public.proteger_status_perfil();
+
+
+-- policies de perfis para o aprovador (as do próprio dono ficam na seção 2)
+drop policy if exists "aprovador: ver todos" on public.perfis;
+drop policy if exists "aprovador: decidir"   on public.perfis;
+
+create policy "aprovador: ver todos"
+  on public.perfis for select using (public.sou_aprovador());
+create policy "aprovador: decidir"
+  on public.perfis for update using (public.sou_aprovador()) with check (public.sou_aprovador());
+
+-- Recriada aqui, e não na seção 2, porque cita a coluna `status` — que só
+-- passa a existir logo acima. Na prática quem cria a linha é o gatilho
+-- criar_perfil (security definer, ignora RLS); esta policy é a rede de
+-- segurança para o caso de alguém tentar inserir o próprio perfil pela API
+-- já nascendo aprovado.
+drop policy if exists "perfil próprio: criar" on public.perfis;
+create policy "perfil próprio: criar"
+  on public.perfis for insert with check (id = auth.uid() and status = 'pendente');
 
 
 -- ----------------------------------------------------------------------------
@@ -156,10 +307,12 @@ alter table public.eventos_resposta enable row level security;
 drop policy if exists "eventos próprios: ler"   on public.eventos_resposta;
 drop policy if exists "eventos próprios: criar" on public.eventos_resposta;
 
+-- conta_aprovada() (seção 2.1): conta pendente não lê nem grava nada. É aqui
+-- que a aprovação vira portão de verdade — no servidor, não na tela.
 create policy "eventos próprios: ler"
-  on public.eventos_resposta for select using (usuario_id = auth.uid());
+  on public.eventos_resposta for select using (usuario_id = auth.uid() and public.conta_aprovada());
 create policy "eventos próprios: criar"
-  on public.eventos_resposta for insert with check (usuario_id = auth.uid());
+  on public.eventos_resposta for insert with check (usuario_id = auth.uid() and public.conta_aprovada());
 -- Sem policy de update nem de delete, de propósito: é a AUSÊNCIA delas que
 -- torna o log append-only de verdade, no banco, e não só por convenção do app.
 
@@ -189,9 +342,9 @@ drop policy if exists "simulados próprios: ler"   on public.simulados;
 drop policy if exists "simulados próprios: criar" on public.simulados;
 
 create policy "simulados próprios: ler"
-  on public.simulados for select using (usuario_id = auth.uid());
+  on public.simulados for select using (usuario_id = auth.uid() and public.conta_aprovada());
 create policy "simulados próprios: criar"
-  on public.simulados for insert with check (usuario_id = auth.uid());
+  on public.simulados for insert with check (usuario_id = auth.uid() and public.conta_aprovada());
 
 
 -- ----------------------------------------------------------------------------
@@ -308,15 +461,16 @@ drop policy if exists "autor: ver as próprias" on public.propostas;
 drop policy if exists "revisor: ver todas"     on public.propostas;
 drop policy if exists "revisor: decidir"       on public.propostas;
 
--- autor só cria como pendente — não dá pra já nascer aprovada
+-- autor só cria como pendente — não dá pra já nascer aprovada.
+-- conta_aprovada(): quem ainda não foi liberado não propõe questão.
 create policy "autor: propor"
   on public.propostas for insert
-  with check (autor_id = auth.uid() and status = 'pendente');
+  with check (autor_id = auth.uid() and status = 'pendente' and public.conta_aprovada());
 
 -- autor vê o que propôs, em qualquer status (pra acompanhar se foi aceito)
 create policy "autor: ver as próprias"
   on public.propostas for select
-  using (autor_id = auth.uid());
+  using (autor_id = auth.uid() and public.conta_aprovada());
 
 -- revisor vê tudo (as políticas de SELECT se combinam com OR: quem for
 -- autor E revisor ao mesmo tempo continua vendo tudo normalmente).
@@ -414,9 +568,12 @@ alter table public.propostas add column if not exists incorporada_em timestamptz
 
 
 -- ----------------------------------------------------------------------------
--- 9. Convide as pessoas do grupo
+-- 9. Convidados — NÃO É MAIS USADO
 --
--- Edite e execute. Só quem estiver aqui consegue criar conta.
+-- O cadastro virou aberto (ver seção 1): qualquer pessoa cria conta, e o
+-- controle acontece depois, na aprovação. Esta tabela fica de pé, vazia ou
+-- não, caso você queira voltar ao modelo fechado — para isso, recrie o
+-- gatilho exigir_convite e mantenha a lista em dia.
 -- ----------------------------------------------------------------------------
 -- insert into public.convidados (email, nome) values
 --   ('franciscometzker@gmail.com', 'Francisco'),
@@ -425,12 +582,24 @@ alter table public.propostas add column if not exists incorporada_em timestamptz
 
 
 -- ----------------------------------------------------------------------------
--- 10. Vire revisor
+-- 10. Vire revisor de questões
 --
 -- Rode depois de já ter feito login pelo menos uma vez pelo app (a conta
 -- precisa existir em auth.users primeiro). Busca pelo e-mail — não precisa
 -- copiar UUID de Authentication → Users na mão.
 -- ----------------------------------------------------------------------------
 -- insert into public.revisores (user_id)
+-- select id from auth.users where email = 'franciscometzker@gmail.com'
+-- on conflict (user_id) do nothing;
+
+
+-- ----------------------------------------------------------------------------
+-- 11. Vire aprovador de contas
+--
+-- OBRIGATÓRIO rodar pelo menos uma vez, para pelo menos uma pessoa: sem
+-- nenhum aprovador cadastrado, ninguém consegue liberar ninguém, e toda conta
+-- nova fica presa em 'pendente' para sempre.
+-- ----------------------------------------------------------------------------
+-- insert into public.aprovadores (user_id)
 -- select id from auth.users where email = 'franciscometzker@gmail.com'
 -- on conflict (user_id) do nothing;

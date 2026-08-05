@@ -222,8 +222,35 @@ tempo, com um em foco e os demais só inscritos.
 Sem sessão válida no aparelho, o boot mostra uma tela de entrar/criar conta
 em vez da tela inicial — ver `pintarLogin()`/`exigeLogin()` em `index.html`.
 Isso não vale para o `offline.html`, que nunca fala com o servidor e continua
-funcionando sem conta, de propósito. Consequência: quem ainda não tem conta
-(cadastro fechado, só quem está em `convidados`) fica bloqueado até criar uma.
+funcionando sem conta, de propósito.
+
+**O cadastro é aberto, e o controle virou aprovação depois do cadastro.** O
+gatilho `exigir_convite` está **desligado** (a tabela `convidados` continua
+de pé, sem uso, caso se queira voltar ao modelo fechado). Agora qualquer
+pessoa cria conta, ela nasce `pendente` e **não enxerga nada** até um
+aprovador liberar:
+
+- Quem barra é a **RLS**, não a tela: `eventos_resposta`, `simulados` e
+  `propostas` exigem `conta_aprovada()` nas policies. Esconder o botão no app
+  não protegeria nada.
+- `perfis` é a exceção deliberada: a pessoa **precisa** ler a própria linha
+  mesmo pendente, senão o app não teria como saber que está esperando.
+- Ninguém se auto-aprova: `status` mora na mesma linha que nome e meta, que a
+  pessoa pode editar, então quem separa as duas coisas é o gatilho
+  `proteger_status_perfil` — que também assina `aprovado_por` com
+  `auth.uid()` do servidor e congela o `email` (é por ele que o aprovador
+  reconhece quem está na fila).
+- `aprovadores` + `sou_aprovador()` seguem o mesmo padrão de
+  `revisores`/`sou_revisor()`: tabela ilegível, function `security definer`
+  devolvendo só booleano.
+- **É obrigatório rodar a seção 11 do `schema.sql`** para virar aprovador.
+  Sem nenhum aprovador cadastrado, toda conta nova fica presa em `pendente`
+  para sempre.
+- No app: `verificarSituacao()` → `exigeAprovacao()` → tela de espera
+  (`pintarEspera()`); a tela de aprovação é `pintarAprovar()`. `SITUACAO`
+  nulo (servidor não respondeu) **não** conta como pendente de propósito —
+  ficar offline não pode trancar quem já usava o app, e a RLS nega os dados
+  de qualquer jeito.
 
 **O conceito de perfil local foi removido** logo depois: com login
 obrigatório, a conta já era a identidade, e o id local (`p1`, `p2`...) só

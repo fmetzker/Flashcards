@@ -83,22 +83,39 @@ forjado em nome de outra pessoa, e a lista de quem pode revisar propostas não
 
 ---
 
-## Parte 4 — Convidar as pessoas do grupo
+## Parte 4 — Virar aprovador de contas
 
-O cadastro é fechado: só quem estiver nesta lista consegue criar conta.
+**Este passo não é opcional.** O cadastro é aberto: qualquer pessoa cria
+conta. Mas a conta nasce **pendente** e não enxerga nada até alguém liberar.
+Se não houver nenhum aprovador cadastrado, toda conta nova — inclusive as de
+quem você quer que use o app — fica presa esperando para sempre.
 
-**1.** No SQL Editor, nova query:
+**1.** Antes de tudo, crie sua conta pelo próprio app (a conta precisa
+existir em `auth.users` antes de virar aprovadora). Abra o app publicado, ele
+mostra a tela de login; toque em **Criar conta**.
+
+> Se você é a primeira pessoa, sua conta também nasce pendente — e não há
+> ninguém para aprovar. O passo 2 resolve isso; o passo 3 libera você.
+
+**2.** No SQL Editor, nova query — troque pelo e-mail que você usou:
 
 ```sql
-insert into public.convidados (email, nome) values
-  ('franciscometzker@gmail.com', 'Francisco'),
-  ('email-da-sua-esposa@exemplo.com', 'Esposa')
-on conflict (email) do nothing;
+insert into public.aprovadores (user_id)
+select id from auth.users where email = 'seu-email-aqui@exemplo.com'
+on conflict (user_id) do nothing;
 ```
 
-**2.** Troque pelos e-mails de verdade e rode. `on conflict do nothing`
-significa que rodar de novo (para adicionar mais alguém depois) não duplica
-quem já está na lista — só acrescenta o novo.
+**3.** Libere a sua própria conta (só desta vez, na mão — daqui pra frente dá
+para fazer tudo pela tela "Aprovar contas" do app):
+
+```sql
+update public.perfis set status = 'aprovado'
+where email = 'seu-email-aqui@exemplo.com';
+```
+
+**4.** Saia e entre de novo no app. Agora deve aparecer o botão **"Aprovar
+contas"** no menu — é por ali que você libera as próximas pessoas, sem
+precisar voltar ao SQL Editor.
 
 ---
 
@@ -144,17 +161,15 @@ errada em lugar nenhum, e publique (commit + push, ou peça para eu fazer).
 
 ---
 
-## Parte 7 — Virar revisor
+## Parte 7 — Virar revisor de questões
+
+Papel diferente do aprovador da Parte 4: **aprovador** libera pessoas,
+**revisor** aprova questões propostas. Normalmente é você nos dois, mas são
+tabelas separadas — dá para delegar um sem o outro.
 
 Só quem está na tabela `revisores` vê a tela "Revisar propostas" no app.
-Normalmente é só você.
 
-**1.** Primeiro, crie sua conta pelo próprio app — abra o app publicado, ele
-já vai te mostrar a tela de login direto (é obrigatória desde que o login
-passou a ser exigido para entrar). Toque em "Criar conta" com um dos e-mails
-convidados na Parte 4.
-
-**2.** De volta ao SQL Editor:
+**1.** Sua conta já existe (Parte 4). De volta ao SQL Editor:
 
 ```sql
 insert into public.revisores (user_id)
@@ -165,7 +180,7 @@ on conflict (user_id) do nothing;
 Troque pelo e-mail que você usou para logar. A busca por e-mail evita ter que
 ir em Authentication → Users copiar UUID na mão.
 
-**3.** Se quiser conferir que funcionou, rode:
+**2.** Se quiser conferir que funcionou, rode:
 
 ```sql
 select u.email from public.revisores r join auth.users u on u.id = r.user_id;
@@ -178,18 +193,24 @@ Deve listar seu e-mail.
 ## Parte 8 — Testar pelo app
 
 **1.** Abra o app publicado. Deve aparecer a tela de login direto — entre com
-o e-mail e senha que você criou na Parte 7.
+o e-mail e senha que você criou na Parte 4.
 
 **2.** Depois de entrar, vá em **Ajustes → Conta**: deve aparecer "Conectado
 como [seu e-mail]" e o status de sincronização.
 
-**3.** Volte à tela inicial. Devem aparecer dois itens novos no menu:
-**"Propor questão"** e **"Revisar propostas"** (o segundo só porque você é
-revisor).
+**3.** Volte à tela inicial. Devem aparecer três itens novos no menu:
+**"Propor questão"**, **"Revisar propostas"** (porque você é revisor) e
+**"Aprovar contas"** (porque você é aprovador).
 
 **4.** Teste proposta e revisão:
 - Em "Propor questão", preencha um exemplo qualquer e envie
 - Em "Revisar propostas", ela deve aparecer na lista — aprove ou rejeite
+
+**5.** Teste a aprovação de contas do jeito que ela vai acontecer de verdade:
+peça para alguém do grupo criar uma conta. A pessoa vai ver a tela
+"Conta aguardando aprovação"; você abre **"Aprovar contas"**, o e-mail dela
+aparece na lista, e depois de aprovar ela entra (tocando em "Verificar de
+novo" ou reabrindo o app).
 
 Se tudo isso funcionar, a configuração está completa.
 
@@ -200,7 +221,10 @@ Se tudo isso funcionar, a configuração está completa.
 | Sintoma | Causa provável | Solução |
 |---|---|---|
 | `conferir.sql` mostra `FALHOU` | Alguma policy do schema não ficou como esperado | Copie a mensagem e peça ajuda antes de usar o app com conta |
-| "Database error saving new user" ao criar conta | E-mail não está em `convidados`, ou a Parte 4 não rodou | Confira a Parte 4; o e-mail precisa bater exatamente |
+| Todo mundo fica preso em "Conta aguardando aprovação", inclusive você | Nenhum aprovador cadastrado — a Parte 4 não rodou | Rode a Parte 4 inteira (passos 2 e 3): sem aprovador ninguém libera ninguém |
+| Criei conta e caí na tela de espera | É o comportamento normal: contas novas nascem pendentes | Peça para quem administra abrir "Aprovar contas" e liberar |
+| Aprovei alguém, mas a pessoa continua na tela de espera | O app só reconsulta no boot ou no botão | Peça para tocar em "Verificar de novo" ou reabrir o app |
+| "Aprovar contas" não aparece no menu | A Parte 4 passo 2 não rodou, ou rodou antes de a conta existir | Repita a Parte 4 e saia/entre de novo — o app só pergunta ao servidor no login |
 | Login funciona mas "Revisar propostas" não aparece | A Parte 7 não rodou, ou rodou antes de o login existir | Repita a Parte 7 depois de ter feito login pelo menos uma vez |
 | Ajustes → Conta diz "Sincronização ainda não configurada" | `supabase.json` ainda tem os valores de exemplo | Repita a Parte 6 |
 | Tela de login diz "sincronização ainda não configurada" e não tem formulário | `supabase.json` ainda tem os valores de exemplo — sem ele, ninguém consegue entrar no app | Repita a Parte 6 |

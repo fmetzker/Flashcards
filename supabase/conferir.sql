@@ -86,6 +86,14 @@ declare
   bruno uuid := '22222222-2222-2222-2222-222222222222';
   visto int;
 begin
+  -- as duas precisam de perfil APROVADO: desde a aprovação de contas
+  -- (schema.sql 2.1), a policy de eventos_resposta exige conta_aprovada(),
+  -- e sem isto este teste falharia por motivo errado — não por vazamento de
+  -- dado entre elas, que é o que ele existe para pegar
+  insert into public.perfis (id, nome, email, status) values
+    (ana,   'Ana',   'ana@exemplo.com',   'aprovado'),
+    (bruno, 'Bruno', 'bruno@exemplo.com', 'aprovado');
+
   -- entra o dado das duas pessoas contornando a RLS (aqui somos postgres)
   insert into public.eventos_resposta (id, usuario_id, questao_id, ts, resultado, caixa_depois, prox)
   values
@@ -159,6 +167,13 @@ declare
   visto_uuid uuid;
   visto_ts   timestamptz;
 begin
+  -- perfis aprovados pelo mesmo motivo da seção 5: a policy "autor: ver as
+  -- próprias" exige conta_aprovada() desde a aprovação de contas
+  insert into public.perfis (id, nome, email, status) values
+    (autor,   'Autor',   'autor@exemplo.com',   'aprovado'),
+    (outro,   'Outro',   'outro@exemplo.com',   'aprovado'),
+    (revisor, 'Revisor', 'revisor@exemplo.com', 'aprovado');
+
   insert into public.revisores (user_id) values (revisor);
   insert into public.propostas (id, autor_id, materia, topico, enunciado, alternativas, correta, explicacao, fonte)
   values (prop_id, autor, 'sus', 'Lei 8.080/90', 'enunciado de teste', alt, 1, 'explicação', 'fonte de teste');
@@ -240,6 +255,131 @@ begin
 
   reset role;
 end $$;
+
+-- ----------------------------------------------------------------------------
+-- 8. Aprovação de contas
+--
+-- O cadastro é aberto, então este é o portão que substitui a allowlist: uma
+-- conta 'pendente' não pode ler nem gravar nada, e — o que mais importa — não
+-- pode se auto-aprovar, mesmo mandando um PATCH direto na API. A policy
+-- "perfil próprio: atualizar" existe para a pessoa editar nome e meta, e o
+-- status mora na mesma linha; é o gatilho que separa as duas coisas.
+-- ----------------------------------------------------------------------------
+do $$
+declare
+  pendente  uuid := '88888888-8888-8888-8888-888888888888';
+  aprovador uuid := '99999999-9999-9999-9999-999999999999';
+  visto     int;
+  status_lido text;
+  quem      uuid;
+begin
+  insert into public.perfis (id, nome, email, status) values
+    (pendente,  'Quem Espera', 'espera@exemplo.com',  'pendente'),
+    (aprovador, 'Quem Aprova', 'aprova@exemplo.com',  'aprovado');
+  insert into public.aprovadores (user_id) values (aprovador);
+
+  -- ---- como a conta pendente ----
+  set local role authenticated;
+  perform set_config('request.jwt.claims', json_build_object('sub', pendente, 'role','authenticated')::text, true);
+
+  -- precisa enxergar o PRÓPRIO perfil, senão não tem como o app saber que
+  -- está pendente e mostrar a tela de espera
+  select count(*) into visto from public.perfis where id = pendente;
+  if visto = 1 then raise notice 'OK — conta pendente vê o próprio perfil (precisa, pra saber que está pendente)';
+  else raise warning 'FALHOU — conta pendente não vê o próprio perfil; o app não teria como mostrar a tela de espera'; end if;
+
+  -- mas não pode gravar resposta nenhuma
+  begin
+    insert into public.eventos_resposta (id, usuario_id, questao_id, ts, resultado, caixa_depois, prox)
+    values (gen_random_uuid(), pendente, 'dddddddddd', now(), 'sabia', 2, current_date);
+    raise warning 'FALHOU — conta pendente conseguiu gravar evento de resposta';
+  exception when insufficient_privilege or check_violation then
+    raise notice 'OK — conta pendente não grava evento (conta_aprovada barra)';
+  end;
+
+  -- nem propor questão
+  begin
+    insert into public.propostas (id, autor_id, materia, topico, enunciado, alternativas, correta, explicacao, fonte)
+    values (gen_random_uuid(), pendente, 'sus', 'T', 'enunciado de pendente', '["A","B","C","D","E"]'::jsonb, 0, 'e', 'f');
+    raise warning 'FALHOU — conta pendente conseguiu propor questão';
+  exception when insufficient_privilege or check_violation then
+    raise notice 'OK — conta pendente não propõe questão';
+  end;
+
+  -- e NÃO pode se auto-aprovar: este é o teste central desta seção
+  begin
+    update public.perfis set status = 'aprovado' where id = pendente;
+    select status into status_lido from public.perfis where id = pendente;
+    if status_lido = 'aprovado' then
+      raise warning 'FALHOU — a conta se auto-aprovou; o portão de aprovação não vale nada';
+    else
+      raise notice 'OK — auto-aprovação não teve efeito (status seguiu %)', status_lido;
+    end if;
+  exception when insufficient_privilege then
+    raise notice 'OK — auto-aprovação recusada pelo gatilho';
+  end;
+
+  -- nem pode trocar o próprio e-mail: é por ele que o aprovador reconhece
+  -- quem está pedindo acesso. Sem esta trava dava para se passar por outro.
+  update public.perfis set nome = 'Nome Novo', email = 'chefe@exemplo.com' where id = pendente;
+  select email into status_lido from public.perfis where id = pendente;
+  if status_lido = 'espera@exemplo.com' then
+    raise notice 'OK — e-mail do perfil não pode ser trocado pelo cliente';
+  else
+    raise warning 'FALHOU — e-mail virou %; dá para se passar por outra pessoa na fila de aprovação', status_lido;
+  end if;
+
+  -- ---- como o aprovador ----
+  perform set_config('request.jwt.claims', json_build_object('sub', aprovador, 'role','authenticated')::text, true);
+
+  select count(*) into visto from public.perfis where status = 'pendente';
+  if visto >= 1 then raise notice 'OK — aprovador enxerga a fila de pendentes (% conta[s])', visto;
+  else raise warning 'FALHOU — aprovador não vê nenhuma conta pendente; a tela de aprovação ficaria vazia'; end if;
+
+  update public.perfis set status = 'aprovado' where id = pendente;
+  select status, aprovado_por into status_lido, quem from public.perfis where id = pendente;
+  if status_lido = 'aprovado' then raise notice 'OK — aprovador consegue aprovar';
+  else raise warning 'FALHOU — aprovador não conseguiu aprovar (status ficou %)', status_lido; end if;
+  if quem = aprovador then raise notice 'OK — aprovado_por vem do servidor (auth.uid())';
+  else raise warning 'FALHOU — aprovado_por = %, deveria ser o aprovador (%)', quem, aprovador; end if;
+
+  -- sou_aprovador() responde certo, e a lista continua ilegível
+  if public.sou_aprovador() then raise notice 'OK — sou_aprovador() diz true pra quem aprova';
+  else raise warning 'FALHOU — sou_aprovador() deveria ser true'; end if;
+
+  begin
+    perform count(*) from public.aprovadores;
+    raise warning 'FALHOU — a tabela aprovadores foi lida diretamente pela API';
+  exception when insufficient_privilege then
+    raise notice 'OK — aprovadores continua ilegível direto, só via sou_aprovador()';
+  end;
+
+  -- ---- depois de aprovada, a conta passa a funcionar ----
+  perform set_config('request.jwt.claims', json_build_object('sub', pendente, 'role','authenticated')::text, true);
+  begin
+    insert into public.eventos_resposta (id, usuario_id, questao_id, ts, resultado, caixa_depois, prox)
+    values (gen_random_uuid(), pendente, 'eeeeeeeeee', now(), 'sabia', 2, current_date);
+    raise notice 'OK — depois de aprovada, a conta grava normalmente';
+  exception when others then
+    raise warning 'FALHOU — conta aprovada continua sem conseguir gravar: %', sqlerrm;
+  end;
+
+  reset role;
+end $$;
+
+
+-- ----------------------------------------------------------------------------
+-- 9. O cadastro está mesmo aberto?
+--    O gatilho de convite tem que estar DESLIGADO — se continuar de pé,
+--    ninguém de fora consegue criar conta e a aprovação nunca acontece.
+-- ----------------------------------------------------------------------------
+select
+  case when count(*) = 0 then 'OK — exigir_convite desligado, cadastro aberto'
+       else 'FALHOU — o gatilho exigir_convite ainda está ativo; o cadastro continua fechado por convite'
+  end as teste_9_cadastro_aberto
+from pg_trigger
+where tgname = 'exigir_convite' and not tgisinternal;
+
 
 rollback;
 
