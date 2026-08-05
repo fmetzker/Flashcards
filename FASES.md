@@ -639,6 +639,84 @@ sem quebra, `offline.html` regenerado, `validar.ps1` sem erros.
 
 ---
 
+## Login obrigatório · **concluída**
+
+**Modelo usado:** Sonnet 5, esforço high.
+
+Conta deixou de ser opcional: sem sessão válida, o boot mostra a tela de
+login em vez da tela inicial (`exigeLogin()`/`pintarLogin()`). O
+`offline.html` é a exceção deliberada — nunca fala com o servidor.
+`validar.py`/`validar.ps1` passaram a tratar `supabase.json` de exemplo como
+**erro**, não aviso: publicar assim tranca todo mundo pra fora.
+
+---
+
+## Fim do perfil local · **concluída**
+
+**Modelo usado:** Sonnet 5, esforço high.
+
+Com login obrigatório, o id local (`p1`, `p2`...) virou redundante — e
+perigoso: o mesmo `p1` podia guardar o progresso de duas pessoas diferentes
+no mesmo aparelho. O progresso passou a ser chaveado pelo id real da conta
+(`sub` do token). Ver regra 1 do `CLAUDE.md`.
+
+Migração automática de três esquemas anteriores (`vr:perfis`/`vr:perfil:<id>`,
+`vr:sessao:<id>`, e a chave pré-Fase 2 `vr-enf-2026` — que era resgatada por
+`carregarPerfis()`, função que deixou de existir). Nada antigo é apagado.
+
+**Verificação.** Testado no navegador: migração preservando meta, cartões,
+dias, fila e cursores; duas contas no mesmo aparelho lendo/escrevendo sob
+chaves distintas, com o estado de uma **intacto** depois de a outra usar o
+app; `offline.html` entrando sem login e persistindo entre aberturas.
+
+**Bug achado no próprio teste:** no `offline.html` não existe sessão, então
+`CONTA_ID` ficava null, `CHAVE` null e `salvar()` só guardava em memória — o
+progresso sumiria ao fechar o arquivo. Corrigido com a chave fixa
+`vr:conta:local`. Não teria aparecido sem rodar o offline de verdade.
+
+---
+
+## Cadastro aberto com aprovação · **concluída**
+
+**Modelo usado:** Opus 5, esforço high (schema/RLS) + Sonnet 5 (telas).
+
+A allowlist de convidados deu lugar a um portão **depois** do cadastro:
+qualquer pessoa cria conta, ela nasce `pendente` e não enxerga nada até um
+aprovador liberar.
+
+- `exigir_convite` desligado; `convidados` fica de pé, sem uso
+- `perfis` ganha `status`/`aprovado_por`/`aprovado_em`/`email`
+- `aprovadores` + `sou_aprovador()`, no padrão de `revisores`/`sou_revisor()`
+- `conta_aprovada()` exigido nas policies de `eventos_resposta`, `simulados`
+  e `propostas`. `perfis` é a exceção deliberada: a pessoa precisa ler a
+  própria linha para o app saber que está pendente
+- gatilho `proteger_status_perfil` impede auto-aprovação (o `status` mora na
+  mesma linha que nome e meta, que a pessoa pode editar), assina
+  `aprovado_por` com `auth.uid()` do servidor e congela o `email`
+
+**Dois problemas achados na revisão, antes de rodar:**
+
+- O backfill que marca contas antigas como aprovadas rodaria **toda vez**.
+  Como o `schema.sql` é idempotente por contrato e feito para ser
+  reexecutado, isso aprovaria em massa quem estivesse na fila naquele
+  momento. Agora vive dentro de um guard que checa se a coluna já existe.
+- As seções 5 e 6 do `conferir.sql` passariam a falhar por **motivo errado**
+  (falta de aprovação, não vazamento entre pessoas), escondendo exatamente o
+  que elas existem para pegar. Ganharam perfis aprovados.
+
+**Verificação.** No app: os cinco caminhos do portão (sem sessão → login;
+pendente e rejeitado → espera; aprovado → app; servidor sem resposta → app,
+porque ficar offline não pode trancar quem já usava). No servidor:
+`conferir.sql` rodado contra o projeto real, seção 8 nova incluída, **sem
+nenhum FALHOU nem WARNING** — conta pendente não grava, não propõe, não se
+auto-aprova e não troca o próprio e-mail; aprovador vê a fila e libera;
+`aprovado_por` vem do servidor; `aprovadores` continua ilegível.
+
+Diferente da Fase 4b, aqui o schema foi conferido contra o projeto real
+**antes** de ser dado como pronto.
+
+---
+
 ## Fase 5 — Social leve (opcional)
 
 **Modelo sugerido:** Sonnet 5, esforço **low** — telas de leitura sobre dado
