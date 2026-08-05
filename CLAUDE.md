@@ -36,16 +36,30 @@ no Safari do iPhone sem nenhuma etapa de compilação.
 
 ## Regras invioláveis
 
-1. **Nunca usar `localStorage` fora do que já existe.** Desde a Fase 2 há
-   múltiplos perfis: `vr:perfis` guarda o índice (`{atual, lista:[{id,nome}]}`)
-   e cada perfil vive em `vr:perfil:<id>`, mesmo formato de estado de sempre.
-   A chave única de antes, `vr-enf-2026`, continua no aparelho como rede de
-   segurança — não é apagada — e é migrada para o perfil `p1` na primeira
-   execução desta versão. Fallback em memória por perfil. Desde a Fase 3, cada
-   perfil também tem `vr:sessao:<id>` (login), `vr:fila:<id>` e
-   `vr:fila-sim:<id>` (eventos e simulados ainda não confirmados no servidor),
-   `vr:cursor-eventos:<id>` e `vr:cursor-simulados:<id>` (até onde o pull já
-   leu). Não introduzir outra chave sem migração.
+1. **Nunca usar `localStorage` fora do que já existe.** **A conta é a
+   identidade — não existe mais "perfil".** O progresso é chaveado pelo id
+   real da conta (o `sub` do token, via `idDoToken()`), não por um id local
+   escolhido na tela. É isso que garante que duas pessoas usando o mesmo
+   aparelho não misturem progresso, mesmo antes de a sincronização rodar.
+
+   | chave | o quê |
+   |---|---|
+   | `vr:sessao` | login (uma só: um logado por vez no aparelho) |
+   | `vr:conta:<userId>` | o estado (mesmo JSON de sempre) |
+   | `vr:fila:<userId>`, `vr:fila-sim:<userId>` | eventos e simulados ainda não confirmados no servidor |
+   | `vr:cursor-eventos:<userId>`, `vr:cursor-simulados:<userId>` | até onde o pull já leu |
+
+   `CONTA_ID`, `CHAVE` e `E` são resolvidos **uma vez, no início do script**.
+   Por isso entrar e sair recarregam a página em vez de repintar: sem o
+   reload, quem acabou de logar seguiria com o `E` vazio de antes do login e
+   gravaria por cima do progresso de verdade. Deslogado, `CHAVE` é `null` e
+   `salvar()` só guarda em memória.
+
+   Esquemas antigos (`vr:perfis`, `vr:perfil:<id>`, `vr:sessao:<id>`, e a
+   chave única pré-Fase 2 `vr-enf-2026`) são **lidos para migrar e nunca
+   apagados** — custam alguns KB e são rede de segurança. Ver
+   `migrarSessaoDoPerfil()` e `migrarEstadoDoPerfil()`. Não introduzir outra
+   chave sem migração.
 2. **Ao alterar `index.html`, incrementar `VERSAO` em `sw.js`.** Formato:
    `v13-852q-materias` → `v14-...`. Desde a v14 o service worker é
    **rede-primeiro**, com o cache só como reserva para quando não há internet —
@@ -118,10 +132,10 @@ duração, blocos (nome, quantas questões, quais matérias) e regra de aprovaç
 Acrescentar um concurso é editar esse arquivo — não exige mexer no código. Uma
 matéria não pode aparecer em dois blocos do mesmo concurso; o validador barra.
 
-**Um perfil pode seguir mais de um concurso ao mesmo tempo.** Duas noções que
+**Uma conta pode seguir mais de um concurso ao mesmo tempo.** Duas noções que
 não podem ser confundidas — é o erro fácil de cometer ao mexer nesta parte:
 
-- `INSCRITOS` / `E.concursos` — todos os que o perfil estuda. Definem o
+- `INSCRITOS` / `E.concursos` — todos os que a conta estuda. Definem o
   **banco carregado** (união das matérias de todos, via `materiasInscritas()`)
   e o **teto do Leitner**, que usa `diasAteMaisProxima()`: seguir um concurso
   distante não pode afrouxar a revisão por causa de outro que é semana que
@@ -131,8 +145,8 @@ não podem ser confundidas — é o erro fácil de cometer ao mexer nesta parte:
   bloco fraco. Trocar o foco (`aplicarFoco()`) só repinta; **mudar a lista de
   inscritos recarrega**, porque a união de matérias muda.
 
-Perfis de antes desta versão guardavam `E.concurso` (singular); `carregarConfig()`
-migra para lista na primeira execução, sem perder a escolha.
+Estados de antes desta versão guardavam `E.concurso` (singular);
+`carregarConfig()` migra para lista na primeira execução, sem perder a escolha.
 
 Consequência assumida desta modelagem: como "Conhecimentos Específicos de
 Enfermagem" é uma matéria só, o compartilhamento do acervo de enfermagem vale
@@ -184,7 +198,7 @@ Aprovação: 35 pontos **e** nenhuma área zerada.
 
 Banco com **876 questões** (99 lp, 99 sus, 654 esp, 24 matemática).
 
-**Fases 0 a 4c concluídas**, mais o suporte a múltiplos concursos por perfil. O
+**Fases 0 a 4c concluídas**, mais o suporte a múltiplos concursos por conta. O
 projeto migrou de app de prova única para plataforma com contas, banco
 compartilhado por matéria e concurso escolhido por cada pessoa. O plano
 completo está em `FASES.md`. A Fase 0 deu id estável a cada questão, tirou o
@@ -194,23 +208,27 @@ Fase 1b subdividiu essas matérias em tópicos reais; a Fase 1c reduziu as
 matérias às três do edital, virando uma árvore de três níveis; a Fase 2 deu
 suporte a múltiplos perfis no mesmo aparelho; a Fase 3a criou o schema do
 Supabase (RLS, allowlist, log append-only); a Fase 3b deu login por e-mail e
-senha, com sessão presa ao perfil local; a Fase 3c deu o motor de
+senha; a Fase 3c deu o motor de
 sincronização — fila local, push idempotente, pull incremental com merge por
 evento mais recente; a Fase 4a deu o formulário de proposta de questão; a Fase
 4b deu a tela de revisão (aprovar/rejeitar); a Fase 4c fechou o ciclo com
 `incorporar-propostas.ps1`, que grava a proposta aprovada em
 `banco/<matéria>.json` — commit e `validar.py` continuam manuais depois. O
 banco em si continua estático o tempo todo: a proposta nunca escreve direto
-nele. Depois disso, o perfil ganhou suporte a mais de um concurso ao mesmo
+nele. Depois disso, a conta ganhou suporte a mais de um concurso ao mesmo
 tempo, com um em foco e os demais só inscritos.
 
 **Login passou a ser obrigatório para entrar no app** (antes era opcional).
-Sem sessão válida para o perfil local, o boot mostra uma tela de
-entrar/criar conta em vez da tela inicial — ver `pintarLogin()`/`exigeLogin()`
-em `index.html`. Isso não vale para o `offline.html`, que nunca fala com o
-servidor e continua funcionando sem conta, de propósito. Consequência: quem
-ainda não tem conta (cadastro fechado, só quem está em `convidados`) fica
-bloqueado até criar uma.
+Sem sessão válida no aparelho, o boot mostra uma tela de entrar/criar conta
+em vez da tela inicial — ver `pintarLogin()`/`exigeLogin()` em `index.html`.
+Isso não vale para o `offline.html`, que nunca fala com o servidor e continua
+funcionando sem conta, de propósito. Consequência: quem ainda não tem conta
+(cadastro fechado, só quem está em `convidados`) fica bloqueado até criar uma.
+
+**O conceito de perfil local foi removido** logo depois: com login
+obrigatório, a conta já era a identidade, e o id local (`p1`, `p2`...) só
+criava a chance de duas pessoas compartilharem a mesma gaveta de progresso no
+mesmo aparelho. Ver a regra 1 para o esquema de chaves atual e as migrações.
 
 Projeto Supabase real criado, `supabase.json` preenchido, e o `schema.sql`
 inteiro (Fases 3a a 4c: RLS, allowlist, `propostas`/`revisores`,

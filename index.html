@@ -361,19 +361,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
 <div class="tela" id="tela-ajustes">
   <h1>Ajustes</h1>
 
-  <div class="rotulo">Perfil</div>
-  <div class="aviso">Estudando: <strong id="perfil-atual">–</strong></div>
-  <div style="display:flex;gap:9px;margin-top:10px;align-items:center">
-    <select id="perfil-lista" style="flex:1;font-family:var(--corpo);font-size:15px;padding:11px 12px;border:1px solid var(--traco);border-radius:10px;background:#fff"></select>
-  </div>
-  <div style="display:flex;gap:9px;margin-top:9px">
-    <button class="pequeno fantasma" onclick="criarPerfil()">Novo perfil</button>
-    <button class="pequeno fantasma" onclick="renomearPerfilAtual()">Renomear</button>
-    <button class="pequeno fantasma" id="perfil-apagar" style="color:var(--coral);border-color:#E9C4C1" onclick="apagarPerfilAtual()">Apagar</button>
-  </div>
-  <div class="aviso">Cada perfil tem progresso, meta e concurso próprios, guardados só neste aparelho.</div>
-
-  <div style="margin-top:24px" class="rotulo">Concursos</div>
+  <div class="rotulo">Concursos</div>
   <div class="aviso">Marque todos que você estuda. O banco de questões passa a trazer as matérias de todos eles; a contagem e o simulado usam o que estiver em foco na tela inicial.</div>
   <div id="concursos-corpo" style="margin-top:10px"></div>
 
@@ -547,52 +535,118 @@ const blocoDe = q => blocoDaMateria[q.m];
 const nomeBloco = id => (BLOCOS.find(b=>b.id===id)||{}).nome || id;
 
 /* =======================================================================
-   PERFIS
-   Vários perfis no mesmo aparelho — cada pessoa com seu progresso e seu
-   concurso-alvo, sem conta e sem rede. O índice mora numa chave fixa; cada
-   perfil tem a sua própria, no mesmo formato que o estado sempre teve.
+   SESSÃO E IDENTIDADE LOCAL
 
-   vr:perfis           -> {atual:"p1", lista:[{id,nome}, ...]}
-   vr:perfil:<id>       -> o estado (mesmo JSON de sempre)
-   vr-enf-2026 (legado) -> chave única de antes desta fase; migrada para
-                           vr:perfil:p1 na primeira execução e depois
-                           deixada em paz (não é apagada — custa nada manter
-                           como rede de segurança).
+   Não existe mais "perfil": a conta É a identidade. Antes havia um id local
+   escolhido na tela (p1, p2...) e o progresso morava sob ele; com login
+   obrigatório isso virou redundante, e pior, mentiroso — o mesmo p1 podia
+   guardar o progresso de duas pessoas diferentes em momentos diferentes.
+
+   Agora a chave do progresso é o id DE VERDADE da conta, tirado do `sub` do
+   próprio token. Consequência que é o ponto de tudo isto: se outra pessoa
+   logar neste mesmo aparelho, ela lê e escreve sob outra chave, e nada se
+   mistura — nem antes de a sincronização rodar.
+
+   vr:sessao            -> sessão (chave única: um logado por vez no aparelho)
+   vr:conta:<userId>    -> o estado (mesmo JSON de sempre)
+   vr:perfil:<id>       -> esquema antigo, por perfil; migrado abaixo
+   vr:perfis            -> índice antigo de perfis; só lido para migrar
+   vr-enf-2026 (legado) -> chave única anterior à Fase 2
+
+   Nada antigo é apagado, de propósito: custa alguns KB e é rede de
+   segurança se alguma migração sair errada.
    ======================================================================= */
-const CHAVE_PERFIS = "vr:perfis";
-const CHAVE_LEGADA = "vr-enf-2026";
-const chavePerfil = id => "vr:perfil:"+id;
+const CHAVE_SESSAO  = "vr:sessao";
+const CHAVE_PERFIS  = "vr:perfis";            // só para migrar
+const chavePerfil   = id => "vr:perfil:"+id;  // idem
+const chaveConta    = id => "vr:conta:"+id;
 
-/* cria o índice na primeira vez que esta versão roda. Se havia progresso na
-   chave antiga (de antes da Fase 2), ele vira o perfil "p1" — ninguém perde
-   histórico só por causa da atualização. */
-function carregarPerfis(){
-  try{
-    const t = localStorage.getItem(CHAVE_PERFIS);
-    if(t) return JSON.parse(t);
-  }catch(e){ /* localStorage indisponível: cai no perfil único abaixo */ }
-
-  const perfis = {atual:"p1", lista:[{id:"p1", nome:"Perfil 1"}]};
-  try{
-    const legado = localStorage.getItem(CHAVE_LEGADA);
-    if(legado) localStorage.setItem(chavePerfil("p1"), legado);
-    localStorage.setItem(CHAVE_PERFIS, JSON.stringify(perfis));
-  }catch(e){ /* sem storage, o índice só vive nesta sessão — ver ler()/salvar() */ }
-  return perfis;
+function lerSessao(){
+  try{ const t = localStorage.getItem(CHAVE_SESSAO); return t ? JSON.parse(t) : null; }
+  catch(e){ return null; }
 }
-function salvarPerfis(p){
-  try{ localStorage.setItem(CHAVE_PERFIS, JSON.stringify(p)); }catch(e){}
+function salvarSessao(s){ try{ localStorage.setItem(CHAVE_SESSAO, JSON.stringify(s)); }catch(e){} }
+function apagarSessaoSalva(){ try{ localStorage.removeItem(CHAVE_SESSAO); }catch(e){} }
+
+/* o id da conta vem do `sub` do access_token. Isto NÃO é uma checagem de
+   segurança — é só para escolher sob qual chave gravar aqui no aparelho.
+   Quem valida o token de verdade é o servidor, via RLS; um token adulterado
+   não passa lá, e adulterar este daqui só faria a pessoa ver o próprio
+   progresso sob outro nome. */
+function idDoToken(token){
+  try{
+    const p = token.split(".")[1].replace(/-/g,"+").replace(/_/g,"/");
+    return JSON.parse(atob(p + "=".repeat((4 - p.length % 4) % 4))).sub || null;
+  }catch(e){ return null; }
 }
 
-let PERFIS = carregarPerfis();
-const CHAVE = chavePerfil(PERFIS.atual);
+/* migração do esquema por perfil para o esquema por conta. Roda uma vez, na
+   primeira abertura desta versão: pega o perfil que estava em uso e promove
+   a sessão dele à chave única. O ESTADO só dá para migrar depois, quando o
+   id da conta é conhecido — ver migrarEstadoDoPerfil(). */
+function migrarSessaoDoPerfil(){
+  try{
+    if(localStorage.getItem(CHAVE_SESSAO)) return;          // já migrado
+    const idx = localStorage.getItem(CHAVE_PERFIS);
+    if(!idx) return;                                        // nunca teve perfil
+    const atual = (JSON.parse(idx)||{}).atual;
+    if(!atual) return;
+    const antiga = localStorage.getItem("vr:sessao:"+atual);
+    if(antiga) localStorage.setItem(CHAVE_SESSAO, antiga);
+  }catch(e){ /* sem storage ou JSON quebrado: segue sem migrar, pede login */ }
+}
+migrarSessaoDoPerfil();
+
+let SESSAO = lerSessao();
+/* O offline.html (window.DADOS) nunca tem sessão — não fala com o servidor,
+   por desenho — mas precisa gravar progresso em algum lugar. Sem esta
+   exceção ele cairia no ramo "deslogado", onde CHAVE é null e salvar() só
+   guarda em memória: o progresso sumiria ao fechar o arquivo. Chave fixa,
+   já que ali não existe conta para distinguir ninguém. */
+let CONTA_ID = SESSAO ? (SESSAO.user_id || idDoToken(SESSAO.access_token||""))
+             : (window.DADOS ? "local" : null);
+
+/* o progresso do perfil que estava logado passa a ser o progresso da conta.
+   Só copia se ainda não houver estado sob a conta — reabrir o app não pode
+   sobrescrever com dados velhos o que já foi estudado no esquema novo. */
+function migrarEstadoDoPerfil(){
+  if(!CONTA_ID) return;
+  try{
+    if(localStorage.getItem(chaveConta(CONTA_ID))) return;   // já tem estado próprio
+    const idx = localStorage.getItem(CHAVE_PERFIS);
+    if(!idx){
+      /* nunca passou pelo esquema de perfis: pode ter progresso na chave
+         única anterior à Fase 2, que naquela época era migrada por
+         carregarPerfis(). Aquela função não existe mais, então o resgate
+         precisa acontecer aqui ou o histórico se perde. */
+      const legado = localStorage.getItem("vr-enf-2026");
+      if(legado) localStorage.setItem(chaveConta(CONTA_ID), legado);
+      return;
+    }
+    const atual = (JSON.parse(idx)||{}).atual;
+    if(!atual) return;
+    const estado = localStorage.getItem(chavePerfil(atual));
+    if(estado) localStorage.setItem(chaveConta(CONTA_ID), estado);
+    // fila e cursores acompanham o estado: sem eles, eventos já empurrados
+    // voltariam a ser contados no próximo pull
+    ["vr:fila:", "vr:fila-sim:", "vr:cursor-eventos:", "vr:cursor-simulados:"].forEach(pre=>{
+      const v = localStorage.getItem(pre+atual);
+      if(v !== null && localStorage.getItem(pre+CONTA_ID) === null) localStorage.setItem(pre+CONTA_ID, v);
+    });
+  }catch(e){ /* migração é oportunista: falhar aqui só significa começar limpo */ }
+}
+migrarEstadoDoPerfil();
+
+const CHAVE = CONTA_ID ? chaveConta(CONTA_ID) : null;
 let memoria = null;                      // fallback se localStorage falhar
 
 function ler(){
+  if(!CHAVE) return null;                // deslogado: estado só existe em memória
   try{ const t = localStorage.getItem(CHAVE); return t ? JSON.parse(t) : null; }
   catch(e){ return memoria; }
 }
 function salvar(){
+  if(!CHAVE){ memoria = E; return; }     // deslogado: nada a persistir ainda
   try{ localStorage.setItem(CHAVE, JSON.stringify(E)); }
   catch(e){ memoria = E; }
 }
@@ -615,49 +669,6 @@ const padrao = {meta:35, cartoes:{}, dias:{}, simulados:[], ultimoBackup:null, v
   diasTotal: {}, diasCertas: {}};
 let E = Object.assign({}, padrao, ler()||{});
 
-function nomePerfilAtual(){
-  const p = PERFIS.lista.find(p=>p.id===PERFIS.atual);
-  return p ? p.nome : "Perfil";
-}
-
-/* trocar, criar e renomear recarregam a página de propósito: o app já faz um
-   boot completo do zero (carregarConfig → carregarBanco → migrarParaIds →
-   pintar), e reaproveitar isso é mais simples e mais seguro do que
-   reinicializar cada variável de estado à mão. */
-function trocarPerfil(id){
-  if(id === PERFIS.atual) return;
-  PERFIS.atual = id;
-  salvarPerfis(PERFIS);
-  location.reload();
-}
-function criarPerfil(){
-  const nome = prompt("Nome do novo perfil:");
-  if(!nome || !nome.trim()) return;
-  const id = "p"+Date.now().toString(36);
-  PERFIS.lista.push({id, nome:nome.trim()});
-  PERFIS.atual = id;
-  salvarPerfis(PERFIS);
-  location.reload();
-}
-function renomearPerfilAtual(){
-  const atual = PERFIS.lista.find(p=>p.id===PERFIS.atual);
-  const nome = prompt("Novo nome do perfil:", atual ? atual.nome : "");
-  if(!nome || !nome.trim() || !atual) return;
-  atual.nome = nome.trim();
-  salvarPerfis(PERFIS);
-  pintarAjustes();
-}
-function apagarPerfilAtual(){
-  if(PERFIS.lista.length <= 1){ alert("Este é o único perfil — não dá para apagar."); return; }
-  const atual = PERFIS.lista.find(p=>p.id===PERFIS.atual);
-  if(!confirm("Apagar o perfil \""+(atual?atual.nome:"")+"\" e todo o progresso dele? Não tem volta.")) return;
-  try{ localStorage.removeItem(chavePerfil(PERFIS.atual)); }catch(e){}
-  PERFIS.lista = PERFIS.lista.filter(p=>p.id!==PERFIS.atual);
-  PERFIS.atual = PERFIS.lista[0].id;
-  salvarPerfis(PERFIS);
-  location.reload();
-}
-
 /* =======================================================================
    CONTA — Fase 3b
    Login por e-mail e senha, contra o Supabase Auth (GoTrue) direto por
@@ -665,26 +676,16 @@ function apagarPerfilAtual(){
    abaixo) bloqueia a entrada no app sem sessão válida, exceto no
    offline.html, que não fala com o servidor.
 
-   A sessão fica presa ao PERFIL local, não numa chave global: trocar de
-   perfil no mesmo aparelho não pode herdar a sessão de outra pessoa. Como
-   trocar de perfil recarrega a página (ver trocarPerfil), isso sai de graça —
-   basta a sessão morar sob a chave do perfil.
+   A leitura/gravação da sessão e a identidade local ficam no bloco SESSÃO E
+   IDENTIDADE LOCAL, mais acima — precisam existir antes do estado, que
+   agora é chaveado pela conta.
 
    O cadastro é fechado: o gatilho exigir_convite (supabase/schema.sql) recusa
    e-mail fora da lista de convidados. O erro que o servidor manda nesse caso
    aparece cru na tela — não tento adivinhar o formato exato da mensagem sem
    um projeto real para testar contra.
    ======================================================================= */
-const chaveSessao = id => "vr:sessao:"+id;
-function lerSessao(){
-  try{ const t = localStorage.getItem(chaveSessao(PERFIS.atual)); return t ? JSON.parse(t) : null; }
-  catch(e){ return null; }
-}
-function salvarSessao(s){ try{ localStorage.setItem(chaveSessao(PERFIS.atual), JSON.stringify(s)); }catch(e){} }
-function apagarSessaoSalva(){ try{ localStorage.removeItem(chaveSessao(PERFIS.atual)); }catch(e){} }
-
 let SUPA = null;      // {url, anonKey} — null enquanto não carrega ou se supabase.json não existir
-let SESSAO = lerSessao();
 let SOU_REVISOR = false;   // só sabido depois de perguntar ao servidor — ver verificarRevisor()
 
 /* supabase.json vem com valores de exemplo até você colar os de verdade —
@@ -714,7 +715,11 @@ function salvarSessaoDe(dado){
     access_token: dado.access_token,
     refresh_token: dado.refresh_token,
     expires_at: Date.now() + (dado.expires_in||3600)*1000,
-    email: dado.user ? dado.user.email : (SESSAO ? SESSAO.email : null)
+    email: dado.user ? dado.user.email : (SESSAO ? SESSAO.email : null),
+    /* guardado explicitamente para não precisar decodificar o token toda vez
+       que o app abre — é ele que dá a chave do progresso local */
+    user_id: (dado.user && dado.user.id) || idDoToken(dado.access_token||"") ||
+             (SESSAO ? SESSAO.user_id : null)
   };
   salvarSessao(SESSAO);
 }
@@ -801,10 +806,11 @@ const chaveFila       = id => "vr:fila:"+id;
 const chaveFilaSim    = id => "vr:fila-sim:"+id;
 const chaveCursorEv   = id => "vr:cursor-eventos:"+id;
 const chaveCursorSim  = id => "vr:cursor-simulados:"+id;
-function lerLista(chaveFn){ try{ const t = localStorage.getItem(chaveFn(PERFIS.atual)); return t ? JSON.parse(t) : []; }catch(e){ return []; } }
-function salvarLista(chaveFn, lista){ try{ localStorage.setItem(chaveFn(PERFIS.atual), JSON.stringify(lista)); }catch(e){} }
-function lerCursor(chaveFn){ try{ return localStorage.getItem(chaveFn(PERFIS.atual)); }catch(e){ return null; } }
-function salvarCursor(chaveFn, v){ try{ localStorage.setItem(chaveFn(PERFIS.atual), v); }catch(e){} }
+/* chaveadas pela conta, igual ao estado: deslogado não há o que enfileirar */
+function lerLista(chaveFn){ if(!CONTA_ID) return []; try{ const t = localStorage.getItem(chaveFn(CONTA_ID)); return t ? JSON.parse(t) : []; }catch(e){ return []; } }
+function salvarLista(chaveFn, lista){ if(!CONTA_ID) return; try{ localStorage.setItem(chaveFn(CONTA_ID), JSON.stringify(lista)); }catch(e){} }
+function lerCursor(chaveFn){ if(!CONTA_ID) return null; try{ return localStorage.getItem(chaveFn(CONTA_ID)); }catch(e){ return null; } }
+function salvarCursor(chaveFn, v){ if(!CONTA_ID) return; try{ localStorage.setItem(chaveFn(CONTA_ID), v); }catch(e){} }
 
 let FILA = lerLista(chaveFila);            // eventos de resposta ainda não confirmados no servidor
 let FILA_SIM = lerLista(chaveFilaSim);     // simulados ainda não confirmados
@@ -1689,29 +1695,9 @@ function pintarStats(){
 }
 
 /* =======================================================================
-   PERFIS — interface
-   ======================================================================= */
-function pintarPerfis(){
-  document.getElementById("perfil-atual").textContent = nomePerfilAtual();
-
-  const sel = document.getElementById("perfil-lista");
-  sel.innerHTML = "";
-  PERFIS.lista.forEach(p=>{
-    const op = document.createElement("option");
-    op.value = p.id; op.textContent = p.nome;
-    if(p.id === PERFIS.atual) op.selected = true;
-    sel.appendChild(op);
-  });
-  sel.onchange = ()=>trocarPerfil(sel.value);
-
-  document.getElementById("perfil-apagar").style.display =
-    PERFIS.lista.length <= 1 ? "none" : "";
-}
-
-/* =======================================================================
    LOGIN OBRIGATÓRIO — interface
    Tela cheia, sem rodapé de navegação. Só aparece no boot (ver BOOT, mais
-   abaixo) quando não há sessão válida para o perfil local atual — e nunca no
+   abaixo) quando não há sessão válida neste aparelho — e nunca no
    offline.html, que não tem como falar com o servidor de jeito nenhum.
 
    Reaproveita entrar()/criarConta() do bloco CONTA, só que bloqueando a
@@ -1752,26 +1738,22 @@ function pintarLogin(){
     finally{ botao.disabled = false; }
   };
 
+  /* recarrega em vez de só trocar de tela: CONTA_ID, CHAVE e E são resolvidos
+     uma vez, no início do script, e é o id da conta que diz sob qual chave o
+     progresso mora. Sem o reload, quem acabou de entrar continuaria com o E
+     vazio de antes do login e gravaria por cima do progresso de verdade. */
   const btEntrar = document.getElementById("login-entrar");
   const btCriar  = document.getElementById("login-criar");
   btEntrar.onclick = aoClicar(btEntrar, async (email, senha)=>{
     await entrar(email, senha);
-    await verificarRevisor();
-    salvar();
-    ir("inicio");
-    sincronizar();
+    location.reload();
   });
   btCriar.onclick = aoClicar(btCriar, async (email, senha)=>{
     const resultado = await criarConta(email, senha);
     if(resultado === "confirme"){
       erro.style.color = "var(--verde)";
       erro.textContent = "Conta criada — confirme pelo e-mail e depois entre.";
-    } else {
-      await verificarRevisor();
-      salvar();
-      ir("inicio");
-      sincronizar();
-    }
+    } else location.reload();
   });
 }
 
@@ -1822,7 +1804,7 @@ function pintarConta(){
       '<button class="pequeno fantasma" id="conta-criar">Criar conta</button>'+
     '</div>'+
     '<div class="aviso" id="conta-erro"></div>'+
-    '<div class="aviso">É só para sincronizar entre aparelhos — sem conta o app funciona igual.</div>';
+    '<div class="aviso">A conta guarda seu progresso e sincroniza entre aparelhos.</div>';
 
   const campoEmail = document.getElementById("conta-email");
   const campoSenha = document.getElementById("conta-senha");
@@ -2078,7 +2060,6 @@ function alternarConcurso(id, checkbox){
 }
 
 function pintarAjustes(){
-  pintarPerfis();
   pintarConcursos();
   pintarConta();
   document.getElementById("in-meta").value = E.meta;
@@ -2140,7 +2121,7 @@ function importar(input){
   r.readAsText(f);
 }
 function zerar(){
-  if(confirm("Apagar todo o progresso do perfil \""+nomePerfilAtual()+"\"? Não tem volta.")){
+  if(confirm("Apagar todo o progresso de "+((SESSAO && SESSAO.email) || "esta conta")+"? Não tem volta.")){
     E = JSON.parse(JSON.stringify(padrao)); salvar(); ir("inicio");
   }
 }
@@ -2167,7 +2148,7 @@ function falhaBoot(msg){
 
 /* login é obrigatório desde que o app passou a exigir conta — exceto no
    offline.html (window.DADOS), que nunca fala com o servidor e não tem como
-   pedir login a ninguém. Uma vez logado, a sessão fica salva por perfil e o
+   pedir login a ninguém. Uma vez logado, a sessão fica salva no aparelho e o
    app abre offline normalmente até ela expirar de verdade (ver
    renovarSessao). */
 function exigeLogin(){ return !window.DADOS && !SESSAO; }
