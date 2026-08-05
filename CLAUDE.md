@@ -162,8 +162,8 @@ Aprovação: 35 pontos **e** nenhuma área zerada.
 
 Banco com **852 questões** (99 lp, 99 sus, 654 esp).
 
-**Fases 0 a 3c e 4a concluídas.** O projeto está migrando de app de prova única
-para plataforma com contas, banco compartilhado por matéria e concurso
+**Fases 0 a 3c, 4a e 4b concluídas.** O projeto está migrando de app de prova
+única para plataforma com contas, banco compartilhado por matéria e concurso
 escolhido por cada pessoa. O plano completo está em `FASES.md`. A Fase 0 deu id
 estável a cada questão, tirou o banco do `index.html` e converteu o progresso de
 índice de array para id; a Fase 1 reagrupou os 85 tópicos em matérias e
@@ -174,12 +174,15 @@ três níveis; a Fase 2 deu suporte a múltiplos perfis no mesmo aparelho; a Fas
 login opcional por e-mail e senha, com sessão presa ao perfil local; a Fase 3c
 deu o motor de sincronização — fila local, push idempotente, pull incremental
 com merge por evento mais recente; a Fase 4a deu o formulário de proposta de
-questão, com o banco continuando estático (a questão só entra de verdade
-depois de revisada e passar pelo `validar.py`, nunca direto). Sem o
-`supabase.json` preenchido com um projeto de verdade, a conta fica indisponível
-e o app funciona exatamente como na Fase 2. Projeto real criado e
-`supabase.json` preenchido; RLS e o gatilho de convite conferidos contra ele.
-A próxima etapa é a Fase 4b (tela de revisão).
+questão; a Fase 4b deu a tela de revisão (aprovar/rejeitar), com o banco
+continuando estático — a questão só entra de verdade depois de revisada e
+passar pelo `validar.py` (Fase 4c), nunca direto. Sem o `supabase.json`
+preenchido com um projeto de verdade, a conta fica indisponível e o app
+funciona exatamente como na Fase 2. Projeto real criado e `supabase.json`
+preenchido; RLS e o gatilho de convite conferidos contra ele; `schema.sql` da
+4a/4b (tabelas `propostas`/`revisores`, function `sou_revisor`, gatilho
+`marcar_revisor`) ainda não confirmado contra o projeto — ver `FASES.md`.
+A próxima etapa é a Fase 4c (script de incorporação ao banco).
 
 **Viés de comprimento — resolvido.** A resposta certa costumava ser visivelmente
 mais longa que os distratores, o que permitia acertar sem saber o conteúdo. Foram

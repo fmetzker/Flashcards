@@ -480,12 +480,45 @@ o bloco 10 do schema pra virar revisor.
 
 ---
 
-### Fase 4b — Revisão
+### Fase 4b — Revisão · **concluída**
 
-**Modelo sugerido:** Sonnet 5, esforço medium.
+**Modelo usado:** Sonnet 5, esforço medium.
 
-- [ ] tela de revisão: lista pendentes, aprova ou rejeita com motivo
-- [ ] visível só para quem está em `revisores`
+- [x] tela de revisão: lista pendentes por matéria/tópico/subtópico,
+      enunciado, alternativas com a correta marcada, explicação, fonte
+- [x] aprovar (confirmação) / rejeitar (motivo opcional, cancelável sem
+      efeito) — atualiza só o status, nunca escreve no banco que o app lê
+- [x] visível só pra quem `sou_revisor()` confirma — ver os dois ajustes de
+      schema abaixo, que a 4a tinha deixado faltando
+
+**Dois complementos de schema que a 4a não previu, achados ao desenhar esta
+tela:**
+
+- `revisores` nega toda leitura pela API (RLS sem policy, de propósito). Isso
+  significa que **não dava pra perguntar "sou revisor?" com um SELECT** — a
+  própria proteção que impede listar quem revisa também impede um revisor
+  descobrir que é revisor. Resolvido com `sou_revisor()`, uma function
+  `security definer` que só devolve booleano, nunca a lista.
+- `revisado_por`/`revisado_em` não tinham como se preencher sozinhos: DEFAULT
+  só atua em INSERT, e essas colunas só fazem sentido num UPDATE (quando a
+  decisão acontece). Resolvido com o gatilho `marcar_revisor`, que também
+  fecha uma brecha que existiria se o cliente preenchesse esses campos
+  direto: sem o gatilho, um revisor poderia assinar a decisão em nome de
+  outro. Com ele, quem decidiu vem sempre de `auth.uid()` no servidor.
+
+**Verificação.** `conferir.sql` ganhou blocos para os dois: `sou_revisor()`
+devolve true/false certo e a tabela continua ilegível mesmo sendo revisor;
+tentar forjar `revisado_por` é ignorado, o gatilho usa o `auth.uid()` real.
+No app, testado com servidor simulado: botão escondido deslogado, escondido
+logado-mas-não-revisor, visível e funcional como revisor — listar pendentes,
+aprovar, rejeitar com motivo, cancelar rejeição sem chamar o servidor,
+`revisado_por` nunca enviado pelo cliente. Deslogar reresetta `SOU_REVISOR` e
+esconde o botão. Regressão completa sem quebra, `offline.html` regenerado,
+`validar.ps1` sem erros.
+
+**Pendente para você, junto com o que já estava pendente da 4a:** rodar
+`schema.sql` de novo (idempotente — inclui `sou_revisor`/`marcar_revisor`
+além de `propostas`/`revisores`) e o bloco 10 pra virar revisor.
 
 ---
 

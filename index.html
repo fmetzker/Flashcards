@@ -242,6 +242,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
     <button onclick="ir('simulado-inicio')">Simulado</button>
     <button onclick="ir('ajustes')">Ajustes</button>
     <button id="menu-propor" style="display:none" onclick="ir('propor')">Propor questão</button>
+    <button id="menu-revisar" style="display:none" onclick="ir('revisar')">Revisar propostas</button>
   </div>
 </div>
 
@@ -371,6 +372,13 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
 
   <div class="aviso" id="pq-erro"></div>
   <button class="verde" style="width:100%;margin-top:16px" id="pq-enviar" onclick="enviarProposta()">Enviar proposta</button>
+</div>
+
+<!-- ============ REVISAR PROPOSTAS ============ -->
+<div class="tela" id="tela-revisar">
+  <h1>Revisar propostas</h1>
+  <div class="sub" id="revisar-sub">–</div>
+  <div id="revisar-corpo" style="margin-top:16px"></div>
 </div>
 
 <!-- ============ AÇÕES FIXAS ============ -->
@@ -571,6 +579,7 @@ function apagarSessaoSalva(){ try{ localStorage.removeItem(chaveSessao(PERFIS.at
 
 let SUPA = null;      // {url, anonKey} — null enquanto não carrega ou se supabase.json não existir
 let SESSAO = lerSessao();
+let SOU_REVISOR = false;   // só sabido depois de perguntar ao servidor — ver verificarRevisor()
 
 /* supabase.json vem com valores de exemplo até você colar os de verdade —
    nesse estado a conta fica indisponível em vez de tentar falar com uma URL
@@ -636,6 +645,18 @@ async function renovarSessao(){
 async function verificarSessao(){
   if(!supaConfigurado() || !SESSAO) return;
   if(Date.now() > SESSAO.expires_at - 5*60*1000) await renovarSessao();
+}
+
+/* a tabela revisores nega toda leitura direta (RLS sem policy, de propósito —
+   ver schema.sql): a única forma de saber "eu sou revisor?" é perguntar pra
+   uma function que só devolve um booleano, nunca a lista de quem revisa. */
+async function verificarRevisor(){
+  SOU_REVISOR = false;
+  if(!supaConfigurado() || !SESSAO) return;
+  try{
+    const r = await chamarRest("rpc/sou_revisor", {method:"POST", body:"{}"});
+    if(r.ok) SOU_REVISOR = (await r.json()) === true;
+  }catch(e){ /* falha ao perguntar: trata como não-revisor, não trava nada */ }
 }
 
 /* =======================================================================
@@ -893,6 +914,7 @@ function ir(nome){
   if(nome==="ajustes") pintarAjustes();
   if(nome==="simulado-inicio") pintarSimuladoInicio();
   if(nome==="propor") pintarPropor();
+  if(nome==="revisar") pintarRevisar();
   rodape(nome);
 }
 function rodape(nome){
@@ -938,6 +960,7 @@ function pintarInicio(){
   // propor questão exige login — sem conta não há como escrever na tabela
   // propostas (RLS), então o botão nem aparece
   document.getElementById("menu-propor").style.display = (supaConfigurado() && SESSAO) ? "" : "none";
+  document.getElementById("menu-revisar").style.display = (supaConfigurado() && SESSAO && SOU_REVISOR) ? "" : "none";
 
   document.getElementById("cabecalho-cargo").textContent = CONCURSO.cargo;
   document.getElementById("cabecalho-sub").textContent =
@@ -1513,7 +1536,7 @@ function pintarConta(){
       '</div>';
     c.querySelector("strong").textContent = SESSAO.email || "–";
     pintarStatusSync();
-    document.getElementById("conta-sair").onclick = async ()=>{ await sair(); pintarConta(); };
+    document.getElementById("conta-sair").onclick = async ()=>{ await sair(); SOU_REVISOR = false; pintarConta(); pintarInicio(); };
     document.getElementById("conta-sincronizar").onclick = ()=>sincronizar();
     return;
   }
@@ -1548,7 +1571,9 @@ function pintarConta(){
   const btCriar  = document.getElementById("conta-criar");
   btEntrar.onclick = aoClicar(btEntrar, async (email, senha)=>{
     await entrar(email, senha);
+    await verificarRevisor();
     pintarConta();
+    pintarInicio();
   });
   btCriar.onclick = aoClicar(btCriar, async (email, senha)=>{
     const resultado = await criarConta(email, senha);
@@ -1636,6 +1661,105 @@ async function enviarProposta(){
     erro.textContent = e.message;
   }finally{
     bt.disabled = false;
+  }
+}
+
+/* =======================================================================
+   REVISAR PROPOSTAS — Fase 4b
+   Visível só pra quem SOU_REVISOR confirmou true (ver verificarRevisor()).
+   Aprovar/rejeitar só muda o status na tabela — não escreve no banco que o
+   app lê. A questão só existe de verdade depois da 4c (incorporar-propostas).
+   ======================================================================= */
+async function pintarRevisar(){
+  const c = document.getElementById("revisar-corpo");
+  c.innerHTML = "";
+  const carregando = document.createElement("div"); carregando.className = "vazio"; carregando.textContent = "Carregando…";
+  c.appendChild(carregando);
+
+  let pendentes;
+  try{
+    const r = await chamarRest("propostas?status=eq.pendente&order=criado_em.asc&select=id,materia,topico,subtopico,enunciado,alternativas,correta,explicacao,fonte,criado_em");
+    if(!r.ok) throw new Error("o servidor respondeu "+r.status);
+    pendentes = await r.json();
+  }catch(e){
+    c.innerHTML = "";
+    const erro = document.createElement("div"); erro.className = "aviso";
+    erro.textContent = "Não foi possível carregar: "+e.message;
+    c.appendChild(erro);
+    return;
+  }
+
+  document.getElementById("revisar-sub").textContent =
+    pendentes.length + (pendentes.length===1 ? " proposta pendente" : " propostas pendentes");
+  c.innerHTML = "";
+  if(!pendentes.length){
+    const vazio = document.createElement("div"); vazio.className = "vazio";
+    vazio.textContent = "Nada pendente no momento.";
+    c.appendChild(vazio);
+    return;
+  }
+
+  pendentes.forEach(p=>{
+    const card = document.createElement("div"); card.className = "card"; card.style.marginBottom = "12px";
+
+    const rot = document.createElement("div"); rot.className = "rotulo";
+    rot.textContent = ((MATERIAS[p.materia]||{}).nome || p.materia)+" · "+p.topico+(p.subtopico ? " · "+p.subtopico : "");
+    card.appendChild(rot);
+
+    const enun = document.createElement("div");
+    enun.style.cssText = "font-size:15.5px;line-height:1.5;margin:8px 0";
+    enun.textContent = p.enunciado;
+    card.appendChild(enun);
+
+    (p.alternativas||[]).forEach((a,i)=>{
+      const linha = document.createElement("div");
+      linha.style.cssText = "padding:4px 0;font-size:14.5px"+(i===p.correta ? ";color:var(--verde);font-weight:600" : "");
+      linha.textContent = "ABCDE"[i]+") "+a+(i===p.correta ? " ✓" : "");
+      card.appendChild(linha);
+    });
+
+    const expl = document.createElement("div"); expl.className = "aviso"; expl.style.marginTop = "8px";
+    expl.textContent = p.explicacao;
+    card.appendChild(expl);
+
+    const fonte = document.createElement("div");
+    fonte.style.cssText = "font-size:12px;color:var(--tinta2);font-family:var(--dado);margin-top:4px";
+    fonte.textContent = p.fonte;
+    card.appendChild(fonte);
+
+    const acoes = document.createElement("div");
+    acoes.style.cssText = "display:flex;gap:9px;margin-top:11px";
+    const btAprovar = document.createElement("button");
+    btAprovar.className = "pequeno verde"; btAprovar.textContent = "Aprovar";
+    btAprovar.onclick = ()=>decidirProposta(p.id, "aprovada");
+    const btRejeitar = document.createElement("button");
+    btRejeitar.className = "pequeno fantasma"; btRejeitar.textContent = "Rejeitar";
+    btRejeitar.onclick = ()=>decidirProposta(p.id, "rejeitada");
+    acoes.appendChild(btAprovar); acoes.appendChild(btRejeitar);
+    card.appendChild(acoes);
+
+    c.appendChild(card);
+  });
+}
+
+async function decidirProposta(id, status){
+  let motivo = null;
+  if(status === "rejeitada"){
+    motivo = prompt("Motivo da rejeição (fica só com você, opcional):");
+    if(motivo === null) return;   // cancelou — não faz nada
+  } else if(!confirm("Aprovar esta proposta?")){
+    return;
+  }
+  try{
+    const corpo = {status};
+    if(motivo) corpo.motivo_rejeicao = motivo;
+    // revisado_por/revisado_em são preenchidos pelo gatilho no servidor
+    // (marcar_revisor, em schema.sql) — não vêm daqui de propósito
+    const r = await chamarRest("propostas?id=eq."+id, {method:"PATCH", headers:{"Prefer":"return=minimal"}, body: JSON.stringify(corpo)});
+    if(!r.ok) throw new Error("o servidor respondeu "+r.status);
+    pintarRevisar();
+  }catch(e){
+    alert("Não foi possível registrar a decisão: "+e.message);
   }
 }
 
@@ -1734,6 +1858,7 @@ carregarConfig()
   .then(migrarParaIds)
   .then(carregarSupabase)   // conta é opcional: nunca rejeita a promise
   .then(verificarSessao)    // idem — desloga em silêncio se a sessão não presta mais
+  .then(verificarRevisor)   // idem — precisa terminar antes do menu pintar, senão o botão pisca
   .then(()=>{ salvar(); ir("inicio"); sincronizar(); })   // idem — puxa em segundo plano, não bloqueia a tela
   .catch(err=>{
     falhaBoot(location.protocol === "file:"

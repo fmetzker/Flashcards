@@ -302,6 +302,59 @@ create policy "revisor: decidir"
 
 
 -- ----------------------------------------------------------------------------
+-- 8.1 "Sou revisor?" — Fase 4b
+--
+-- `revisores` nega toda leitura pela API (revoke all, seção 7) — de propósito,
+-- pra lista de quem revisa não ficar enumerável. Mas então o app precisa de um
+-- jeito de perguntar "eu, especificamente, sou revisor?" sem poder listar
+-- quem mais é. Uma function security definer que só devolve true/false
+-- resolve isso: ela lê a tabela com privilégio elevado, mas o único dado que
+-- sai dela é o booleano.
+-- ----------------------------------------------------------------------------
+create or replace function public.sou_revisor()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (select 1 from public.revisores where user_id = auth.uid());
+$$;
+
+grant execute on function public.sou_revisor() to authenticated;
+
+
+-- ----------------------------------------------------------------------------
+-- 8.2 Quem decidiu e quando — Fase 4b
+--
+-- `revisado_por`/`revisado_em` não têm DEFAULT porque DEFAULT só se aplica em
+-- INSERT, e essas colunas só fazem sentido preenchidas num UPDATE (quando a
+-- decisão acontece). Um gatilho resolve, e tem uma vantagem sobre confiar no
+-- cliente pra mandar esses campos: quem decidiu vem de auth.uid() no servidor,
+-- não do que o app disser — não dá pra um revisor assinar a decisão de outro.
+-- ----------------------------------------------------------------------------
+create or replace function public.marcar_revisor()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if old.status = 'pendente' and new.status <> 'pendente' then
+    new.revisado_por := auth.uid();
+    new.revisado_em := now();
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists marcar_revisor on public.propostas;
+create trigger marcar_revisor
+  before update on public.propostas
+  for each row execute function public.marcar_revisor();
+
+
+-- ----------------------------------------------------------------------------
 -- 9. Convide as pessoas do grupo
 --
 -- Edite e execute. Só quem estiver aqui consegue criar conta.
@@ -316,9 +369,9 @@ create policy "revisor: decidir"
 -- 10. Vire revisor
 --
 -- Rode depois de já ter feito login pelo menos uma vez pelo app (a conta
--- precisa existir em auth.users primeiro). Pra achar seu user_id: Authentication
--- → Users no painel do Supabase, copie o UUID da sua linha.
+-- precisa existir em auth.users primeiro). Busca pelo e-mail — não precisa
+-- copiar UUID de Authentication → Users na mão.
 -- ----------------------------------------------------------------------------
--- insert into public.revisores (user_id) values
---   ('cole-aqui-o-uuid-do-seu-usuario')
+-- insert into public.revisores (user_id)
+-- select id from auth.users where email = 'franciscometzker@gmail.com'
 -- on conflict (user_id) do nothing;

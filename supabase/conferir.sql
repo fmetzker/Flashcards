@@ -148,6 +148,8 @@ declare
   prop_id uuid := gen_random_uuid();
   alt     jsonb := '["A","B","C","D","E"]'::jsonb;
   visto   int;
+  visto_uuid uuid;
+  visto_ts   timestamptz;
 begin
   insert into public.revisores (user_id) values (revisor);
 
@@ -182,9 +184,52 @@ begin
   if visto = 1 then raise notice 'OK — revisor vê a proposta de outra pessoa';
   else raise warning 'FALHOU — revisor vê % propostas; deveria ver 1', visto; end if;
 
-  update public.propostas set status = 'aprovada', revisado_por = revisor where id = prop_id;
-  if found then raise notice 'OK — revisor consegue decidir';
-  else raise warning 'FALHOU — revisor não conseguiu atualizar o status'; end if;
+  -- tenta assinar a decisão em nome de outra pessoa (spoof) — o gatilho tem
+  -- que ignorar isso e usar auth.uid() de verdade, não o que o cliente mandou
+  update public.propostas set status = 'aprovada', revisado_por = autor where id = prop_id;
+  select revisado_por, revisado_em into visto_uuid, visto_ts from public.propostas where id = prop_id;
+  if visto_uuid = revisor then
+    raise notice 'OK — revisado_por vem do servidor (auth.uid()), não do que o cliente mandou';
+  else
+    raise warning 'FALHOU — revisado_por = %, deveria ser o revisor (%), não % — dá pra forjar quem decidiu', visto_uuid, revisor, autor;
+  end if;
+  if visto_ts is not null then raise notice 'OK — revisado_em foi preenchido pelo gatilho';
+  else raise warning 'FALHOU — revisado_em ficou nulo'; end if;
+
+  reset role;
+end $$;
+
+
+-- ----------------------------------------------------------------------------
+-- 7. sou_revisor() — só devolve booleano, nunca a lista de quem revisa
+-- ----------------------------------------------------------------------------
+do $$
+declare
+  revisor uuid := '66666666-6666-6666-6666-666666666666';
+  ninguem uuid := '77777777-7777-7777-7777-777777777777';
+  resultado boolean;
+begin
+  insert into public.revisores (user_id) values (revisor);
+
+  set local role authenticated;
+  perform set_config('request.jwt.claims', json_build_object('sub', revisor, 'role','authenticated')::text, true);
+  select public.sou_revisor() into resultado;
+  if resultado then raise notice 'OK — sou_revisor() diz true pra quem é revisor';
+  else raise warning 'FALHOU — sou_revisor() deveria ser true'; end if;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', ninguem, 'role','authenticated')::text, true);
+  select public.sou_revisor() into resultado;
+  if not resultado then raise notice 'OK — sou_revisor() diz false pra quem não é';
+  else raise warning 'FALHOU — sou_revisor() deveria ser false'; end if;
+
+  -- e a tabela em si continua ilegível diretamente, mesmo sendo revisor
+  perform set_config('request.jwt.claims', json_build_object('sub', revisor, 'role','authenticated')::text, true);
+  begin
+    perform count(*) from public.revisores;
+    raise warning 'FALHOU — a tabela revisores foi lida diretamente pela API';
+  exception when insufficient_privilege then
+    raise notice 'OK — revisores continua ilegível direto, só via sou_revisor()';
+  end;
 
   reset role;
 end $$;
