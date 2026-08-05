@@ -182,6 +182,13 @@ button.fechar{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;
 .vazio{text-align:center;color:var(--tinta2);padding:40px 20px;font-size:15px}
 label{display:block;font-size:14px;color:var(--tinta2);margin:14px 0 5px}
 input[type=number]{width:100%;font-family:var(--dado);font-size:17px;padding:12px;border:1px solid var(--traco);border-radius:10px;background:#fff}
+input[type=text],input[type=email],input[type=password],textarea,select{
+  width:100%;font-family:var(--corpo);font-size:15px;padding:11px 12px;
+  border:1px solid var(--traco);border-radius:10px;background:#fff}
+textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-family:var(--corpo)}
+.alt-proposta{display:flex;gap:9px;align-items:center;margin-top:8px}
+.alt-proposta input[type=radio]{flex:0 0 auto;width:18px;height:18px}
+.alt-proposta input[type=text]{flex:1}
 .aviso{font-size:13px;color:var(--tinta2);line-height:1.45;margin-top:10px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -234,6 +241,7 @@ input[type=number]{width:100%;font-family:var(--dado);font-size:17px;padding:12p
     <button onclick="ir('stats')">Estatísticas</button>
     <button onclick="ir('simulado-inicio')">Simulado</button>
     <button onclick="ir('ajustes')">Ajustes</button>
+    <button id="menu-propor" style="display:none" onclick="ir('propor')">Propor questão</button>
   </div>
 </div>
 
@@ -333,6 +341,36 @@ input[type=number]{width:100%;font-family:var(--dado);font-size:17px;padding:12p
 
   <div style="margin-top:28px" class="rotulo">Zona de risco</div>
   <button class="pequeno fantasma" style="margin-top:10px;color:var(--coral);border-color:#E9C4C1" onclick="zerar()">Apagar todo o progresso</button>
+</div>
+
+<!-- ============ PROPOR QUESTÃO ============ -->
+<div class="tela" id="tela-propor">
+  <h1>Propor questão</h1>
+  <div class="sub">Entra no banco só depois de revisada e passar pelo validador — nada aqui vai direto para o app.</div>
+
+  <label for="pq-materia">Matéria</label>
+  <select id="pq-materia"></select>
+
+  <label for="pq-topico">Tópico</label>
+  <input type="text" id="pq-topico" placeholder="reuse um tópico existente, se der">
+
+  <label for="pq-subtopico">Subtópico (opcional)</label>
+  <input type="text" id="pq-subtopico">
+
+  <label for="pq-enunciado">Enunciado</label>
+  <textarea id="pq-enunciado"></textarea>
+
+  <label style="margin-top:18px">Alternativas — marque a correta</label>
+  <div id="pq-alternativas"></div>
+
+  <label for="pq-explicacao">Explicação</label>
+  <textarea id="pq-explicacao"></textarea>
+
+  <label for="pq-fonte">Fonte (lei e artigo, ou manual e capítulo)</label>
+  <input type="text" id="pq-fonte">
+
+  <div class="aviso" id="pq-erro"></div>
+  <button class="verde" style="width:100%;margin-top:16px" id="pq-enviar" onclick="enviarProposta()">Enviar proposta</button>
 </div>
 
 <!-- ============ AÇÕES FIXAS ============ -->
@@ -648,13 +686,18 @@ let CURSOR_SIM = lerCursor(chaveCursorSim);
 let sincronizando = false;
 
 async function chamarRest(caminho, opcoes){
-  const r = await fetch(SUPA.url+"/rest/v1/"+caminho, Object.assign({
-    headers: Object.assign({
-      "apikey": SUPA.anonKey,
-      "Authorization": "Bearer "+SESSAO.access_token,
-      "Content-Type": "application/json"
-    }, (opcoes && opcoes.headers) || {})
-  }, opcoes || {}));
+  opcoes = opcoes || {};
+  // headers precisa ser calculado À PARTE e sobrescrever por último: um
+  // Object.assign só no nível de cima (como era antes) faz opcoes.headers
+  // substituir o objeto de headers inteiro em vez de se somar a ele —
+  // qualquer chamada que passasse headers próprios (Prefer, por exemplo)
+  // saía sem apikey nem Authorization, e o Postgres rejeitava a requisição.
+  const headers = Object.assign({
+    "apikey": SUPA.anonKey,
+    "Authorization": "Bearer "+SESSAO.access_token,
+    "Content-Type": "application/json"
+  }, opcoes.headers || {});
+  const r = await fetch(SUPA.url+"/rest/v1/"+caminho, Object.assign({}, opcoes, {headers}));
   if(r.status === 401){    // token expirado no meio do caminho: renova e tenta uma vez de novo
     await renovarSessao();
     if(!SESSAO) throw new Error("sessão expirou");
@@ -849,6 +892,7 @@ function ir(nome){
   if(nome==="stats") pintarStats();
   if(nome==="ajustes") pintarAjustes();
   if(nome==="simulado-inicio") pintarSimuladoInicio();
+  if(nome==="propor") pintarPropor();
   rodape(nome);
 }
 function rodape(nome){
@@ -891,6 +935,10 @@ window.addEventListener("resize", ()=>{
 });
 
 function pintarInicio(){
+  // propor questão exige login — sem conta não há como escrever na tabela
+  // propostas (RLS), então o botão nem aparece
+  document.getElementById("menu-propor").style.display = (supaConfigurado() && SESSAO) ? "" : "none";
+
   document.getElementById("cabecalho-cargo").textContent = CONCURSO.cargo;
   document.getElementById("cabecalho-sub").textContent =
     [CONCURSO.orgao, CONCURSO.banca, "prova "+CONCURSO.data.slice(8)+"/"+CONCURSO.data.slice(5,7)]
@@ -1509,6 +1557,86 @@ function pintarConta(){
       erro.textContent = "Conta criada — confirme pelo e-mail e depois entre.";
     } else pintarConta();
   });
+}
+
+/* =======================================================================
+   PROPOR QUESTÃO — Fase 4a
+   O banco continua estático (banco/*.json, validado por validar.py); esta
+   tela só escreve numa caixa de entrada no Supabase (tabela `propostas`).
+   Precisa de login — sem sessão não há como passar a RLS de insert.
+   ======================================================================= */
+function pintarPropor(){
+  const sel = document.getElementById("pq-materia");
+  sel.innerHTML = "";
+  ORDEM_MATERIAS.forEach(id=>{
+    const op = document.createElement("option");
+    op.value = id; op.textContent = (MATERIAS[id]||{}).nome || id;
+    sel.appendChild(op);
+  });
+
+  const alvo = document.getElementById("pq-alternativas");
+  alvo.innerHTML = "";
+  for(let i=0;i<5;i++){
+    const linha = document.createElement("div"); linha.className = "alt-proposta";
+    const rd = document.createElement("input");
+    rd.type = "radio"; rd.name = "pq-correta"; rd.value = i; rd.id = "pq-correta-"+i;
+    if(i===0) rd.checked = true;
+    const camp = document.createElement("input");
+    camp.type = "text"; camp.id = "pq-alt-"+i; camp.placeholder = "ABCDE"[i];
+    linha.appendChild(rd); linha.appendChild(camp);
+    alvo.appendChild(linha);
+  }
+  document.getElementById("pq-erro").textContent = "";
+}
+
+async function enviarProposta(){
+  const erro = document.getElementById("pq-erro");
+  erro.textContent = ""; erro.style.color = "";
+
+  const materia = document.getElementById("pq-materia").value;
+  const topico = document.getElementById("pq-topico").value.trim();
+  const subtopico = document.getElementById("pq-subtopico").value.trim();
+  const enunciado = document.getElementById("pq-enunciado").value.trim();
+  const alternativas = Array.from({length:5}, (_,i)=>document.getElementById("pq-alt-"+i).value.trim());
+  const correta = Number((document.querySelector('input[name="pq-correta"]:checked')||{}).value);
+  const explicacao = document.getElementById("pq-explicacao").value.trim();
+  const fonte = document.getElementById("pq-fonte").value.trim();
+
+  // as mesmas exigências básicas do validar.py — não substituem o validador
+  // (que roda depois, na hora de incorporar), só evitam ida e volta óbvia
+  if(!topico || !enunciado || !explicacao || !fonte || alternativas.some(a=>!a)){
+    erro.textContent = "Preencha tópico, enunciado, as 5 alternativas, explicação e fonte.";
+    return;
+  }
+  if(new Set(alternativas).size !== 5){
+    erro.textContent = "As 5 alternativas precisam ser diferentes entre si.";
+    return;
+  }
+
+  const bt = document.getElementById("pq-enviar");
+  bt.disabled = true;
+  try{
+    const corpo = {
+      id: uuidv4(), materia, topico, subtopico: subtopico||null,
+      enunciado, alternativas, correta, explicacao, fonte
+    };
+    const r = await chamarRest("propostas", {method:"POST", headers:{"Prefer":"return=minimal"}, body: JSON.stringify(corpo)});
+    if(!r.ok){
+      const dado = await r.json().catch(()=>({}));
+      throw new Error(dado.message || dado.error || ("o servidor respondeu "+r.status));
+    }
+    // limpa os campos SEM chamar pintarPropor(): ela reconstrói o formulário
+    // do zero e apagaria a mensagem de sucesso que acabou de ser escrita
+    ["pq-topico","pq-subtopico","pq-enunciado","pq-explicacao","pq-fonte"].forEach(id=>document.getElementById(id).value="");
+    document.querySelectorAll('#pq-alternativas input[type=text]').forEach(el=>el.value="");
+    document.getElementById("pq-correta-0").checked = true;
+    erro.style.color = "var(--verde)";
+    erro.textContent = "Proposta enviada — obrigado! Ela entra no banco depois de revisada.";
+  }catch(e){
+    erro.textContent = e.message;
+  }finally{
+    bt.disabled = false;
+  }
 }
 
 /* =======================================================================

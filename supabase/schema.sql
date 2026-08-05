@@ -219,7 +219,90 @@ order by usuario_id, questao_id, ts desc, id desc;
 
 
 -- ----------------------------------------------------------------------------
--- 6. Convide as pessoas do grupo
+-- 7. Revisores — Fase 4
+--
+-- Quem pode ver e aprovar propostas de questão de qualquer pessoa. Mesma
+-- lógica da allowlist de convidados: RLS ligada, zero policies, ninguém lê
+-- pela API — só as policies de `propostas` abaixo consultam esta tabela via
+-- subquery, o que roda com a permissão de quem está fazendo a consulta.
+-- ----------------------------------------------------------------------------
+create table if not exists public.revisores (
+  user_id    uuid primary key references auth.users(id) on delete cascade,
+  criado_em  timestamptz not null default now()
+);
+
+alter table public.revisores enable row level security;
+revoke all on public.revisores from anon, authenticated;
+
+
+-- ----------------------------------------------------------------------------
+-- 8. Propostas de questão — Fase 4
+--
+-- O banco de questões continua estático, versionado em banco/*.json e
+-- validado por validar.py — isso NÃO muda. Esta tabela é só a caixa de
+-- entrada: alguém propõe, um revisor aprova ou rejeita, e só DEPOIS uma
+-- pessoa com a chave secreta roda incorporar-propostas.ps1 localmente para
+-- transformar o aprovado num arquivo de matéria de verdade, pelo mesmo
+-- caminho — commit, validar.py — que qualquer outra questão sempre seguiu.
+-- Aprovar aqui nunca escreve direto no banco que o app lê.
+--
+-- `id` é gerado no cliente, igual a eventos_resposta: mesmo motivo (reenvio
+-- depois de queda de rede não duplica, colide na chave primária).
+-- ----------------------------------------------------------------------------
+create table if not exists public.propostas (
+  id             uuid primary key,
+  autor_id       uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  materia        text not null check (materia in ('portugues','sus','enfermagem')),
+  topico         text not null,
+  subtopico      text,
+  enunciado      text not null,
+  alternativas   jsonb not null check (jsonb_array_length(alternativas) = 5),
+  correta        smallint not null check (correta between 0 and 4),
+  explicacao     text not null,
+  fonte          text not null,
+  status         text not null default 'pendente' check (status in ('pendente','aprovada','rejeitada')),
+  motivo_rejeicao text,
+  revisado_por   uuid references auth.users(id),
+  revisado_em    timestamptz,
+  criado_em      timestamptz not null default now()
+);
+
+create index if not exists propostas_por_status on public.propostas (status, criado_em);
+
+alter table public.propostas enable row level security;
+
+drop policy if exists "autor: propor"          on public.propostas;
+drop policy if exists "autor: ver as próprias" on public.propostas;
+drop policy if exists "revisor: ver todas"     on public.propostas;
+drop policy if exists "revisor: decidir"       on public.propostas;
+
+-- autor só cria como pendente — não dá pra já nascer aprovada
+create policy "autor: propor"
+  on public.propostas for insert
+  with check (autor_id = auth.uid() and status = 'pendente');
+
+-- autor vê o que propôs, em qualquer status (pra acompanhar se foi aceito)
+create policy "autor: ver as próprias"
+  on public.propostas for select
+  using (autor_id = auth.uid());
+
+-- revisor vê tudo (as políticas de SELECT se combinam com OR: quem for
+-- autor E revisor ao mesmo tempo continua vendo tudo normalmente)
+create policy "revisor: ver todas"
+  on public.propostas for select
+  using (exists (select 1 from public.revisores r where r.user_id = auth.uid()));
+
+-- só revisor muda status — o autor não pode auto-aprovar a própria proposta
+create policy "revisor: decidir"
+  on public.propostas for update
+  using (exists (select 1 from public.revisores r where r.user_id = auth.uid()))
+  with check (exists (select 1 from public.revisores r where r.user_id = auth.uid()));
+
+-- sem policy de delete: rejeitada fica registrada, não some
+
+
+-- ----------------------------------------------------------------------------
+-- 9. Convide as pessoas do grupo
 --
 -- Edite e execute. Só quem estiver aqui consegue criar conta.
 -- ----------------------------------------------------------------------------
@@ -227,3 +310,15 @@ order by usuario_id, questao_id, ts desc, id desc;
 --   ('franciscometzker@gmail.com', 'Francisco'),
 --   ('esposa@exemplo.com',         'Esposa')
 -- on conflict (email) do nothing;
+
+
+-- ----------------------------------------------------------------------------
+-- 10. Vire revisor
+--
+-- Rode depois de já ter feito login pelo menos uma vez pelo app (a conta
+-- precisa existir em auth.users primeiro). Pra achar seu user_id: Authentication
+-- → Users no painel do Supabase, copie o UUID da sua linha.
+-- ----------------------------------------------------------------------------
+-- insert into public.revisores (user_id) values
+--   ('cole-aqui-o-uuid-do-seu-usuario')
+-- on conflict (user_id) do nothing;

@@ -416,16 +416,86 @@ PostgREST — o servidor simulado aqui aproxima o contrato, não garante.
 
 ## Fase 4 — Banco colaborativo
 
-**Modelo sugerido:** Opus 5, esforço **high**, para o fluxo de aprovação e o
-critério de contribuição (o que barra uma questão ruim de entrar — é o portão
-de qualidade do banco, mesmo peso do que `validar.py` já protege); Sonnet 5,
-esforço **medium**, para as telas.
+O banco continua **estático**: `banco/*.json`, versionado, validado por
+`validar.py`. O Supabase entra só como caixa de entrada — proposta e revisão
+acontecem lá, mas a questão só existe de verdade no app depois de um script
+local incorporar o aprovado ao arquivo de matéria e o `validar.py` rodar,
+igual sempre rodou. Aprovar no app nunca escreve direto no banco que o app lê.
 
-- [ ] propor questão, revisar, aprovar
-- [ ] métricas de viés rodam antes da aprovação — o portão de qualidade vira o
-      critério de contribuição, e o banco não degrada quando outras pessoas
-      escrevem nele
-- [ ] histórico de edição por questão
+```
+app (logado) → propõe → tabela `propostas` (pendente)
+                                ↓
+                    revisor aprova/rejeita no app
+                                ↓
+     script local puxa as aprovadas → banco/<matéria>.json → validar.py → commit
+```
+
+### Fase 4a — Schema e formulário de proposta · **concluída**
+
+**Modelo usado:** Opus 5, esforço high (schema/RLS) + Sonnet 5 (formulário).
+
+- [x] tabela `propostas` (matéria/tópico/subtópico/enunciado/alternativas/
+      correta/explicação/fonte/status), `id` gerado no cliente — mesmo motivo
+      de idempotência dos eventos de resposta
+- [x] tabela `revisores` (allowlist de quem pode aprovar, mesmo padrão de
+      `convidados`: RLS ligada, zero policies, ninguém lê pela API)
+- [x] RLS de `propostas`: autor lê/escreve só as próprias; revisor lê e
+      decide todas; **autor não consegue aprovar a própria proposta** mesmo
+      chamando a API direto — testado em `conferir.sql`
+- [x] tela "Propor questão" no app, item de menu que só aparece logado
+- [x] validações no formulário espelham as exigências mínimas do
+      `validar.py` (5 alternativas distintas, todos os campos obrigatórios)
+      — não o substituem; o validador de verdade roda na hora de incorporar
+
+**Dois bugs reais encontrados e corrigidos no caminho, nenhum deles novo
+desta fase:**
+
+- `chamarRest` fazia `Object.assign({headers:...}, opcoes)` — quando
+  `opcoes` também tinha `headers` (todo POST com `Prefer`), o de cima
+  sobrescrevia o de baixo por inteiro, e a chamada saía **sem `apikey` nem
+  `Authorization`**. Isso datava da Fase 3c: `empurrarUm()` (push de
+  eventos e simulados) tinha esse defeito desde que foi escrito. Os testes
+  da 3c "passaram" porque o servidor simulado da época não conferia
+  cabeçalho — só quando testei a proposta com mais cuidado (conferindo o
+  cabeçalho recebido) o defeito apareceu. Ou seja: **a sincronização
+  provavelmente nunca funcionou de verdade contra o projeto real**, apesar
+  de "verificada" na 3c. Corrigido para as duas funções de uma vez.
+- a tela de proposta chamava `pintarPropor()` depois de enviar com sucesso,
+  pra limpar os campos — só que `pintarPropor()` também apaga a mensagem de
+  erro/sucesso como parte de reconstruir o formulário, então a confirmação
+  desaparecia na hora. Troquei por limpar os campos um a um, sem repintar.
+
+**Verificação.** Formulário testado com servidor simulado, inclusive
+inspecionando o cabeçalho de verdade da requisição (é assim que os dois bugs
+acima apareceram): validação de campo vazio, validação de alternativas
+repetidas, envio com sucesso mostrando a mensagem certa, formato exato do
+payload. Botão do menu escondido sem login, visível logado. `conferir.sql`
+com blocos novos: autor vê só a própria proposta, terceiro não vê nada,
+revisor vê e decide, autor não consegue aprovar a própria. Regressão completa
+sem quebra, `offline.html` regenerado, `validar.ps1` sem erros.
+
+**Pendente para você:** rodar `schema.sql` de novo no SQL Editor (é
+idempotente, adiciona só o que falta), depois logar pelo app uma vez e rodar
+o bloco 10 do schema pra virar revisor.
+
+---
+
+### Fase 4b — Revisão
+
+**Modelo sugerido:** Sonnet 5, esforço medium.
+
+- [ ] tela de revisão: lista pendentes, aprova ou rejeita com motivo
+- [ ] visível só para quem está em `revisores`
+
+---
+
+### Fase 4c — Incorporação ao banco
+
+**Modelo sugerido:** Sonnet 5, esforço medium.
+
+- [ ] `incorporar-propostas.ps1`: puxa as aprovadas (chave secreta, rodado só
+      localmente, nunca no app), calcula o id, grava no arquivo de matéria —
+      e para aí; commit e `validar.ps1` continuam manuais
 
 ---
 

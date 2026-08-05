@@ -162,21 +162,24 @@ Aprovação: 35 pontos **e** nenhuma área zerada.
 
 Banco com **852 questões** (99 lp, 99 sus, 654 esp).
 
-**Fases 0 a 3c concluídas.** O projeto está migrando de app de prova única para
-plataforma com contas, banco compartilhado por matéria e concurso escolhido por
-cada pessoa. O plano completo está em `FASES.md`. A Fase 0 deu id estável a cada
-questão, tirou o banco do `index.html` e converteu o progresso de índice de
-array para id; a Fase 1 reagrupou os 85 tópicos em matérias e transformou o
-concurso em dado; a Fase 1b subdividiu essas matérias em tópicos reais; a Fase
-1c reduziu as matérias às três do edital, virando uma árvore de três níveis; a
-Fase 2 deu suporte a múltiplos perfis no mesmo aparelho; a Fase 3a criou o
-schema do Supabase (RLS, allowlist, log append-only); a Fase 3b deu login
-opcional por e-mail e senha, com sessão presa ao perfil local; a Fase 3c deu o
-motor de sincronização — fila local, push idempotente, pull incremental com
-merge por evento mais recente. Sem o `supabase.json` preenchido com um projeto
-de verdade, a conta fica indisponível e o app funciona exatamente como na
-Fase 2. Projeto real criado e `supabase.json` preenchido; RLS e o gatilho de
-convite conferidos contra ele. A próxima etapa é a Fase 4 (banco colaborativo).
+**Fases 0 a 3c e 4a concluídas.** O projeto está migrando de app de prova única
+para plataforma com contas, banco compartilhado por matéria e concurso
+escolhido por cada pessoa. O plano completo está em `FASES.md`. A Fase 0 deu id
+estável a cada questão, tirou o banco do `index.html` e converteu o progresso de
+índice de array para id; a Fase 1 reagrupou os 85 tópicos em matérias e
+transformou o concurso em dado; a Fase 1b subdividiu essas matérias em tópicos
+reais; a Fase 1c reduziu as matérias às três do edital, virando uma árvore de
+três níveis; a Fase 2 deu suporte a múltiplos perfis no mesmo aparelho; a Fase
+3a criou o schema do Supabase (RLS, allowlist, log append-only); a Fase 3b deu
+login opcional por e-mail e senha, com sessão presa ao perfil local; a Fase 3c
+deu o motor de sincronização — fila local, push idempotente, pull incremental
+com merge por evento mais recente; a Fase 4a deu o formulário de proposta de
+questão, com o banco continuando estático (a questão só entra de verdade
+depois de revisada e passar pelo `validar.py`, nunca direto). Sem o
+`supabase.json` preenchido com um projeto de verdade, a conta fica indisponível
+e o app funciona exatamente como na Fase 2. Projeto real criado e
+`supabase.json` preenchido; RLS e o gatilho de convite conferidos contra ele.
+A próxima etapa é a Fase 4b (tela de revisão).
 
 **Viés de comprimento — resolvido.** A resposta certa costumava ser visivelmente
 mais longa que os distratores, o que permitia acertar sem saber o conteúdo. Foram

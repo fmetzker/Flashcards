@@ -133,6 +133,62 @@ begin
   reset role;
 end $$;
 
+
+-- ----------------------------------------------------------------------------
+-- 6. Propostas de questão — Fase 4
+--
+-- Autor vê e propõe só o que é seu; revisor vê tudo e decide; autor NÃO pode
+-- aprovar a própria proposta mesmo tentando via API direta.
+-- ----------------------------------------------------------------------------
+do $$
+declare
+  autor   uuid := '33333333-3333-3333-3333-333333333333';
+  outro   uuid := '44444444-4444-4444-4444-444444444444';
+  revisor uuid := '55555555-5555-5555-5555-555555555555';
+  prop_id uuid := gen_random_uuid();
+  alt     jsonb := '["A","B","C","D","E"]'::jsonb;
+  visto   int;
+begin
+  insert into public.revisores (user_id) values (revisor);
+
+  insert into public.propostas (id, autor_id, materia, topico, enunciado, alternativas, correta, explicacao, fonte)
+  values (prop_id, autor, 'sus', 'Lei 8.080/90', 'enunciado de teste', alt, 1, 'explicação', 'fonte de teste');
+
+  -- autor vê a própria proposta
+  set local role authenticated;
+  perform set_config('request.jwt.claims', json_build_object('sub', autor, 'role','authenticated')::text, true);
+  select count(*) into visto from public.propostas;
+  if visto = 1 then raise notice 'OK — autor vê a própria proposta';
+  else raise warning 'FALHOU — autor vê % propostas; deveria ver 1', visto; end if;
+
+  -- outra pessoa (nem autor, nem revisor) não vê nada
+  perform set_config('request.jwt.claims', json_build_object('sub', outro, 'role','authenticated')::text, true);
+  select count(*) into visto from public.propostas;
+  if visto = 0 then raise notice 'OK — outra pessoa não vê a proposta alheia';
+  else raise warning 'FALHOU — outra pessoa vê % proposta(s) que não são dela', visto; end if;
+
+  -- autor tenta aprovar a própria proposta: tem que ser recusado
+  perform set_config('request.jwt.claims', json_build_object('sub', autor, 'role','authenticated')::text, true);
+  update public.propostas set status = 'aprovada' where id = prop_id;
+  if found then
+    raise warning 'FALHOU — o autor conseguiu aprovar a própria proposta';
+  else
+    raise notice 'OK — autor não consegue aprovar a própria proposta';
+  end if;
+
+  -- revisor vê e aprova normalmente
+  perform set_config('request.jwt.claims', json_build_object('sub', revisor, 'role','authenticated')::text, true);
+  select count(*) into visto from public.propostas;
+  if visto = 1 then raise notice 'OK — revisor vê a proposta de outra pessoa';
+  else raise warning 'FALHOU — revisor vê % propostas; deveria ver 1', visto; end if;
+
+  update public.propostas set status = 'aprovada', revisado_por = revisor where id = prop_id;
+  if found then raise notice 'OK — revisor consegue decidir';
+  else raise warning 'FALHOU — revisor não conseguiu atualizar o status'; end if;
+
+  reset role;
+end $$;
+
 rollback;
 
 -- ============================================================================
