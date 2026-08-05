@@ -57,7 +57,7 @@ Pode ser com e-mail ou com conta do GitHub. Não precisa cartão.
 **4.** Aguarde alguns segundos. Vai aparecer um endereço tipo:
 `https://palavra-aleatoria-12345.netlify.app`
 
-**5.** Abra esse endereço no navegador. Você deve ver a tela inicial do app, com a contagem de dias e a cartela de quadradinhos.
+**5.** Abra esse endereço no navegador. Você deve ver a tela de **entrar/criar conta** — não a tela inicial ainda. Isso é esperado: login é obrigatório, e a Parte 3 explica o resto.
 
 **6.** Se quiser um nome melhor: no painel do Netlify, vá em **Site configuration → Change site name** e escolha algo como `prova-enfermagem-vr`. O endereço vira `https://prova-enfermagem-vr.netlify.app`.
 
@@ -114,17 +114,31 @@ Ele abre em tela cheia, sem barra de navegador — como um aplicativo normal.
 
 ---
 
-## Parte 3 — Testar se está mesmo funcionando
+## Parte 3 — Criar conta e esperar liberação
 
-Faça este teste antes de confiar no app. Leva 1 minuto e evita descobrir o problema no meio do mar.
+**Login é obrigatório para entrar no app.** Sem ele, nem a tela inicial aparece. E o cadastro, mesmo sendo aberto pra qualquer e-mail, não libera sozinho — alguém precisa aprovar você depois.
+
+**1.** Na tela de entrar/criar conta, toque em **Criar conta**. Preencha e-mail e uma senha seguem — não precisa ser convidado antes, qualquer e-mail funciona.
+
+**2.** Depois de criar, você cai numa tela **"Conta aguardando aprovação"**. Isso é normal, não é erro. Avise quem administra o app (mande o e-mail que você usou) para que ele te libere.
+
+**3.** Quando avisarem que liberaram, toque em **"Verificar de novo"** na própria tela de espera — ou feche e abra o app de novo. Você deve cair na tela inicial.
+
+> Depois desse primeiro login, o app guarda a sessão no aparelho e continua abrindo offline normalmente — você não vai precisar repetir isso, a não ser que saia da conta ou apague os dados do Safari.
+
+---
+
+## Parte 4 — Testar se está mesmo funcionando
+
+Faça este teste antes de confiar no app. Leva 1 minuto e evita descobrir o problema no meio do mar. **Faça isto depois da Parte 3** — sem ter logado pelo menos uma vez com internet, o app não abre nem em modo avião.
 
 **1.** Ative o **Modo Avião** no iPhone.
 
 **2.** Abra o app pelo ícone da tela de início.
 
 **3.** Verifique:
-- [ ] A tela inicial carrega normalmente
-- [ ] Em "Questões no app" aparece **852**
+- [ ] A tela inicial carrega normalmente (não a tela de login nem a de espera)
+- [ ] Em "Questões no app" aparece um número (876, ou mais se o banco cresceu)
 - [ ] O botão "Estudar agora" abre uma questão
 - [ ] Responder a questão mostra a explicação e a fonte
 - [ ] Voltar ao início e a meta do dia subiu
@@ -135,7 +149,7 @@ Se tudo passou, está pronto. Pode desligar o modo avião.
 
 ---
 
-## Parte 4 — Primeiro uso
+## Parte 5 — Primeiro uso
 
 **1.** Vá em **Ajustes** e confirme a **meta diária**. Está em 35, que corresponde a cerca de 45 minutos por dia. Se você tiver menos tempo em algum período, reduza — meta batida com constância vale mais que meta grande abandonada.
 
@@ -151,9 +165,9 @@ Se tudo passou, está pronto. Pode desligar o modo avião.
 
 ---
 
-## Parte 5 — Backup (não pule esta parte)
+## Parte 6 — Backup (não pule esta parte)
 
-O progresso fica salvo **só no seu iPhone**. Se você trocar de aparelho, reinstalar o app ou limpar os dados do Safari, ele some.
+Sua conta já sincroniza o progresso com o servidor — trocar de aparelho e logar de novo traz tudo de volta sozinho. Mas isso depende de o app ter tido internet recente para sincronizar; se você respondeu questões nos últimos dias sem rede, ou se algo der errado do lado do servidor, o backup manual é a rede de segurança que não depende de nada disso.
 
 **Rotina semanal, 5 segundos:**
 
@@ -164,11 +178,11 @@ O progresso fica salvo **só no seu iPhone**. Se você trocar de aparelho, reins
 O app avisa sozinho na tela inicial quando passam 7 dias sem backup.
 
 **Para restaurar** (celular novo, ou depois de reinstalar):
-Instale o app de novo pelos passos da Parte 2, vá em **Ajustes → Backup** e use **Restaurar de arquivo** ou **Restaurar de texto**.
+Instale o app de novo pelos passos da Parte 2, faça login com a mesma conta (a sincronização deve trazer o progresso sozinha) e, se algo faltar, use **Ajustes → Backup → Restaurar de arquivo** ou **Restaurar de texto**.
 
 ---
 
-## Parte 6 — Atualizar quando houver questões novas
+## Parte 7 — Atualizar quando houver questões novas
 
 Quando você receber uma versão nova do app:
 
@@ -197,7 +211,9 @@ Seu progresso não se perde na atualização — ele fica guardado separado das 
 | Sintoma | Causa provável | Solução |
 |---|---|---|
 | Não aparece "Adicionar à Tela de Início" | Não está no Safari | Abra o endereço no Safari |
-| O app não abre sem internet | O service worker não terminou de guardar | Abra com internet e navegue por 30 segundos; confira em Ajustes → Uso offline |
+| O app não abre sem internet | O service worker não terminou de guardar, OU você nunca fez o primeiro login | Abra com internet, faça login (Parte 3) e navegue por 30 segundos; confira em Ajustes → Uso offline |
+| Fico preso na tela "Conta aguardando aprovação" | Ninguém aprovou sua conta ainda | Avise quem administra o app (seu e-mail de cadastro); depois toque em "Verificar de novo" |
+| Criei conta e não aparece nada pra aprovar | Quem administra ainda não olhou a tela "Aprovar contas" | Confirme com ele/ela que o e-mail está certo |
 | Continua mostrando o número antigo de questões | Cache com a mesma versão | Troque o `VERSAO` no `sw.js`, publique de novo, feche e abra o app duas vezes |
 | O progresso sumiu | Dados limpos ou app reinstalado | Restaure pelo backup em Ajustes |
 | A página abre com uma tela de erro em vez do app | Faltou a pasta `banco/`, o `concursos.json`, ou eles ficaram fora da raiz do site | Confira a lista de arquivos e pastas no início deste tutorial |
@@ -206,12 +222,13 @@ Seu progresso não se perde na atualização — ele fica guardado separado das 
 
 ---
 
-## Resumo em 7 linhas
+## Resumo em 8 linhas
 
-1. Criar conta no Netlify
-2. Arrastar o zip em `app.netlify.com/drop`
-3. Abrir o endereço no Safari do iPhone
-4. Compartilhar → Adicionar à Tela de Início
-5. Navegar 30 segundos com internet
+1. Criar conta no Netlify (ou GitHub) e publicar a pasta do projeto
+2. Abrir o endereço no Safari do iPhone
+3. Compartilhar → Adicionar à Tela de Início
+4. Criar sua conta no app e esperar quem administra te aprovar
+5. Navegar 30 segundos com internet, já logado
 6. Testar no modo avião
-7. Estudar 35 questões por dia e fazer backup toda semana
+7. Estudar suas questões diárias
+8. Fazer backup toda semana, mesmo com a sincronização ligada
