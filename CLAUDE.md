@@ -232,6 +232,20 @@ tudo vira revisão diária. Ver `proximaData()`.
 Três respostas possíveis: "Sabia" sobe uma caixa; "Chutei" e "Errei" voltam para
 a caixa 1. O botão "Chutei" é central — não removê-lo nem transformá-lo em acerto.
 
+**O dia sempre vira no fuso de Brasília, nunca no fuso do aparelho.** `hoje()`
+usa `Intl.DateTimeFormat` com `timeZone:"America/Sao_Paulo"` fixo — não um
+offset `-3` na unha, que quebraria se o Brasil reintroduzisse horário de
+verão. Qualquer soma ou comparação de data usa `diaUTC()`/`somarDias()`, nunca
+`new Date()` puro nem `.setDate()`: misturar hora local do aparelho com
+formatação UTC no meio do cálculo foi exatamente o bug que existia antes desta
+regra (o dia virava errado dependendo de onde o aparelho estava, inclusive
+num navio). O merge de eventos de outro aparelho (`aplicarEventoRemoto`) usa a
+mesma formatação de fuso ao decidir em qual dia contar a resposta.
+
+Acurácia por período (hoje/7 dias/30 dias) soma `E.diasCertas`/`E.diasTotal`
+numa janela — campos paralelos a `E.dias` (que só conta quantidade), criados
+de propósito para não fazer dias de antes desta métrica aparecerem como 0%.
+
 ## Publicação
 
 Netlify (arrastar a pasta) ou GitHub Pages (git push + Settings → Pages).

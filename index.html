@@ -223,6 +223,9 @@ input[type=number]{width:100%;font-family:var(--dado);font-size:17px;padding:12p
     <div class="stat"><span>Questões no app</span><span class="n" id="n-banco">0</span></div>
     <div class="stat"><span>Já vistas</span><span class="n" id="n-vistas">0</span></div>
     <div class="stat"><span>Acurácia geral</span><span class="n" id="n-acuracia">–</span></div>
+    <div class="stat"><span>Acurácia hoje</span><span class="n" id="n-acuracia-dia">–</span></div>
+    <div class="stat"><span>Acurácia — 7 dias</span><span class="n" id="n-acuracia-semana">–</span></div>
+    <div class="stat"><span>Acurácia — 30 dias</span><span class="n" id="n-acuracia-mes">–</span></div>
     <div class="stat"><span>No caderno de erros</span><span class="n" id="n-erros">0</span></div>
   </div>
 
@@ -450,7 +453,15 @@ const padrao = {meta:35, cartoes:{}, dias:{}, simulados:[], ultimoBackup:null, v
   /* ids de eventos gerados por ESTE perfil, para o pull não contar de novo o
      que este aparelho já somou em acertos/erros/dias na hora da resposta —
      ver o bloco SINCRONIZAÇÃO, mais abaixo */
-  eventosProprios: []};
+  eventosProprios: [],
+  /* acurácia por período (diária/semanal/mensal): total de respostas e quantas
+     foram "sabia", por dia. Paralelo a `dias` (que só conta quantidade) e não
+     reaproveitado dele de propósito — `dias` já existia antes desta métrica, e
+     se a acurácia dividisse por ele, dias de antes desta versão apareceriam
+     como 0% (têm total, não têm "certas") em vez de simplesmente não entrar
+     na conta. Como as somas nunca decrescem, dias sem estes dois campos
+     contribuem 0/0 pra janela e não distorcem nada. */
+  diasTotal: {}, diasCertas: {}};
 let E = Object.assign({}, padrao, ler()||{});
 
 function nomePerfilAtual(){
@@ -664,8 +675,13 @@ function aplicarEventoRemoto(ev){
   const c = E.cartoes[ev.questao_id] || {caixa:1, acertos:0, erros:0, prox:hoje(), ts:null};
   if(E.eventosProprios.indexOf(ev.id) < 0){
     if(ev.resultado === "sabia") c.acertos++; else c.erros++;
-    const dia = ev.ts.slice(0,10);
+    // fmtDiaBrasilia, não ev.ts.slice(0,10): o timestamp é UTC, e uma resposta
+    // dada às 21h em Brasília já é "amanhã" em UTC — cortar a string juntaria
+    // a resposta ao dia errado
+    const dia = fmtDiaBrasilia.format(new Date(ev.ts));
     E.dias[dia] = (E.dias[dia]||0) + 1;
+    E.diasTotal[dia] = (E.diasTotal[dia]||0) + 1;
+    if(ev.resultado === "sabia") E.diasCertas[dia] = (E.diasCertas[dia]||0) + 1;
   }
   if(!c.ts || ev.ts > c.ts){ c.caixa = ev.caixa_depois; c.prox = ev.prox; c.ts = ev.ts; }
   E.cartoes[ev.questao_id] = c;
@@ -769,9 +785,35 @@ async function migrarParaIds(){
   salvar();
 }
 
-const hoje = () => new Date().toISOString().slice(0,10);
-const dia = txt => new Date(txt+"T00:00:00");
-function diasAte(){ return Math.max(0, Math.ceil((dia(CONCURSO.data) - new Date())/86400000)); }
+/* =======================================================================
+   DATAS — sempre no fuso de Brasília, nunca no fuso do aparelho
+   A prova é em Volta Redonda; o dia "vira" à meia-noite de Brasília, não à
+   meia-noite de onde quer que o app esteja rodando (inclusive num navio, o
+   caso original que o projeto foi pensado para suportar). Antes desta versão
+   hoje() usava toISOString(), que é sempre UTC — coincidência, não fuso
+   correto, e diferente tanto do horário local quanto do de Brasília.
+
+   Duas regras para não reintroduzir o problema:
+   1. "que dia é hoje" só se calcula com hoje() (Intl com timeZone fixo).
+   2. toda soma/comparação de datas usa diaUTC() — nunca new Date() puro nem
+      .setDate() local — para não misturar fuso do aparelho com formatação
+      UTC no meio do cálculo.
+   ======================================================================= */
+const FUSO_BRASILIA = "America/Sao_Paulo";
+const fmtDiaBrasilia = new Intl.DateTimeFormat("en-CA", {timeZone: FUSO_BRASILIA, year:"numeric", month:"2-digit", day:"2-digit"});
+const hoje = () => fmtDiaBrasilia.format(new Date());   // "AAAA-MM-DD", dia corrente em Brasília
+
+/* "YYYY-MM-DD" -> Date ancorado em meia-noite UTC. Não é a mesma coisa que
+   meia-noite de Brasília (são 3h de diferença), mas para SOMAR e COMPARAR
+   datas isso não importa — o que importa é que todo o cálculo de calendário
+   use sempre a mesma âncora, e nunca a hora local do aparelho. */
+const diaUTC = txt => new Date(txt+"T00:00:00Z");
+function somarDias(dataYMD, n){
+  const d = diaUTC(dataYMD);
+  d.setUTCDate(d.getUTCDate()+n);
+  return d.toISOString().slice(0,10);
+}
+function diasAte(){ return Math.max(0, Math.ceil((diaUTC(CONCURSO.data) - diaUTC(hoje()))/86400000)); }
 
 /* Leitner com teto: nenhum intervalo passa de 1/3 dos dias restantes */
 const INTERVALOS = [0,1,3,7,14];
@@ -779,8 +821,7 @@ function proximaData(caixa){
   const d = diasAte();
   const teto = d<=10 ? 1 : Math.max(1, Math.floor(d/3));
   const inter = Math.min(INTERVALOS[Math.max(0,Math.min(4,caixa-1))], teto);
-  const dt = new Date(); dt.setDate(dt.getDate()+inter);
-  return dt.toISOString().slice(0,10);
+  return somarDias(hoje(), inter);
 }
 
 function fila(){
@@ -863,19 +904,18 @@ function pintarInicio(){
   document.getElementById("fila-info").textContent =
     q.revisar.length+" para revisar · "+q.novas.length+" ainda não vistas";
 
-  let seq=0; const d=new Date();
+  let seq=0, kStreak=hoje();
   for(let i=0;i<200;i++){
-    const k=d.toISOString().slice(0,10);
-    if(i===0 && !(E.dias[k]>=E.meta)){ d.setDate(d.getDate()-1); continue; }
-    if(E.dias[k]>=E.meta){ seq++; d.setDate(d.getDate()-1); } else break;
+    if(i===0 && !(E.dias[kStreak]>=E.meta)){ kStreak=somarDias(kStreak,-1); continue; }
+    if(E.dias[kStreak]>=E.meta){ seq++; kStreak=somarDias(kStreak,-1); } else break;
   }
   document.getElementById("streak-info").textContent = seq>0 ? seq+" dias seguidos" : "sem sequência";
 
   // cartela
   const g = document.getElementById("grade"); g.innerHTML="";
-  const ini = dia(CONCURSO.inicio || hoje()), fim = dia(CONCURSO.data);
+  const ini = diaUTC(CONCURSO.inicio || hoje()), fim = diaUTC(CONCURSO.data);
   let n=0;
-  for(let d2=new Date(ini); d2<=fim; d2.setDate(d2.getDate()+1)){
+  for(let d2=new Date(ini); d2<=fim; d2.setUTCDate(d2.getUTCDate()+1)){
     n++;
     const k = d2.toISOString().slice(0,10);
     const el = document.createElement("div"); el.className="dia";
@@ -899,11 +939,27 @@ function pintarInicio(){
   document.getElementById("n-acuracia").textContent = tot? Math.round(ac/tot*100)+"%" : "–";
   document.getElementById("n-erros").textContent = erros;
 
+  // acurácia por período: soma diasCertas/diasTotal na janela de dias corridos
+  // terminando hoje. Dias sem os dois campos (de antes desta versão) somam
+  // 0/0 e não entram na conta — ver comentário em `padrao`.
+  const acuraciaJanela = n => {
+    let certas=0, total=0, k=hoje();
+    for(let i=0;i<n;i++){
+      certas += E.diasCertas[k]||0;
+      total += E.diasTotal[k]||0;
+      k = somarDias(k,-1);
+    }
+    return total ? Math.round(certas/total*100)+"%" : "–";
+  };
+  document.getElementById("n-acuracia-dia").textContent = acuraciaJanela(1);
+  document.getElementById("n-acuracia-semana").textContent = acuraciaJanela(7);
+  document.getElementById("n-acuracia-mes").textContent = acuraciaJanela(30);
+
   // alerta de área em risco
   const box = document.getElementById("alerta-area"); box.innerHTML="";
 
   if(vistas > 0){
-    const dias = E.ultimoBackup ? Math.floor((new Date(hoje()) - new Date(E.ultimoBackup))/86400000) : 999;
+    const dias = E.ultimoBackup ? Math.floor((diaUTC(hoje()) - diaUTC(E.ultimoBackup))/86400000) : 999;
     if(dias >= 7){
       const bk = document.createElement("div"); bk.className="alerta";
       bk.textContent = E.ultimoBackup
@@ -1181,7 +1237,10 @@ function registrar(id, resultado){
   c.prox = proximaData(c.caixa);
   c.ts = agora;
   E.cartoes[id] = c;
-  E.dias[hoje()] = (E.dias[hoje()]||0)+1;
+  const h = hoje();
+  E.dias[h] = (E.dias[h]||0)+1;
+  E.diasTotal[h] = (E.diasTotal[h]||0)+1;
+  if(resultado === "sabia") E.diasCertas[h] = (E.diasCertas[h]||0)+1;
 
   if(supaConfigurado() && SESSAO){
     const ev = {id:uuidv4(), questao_id:id, ts:agora, resultado, caixa_depois:c.caixa, prox:c.prox};
