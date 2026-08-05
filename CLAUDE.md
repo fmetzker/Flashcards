@@ -108,9 +108,24 @@ tópico — os assuntos deles já são específicos o bastante.
 
 **O concurso é uma receita** em `concursos.json`: cargo, órgão, banca, data,
 duração, blocos (nome, quantas questões, quais matérias) e regra de aprovação.
-O app carrega só as matérias que o concurso cobra. Acrescentar um concurso é
-editar esse arquivo — não exige mexer no código. Uma matéria não pode aparecer
-em dois blocos do mesmo concurso; o validador barra.
+Acrescentar um concurso é editar esse arquivo — não exige mexer no código. Uma
+matéria não pode aparecer em dois blocos do mesmo concurso; o validador barra.
+
+**Um perfil pode seguir mais de um concurso ao mesmo tempo.** Duas noções que
+não podem ser confundidas — é o erro fácil de cometer ao mexer nesta parte:
+
+- `INSCRITOS` / `E.concursos` — todos os que o perfil estuda. Definem o
+  **banco carregado** (união das matérias de todos, via `materiasInscritas()`)
+  e o **teto do Leitner**, que usa `diasAteMaisProxima()`: seguir um concurso
+  distante não pode afrouxar a revisão por causa de outro que é semana que
+  vem.
+- `CONCURSO` / `E.concursoAtivo` — apenas o que está **em foco na tela**:
+  cabeçalho, contagem regressiva (`diasAte()`), cartela, simulado e alerta de
+  bloco fraco. Trocar o foco (`aplicarFoco()`) só repinta; **mudar a lista de
+  inscritos recarrega**, porque a união de matérias muda.
+
+Perfis de antes desta versão guardavam `E.concurso` (singular); `carregarConfig()`
+migra para lista na primeira execução, sem perder a escolha.
 
 Consequência assumida desta modelagem: como "Conhecimentos Específicos de
 Enfermagem" é uma matéria só, o compartilhamento do acervo de enfermagem vale

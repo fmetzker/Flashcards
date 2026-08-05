@@ -532,6 +532,45 @@ além de `propostas`/`revisores`) e o bloco 10 pra virar revisor.
 
 ---
 
+## Múltiplos concursos por perfil · **concluída**
+
+Pedido fora da numeração das fases — o perfil escolhe um ou mais concursos.
+
+**Modelo usado:** Opus 5, esforço high (modelo/migração/teto) + Sonnet 5,
+esforço medium (interface).
+
+A separação que sustenta tudo, e que é o ponto onde um erro sai caro:
+
+| | define | muda quando |
+|---|---|---|
+| `INSCRITOS` / `E.concursos` | banco carregado (união das matérias) e teto do Leitner (`diasAteMaisProxima`) | marcar/desmarcar em Ajustes — **recarrega** |
+| `CONCURSO` / `E.concursoAtivo` | cabeçalho, contagem, cartela, simulado, alerta de bloco | seletor na tela inicial — **só repinta** |
+
+- [x] `E.concurso` (singular) migra para `E.concursos` + `E.concursoAtivo` na
+      primeira execução, sem perder a escolha de quem já usava; id que sumiu
+      do `concursos.json` é descartado em vez de travar o perfil
+- [x] banco = união das matérias de todos os inscritos — é isso que faz
+      "seguir dois" significar estudar o conteúdo dos dois, e não só trocar
+      o cabeçalho
+- [x] teto do Leitner usa a prova **mais próxima** entre os inscritos
+- [x] seletor de foco no cabeçalho (só aparece com mais de um)
+- [x] seção "Concursos" em Ajustes; não dá pra ficar sem nenhum; se o foco
+      sair da lista, migra sozinho para o que restou
+
+**Verificação.** Com um segundo concurso simulado em memória (Barra Mansa,
+prova 21 dias antes de Volta Redonda, sem SUS no edital): migração do formato
+antigo preservando meta e cartões; união trazendo as 852 questões; **teto do
+Leitner apertando de 15 para 8 dias por causa da prova mais próxima** —
+conferido no número, não só na lógica: caixa 5 marcou revisão para 13/08 em
+vez de 19/08, que cairia depois da prova de Barra Mansa; troca de foco
+mudando cabeçalho/contagem/blocos sem recarregar banco; simulado seguindo a
+receita do foco (15+25, 150 min, mínimo 20 sem cláusula de bloco zerado);
+questões de SUS ainda estudáveis com foco no concurso que não tem SUS;
+proteção do último concurso e migração automática do foco. Regressão completa
+sem quebra, `offline.html` regenerado, `validar.ps1` sem erros.
+
+---
+
 ## Fase 5 — Social leve (opcional)
 
 **Modelo sugerido:** Sonnet 5, esforço **low** — telas de leitura sobre dado
