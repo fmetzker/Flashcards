@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v25-caaq-cdm-matematica";
+const VERSAO = "v26-fetch-sem-cache-http";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
@@ -53,12 +53,20 @@ self.addEventListener("activate", evento => {
    trocar a VERSAO aqui não bastava para resolver: o service worker velho
    respondia antes. Como o app passou a assumir que há rede, rede-primeiro
    custa pouco e acaba com esse problema. Sem internet, o cache assume e o app
-   continua abrindo. */
+   continua abrindo.
+
+   {cache:"no-store"} é essencial aqui: o GitHub Pages manda
+   Cache-Control: max-age=600 em tudo, e sem isso o fetch() abaixo pode ser
+   respondido pela própria memória de cache HTTP do navegador — uma camada
+   ABAIXO deste service worker — sem sequer sair pro ar. "Rede primeiro"
+   só é rede primeiro de verdade se a chamada ignorar esse cache; do
+   contrário, fechar e reabrir o app dentro da mesma janela de 10 minutos
+   continua servindo a versão antiga, e parece que a v25 nunca chegou. */
 self.addEventListener("fetch", evento => {
   if (evento.request.method !== "GET") return;
 
   evento.respondWith(
-    fetch(evento.request)
+    fetch(evento.request, { cache: "no-store" })
       .then(resposta => {
         if (resposta && resposta.status === 200 && resposta.type === "basic") {
           const copia = resposta.clone();
