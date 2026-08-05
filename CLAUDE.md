@@ -27,6 +27,7 @@ Edital 003/2026-SMA · banca FEVRE · cargo Enfermeiro.
 | `supabase/schema.sql` | Fase 3a: tabelas, RLS e allowlist — colar no SQL Editor |
 | `supabase/conferir.sql` | Confere o que a RLS **nega**; rodar depois do schema |
 | `supabase.json` | URL e chave `anon` do projeto — a chave é pública por design |
+| `TUTORIAL-SUPABASE.md` | Configurar conta/sincronização — feito uma vez pelo mantenedor |
 | `FASES.md` | Plano de evolução para contas, banco compartilhado e concursos |
 
 Sem build, sem dependências, sem framework. É proposital: o app precisa rodar
@@ -272,4 +273,5 @@ de propósito para não fazer dias de antes desta métrica aparecerem como 0%.
 Netlify (arrastar a pasta) ou GitHub Pages (git push + Settings → Pages).
 Precisa ir junto: os 6 arquivos originais, `concursos.json`, `supabase.json` e a
 pasta `banco/` inteira — sem ela o app cai na tela de erro de boot. Detalhes em
-`TUTORIAL.md`.
+`TUTORIAL.md`. Configurar conta e sincronização (uma vez só, feito pelo
+mantenedor) está em `TUTORIAL-SUPABASE.md`.
