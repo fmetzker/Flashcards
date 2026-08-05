@@ -516,6 +516,18 @@ aprovar, rejeitar com motivo, cancelar rejeição sem chamar o servidor,
 esconde o botão. Regressão completa sem quebra, `offline.html` regenerado,
 `validar.ps1` sem erros.
 
+**Correção posterior, achada só ao rodar contra o projeto real:** o
+`conferir.sql` simula pessoas (Ana, Bruno, autor, revisor) com UUIDs
+fictícios, mas `usuario_id`/`autor_id`/`user_id`/`revisado_por` têm chave
+estrangeira de verdade para `auth.users` — a primeira execução real quebrou
+com `violates foreign key constraint`. Corrigido com uma function auxiliar
+(`pg_temp.desliga_fk`) que desliga só o gatilho **interno** de FK de uma
+tabela, sem tocar em gatilhos nomeados como `marcar_revisor` — desligar tudo
+de uma vez (`disable trigger all`) teria silenciado esse gatilho bem no teste
+que precisa dele ativo. Nunca tinha rodado de verdade antes desta correção;
+"testado" nas seções anteriores queria dizer analisado com cuidado, não
+executado.
+
 **Pendente para você, junto com o que já estava pendente da 4a:** rodar
 `schema.sql` de novo (idempotente — inclui `sou_revisor`/`marcar_revisor`
 além de `propostas`/`revisores`) e o bloco 10 pra virar revisor.
