@@ -12,28 +12,13 @@
 
 begin;
 
--- ----------------------------------------------------------------------------
--- Auxiliar só deste arquivo: desliga apenas os gatilhos INTERNOS de chave
--- estrangeira de uma tabela — os que o Postgres cria sozinho para aplicar
--- `references` — sem tocar em gatilhos nomeados como marcar_revisor.
---
--- Necessário porque os testes abaixo simulam pessoas (Ana, Bruno, autor,
--- revisor...) com UUIDs fictícios, que não existem em auth.users de verdade.
--- Várias colunas têm chave estrangeira pra lá; "ALTER TABLE ... DISABLE
--- TRIGGER ALL" desligaria a FK e o marcar_revisor juntos, e o teste do
--- gatilho (seção 6) precisa dele continuar ativo mesmo com a FK fictícia
--- desligada. pg_temp: existe só nesta sessão, some sozinho ao desconectar.
--- ----------------------------------------------------------------------------
-create or replace function pg_temp.desliga_fk(tabela regclass, religar boolean)
-returns void language plpgsql as $$
-declare r record;
-begin
-  for r in select tgname from pg_trigger where tgrelid = tabela and tgisinternal
-  loop
-    execute format('alter table %s %s trigger %I', tabela,
-      case when religar then 'enable' else 'disable' end, r.tgname);
-  end loop;
-end $$;
+-- Os testes abaixo simulam pessoas (Ana, Bruno, autor, revisor...) com UUIDs
+-- fictícios, sem conta de verdade em auth.users — mas várias colunas têm
+-- chave estrangeira pra lá. "DEFERRED" adia a checagem dessas chaves para o
+-- COMMIT; como este arquivo sempre termina em ROLLBACK, a checagem nunca
+-- chega a rodar. Precisa que schema.sql (seção 8.3) já tenha marcado essas
+-- chaves como adiáveis — se este comando der erro, rode schema.sql de novo.
+set constraints all deferred;
 
 -- ----------------------------------------------------------------------------
 -- 1. RLS está ligada em todas as tabelas?
@@ -101,12 +86,6 @@ declare
   bruno uuid := '22222222-2222-2222-2222-222222222222';
   visto int;
 begin
-  -- Ana e Bruno são UUIDs fictícios, sem conta de verdade em auth.users —
-  -- ver o comentário de pg_temp.desliga_fk no topo do arquivo. Continua
-  -- desligado até o fim do bloco porque a tentativa de forjar em nome do
-  -- Bruno, mais abaixo, também insere com esse usuario_id fictício.
-  perform pg_temp.desliga_fk('public.eventos_resposta', false);
-
   -- entra o dado das duas pessoas contornando a RLS (aqui somos postgres)
   insert into public.eventos_resposta (id, usuario_id, questao_id, ts, resultado, caixa_depois, prox)
   values
@@ -160,7 +139,6 @@ begin
   end;
 
   reset role;
-  perform pg_temp.desliga_fk('public.eventos_resposta', true);
 end $$;
 
 
@@ -181,13 +159,6 @@ declare
   visto_uuid uuid;
   visto_ts   timestamptz;
 begin
-  -- autor/outro/revisor são UUIDs fictícios, sem conta em auth.users; as duas
-  -- tabelas têm chave estrangeira pra lá — inclusive revisado_por, testada
-  -- mais abaixo. Como desliga_fk só toca o gatilho interno de FK, dá pra
-  -- deixar desligado o bloco inteiro sem afetar marcar_revisor nenhuma vez.
-  perform pg_temp.desliga_fk('public.revisores', false);
-  perform pg_temp.desliga_fk('public.propostas', false);
-
   insert into public.revisores (user_id) values (revisor);
   insert into public.propostas (id, autor_id, materia, topico, enunciado, alternativas, correta, explicacao, fonte)
   values (prop_id, autor, 'sus', 'Lei 8.080/90', 'enunciado de teste', alt, 1, 'explicação', 'fonte de teste');
@@ -233,8 +204,6 @@ begin
   else raise warning 'FALHOU — revisado_em ficou nulo'; end if;
 
   reset role;
-  perform pg_temp.desliga_fk('public.propostas', true);
-  perform pg_temp.desliga_fk('public.revisores', true);
 end $$;
 
 
@@ -247,8 +216,6 @@ declare
   ninguem uuid := '77777777-7777-7777-7777-777777777777';
   resultado boolean;
 begin
-  -- mesmo motivo dos blocos anteriores: revisor é um UUID fictício
-  perform pg_temp.desliga_fk('public.revisores', false);
   insert into public.revisores (user_id) values (revisor);
 
   set local role authenticated;
@@ -272,7 +239,6 @@ begin
   end;
 
   reset role;
-  perform pg_temp.desliga_fk('public.revisores', true);
 end $$;
 
 rollback;

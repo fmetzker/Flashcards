@@ -516,17 +516,28 @@ aprovar, rejeitar com motivo, cancelar rejeição sem chamar o servidor,
 esconde o botão. Regressão completa sem quebra, `offline.html` regenerado,
 `validar.ps1` sem erros.
 
-**Correção posterior, achada só ao rodar contra o projeto real:** o
-`conferir.sql` simula pessoas (Ana, Bruno, autor, revisor) com UUIDs
-fictícios, mas `usuario_id`/`autor_id`/`user_id`/`revisado_por` têm chave
-estrangeira de verdade para `auth.users` — a primeira execução real quebrou
-com `violates foreign key constraint`. Corrigido com uma function auxiliar
-(`pg_temp.desliga_fk`) que desliga só o gatilho **interno** de FK de uma
-tabela, sem tocar em gatilhos nomeados como `marcar_revisor` — desligar tudo
-de uma vez (`disable trigger all`) teria silenciado esse gatilho bem no teste
-que precisa dele ativo. Nunca tinha rodado de verdade antes desta correção;
-"testado" nas seções anteriores queria dizer analisado com cuidado, não
-executado.
+**Correção posterior, achada só ao rodar contra o projeto real, em duas
+tentativas:** o `conferir.sql` simula pessoas (Ana, Bruno, autor, revisor) com
+UUIDs fictícios, mas `usuario_id`/`autor_id`/`user_id`/`revisado_por` têm
+chave estrangeira de verdade para `auth.users` — a primeira execução real
+quebrou com `violates foreign key constraint`. Nunca tinha rodado de verdade
+antes desta correção; "testado" nas seções anteriores queria dizer analisado
+com cuidado, não executado.
+
+- **1ª tentativa:** uma function auxiliar (`pg_temp.desliga_fk`) que desligava
+  só o gatilho **interno** de FK de uma tabela, sem tocar em gatilhos nomeados
+  como `marcar_revisor`. Esbarrou numa proteção do Postgres: só superusuário
+  de verdade pode desligar um `RI_ConstraintTrigger`, e o papel do SQL Editor
+  do Supabase não é superusuário de verdade — `permission denied ... is a
+  system trigger`.
+- **2ª tentativa, a que ficou:** em vez de desligar o gatilho, tornar as
+  chaves estrangeiras para `auth.users` **adiáveis** (`schema.sql`, seção
+  8.3, descobrindo-as sozinho via `pg_constraint` em vez de nomear cada uma
+  na mão) e, em `conferir.sql`, `set constraints all deferred` logo depois do
+  `begin`. A checagem passa a rodar só no `COMMIT`; como o arquivo sempre
+  termina em `ROLLBACK`, ela nunca chega a rodar para o dado de teste. Não
+  precisa de nenhum privilégio especial — bem mais robusto que brigar com
+  gatilho.
 
 **Pendente para você, junto com o que já estava pendente da 4a:** rodar
 `schema.sql` de novo (idempotente — inclui `sou_revisor`/`marcar_revisor`

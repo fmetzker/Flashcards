@@ -355,6 +355,40 @@ create trigger marcar_revisor
 
 
 -- ----------------------------------------------------------------------------
+-- 8.3 Chaves estrangeiras adiáveis — só para permitir a conferência
+--
+-- Por padrão, uma chave estrangeira é checada no exato momento do INSERT/
+-- UPDATE. "Adiável" (DEFERRABLE) permite pedir pra checagem só rodar no
+-- COMMIT — e como conferir.sql sempre termina em ROLLBACK, a checagem nunca
+-- chega a rodar para o dado de teste que ele insere (Ana, Bruno, autor,
+-- revisor... UUIDs fictícios, sem conta de verdade em auth.users).
+--
+-- Não muda o comportamento normal do app: sem pedir explicitamente (é isso
+-- que conferir.sql faz, com SET CONSTRAINTS ALL DEFERRED), continua checando
+-- na hora, exatamente como antes. A alternativa que tentei primeiro —
+-- desligar o gatilho que aplica a FK — esbarra numa proteção do Postgres:
+-- só superusuário de verdade pode desligar esse gatilho específico, e o
+-- papel do SQL Editor do Supabase não é superusuário de verdade.
+--
+-- Descobre as FKs sozinho em vez de nomear cada uma na mão — não quebra se
+-- uma tabela nova ganhar uma referência pra auth.users no futuro.
+-- ----------------------------------------------------------------------------
+do $$
+declare r record;
+begin
+  for r in
+    select conname, conrelid::regclass as tabela
+    from pg_constraint
+    where contype = 'f'
+      and confrelid = 'auth.users'::regclass
+      and connamespace = 'public'::regnamespace
+  loop
+    execute format('alter table %s alter constraint %I deferrable initially immediate', r.tabela, r.conname);
+  end loop;
+end $$;
+
+
+-- ----------------------------------------------------------------------------
 -- 9. Convide as pessoas do grupo
 --
 -- Edite e execute. Só quem estiver aqui consegue criar conta.
