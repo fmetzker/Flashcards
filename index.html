@@ -195,6 +195,13 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
 </head>
 <body>
 
+<!-- ============ LOGIN OBRIGATÓRIO ============ -->
+<div class="tela" id="tela-login">
+  <h1>Entrar</h1>
+  <div class="sub">É preciso estar conectado para estudar neste app.</div>
+  <div class="card" style="margin-top:16px" id="login-corpo"></div>
+</div>
+
 <!-- ============ INÍCIO ============ -->
 <div class="tela ativa" id="tela-inicio">
   <div class="topo">
@@ -606,9 +613,10 @@ function apagarPerfilAtual(){
 
 /* =======================================================================
    CONTA — Fase 3b
-   Login opcional por e-mail e senha, contra o Supabase Auth (GoTrue) direto
-   por fetch, sem SDK e sem CDN. Sem conta, o app funciona exatamente como na
-   Fase 2 — nada aqui é obrigatório.
+   Login por e-mail e senha, contra o Supabase Auth (GoTrue) direto por
+   fetch, sem SDK e sem CDN. Deixou de ser opcional: o boot (ver BOOT, mais
+   abaixo) bloqueia a entrada no app sem sessão válida, exceto no
+   offline.html, que não fala com o servidor.
 
    A sessão fica presa ao PERFIL local, não numa chave global: trocar de
    perfil no mesmo aparelho não pode herdar a sessão de outra pessoa. Como
@@ -641,7 +649,7 @@ function supaConfigurado(){
 
 async function carregarSupabase(){
   try{ SUPA = await pega("supabase.json"); }
-  catch(e){ SUPA = null; }   // arquivo ausente não é erro fatal: conta é opcional
+  catch(e){ SUPA = null; }   // não trava o boot — quem trata a ausência é a tela de login (exigeLogin/pintarLogin)
 }
 
 async function chamarAuth(caminho, corpo){
@@ -970,6 +978,7 @@ function ir(nome){
   document.querySelectorAll(".tela").forEach(t=>t.classList.remove("ativa"));
   document.getElementById("tela-"+nome).classList.add("ativa");
   window.scrollTo(0,0);
+  if(nome==="login") pintarLogin();
   if(nome==="inicio") pintarInicio();
   if(nome==="materias") pintarMaterias();
   if(nome==="stats") pintarStats();
@@ -992,6 +1001,8 @@ function rodape(nome){
     b("Voltar", ()=>ir("inicio"), "fantasma");
     if(BANCO.length>=20) b("Começar simulado", iniciarSimulado, "verde");
   } else if(nome==="simulado"){
+    box.classList.remove("ativa");
+  } else if(nome==="login"){
     box.classList.remove("ativa");
   } else {
     b("Voltar ao início", ()=>ir("inicio"), "fantasma");
@@ -1593,10 +1604,79 @@ function pintarPerfis(){
 }
 
 /* =======================================================================
+   LOGIN OBRIGATÓRIO — interface
+   Tela cheia, sem rodapé de navegação. Só aparece no boot (ver BOOT, mais
+   abaixo) quando não há sessão válida para o perfil local atual — e nunca no
+   offline.html, que não tem como falar com o servidor de jeito nenhum.
+
+   Reaproveita entrar()/criarConta() do bloco CONTA, só que bloqueando a
+   entrada em vez de oferecer como opção. Ao logar com sucesso, cai direto na
+   tela inicial, igual ao fim normal do boot.
+   ======================================================================= */
+function pintarLogin(){
+  const c = document.getElementById("login-corpo");
+
+  if(!supaConfigurado()){
+    c.innerHTML = '<div class="aviso">Sincronização ainda não configurada neste app — fale com quem administra para liberar o acesso.</div>';
+    return;
+  }
+
+  const estilo = "width:100%;font-family:var(--corpo);font-size:15px;padding:11px 12px;"+
+                 "border:1px solid var(--traco);border-radius:10px;background:#fff;margin-top:8px";
+  c.innerHTML =
+    '<input type="email" id="login-email" placeholder="e-mail" autocomplete="username" style="'+estilo+'">'+
+    '<input type="password" id="login-senha" placeholder="senha" autocomplete="current-password" style="'+estilo+'">'+
+    '<div style="display:flex;gap:9px;margin-top:9px">'+
+      '<button class="pequeno" id="login-entrar">Entrar</button>'+
+      '<button class="pequeno fantasma" id="login-criar">Criar conta</button>'+
+    '</div>'+
+    '<div class="aviso" id="login-erro"></div>'+
+    '<div class="aviso">Cadastro fechado — só quem foi convidado consegue criar conta.</div>';
+
+  const campoEmail = document.getElementById("login-email");
+  const campoSenha = document.getElementById("login-senha");
+  const erro = document.getElementById("login-erro");
+
+  const aoClicar = (botao, fn) => async ()=>{
+    erro.textContent = ""; erro.style.color = "";
+    const email = campoEmail.value.trim(), senha = campoSenha.value;
+    if(!email || !senha){ erro.textContent = "Preencha e-mail e senha."; return; }
+    botao.disabled = true;
+    try{ await fn(email, senha); }
+    catch(e){ erro.textContent = e.message; }
+    finally{ botao.disabled = false; }
+  };
+
+  const btEntrar = document.getElementById("login-entrar");
+  const btCriar  = document.getElementById("login-criar");
+  btEntrar.onclick = aoClicar(btEntrar, async (email, senha)=>{
+    await entrar(email, senha);
+    await verificarRevisor();
+    salvar();
+    ir("inicio");
+    sincronizar();
+  });
+  btCriar.onclick = aoClicar(btCriar, async (email, senha)=>{
+    const resultado = await criarConta(email, senha);
+    if(resultado === "confirme"){
+      erro.style.color = "var(--verde)";
+      erro.textContent = "Conta criada — confirme pelo e-mail e depois entre.";
+    } else {
+      await verificarRevisor();
+      salvar();
+      ir("inicio");
+      sincronizar();
+    }
+  });
+}
+
+/* =======================================================================
    CONTA — interface
    Três estados possíveis: indisponível (versão offline ou não configurada),
-   deslogado (formulário) e logado (e-mail + Sair). Nada aqui é obrigatório
-   para o app funcionar — ver o comentário no bloco CONTA mais acima.
+   deslogado (formulário) e logado (e-mail + Sair). Desde que o login passou
+   a ser obrigatório para entrar no app (ver LOGIN OBRIGATÓRIO, acima), na
+   prática só o estado logado é alcançável por aqui — o formulário deslogado
+   fica como reserva defensiva, não como caminho normal.
    ======================================================================= */
 function pintarConta(){
   const c = document.getElementById("conta-corpo");
@@ -1619,7 +1699,10 @@ function pintarConta(){
       '</div>';
     c.querySelector("strong").textContent = SESSAO.email || "–";
     pintarStatusSync();
-    document.getElementById("conta-sair").onclick = async ()=>{ await sair(); SOU_REVISOR = false; pintarConta(); pintarInicio(); };
+    // recarrega em vez de repintar: login é obrigatório agora, então sair
+    // precisa cair na mesma tela de login que o boot mostra sem sessão —
+    // reusar o boot evita duplicar essa lógica aqui.
+    document.getElementById("conta-sair").onclick = async ()=>{ await sair(); location.reload(); };
     document.getElementById("conta-sincronizar").onclick = ()=>sincronizar();
     return;
   }
@@ -1977,13 +2060,24 @@ function falhaBoot(msg){
   document.getElementById("boot-msg").textContent = msg;
 }
 
+/* login é obrigatório desde que o app passou a exigir conta — exceto no
+   offline.html (window.DADOS), que nunca fala com o servidor e não tem como
+   pedir login a ninguém. Uma vez logado, a sessão fica salva por perfil e o
+   app abre offline normalmente até ela expirar de verdade (ver
+   renovarSessao). */
+function exigeLogin(){ return !window.DADOS && !SESSAO; }
+
 carregarConfig()
   .then(carregarBanco)
   .then(migrarParaIds)
-  .then(carregarSupabase)   // conta é opcional: nunca rejeita a promise
-  .then(verificarSessao)    // idem — desloga em silêncio se a sessão não presta mais
-  .then(verificarRevisor)   // idem — precisa terminar antes do menu pintar, senão o botão pisca
-  .then(()=>{ salvar(); ir("inicio"); sincronizar(); })   // idem — puxa em segundo plano, não bloqueia a tela
+  .then(carregarSupabase)   // arquivo ausente não é erro fatal, mas sem ele ninguém consegue logar
+  .then(verificarSessao)    // desloga em silêncio se a sessão salva não presta mais
+  .then(verificarRevisor)   // precisa terminar antes do menu pintar, senão o botão pisca
+  .then(()=>{
+    salvar();
+    if(exigeLogin()) ir("login");
+    else { ir("inicio"); sincronizar(); }   // puxa em segundo plano, não bloqueia a tela
+  })
   .catch(err=>{
     falhaBoot(location.protocol === "file:"
       ? "O app foi aberto como arquivo local. Desde que o banco passou a viver em banco/*.json, o navegador bloqueia a leitura desses arquivos por segurança. Publique a pasta num endereço http ou https e abra por lá."

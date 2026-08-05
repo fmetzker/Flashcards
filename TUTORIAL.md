@@ -12,7 +12,7 @@ Cargo: Enfermeiro · Edital 003/2026-SMA · Prova em 20/09/2026
   passou a viver em arquivos separados, publicar exige levar a pasta `banco/`
   junto, e um zip preparado à mão é fácil de deixar algo de fora)
 - Um computador (recomendado) ou o iPhone com o app Arquivos
-- Internet apenas para a publicação e a primeira abertura — depois disso o app roda offline
+- Internet para a publicação e para logar da primeira vez em cada aparelho/perfil — login é obrigatório para entrar no app (exceto na versão `offline.html`); depois de logado, continua funcionando offline
 
 **Por que precisa publicar num endereço na internet:**
 O Safari do iPhone não permite adicionar um arquivo local à tela de início, e o armazenamento do progresso não funciona de forma confiável em arquivo aberto direto do aparelho. Publicar uma vez resolve os dois problemas de uma vez, e depois o app funciona sem rede.
@@ -26,8 +26,8 @@ O Safari do iPhone não permite adicionar um arquivo local à tela de início, e
 | `manifest.json` | Define nome, cores e ícone do app |
 | `icone-192.png`, `icone-512.png`, `apple-touch-icon.png` | Ícones |
 | `concursos.json` | Data da prova, composição, regra de aprovação |
-| `supabase.json` | Endereço da conta (opcional — sem ele, conta fica indisponível) |
-| `banco/` | **A pasta inteira**, com as 852 questões — sem ela o app cai numa tela de erro |
+| `supabase.json` | Endereço da conta — **obrigatório**: sem ele, ninguém consegue logar, e login é exigido para entrar no app |
+| `banco/` | **A pasta inteira**, com as questões — sem ela o app cai numa tela de erro |
 
 Não precisa ir: os arquivos `.ps1`, `.py`, `FASES.md`, `CLAUDE.md`, a pasta
 `supabase/` (SQL) nem o `offline.html`. São ferramentas de desenvolvimento —

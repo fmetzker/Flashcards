@@ -254,7 +254,10 @@ def confere_supabase():
     if not supa.get('url') or not supa.get('anonKey'):
         erros.append("supabase.json precisa dos campos 'url' e 'anonKey'")
     elif 'SEU-PROJETO' in supa['url']:
-        avisos.append("supabase.json ainda tem a URL de exemplo — conta fica indisponível até você colar a de verdade")
+        # desde que o login passou a ser obrigatório, isto não é mais "sem
+        # sincronizar" — é "ninguém consegue nem abrir o app"
+        erros.append("supabase.json ainda tem a URL de exemplo — como o login é obrigatório, "
+                     "publicar assim tranca todo mundo pra fora do app")
 
 
 def papel_do_jwt(jwt):

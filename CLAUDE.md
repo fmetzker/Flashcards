@@ -193,8 +193,8 @@ Fase 1 reagrupou os 85 tópicos em matérias e transformou o concurso em dado; a
 Fase 1b subdividiu essas matérias em tópicos reais; a Fase 1c reduziu as
 matérias às três do edital, virando uma árvore de três níveis; a Fase 2 deu
 suporte a múltiplos perfis no mesmo aparelho; a Fase 3a criou o schema do
-Supabase (RLS, allowlist, log append-only); a Fase 3b deu login opcional por
-e-mail e senha, com sessão presa ao perfil local; a Fase 3c deu o motor de
+Supabase (RLS, allowlist, log append-only); a Fase 3b deu login por e-mail e
+senha, com sessão presa ao perfil local; a Fase 3c deu o motor de
 sincronização — fila local, push idempotente, pull incremental com merge por
 evento mais recente; a Fase 4a deu o formulário de proposta de questão; a Fase
 4b deu a tela de revisão (aprovar/rejeitar); a Fase 4c fechou o ciclo com
@@ -203,6 +203,14 @@ evento mais recente; a Fase 4a deu o formulário de proposta de questão; a Fase
 banco em si continua estático o tempo todo: a proposta nunca escreve direto
 nele. Depois disso, o perfil ganhou suporte a mais de um concurso ao mesmo
 tempo, com um em foco e os demais só inscritos.
+
+**Login passou a ser obrigatório para entrar no app** (antes era opcional).
+Sem sessão válida para o perfil local, o boot mostra uma tela de
+entrar/criar conta em vez da tela inicial — ver `pintarLogin()`/`exigeLogin()`
+em `index.html`. Isso não vale para o `offline.html`, que nunca fala com o
+servidor e continua funcionando sem conta, de propósito. Consequência: quem
+ainda não tem conta (cadastro fechado, só quem está em `convidados`) fica
+bloqueado até criar uma.
 
 Projeto Supabase real criado, `supabase.json` preenchido, e o `schema.sql`
 inteiro (Fases 3a a 4c: RLS, allowlist, `propostas`/`revisores`,

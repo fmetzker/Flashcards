@@ -233,7 +233,7 @@ if (-not (Test-Path $arqSupa)) {
   try {
     $supa = [System.IO.File]::ReadAllText($arqSupa, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
     if (-not $supa.url -or -not $supa.anonKey) { Erro "supabase.json precisa dos campos 'url' e 'anonKey'" }
-    elseif ($supa.url -match 'SEU-PROJETO') { Aviso "supabase.json ainda tem a URL de exemplo — conta fica indisponível até você colar a de verdade" }
+    elseif ($supa.url -match 'SEU-PROJETO') { Erro "supabase.json ainda tem a URL de exemplo — como o login é obrigatório, publicar assim tranca todo mundo pra fora do app" }
   } catch { Erro "supabase.json não é JSON válido" }
 }
 

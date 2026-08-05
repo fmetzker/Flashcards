@@ -5,10 +5,12 @@ família instalar o app pronto. Este é para **você**, configurando a
 infraestrutura uma vez só. Ninguém mais vai precisar repetir isto — quem só
 usa o app faz login normalmente, sem tocar em nada aqui.
 
-Sem isto, o app funciona perfeitamente do mesmo jeito — conta é opcional, só
-serve para sincronizar progresso entre aparelhos e para o banco colaborativo
-(propor/revisar questão). Se você não quer isso agora, pode pular o tutorial
-inteiro.
+**Login passou a ser obrigatório para entrar no app** — sem `supabase.json`
+preenchido com um projeto de verdade, ninguém consegue nem abrir a tela
+inicial (a tela de login aparece, mas sem servidor pra falar com ela). Não
+dá para pular este tutorial se o app vai ser usado por mais alguém além de
+você. A única exceção é o `offline.html` (arquivo único, sem rede), que
+nunca exigiu conta e continua sem exigir.
 
 Tempo: uns 15 minutos, feito uma vez.
 
@@ -147,9 +149,10 @@ errada em lugar nenhum, e publique (commit + push, ou peça para eu fazer).
 Só quem está na tabela `revisores` vê a tela "Revisar propostas" no app.
 Normalmente é só você.
 
-**1.** Primeiro, faça login pelo próprio app **pelo menos uma vez** — a conta
-precisa existir antes de poder virar revisor (é a Fase 3b: Ajustes → Conta →
-Criar conta, com um dos e-mails convidados na Parte 4).
+**1.** Primeiro, crie sua conta pelo próprio app — abra o app publicado, ele
+já vai te mostrar a tela de login direto (é obrigatória desde que o login
+passou a ser exigido para entrar). Toque em "Criar conta" com um dos e-mails
+convidados na Parte 4.
 
 **2.** De volta ao SQL Editor:
 
@@ -174,11 +177,11 @@ Deve listar seu e-mail.
 
 ## Parte 8 — Testar pelo app
 
-**1.** Abra o app publicado, vá em **Ajustes → Conta**, entre com o e-mail e
-senha que você criou.
+**1.** Abra o app publicado. Deve aparecer a tela de login direto — entre com
+o e-mail e senha que você criou na Parte 7.
 
-**2.** Deve aparecer "Conectado como [seu e-mail]" e o status de
-sincronização.
+**2.** Depois de entrar, vá em **Ajustes → Conta**: deve aparecer "Conectado
+como [seu e-mail]" e o status de sincronização.
 
 **3.** Volte à tela inicial. Devem aparecer dois itens novos no menu:
 **"Propor questão"** e **"Revisar propostas"** (o segundo só porque você é
@@ -200,4 +203,5 @@ Se tudo isso funcionar, a configuração está completa.
 | "Database error saving new user" ao criar conta | E-mail não está em `convidados`, ou a Parte 4 não rodou | Confira a Parte 4; o e-mail precisa bater exatamente |
 | Login funciona mas "Revisar propostas" não aparece | A Parte 7 não rodou, ou rodou antes de o login existir | Repita a Parte 7 depois de ter feito login pelo menos uma vez |
 | Ajustes → Conta diz "Sincronização ainda não configurada" | `supabase.json` ainda tem os valores de exemplo | Repita a Parte 6 |
+| Tela de login diz "sincronização ainda não configurada" e não tem formulário | `supabase.json` ainda tem os valores de exemplo — sem ele, ninguém consegue entrar no app | Repita a Parte 6 |
 | Colei a chave errada em algum lugar | Confundiu `sb_secret_` com `sb_publishable_` | Rode `validar.ps1` — ele acusa; troque pela pública e considere regenerar a secreta no painel |
