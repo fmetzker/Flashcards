@@ -223,8 +223,8 @@ order by usuario_id, questao_id, ts desc, id desc;
 --
 -- Quem pode ver e aprovar propostas de questão de qualquer pessoa. Mesma
 -- lógica da allowlist de convidados: RLS ligada, zero policies, ninguém lê
--- pela API — só as policies de `propostas` abaixo consultam esta tabela via
--- subquery, o que roda com a permissão de quem está fazendo a consulta.
+-- pela API — nem mesmo as policies de `propostas`, que por isso consultam
+-- esta tabela através de sou_revisor() (seção 7.1), não direto.
 -- ----------------------------------------------------------------------------
 create table if not exists public.revisores (
   user_id    uuid primary key references auth.users(id) on delete cascade,
@@ -233,6 +233,38 @@ create table if not exists public.revisores (
 
 alter table public.revisores enable row level security;
 revoke all on public.revisores from anon, authenticated;
+
+
+-- ----------------------------------------------------------------------------
+-- 7.1 "Sou revisor?"
+--
+-- `revisores` nega toda leitura pela API (revoke all, logo acima) — de
+-- propósito, pra lista de quem revisa não ficar enumerável. Mas então
+-- precisa de um jeito de perguntar "eu, especificamente, sou revisor?" sem
+-- poder listar quem mais é. Uma function security definer que só devolve
+-- true/false resolve: ela lê a tabela com privilégio elevado, e o único dado
+-- que sai dela é o booleano.
+--
+-- Precisa vir ANTES das policies de `propostas`, duas seções abaixo: elas
+-- chamam esta function, e o Postgres exige que ela já exista na hora de
+-- criar a policy. Também é por isso que ela existe: uma policy de RLS roda
+-- com o privilégio de quem está consultando, não do dono da tabela — uma
+-- policy que fizesse `exists (select ... from revisores ...)` direto bateria
+-- no mesmo "permission denied" que motivou o revoke all, e travaria a
+-- leitura de `propostas` pra QUALQUER pessoa, revisor ou não (o Postgres
+-- avalia todas as policies de uma tabela, mesmo as que não se aplicam).
+-- ----------------------------------------------------------------------------
+create or replace function public.sou_revisor()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (select 1 from public.revisores where user_id = auth.uid());
+$$;
+
+grant execute on function public.sou_revisor() to authenticated;
 
 
 -- ----------------------------------------------------------------------------
@@ -287,45 +319,24 @@ create policy "autor: ver as próprias"
   using (autor_id = auth.uid());
 
 -- revisor vê tudo (as políticas de SELECT se combinam com OR: quem for
--- autor E revisor ao mesmo tempo continua vendo tudo normalmente)
+-- autor E revisor ao mesmo tempo continua vendo tudo normalmente).
+-- sou_revisor(), não a subquery direta em revisores — ver o comentário na
+-- seção 7.1 do porquê isso não é só estilo, é o que faz a policy funcionar.
 create policy "revisor: ver todas"
   on public.propostas for select
-  using (exists (select 1 from public.revisores r where r.user_id = auth.uid()));
+  using (public.sou_revisor());
 
 -- só revisor muda status — o autor não pode auto-aprovar a própria proposta
 create policy "revisor: decidir"
   on public.propostas for update
-  using (exists (select 1 from public.revisores r where r.user_id = auth.uid()))
-  with check (exists (select 1 from public.revisores r where r.user_id = auth.uid()));
+  using (public.sou_revisor())
+  with check (public.sou_revisor());
 
 -- sem policy de delete: rejeitada fica registrada, não some
 
 
 -- ----------------------------------------------------------------------------
--- 8.1 "Sou revisor?" — Fase 4b
---
--- `revisores` nega toda leitura pela API (revoke all, seção 7) — de propósito,
--- pra lista de quem revisa não ficar enumerável. Mas então o app precisa de um
--- jeito de perguntar "eu, especificamente, sou revisor?" sem poder listar
--- quem mais é. Uma function security definer que só devolve true/false
--- resolve isso: ela lê a tabela com privilégio elevado, mas o único dado que
--- sai dela é o booleano.
--- ----------------------------------------------------------------------------
-create or replace function public.sou_revisor()
-returns boolean
-language sql
-security definer
-set search_path = public
-stable
-as $$
-  select exists (select 1 from public.revisores where user_id = auth.uid());
-$$;
-
-grant execute on function public.sou_revisor() to authenticated;
-
-
--- ----------------------------------------------------------------------------
--- 8.2 Quem decidiu e quando — Fase 4b
+-- 8.1 Quem decidiu e quando — Fase 4b
 --
 -- `revisado_por`/`revisado_em` não têm DEFAULT porque DEFAULT só se aplica em
 -- INSERT, e essas colunas só fazem sentido preenchidas num UPDATE (quando a
@@ -355,7 +366,7 @@ create trigger marcar_revisor
 
 
 -- ----------------------------------------------------------------------------
--- 8.3 Chaves estrangeiras adiáveis — só para permitir a conferência
+-- 8.2 Chaves estrangeiras adiáveis — só para permitir a conferência
 --
 -- Por padrão, uma chave estrangeira é checada no exato momento do INSERT/
 -- UPDATE. "Adiável" (DEFERRABLE) permite pedir pra checagem só rodar no

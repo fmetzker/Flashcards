@@ -530,14 +530,28 @@ com cuidado, não executado.
   de verdade pode desligar um `RI_ConstraintTrigger`, e o papel do SQL Editor
   do Supabase não é superusuário de verdade — `permission denied ... is a
   system trigger`.
-- **2ª tentativa, a que ficou:** em vez de desligar o gatilho, tornar as
-  chaves estrangeiras para `auth.users` **adiáveis** (`schema.sql`, seção
-  8.3, descobrindo-as sozinho via `pg_constraint` em vez de nomear cada uma
-  na mão) e, em `conferir.sql`, `set constraints all deferred` logo depois do
-  `begin`. A checagem passa a rodar só no `COMMIT`; como o arquivo sempre
-  termina em `ROLLBACK`, ela nunca chega a rodar para o dado de teste. Não
-  precisa de nenhum privilégio especial — bem mais robusto que brigar com
-  gatilho.
+- **2ª tentativa:** em vez de desligar o gatilho, tornar as chaves
+  estrangeiras para `auth.users` **adiáveis** (`schema.sql`, descobrindo-as
+  sozinho via `pg_constraint` em vez de nomear cada uma na mão) e, em
+  `conferir.sql`, `set constraints all deferred` logo depois do `begin`. A
+  checagem passa a rodar só no `COMMIT`; como o arquivo sempre termina em
+  `ROLLBACK`, ela nunca chega a rodar para o dado de teste. Não precisa de
+  nenhum privilégio especial — bem mais robusto que brigar com gatilho.
+- **Um terceiro problema, de desenho, não de teste:** rodando de novo, veio
+  `permission denied for table revisores` numa consulta comum a `propostas`
+  (não uma tentativa de burlar nada). Causa: as policies "revisor: ver
+  todas"/"revisor: decidir" faziam `exists (select ... from revisores ...)`
+  direto — e essa subquery roda com o privilégio de quem está consultando,
+  não do dono da tabela. Como `revisores` nega tudo (`revoke all`), **e o
+  Postgres avalia todas as policies de uma tabela, mesmo as que não se
+  aplicam**, isso travaria a leitura de `propostas` para qualquer pessoa,
+  revisor ou não — não só no teste, no app de verdade também, e eu não tinha
+  percebido porque nunca tinha rodado contra um projeto real. É exatamente o
+  problema que `sou_revisor()` (uma function `security definer`) foi criada
+  pra resolver — só que eu não tinha usado ela dentro das próprias policies,
+  só no app. Corrigido: as duas policies agora chamam `sou_revisor()`, que
+  precisou subir de posição no arquivo (seção 7.1, antes de `propostas`) —
+  o Postgres exige que a function já exista na hora de criar a policy.
 
 **Pendente para você, junto com o que já estava pendente da 4a:** rodar
 `schema.sql` de novo (idempotente — inclui `sou_revisor`/`marcar_revisor`

@@ -16,7 +16,7 @@ begin;
 -- fictícios, sem conta de verdade em auth.users — mas várias colunas têm
 -- chave estrangeira pra lá. "DEFERRED" adia a checagem dessas chaves para o
 -- COMMIT; como este arquivo sempre termina em ROLLBACK, a checagem nunca
--- chega a rodar. Precisa que schema.sql (seção 8.3) já tenha marcado essas
+-- chega a rodar. Precisa que schema.sql (seção 8.2) já tenha marcado essas
 -- chaves como adiáveis — se este comando der erro, rode schema.sql de novo.
 set constraints all deferred;
 
