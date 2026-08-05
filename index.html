@@ -369,10 +369,6 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   <div style="margin-top:24px" class="rotulo">Conta</div>
   <div id="conta-corpo"></div>
 
-  <label for="in-meta" style="margin-top:24px">Meta diária de questões</label>
-  <input type="number" id="in-meta" min="5" max="200" step="5">
-  <div class="aviso">45 min por dia ≈ 35 questões, contando a leitura das explicações.</div>
-
   <div style="margin-top:24px" class="rotulo">Backup</div>
   <div class="aviso" id="backup-info">–</div>
   <div style="display:flex;gap:9px;margin-top:10px">
@@ -502,10 +498,19 @@ async function pega(caminho){
    CONCURSO — apenas o que está EM FOCO na tela: cabeçalho, contagem
      regressiva, cartela, simulado, alerta de bloco fraco. Trocar o foco não
      recarrega banco nenhum, só repinta. */
+/* meta diária deixou de ser configurável: é sempre o total de questões da
+   prova do concurso em foco. Somada aqui, não guardada em concursos.json,
+   porque já é a soma de bl.questoes que o cabeçalho/simulado já usam — outra
+   fonte pra o mesmo número só criaria chance de os dois divergirem. */
+function metaDoConcurso(c){
+  return (c.blocos||[]).reduce((soma,bl)=> soma + (bl.questoes||0), 0) || 35;
+}
+
 function aplicarFoco(id){
   CONCURSO = INSCRITOS.find(c=>c.id === id) || INSCRITOS[0];
   E.concursoAtivo = CONCURSO.id;
   BLOCOS = CONCURSO.blocos;
+  E.meta = metaDoConcurso(CONCURSO);
   // blocoDaMateria é do concurso em foco: é ele que diz de que bloco da prova
   // cada matéria faz parte (e blocos são por concurso, não globais)
   Object.keys(blocoDaMateria).forEach(k=>delete blocoDaMateria[k]);
@@ -671,7 +676,11 @@ function salvar(){
   try{ localStorage.setItem(CHAVE, JSON.stringify(E)); }
   catch(e){ memoria = E; }
 }
-const padrao = {meta:35, cartoes:{}, dias:{}, simulados:[], ultimoBackup:null, versaoEstado:0,
+const padrao = {
+  /* meta não é mais configurável pela pessoa: aplicarFoco() sempre
+     sobrescreve com o total de questões da prova em foco (metaDoConcurso).
+     Este 35 só existe como fallback antes do primeiro carregarConfig(). */
+  meta:35, cartoes:{}, dias:{}, simulados:[], ultimoBackup:null, versaoEstado:0,
   /* concurso (singular) é o formato antigo, de quando o perfil seguia um só;
      fica aqui porque carregarConfig() ainda o lê para migrar. concursos é a
      lista que o perfil segue; concursoAtivo é qual está em foco na tela. */
@@ -2219,10 +2228,6 @@ function alternarConcurso(id, checkbox){
 function pintarAjustes(){
   pintarConcursos();
   pintarConta();
-  document.getElementById("in-meta").value = E.meta;
-  document.getElementById("in-meta").onchange = function(){
-    E.meta = Math.max(5, parseInt(this.value)||35); salvar();
-  };
   let grava=true; try{ localStorage.setItem("t","1"); localStorage.removeItem("t"); }catch(e){ grava=false; }
   document.getElementById("ajustes-msg").textContent = grava
     ? "O progresso está sendo salvo neste aparelho."

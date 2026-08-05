@@ -151,9 +151,9 @@ Se tudo passou, está pronto. Pode desligar o modo avião.
 
 ## Parte 5 — Primeiro uso
 
-**1.** Vá em **Ajustes** e confirme a **meta diária**. Está em 35, que corresponde a cerca de 45 minutos por dia. Se você tiver menos tempo em algum período, reduza — meta batida com constância vale mais que meta grande abandonada.
+**1.** A meta diária não se configura mais — ela é sempre o total de questões da prova do concurso em foco (por exemplo, 70 no vestibular de Enfermeiro). Aparece pronta na tela inicial, em "Meta de hoje".
 
-**2.** Volte ao início e toque em **Estudar agora**.
+**2.** Toque em **Estudar agora**.
 
 **3.** Ao responder cada questão, use os botões com honestidade:
 - **Sabia** — você tinha certeza. A questão vai para a caixa seguinte e volta mais tarde.
