@@ -176,6 +176,15 @@ Login é **obrigatório** para entrar no app — exceto no `offline.html`, que
 nunca fala com o servidor. Sem sessão válida, o boot mostra a tela de
 entrar/criar conta (`exigeLogin()`/`pintarLogin()`).
 
+**O link do e-mail de confirmação de cadastro não visita uma página do
+Supabase** — o GoTrue confere o token no servidor e redireciona de volta pro
+app com a sessão pronta em `#access_token=...&refresh_token=...&type=signup`
+na URL (fragmento). `capturarSessaoDoHash()` lê isso **antes** de
+`lerSessao()` decidir a sessão normal, grava e limpa o hash com
+`history.replaceState` (o token não pode sobreviver a um F5 nem ficar
+visível na URL). Sem isso, abrir o link parecia não fazer nada — o app
+ignorava o fragmento inteiro e mostrava a tela de login comum.
+
 **Cadastro é aberto; o controle é aprovação depois do cadastro.** Qualquer
 e-mail cria conta, ela nasce `pendente` e **não enxerga nada** até um
 aprovador liberar:

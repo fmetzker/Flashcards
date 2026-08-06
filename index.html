@@ -645,16 +645,43 @@ function lerSessao(){
 function salvarSessao(s){ try{ localStorage.setItem(CHAVE_SESSAO, JSON.stringify(s)); }catch(e){} }
 function apagarSessaoSalva(){ try{ localStorage.removeItem(CHAVE_SESSAO); }catch(e){} }
 
-/* o id da conta vem do `sub` do access_token. Isto NÃO é uma checagem de
-   segurança — é só para escolher sob qual chave gravar aqui no aparelho.
-   Quem valida o token de verdade é o servidor, via RLS; um token adulterado
-   não passa lá, e adulterar este daqui só faria a pessoa ver o próprio
-   progresso sob outro nome. */
-function idDoToken(token){
+/* Decodifica o miolo (payload) de um JWT. Isto NÃO é uma checagem de
+   segurança — é só para ler dado que já está ali (sub, email) sem precisar
+   perguntar ao servidor de novo. Quem valida o token de verdade é o
+   servidor, via RLS; um token adulterado não passa lá, e adulterar este
+   daqui só faria a pessoa ver o próprio progresso sob outro nome. */
+function payloadDoToken(token){
   try{
     const p = token.split(".")[1].replace(/-/g,"+").replace(/_/g,"/");
-    return JSON.parse(atob(p + "=".repeat((4 - p.length % 4) % 4))).sub || null;
-  }catch(e){ return null; }
+    return JSON.parse(atob(p + "=".repeat((4 - p.length % 4) % 4)));
+  }catch(e){ return {}; }
+}
+function idDoToken(token){ return payloadDoToken(token).sub || null; }
+
+/* O link do e-mail de confirmação de cadastro não leva a pessoa a uma
+   página do Supabase — o GoTrue confere o token no servidor e REDIRECIONA
+   de volta pra cá, com a sessão já pronta em
+   #access_token=...&refresh_token=...&type=signup na URL (fragmento, não
+   query string). Sem isto, o app ignorava esse hash inteiro e mostrava a
+   tela de login normal — abrir o link parecia não fazer nada.
+
+   Roda antes de ler a sessão salva, e não depende dela: numa confirmação de
+   cadastro não existe sessão prévia mesmo, e construir o objeto aqui sem
+   referenciar SESSAO evita depender de uma variável que este trecho do
+   script ainda não terminou de inicializar. */
+function capturarSessaoDoHash(){
+  if(!location.hash || location.hash.indexOf("access_token=") < 0) return null;
+  const params = new URLSearchParams(location.hash.slice(1));
+  const access_token = params.get("access_token");
+  if(!access_token) return null;
+  const payload = payloadDoToken(access_token);
+  return {
+    access_token,
+    refresh_token: params.get("refresh_token"),
+    expires_at: Date.now() + (Number(params.get("expires_in"))||3600)*1000,
+    email: payload.email || null,
+    user_id: payload.sub || null
+  };
 }
 
 /* migração do esquema por perfil para o esquema por conta. Roda uma vez, na
@@ -675,6 +702,16 @@ function migrarSessaoDoPerfil(){
 migrarSessaoDoPerfil();
 
 let SESSAO = lerSessao();
+{
+  const doHash = capturarSessaoDoHash();
+  if(doHash){
+    SESSAO = doHash;
+    salvarSessao(SESSAO);
+    // tira o token da URL: não pode sobreviver a um F5 (reprocessaria o
+    // mesmo hash) nem ficar visível na barra de endereço/histórico
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+}
 /* O offline.html (window.DADOS) nunca tem sessão — não fala com o servidor,
    por desenho — mas precisa gravar progresso em algum lugar. Sem esta
    exceção ele cairia no ramo "deslogado", onde CHAVE é null e salvar() só
@@ -806,15 +843,15 @@ async function chamarAuth(caminho, corpo){
   return dado;
 }
 function salvarSessaoDe(dado){
+  const payload = payloadDoToken(dado.access_token||"");
   SESSAO = {
     access_token: dado.access_token,
     refresh_token: dado.refresh_token,
     expires_at: Date.now() + (dado.expires_in||3600)*1000,
-    email: dado.user ? dado.user.email : (SESSAO ? SESSAO.email : null),
+    email: (dado.user && dado.user.email) || payload.email || (SESSAO ? SESSAO.email : null),
     /* guardado explicitamente para não precisar decodificar o token toda vez
        que o app abre — é ele que dá a chave do progresso local */
-    user_id: (dado.user && dado.user.id) || idDoToken(dado.access_token||"") ||
-             (SESSAO ? SESSAO.user_id : null)
+    user_id: (dado.user && dado.user.id) || payload.sub || (SESSAO ? SESSAO.user_id : null)
   };
   salvarSessao(SESSAO);
 }
