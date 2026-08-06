@@ -869,11 +869,37 @@ Auditoria depois das correções: `sem-pergunta` de 6 para **0**, banco em
 meio do caminho (`reescritas.json` não reconhecido; `indice-legado.json`
 apontando para ids que deixaram de existir), ambos corrigidos.
 
+### Segunda rodada — as duas lacunas do edital · **concluída**
+
+23 questões novas, escritas seguindo `METODOLOGIA.md` desde o início (não
+auditadas depois — nasceram já dentro do padrão):
+
+- **10** em Saúde do Homem, 3 subtópicos: PNAISH (o que é, faixa etária,
+  barreira cultural que justifica a política), rastreamento e prevenção do
+  câncer de próstata (decisão compartilhada, não rastreamento populacional —
+  posição do INCA), saúde sexual e reprodutiva (vasectomia, Lei 9.263/1996,
+  IST).
+- **13** em Feridas, Estomias e Reabilitação, 4 subtópicos: classificação de
+  lesão por pressão (estágios 1 a 4, não classificável, Escala de Braden),
+  avaliação e tratamento de feridas (coberturas por tipo de exsudato,
+  desbridamento, definição de ferida crônica), estomias (ileostomia vs.
+  colostomia, Polo Regional de Ostomizados, pele periestomal), reabilitação
+  (Rede de Cuidados à Pessoa com Deficiência).
+
+**Processo:** as 23 questões foram checadas contra o viés de comprimento
+**antes** de entrar no banco — script de geração roda em modo checagem por
+padrão, só grava com uma variável de ambiente explícita, e mesmo assim só se
+a checagem vier limpa. Encontrou 3 questões com distrator curto demais logo
+na primeira passada; corrigidas antes de gravar, não depois.
+
+**Verificação.** `validar.ps1`: sem erros; o indicador "correta é a mais
+longa" subiu de 228 para 241 (dentro do ruído documentado — o que importa,
+excede-20/excede-40 caracteres, continua em **zero**). `auditar-banco.ps1`:
+nenhum apontamento novo nas 23; banco geral sobe de 92,8% para **93,0%**
+sem apontamento algum.
+
 ### O que falta neste bloco
 
-- [ ] **As duas lacunas do edital** — 3.6 Saúde do Homem e 3.18 Feridas,
-  Estomias e Reabilitação continuam com zero questões. É o item de maior
-  ganho real que sobrou: o resto do banco está bom, isso está ausente.
 - [ ] 48 questões com distrator curto demais (gravidade média) e 3 com
   explicação curta sem raciocínio. Sem urgência.
 - [ ] Priorização por **incidência real** continua bloqueada por falta das

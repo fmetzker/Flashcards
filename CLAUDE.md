@@ -207,7 +207,7 @@ Aprovação: 35 pontos **e** nenhuma área zerada.
 
 ## Estado atual e trabalho pendente
 
-Banco com **876 questões** (99 lp, 99 sus, 654 esp, 24 matemática).
+Banco com **899 questões** (99 lp, 99 sus, 677 esp, 24 matemática).
 
 **Fases 0 a 4c concluídas**, mais o suporte a múltiplos concursos por conta. O
 projeto migrou de app de prova única para plataforma com contas, banco
