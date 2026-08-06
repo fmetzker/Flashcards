@@ -2,10 +2,16 @@
   "_leia": "Arvore oficial do conteudo programatico de cada materia, transcrita do edital. Serve para a tela Materias mostrar o que o edital cobra MESMO SEM CARTAO ESCRITO — topico com 0 cartoes aparece apagado, como divida de cobertura (Sinal 2 do PADRAO-DOS-CARTOES.md). Nao substitui o banco: quem manda no que existe de verdade e banco/<materia>.json. Materia ausente daqui simplesmente nao ganha topico vazio na tela.",
   "materias": {
     "ingles": {
-      "fonte": "Transpetro, Edital nº 02 - TERRA/NÍVEL SUPERIOR-2023.2, Anexo de Conteúdos Programáticos, Conhecimentos Básicos",
+      "fonte": "Decomposição do projeto a partir do Edital nº 02 - TERRA/NÍVEL SUPERIOR-2023.2 (Conhecimentos Básicos: \"compreensão de texto escrito\" + \"itens gramaticais relevantes\"). O edital não detalha os pontos gramaticais, ao contrário de Português — a lista abaixo é gramática inglesa normativa padrão, não texto oficial da Transpetro.",
       "topicos": [
-        "Compreensão de texto escrito em língua inglesa",
-        "Itens gramaticais relevantes para a compreensão dos conteúdos semânticos"
+        "Verb Tenses",
+        "Modal Verbs",
+        "Passive Voice",
+        "Comparatives and Superlatives",
+        "Connectors",
+        "False Cognates",
+        "Reading Comprehension",
+        "Vocabulary in Context"
       ]
     },
     "maritimo-maquinas": {
