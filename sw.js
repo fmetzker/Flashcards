@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v40-padrao-dos-cartoes";
+const VERSAO = "v41-transpetro-pre-edital";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
@@ -21,7 +21,10 @@ const ARQUIVOS = [
   "./banco/indice-legado.json",
   /* mapa de questões reescritas — sem ele no cache, abrir offline depois de
      uma correção de enunciado perderia o histórico daqueles cartões */
-  "./banco/reescritas.json"
+  "./banco/reescritas.json",
+  /* árvore oficial do conteúdo programático — sem ele, a tela Matérias offline
+     deixa de mostrar os tópicos do edital que ainda não têm cartão */
+  "./banco/topicos.json"
 ];
 
 /* Instalação: baixa tudo e guarda.

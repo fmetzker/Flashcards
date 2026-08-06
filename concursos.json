@@ -63,6 +63,105 @@
         "nenhumBlocoZerado": true,
         "desempate": "Classificatório por soma das notas; em caso de empate, vale primeiro a maior nota em Matemática, depois em Português, depois a maior idade, e por fim sorteio (item 10.2 do edital)."
       }
+    },
+    {
+      "id": "transpetro-mom",
+      "cargo": "Moço de Máquinas",
+      "orgao": "Transpetro",
+      "banca": "Cesgranrio",
+      "edital": "PRÉ-EDITAL. Estrutura copiada do Edital nº 03 - TRANSPETRO/PSP/MAR-2023.3 (prova 09/12/2023). O edital de 2026 ainda não saiu; provas previstas para novembro/2026 e a data abaixo é provisória.",
+      "data": "2026-11-22",
+      "inicio": "2026-08-06",
+      "duracaoMin": 240,
+      "blocos": [
+        {
+          "id": "lp",
+          "nome": "Língua Portuguesa",
+          "questoes": 10,
+          "materias": ["portugues"]
+        },
+        {
+          "id": "esp",
+          "nome": "Conhecimentos específicos",
+          "questoes": 30,
+          "materias": ["maritimo-maquinas"]
+        }
+      ],
+      "aprovacao": {
+        "minimoTotal": 20,
+        "nenhumBlocoZerado": true,
+        "desempate": "Elimina quem fica abaixo de 50% em Básicos OU abaixo de 50% em Específicos. A classificação usa APENAS a nota de Conhecimentos Específicos. Empate: 60 anos ou mais primeiro, depois maior nota em Básicos, depois mais idoso, depois quem foi jurado."
+      }
+    },
+    {
+      "id": "transpetro-enf-trab",
+      "cargo": "Enfermagem do Trabalho",
+      "orgao": "Transpetro",
+      "banca": "Cesgranrio",
+      "edital": "PRÉ-EDITAL. Estrutura e conteúdo copiados do Edital nº 02 - TERRA/NÍVEL SUPERIOR-2023.2, ênfase 14 (prova 10/12/2023). O edital de 2026 ainda não saiu; provas previstas para novembro/2026 e a data abaixo é provisória.",
+      "data": "2026-11-22",
+      "inicio": "2026-08-06",
+      "duracaoMin": 270,
+      "blocos": [
+        {
+          "id": "lp",
+          "nome": "Língua Portuguesa",
+          "questoes": 10,
+          "materias": ["portugues"]
+        },
+        {
+          "id": "ing",
+          "nome": "Língua Inglesa",
+          "questoes": 10,
+          "materias": ["ingles"]
+        },
+        {
+          "id": "esp",
+          "nome": "Conhecimentos específicos",
+          "questoes": 50,
+          "materias": ["enfermagem-trabalho"]
+        }
+      ],
+      "aprovacao": {
+        "minimoTotal": 35,
+        "nenhumBlocoZerado": true,
+        "desempate": "Elimina quem fica abaixo de 50% em Básicos, abaixo de 50% em Específicos, ou tira ZERO em qualquer matéria dos Básicos. A classificação usa APENAS a nota de Conhecimentos Específicos. Empate: 60 anos ou mais primeiro, depois maior nota em Básicos, depois maior nota em Português, depois mais idoso."
+      }
+    },
+    {
+      "id": "transpetro-psi",
+      "cargo": "Psicologia",
+      "orgao": "Transpetro",
+      "banca": "Cesgranrio",
+      "edital": "PRÉ-EDITAL, PARCIAL. Psicologia é ênfase NOVA em 2026 — não existia no edital de nível superior de 2023, então não há conteúdo programático anterior deste cargo na Transpetro. Só os Conhecimentos Básicos abaixo estão fundamentados (idênticos para todas as ênfases de nível superior). Os 50 itens de Conhecimentos Específicos estão contados, mas SEM tópicos: nada foi inventado. Preencher quando o Edital nº 04 sair.",
+      "data": "2026-11-22",
+      "inicio": "2026-08-06",
+      "duracaoMin": 270,
+      "blocos": [
+        {
+          "id": "lp",
+          "nome": "Língua Portuguesa",
+          "questoes": 10,
+          "materias": ["portugues"]
+        },
+        {
+          "id": "ing",
+          "nome": "Língua Inglesa",
+          "questoes": 10,
+          "materias": ["ingles"]
+        },
+        {
+          "id": "esp",
+          "nome": "Conhecimentos específicos",
+          "questoes": 50,
+          "materias": ["psicologia"]
+        }
+      ],
+      "aprovacao": {
+        "minimoTotal": 35,
+        "nenhumBlocoZerado": true,
+        "desempate": "Elimina quem fica abaixo de 50% em Básicos, abaixo de 50% em Específicos, ou tira ZERO em qualquer matéria dos Básicos. A classificação usa APENAS a nota de Conhecimentos Específicos. Empate: 60 anos ou mais primeiro, depois maior nota em Básicos, depois maior nota em Português, depois mais idoso."
+      }
     }
   ]
 }

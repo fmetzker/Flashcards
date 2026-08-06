@@ -203,6 +203,11 @@ button.fechar{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;
 .subtopico .num{font-family:var(--dado);font-size:11.5px;white-space:nowrap}
 .subtopico .mini{width:44px;margin-left:0}
 .subtopico .estudar{margin-left:auto;font-size:12px;padding:5px 10px}
+/* tópico que veio do conteúdo programático mas ainda não tem cartão escrito:
+   aparece apagado, sem botão, como dívida de cobertura à vista */
+.sem-cartao .nome{color:var(--tinta2)}
+.sem-cartao .num{margin-left:auto;font-family:var(--corpo);font-size:11.5px;
+  font-style:italic;color:var(--tinta2);opacity:.75}
 .topico .num{font-family:var(--dado);font-size:12px;color:var(--tinta2);white-space:nowrap}
 .topico .mini,.cabM .mini{width:52px;margin-left:0}
 .estudar{flex:0 0 auto;font-size:13px;padding:6px 11px;background:transparent;color:var(--verde);
@@ -513,7 +518,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
    q  = enunciado   o = 5 alternativas   c = índice da correta (0-4)
    e  = explicação   f = fonte
    ======================================================================= */
-let BANCO = [], CONCURSO = null, BLOCOS = [], ORDEM_MATERIAS = [];
+let BANCO = [], CONCURSO = null, BLOCOS = [], ORDEM_MATERIAS = [], TOPICOS_EDITAL = {};
 let CONCURSOS = [];          // todos os que existem em concursos.json
 let INSCRITOS = [];          // os que ESTE perfil segue (objetos, não ids)
 const porId = {}, MATERIAS = {}, blocoDaMateria = {};
@@ -589,6 +594,13 @@ async function carregarConfig(){
   const mats = await pega("banco/materias.json");
   mats.forEach(m=>{ MATERIAS[m.id] = m; });
   ORDEM_MATERIAS = mats.map(m=>m.id);
+
+  /* Árvore oficial do edital, para a tela Matérias conseguir mostrar o que a
+     prova cobra mesmo onde ainda não há cartão escrito. É opcional de
+     propósito: se o arquivo faltar (versão antiga em cache, por exemplo), o
+     app segue mostrando só o que existe no banco, como sempre fez. */
+  try{ TOPICOS_EDITAL = (await pega("banco/topicos.json")).materias || {}; }
+  catch(e){ TOPICOS_EDITAL = {}; }
 }
 
 /* união das matérias de TODOS os concursos inscritos — não só do que está em
@@ -1582,6 +1594,23 @@ function resumoDoBanco(){
       if(c){ n.vistas++; n.ac += c.acertos; n.resp += c.acertos + c.erros; }
     });
   });
+
+  /* Acrescenta o que o edital cobra e o banco ainda não cobre: tópico com
+     total 0. Sem isto, item do conteúdo programático sem nenhum cartão fica
+     invisível — que é justamente o pior caso descrito no Sinal 2 do
+     PADRAO-DOS-CARTOES.md: estudar com sensação de cobertura completa e
+     chegar na prova sem ter visto o assunto.
+
+     Só entra matéria que a pessoa realmente segue (materiasInscritas), senão
+     um concurso alheio encheria a tela de assunto que não vai cair. */
+  materiasInscritas().forEach(mid=>{
+    const oficial = TOPICOS_EDITAL[mid];
+    if(!oficial || !oficial.topicos) return;
+    const d = dados[mid] = dados[mid] || Object.assign(vazio(), {topicos:{}});
+    oficial.topicos.forEach(t=>{
+      d.topicos[t] = d.topicos[t] || Object.assign(vazio(), {subs:{}});
+    });
+  });
   return dados;
 }
 
@@ -1609,20 +1638,26 @@ const abertas = {};
 const porTamanho = mapa => Object.keys(mapa)
   .sort((x,y)=> mapa[y].total - mapa[x].total || x.localeCompare(y,"pt"));
 
-/* uma linha com nome, barra de acerto, contagem e botão de estudar */
+/* uma linha com nome, barra de acerto, contagem e botão de estudar.
+   Tópico que veio só do edital (total 0) não ganha botão: não há o que
+   estudar ainda. Fica apagado, como dívida de cobertura visível. */
 function linhaNivel(cls, rotulo, d, aoEstudar){
   const linha = document.createElement("div"); linha.className = cls;
+  const vazia = !d.total;
+  if(vazia) linha.classList.add("sem-cartao");
   const nome = document.createElement("span"); nome.className = "nome"; nome.textContent = rotulo;
   linha.appendChild(nome);
   const barra = miniBarra(d);
   if(barra) linha.appendChild(barra);
   const num = document.createElement("span"); num.className = "num";
-  num.textContent = d.vistas+"/"+d.total;
+  num.textContent = vazia ? "sem cartão" : d.vistas+"/"+d.total;
   linha.appendChild(num);
-  const bt = document.createElement("button");
-  bt.className = "estudar"; bt.textContent = "Estudar";
-  bt.onclick = aoEstudar;
-  linha.appendChild(bt);
+  if(!vazia){
+    const bt = document.createElement("button");
+    bt.className = "estudar"; bt.textContent = "Estudar";
+    bt.onclick = aoEstudar;
+    linha.appendChild(bt);
+  }
   return linha;
 }
 
@@ -1693,12 +1728,22 @@ function pintarMaterias(){
       corpo.appendChild(grupo);
     });
 
-    const tudo = document.createElement("button");
-    tudo.className = "pequeno fantasma";
-    tudo.style.cssText = "width:100%;margin-top:11px";
-    tudo.textContent = "Estudar toda a matéria";
-    tudo.onclick = ()=>iniciarSessao("filtro", {m:mid});
-    corpo.appendChild(tudo);
+    /* matéria que só tem tópico de edital (nenhum cartão escrito) não oferece
+       estudo — iniciarSessao cairia no alert de "nada na fila" */
+    if(d.total){
+      const tudo = document.createElement("button");
+      tudo.className = "pequeno fantasma";
+      tudo.style.cssText = "width:100%;margin-top:11px";
+      tudo.textContent = "Estudar toda a matéria";
+      tudo.onclick = ()=>iniciarSessao("filtro", {m:mid});
+      corpo.appendChild(tudo);
+    } else {
+      const nota = document.createElement("div");
+      nota.className = "aviso";
+      nota.style.marginTop = "11px";
+      nota.textContent = "Conteúdo do edital já mapeado; os cartões ainda não foram escritos.";
+      corpo.appendChild(nota);
+    }
 
     cx.appendChild(corpo);
     c.appendChild(cx);

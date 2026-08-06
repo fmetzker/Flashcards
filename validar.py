@@ -56,7 +56,7 @@ def carrega_banco():
     # arquivo de matéria que não está no materias.json passaria despercebido
     for nome in sorted(os.listdir(BANCO_DIR)):
         base = os.path.splitext(nome)[0]
-        if not nome.endswith('.json') or base in ('materias', 'indice-legado', 'reescritas'):
+        if not nome.endswith('.json') or base in ('materias', 'indice-legado', 'reescritas', 'topicos'):
             continue
         if base not in nome_materia:
             erros.append(f"banco/{nome} não corresponde a nenhuma matéria de materias.json")
@@ -125,6 +125,36 @@ def valida_migracao(B, ids):
     if len(legado) != len(B):
         avisos.append(f"indice-legado.json tem {len(legado)} ids e o banco tem {len(B)} questões "
                       "(esperado se o banco cresceu depois da Fase 0)")
+
+
+def valida_topicos(B, materias):
+    """A árvore oficial do edital (opcional) precisa apontar para matéria que
+    existe, senão vira tópico órfão que nunca aparece na tela. Também avisa
+    quando um tópico do registro já tem cartão escrito com nome diferente —
+    quase sempre é divergência de grafia, e as duas versões apareceriam
+    separadas como se fossem assuntos distintos."""
+    caminho = os.path.join(BANCO_DIR, 'topicos.json')
+    if not os.path.exists(caminho):
+        return
+    reg = json.load(open(caminho, encoding='utf-8')).get('materias', {})
+    ids_mat = {m['id'] for m in materias}
+    for mid, dado in reg.items():
+        if mid not in ids_mat:
+            erros.append(f"topicos.json: matéria '{mid}' não existe em materias.json")
+            continue
+        oficiais = dado.get('topicos', [])
+        if not oficiais:
+            avisos.append(f"topicos.json: matéria '{mid}' está sem nenhum tópico")
+        if len(set(oficiais)) != len(oficiais):
+            erros.append(f"topicos.json: matéria '{mid}' tem tópico repetido")
+        if not dado.get('fonte'):
+            erros.append(f"topicos.json: matéria '{mid}' sem 'fonte' — de qual edital veio esta árvore?")
+        # tópico que já existe no banco sob outro nome não é erro, mas confunde
+        no_banco = {q['t'] for q in B if q.get('m') == mid}
+        soltos = no_banco - set(oficiais)
+        if soltos:
+            avisos.append(f"topicos.json: matéria '{mid}' tem {len(soltos)} tópico(s) no banco "
+                          f"fora da árvore do edital: {', '.join(sorted(soltos)[:4])}")
 
 
 def valida_js(fonte):
@@ -309,6 +339,7 @@ def main():
     valida_js(fonte)
     ids = valida_questoes(B)
     valida_migracao(B, ids)
+    valida_topicos(B, materias)
     valida_concursos(B)
 
     print(f"\nBanco: {len(B)} questões em {len(materias)} matérias")

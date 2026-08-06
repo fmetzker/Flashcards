@@ -1,0 +1,55 @@
+{
+  "_leia": "Arvore oficial do conteudo programatico de cada materia, transcrita do edital. Serve para a tela Materias mostrar o que o edital cobra MESMO SEM CARTAO ESCRITO — topico com 0 cartoes aparece apagado, como divida de cobertura (Sinal 2 do PADRAO-DOS-CARTOES.md). Nao substitui o banco: quem manda no que existe de verdade e banco/<materia>.json. Materia ausente daqui simplesmente nao ganha topico vazio na tela.",
+  "materias": {
+    "ingles": {
+      "fonte": "Transpetro, Edital nº 02 - TERRA/NÍVEL SUPERIOR-2023.2, Anexo de Conteúdos Programáticos, Conhecimentos Básicos",
+      "topicos": [
+        "Compreensão de texto escrito em língua inglesa",
+        "Itens gramaticais relevantes para a compreensão dos conteúdos semânticos"
+      ]
+    },
+    "maritimo-maquinas": {
+      "fonte": "Transpetro, Edital nº 03 - TRANSPETRO/PSP/MAR-2023.3, ANEXO IV, cargo Moço de Máquinas",
+      "topicos": [
+        "Legislação Marítima e Ambiental",
+        "Conscientização sobre proteção de navio",
+        "Conhecimentos Elementares de Primeiros Socorros",
+        "Técnicas de Sobrevivência Pessoal",
+        "Segurança no Trabalho",
+        "Prevenção e Controle da Poluição do Meio Ambiente Aquaviário",
+        "Procedimentos de Emergências",
+        "Relações Interpessoais e Responsabilidades Sociais",
+        "Prevenção e Combate a Incêndio",
+        "Arquitetura Naval Aplicada",
+        "Pintura e Conservação de Embarcação",
+        "Máquinas e Sistemas Auxiliares",
+        "Serviço de Quarto de Máquinas de Apoio",
+        "Manutenção de Máquinas e Equipamentos Auxiliares",
+        "Motores Diesel e Sistemas de Propulsão",
+        "Ferramentaria"
+      ]
+    },
+    "enfermagem-trabalho": {
+      "fonte": "Transpetro, Edital nº 02 - TERRA/NÍVEL SUPERIOR-2023.2, ênfase 14 (Enfermagem do Trabalho)",
+      "topicos": [
+        "Assistência de Enfermagem em Urgências e Emergências",
+        "Doenças Profissionais e Doenças Relacionadas ao Trabalho",
+        "Epidemiologia e Vigilância da Saúde do Trabalhador",
+        "Ergonomia Aplicada ao Trabalho",
+        "Toxicologia da Indústria de Petróleo, Gás e Derivados",
+        "Programa de Controle Médico de Saúde Ocupacional (PCMSO)",
+        "Níveis de Atenção à Saúde",
+        "Bem-Estar, Saúde e Qualidade de Vida no Trabalho",
+        "Biossegurança e Saúde",
+        "Ética e Deontologia de Enfermagem",
+        "Administração de Serviços de Saúde e dos SESMT",
+        "Gestão de Segurança e Saúde do Trabalho",
+        "Legislação de Segurança e Medicina do Trabalho",
+        "Sistematização da Assistência de Enfermagem",
+        "Bioestatística",
+        "Elementos de Higiene Ocupacional",
+        "Sistema de Saúde Brasileiro"
+      ]
+    }
+  }
+}

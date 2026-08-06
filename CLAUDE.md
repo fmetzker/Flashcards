@@ -1,9 +1,12 @@
 # App de estudo — Concursos públicos
 
 Aplicativo web de questões com repetição espaçada, contas e banco
-colaborativo. Hoje atende dois concursos: Enfermeiro/Volta Redonda (edital
-003/2026-SMA, prova 20/09/2026) e CAAQ-CDM/Marinha. Novo concurso é editar
-`concursos.json` — não exige mexer no código.
+colaborativo. Hoje atende cinco concursos: Enfermeiro/Volta Redonda (edital
+003/2026-SMA, prova 20/09/2026), CAAQ-CDM/Marinha e três da Transpetro
+cadastrados como **pré-edital** (Moço de Máquinas, Enfermagem do Trabalho e
+Psicologia), com estrutura copiada dos editais de 2023 enquanto os de 2026
+não saem. Novo concurso é editar `concursos.json` — não exige mexer no
+código.
 
 ## Estrutura
 
@@ -12,6 +15,7 @@ colaborativo. Hoje atende dois concursos: Enfermeiro/Volta Redonda (edital
 | `index.html` | App inteiro: HTML, CSS e JS. O banco **não** vive aqui |
 | `concursos.json` | Receitas de prova: data, composição, regra de aprovação |
 | `banco/materias.json` | Lista de matérias, na ordem de exibição |
+| `banco/topicos.json` | Árvore oficial do edital — deixa a tela Matérias mostrar tópico que a prova cobra e o banco ainda não cobre |
 | `banco/<matéria>.json` | Questões daquela matéria, uma por linha |
 | `banco/indice-legado.json` | Ids na ordem antiga do array — migra progresso pré-id estável |
 | `banco/reescritas.json` | Mapa id antigo→novo de enunciados corrigidos — preserva progresso |
@@ -95,6 +99,15 @@ no Safari do iPhone sem nenhuma etapa de compilação.
     momento em que roda. Tabela nova com FK para `auth.users` adicionada
     depois dela nunca vira adiável, e `conferir.sql` quebra com
     `violates foreign key constraint` ao inserir dado de teste.
+11. **Nunca inventar conteúdo de edital.** Cargo, composição da prova,
+    regra de aprovação e conteúdo programático saem do edital publicado, e
+    o campo `edital` de `concursos.json` diz de onde. Quando a fonte não
+    existe (pré-edital, cargo novo), registrar o que é certo e deixar o
+    resto **vazio e declarado** — como `transpetro-psi`, que tem o bloco de
+    Específicos contado mas sem tópicos, porque Psicologia é ênfase nova em
+    2026 e não há edital anterior da Transpetro para esse cargo. Assunto
+    inventado é pior que assunto faltando: a pessoa estuda com sensação de
+    cobertura e chega na prova sem ter visto o que caiu.
 
 ## Formato do banco de questões
 
@@ -125,14 +138,31 @@ os concursos cadastrados em `concursos.json`:
 
 | id | nome | questões | tópicos | subtópicos |
 |---|---|--:|--:|--:|
-| `portugues` | Língua Portuguesa | 109 | 23 | — |
-| `sus` | Legislação do SUS | 99 | 10 | — |
+| `portugues` | Língua Portuguesa | 127 | 23 | — |
+| `ingles` | Língua Inglesa | 0 | 2¹ | — |
+| `sus` | Legislação do SUS | 103 | 10 | — |
 | `enfermagem` | Conhecimentos Específicos de Enfermagem | 677 | 19 | 120 |
+| `enfermagem-trabalho` | Enfermagem do Trabalho | 0 | 17¹ | — |
+| `psicologia` | Psicologia | 0 | 0² | — |
+| `maritimo-maquinas` | Máquinas e Prática Marítima | 0 | 16¹ | — |
 | `matematica` | Matemática | 39 | 6 | — |
+
+¹ tópicos vindos só de `banco/topicos.json` (árvore do edital), ainda sem
+cartão escrito. ² Psicologia não tem árvore porque não existe edital
+anterior do cargo na Transpetro — ver regra 11.
 
 Dentro delas, dois níveis: **tópico** (Imunização, Urgência, Saúde da Mulher)
 e **subtópico** (Rede de frio, Calendário vacinal). Português e SUS param no
 tópico — os assuntos deles já são específicos o bastante.
+
+**`banco/topicos.json` é a árvore oficial do edital**, separada do banco de
+propósito: tópico só existe como campo `t` de uma questão, então item do
+conteúdo programático sem nenhum cartão seria invisível — o pior caso do
+Sinal 2 do `PADRAO-DOS-CARTOES.md`. `resumoDoBanco()` mescla essa árvore com
+o que o banco tem, e a tela Matérias mostra o que falta apagado, escrito
+"sem cartão" e sem botão de estudar. O arquivo é **opcional**: se sumir, o
+app volta a mostrar só o que existe. Cada matéria ali precisa de `fonte`
+dizendo de qual edital a árvore foi transcrita — o validador barra sem.
 
 **O concurso é uma receita** em `concursos.json`: cargo, órgão, banca, data,
 duração, blocos (nome, quantas questões, quais matérias) e regra de
