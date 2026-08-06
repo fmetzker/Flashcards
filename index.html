@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Prova 20/09">
+<meta name="apple-mobile-web-app-title" content="Flashcard">
 <meta name="theme-color" content="#0E7C66">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -299,6 +299,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
     <button onclick="ir('ajustes')">Ajustes</button>
     <button id="menu-propor" style="display:none" onclick="ir('propor')">Propor questão</button>
     <button id="menu-revisar" style="display:none" onclick="ir('revisar')">Revisar propostas</button>
+    <button id="menu-reportes" style="display:none" onclick="ir('reportes')">Reportes de questões</button>
     <button id="menu-aprovar" style="display:none" onclick="ir('aprovar')">Aprovar contas</button>
   </div>
 </div>
@@ -424,6 +425,13 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   <h1>Revisar propostas</h1>
   <div class="sub" id="revisar-sub">–</div>
   <div id="revisar-corpo" style="margin-top:16px"></div>
+</div>
+
+<!-- ============ REPORTES DE QUESTÕES ============ -->
+<div class="tela" id="tela-reportes">
+  <h1>Reportes de questões</h1>
+  <div class="sub" id="reportes-sub">–</div>
+  <div id="reportes-corpo" style="margin-top:16px"></div>
 </div>
 
 <!-- ============ AGUARDANDO APROVAÇÃO ============ -->
@@ -1123,6 +1131,7 @@ function ir(nome){
   if(nome==="simulado-inicio") pintarSimuladoInicio();
   if(nome==="propor") pintarPropor();
   if(nome==="revisar") pintarRevisar();
+  if(nome==="reportes") pintarReportes();
   rodape(nome);
 }
 function rodape(nome){
@@ -1191,6 +1200,7 @@ function pintarInicio(){
   // propostas (RLS), então o botão nem aparece
   document.getElementById("menu-propor").style.display = (supaConfigurado() && SESSAO) ? "" : "none";
   document.getElementById("menu-revisar").style.display = (supaConfigurado() && SESSAO && SOU_REVISOR) ? "" : "none";
+  document.getElementById("menu-reportes").style.display = (supaConfigurado() && SESSAO && SOU_REVISOR) ? "" : "none";
   document.getElementById("menu-aprovar").style.display = (supaConfigurado() && SESSAO && SOU_APROVADOR) ? "" : "none";
 
   pintarFocoConcurso();
@@ -1261,18 +1271,12 @@ function pintarInicio(){
   document.getElementById("n-acuracia-mes").textContent = acuraciaJanela(30);
 
   // alerta de área em risco
+  // (o aviso semanal de backup foi removido: a sincronização por conta já
+  // cobre o caso comum de trocar de aparelho — o backup manual continua
+  // disponível em Ajustes como rede de segurança extra, sem cobrar toda
+  // semana. Ver "Bloco A" do plano de melhorias.)
   const box = document.getElementById("alerta-area"); box.innerHTML="";
 
-  if(vistas > 0){
-    const dias = E.ultimoBackup ? Math.floor((diaUTC(hoje()) - diaUTC(E.ultimoBackup))/86400000) : 999;
-    if(dias >= 7){
-      const bk = document.createElement("div"); bk.className="alerta";
-      bk.textContent = E.ultimoBackup
-        ? "Faz "+dias+" dias que você não faz backup do progresso. Ajustes → Backup."
-        : "Você ainda não fez backup do progresso. Ajustes → Backup.";
-      box.appendChild(bk);
-    }
-  }
   BLOCOS.forEach(bl=>{
     let acc=0, t=0;
     BANCO.forEach(q2=>{ if(blocoDe(q2)!==bl.id) return; const c=E.cartoes[q2.id]; if(c){acc+=c.acertos;t+=c.acertos+c.erros;} });
@@ -1574,6 +1578,16 @@ function responder(escolha){
   ex.innerHTML = '<div class="expl"><div class="corpo"></div><div class="fonte"></div></div>';
   ex.querySelector(".corpo").textContent = q.e;
   ex.querySelector(".fonte").textContent = q.f;
+  // só quem tem conta reporta — mesma regra de propor questão (RLS exige
+  // conta_aprovada() na tabela reportes)
+  if(supaConfigurado() && SESSAO){
+    const btRep = document.createElement("button");
+    btRep.className = "pequeno fantasma";
+    btRep.style.cssText = "margin-top:10px;font-size:12px;padding:7px 10px";
+    btRep.textContent = "Reportar problema nesta questão";
+    btRep.onclick = ()=>reportarProblema(id);
+    ex.querySelector(".expl").appendChild(btRep);
+  }
 
   const alvo = document.getElementById("acoes-interno"); alvo.innerHTML="";
   document.getElementById("acoes").classList.add("ativa");
@@ -1613,6 +1627,25 @@ function registrar(id, resultado){
   S.pos++;
   if(S.pos >= S.lista.length){ ir("inicio"); return; }
   mostrarQuestao();
+}
+
+/* =======================================================================
+   REPORTAR PROBLEMA EM QUESTÃO
+   Canal simples: enunciado, alternativa, explicação ou fonte errados. Usa os
+   mesmos revisores de propostas (RLS: sou_revisor(), supabase/schema.sql
+   8.4) — julgar se uma questão está certa é o mesmo tipo de trabalho.
+   ======================================================================= */
+async function reportarProblema(id){
+  const motivo = prompt("Qual é o problema com esta questão? (enunciado, alternativa, explicação, fonte...)");
+  if(!motivo || !motivo.trim()) return;
+  try{
+    const corpo = {id: uuidv4(), questao_id: id, motivo: motivo.trim()};
+    const r = await chamarRest("reportes", {method:"POST", headers:{"Prefer":"return=minimal"}, body: JSON.stringify(corpo)});
+    if(!r.ok) throw new Error("o servidor respondeu "+r.status);
+    alert("Reportado — obrigado. Quem revisa vai conferir.");
+  }catch(e){
+    alert("Não foi possível enviar: "+e.message);
+  }
 }
 
 /* =======================================================================
@@ -2102,6 +2135,94 @@ async function decidirProposta(id, status){
 }
 
 /* =======================================================================
+   REPORTES DE QUESTÕES
+   Visível só pra quem SOU_REVISOR confirmou true — mesmos revisores de
+   propostas (ver comentário na seção 8.4 do schema.sql). `reportes` guarda
+   só o id da questão, não o enunciado: o texto vem do BANCO já carregado
+   localmente, e pode faltar se o revisor não seguir o concurso daquela
+   matéria — tratado abaixo, não trava a tela.
+   ======================================================================= */
+async function pintarReportes(){
+  const c = document.getElementById("reportes-corpo");
+  c.innerHTML = "";
+  const carregando = document.createElement("div"); carregando.className = "vazio"; carregando.textContent = "Carregando…";
+  c.appendChild(carregando);
+
+  let pendentes;
+  try{
+    const r = await chamarRest("reportes?status=eq.pendente&order=criado_em.asc&select=id,questao_id,motivo,criado_em");
+    if(!r.ok) throw new Error("o servidor respondeu "+r.status);
+    pendentes = await r.json();
+  }catch(e){
+    c.innerHTML = "";
+    const erro = document.createElement("div"); erro.className = "aviso";
+    erro.textContent = "Não foi possível carregar: "+e.message;
+    c.appendChild(erro);
+    return;
+  }
+
+  document.getElementById("reportes-sub").textContent =
+    pendentes.length + (pendentes.length===1 ? " reporte pendente" : " reportes pendentes");
+  c.innerHTML = "";
+  if(!pendentes.length){
+    const vazio = document.createElement("div"); vazio.className = "vazio";
+    vazio.textContent = "Nada pendente no momento.";
+    c.appendChild(vazio);
+    return;
+  }
+
+  pendentes.forEach(rp=>{
+    const q = porId[rp.questao_id];
+    const card = document.createElement("div"); card.className = "card"; card.style.marginBottom = "12px";
+
+    const rot = document.createElement("div"); rot.className = "rotulo";
+    rot.textContent = q ? ((MATERIAS[q.m]||{}).nome || q.m)+" · "+q.t+(q.s ? " · "+q.s : "") : "questão fora do seu banco local";
+    card.appendChild(rot);
+
+    const enun = document.createElement("div");
+    enun.style.cssText = "font-size:15.5px;line-height:1.5;margin:8px 0";
+    enun.textContent = q ? q.q : "Enunciado não disponível neste aparelho — a matéria dessa questão não está entre os concursos que você segue. O id abaixo identifica ela em banco/*.json.";
+    card.appendChild(enun);
+
+    const motivo = document.createElement("div"); motivo.className = "aviso";
+    motivo.style.cssText = "margin-top:6px;color:var(--coral)";
+    motivo.textContent = "Motivo do reporte: "+rp.motivo;
+    card.appendChild(motivo);
+
+    const idTxt = document.createElement("div");
+    idTxt.style.cssText = "font-size:11px;color:var(--tinta2);font-family:var(--dado);margin-top:4px";
+    idTxt.textContent = "id: "+rp.questao_id;
+    card.appendChild(idTxt);
+
+    const acoes = document.createElement("div");
+    acoes.style.cssText = "display:flex;gap:9px;margin-top:11px";
+    const btResolver = document.createElement("button");
+    btResolver.className = "pequeno verde"; btResolver.textContent = "Marcar resolvido";
+    btResolver.onclick = ()=>decidirReporte(rp.id, "resolvido");
+    const btDescartar = document.createElement("button");
+    btDescartar.className = "pequeno fantasma"; btDescartar.textContent = "Descartar";
+    btDescartar.onclick = ()=>decidirReporte(rp.id, "descartado");
+    acoes.appendChild(btResolver); acoes.appendChild(btDescartar);
+    card.appendChild(acoes);
+
+    c.appendChild(card);
+  });
+}
+
+async function decidirReporte(id, status){
+  if(!confirm(status === "resolvido" ? "Marcar este reporte como resolvido?" : "Descartar este reporte?")) return;
+  try{
+    // resolvido_por/resolvido_em vêm do gatilho no servidor (marcar_revisor_reporte,
+    // schema.sql 8.4), não daqui de propósito
+    const r = await chamarRest("reportes?id=eq."+id, {method:"PATCH", headers:{"Prefer":"return=minimal"}, body: JSON.stringify({status})});
+    if(!r.ok) throw new Error("o servidor respondeu "+r.status);
+    pintarReportes();
+  }catch(e){
+    alert("Não foi possível registrar a decisão: "+e.message);
+  }
+}
+
+/* =======================================================================
    AGUARDANDO APROVAÇÃO
    Tela cheia, sem rodapé, igual à de login: o cadastro é aberto, mas a conta
    nasce pendente e não enxerga nada até um aprovador liberar. Quem barra de
@@ -2298,8 +2419,8 @@ function pintarAjustes(){
     : "Este ambiente não permite salvar dados: o progresso vale só enquanto a aba estiver aberta. Publicado num endereço https, salva normalmente.";
 
   document.getElementById("backup-info").textContent = E.ultimoBackup
-    ? "Último backup em "+E.ultimoBackup.split("-").reverse().join("/")+". Faça um por semana e guarde o arquivo ou o texto fora do aparelho."
-    : "Nenhum backup feito ainda. Faça um por semana e guarde o arquivo ou o texto fora do aparelho.";
+    ? "Último backup em "+E.ultimoBackup.split("-").reverse().join("/")+". A conta já sincroniza sozinha — isto aqui é só uma cópia extra, sem hora certa pra fazer."
+    : "A conta já sincroniza o progresso sozinha. Isto aqui é uma cópia extra, útil se o servidor ficar fora do ar ou algo der errado — não é obrigatório.";
 
   const off = document.getElementById("offline-msg");
   if(window.DADOS) off.textContent = "Esta é a versão de arquivo único: o banco está embutido, e ela abre sem servidor e sem internet. Gerada por gerar-offline.ps1.";

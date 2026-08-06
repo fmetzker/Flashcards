@@ -381,6 +381,69 @@ from pg_trigger
 where tgname = 'exigir_convite' and not tgisinternal;
 
 
+-- ----------------------------------------------------------------------------
+-- 10. Reportar problema em questão
+--
+-- Mesmo padrão de propostas (seção 6): autor vê e cria só o que é seu,
+-- revisor vê e decide tudo, autor não pode se auto-resolver, resolvido_por
+-- não pode ser forjado pelo cliente.
+-- ----------------------------------------------------------------------------
+do $$
+declare
+  autor    uuid := '10101010-1010-1010-1010-101010101010';
+  outro    uuid := '20202020-2020-2020-2020-202020202020';
+  revisor  uuid := '30303030-3030-3030-3030-303030303030';
+  rep_id   uuid := gen_random_uuid();
+  visto    int;
+  visto_uuid uuid;
+  visto_ts   timestamptz;
+begin
+  insert into public.perfis (id, nome, email, status) values
+    (autor,   'Autor Reporte',   'autor-reporte@exemplo.com',   'aprovado'),
+    (outro,   'Outro Reporte',   'outro-reporte@exemplo.com',   'aprovado'),
+    (revisor, 'Revisor Reporte', 'revisor-reporte@exemplo.com', 'aprovado');
+  insert into public.revisores (user_id) values (revisor) on conflict do nothing;
+
+  set local role authenticated;
+  perform set_config('request.jwt.claims', json_build_object('sub', autor, 'role','authenticated')::text, true);
+  insert into public.reportes (id, questao_id, motivo)
+  values (rep_id, 'ffffffffff', 'enunciado com erro de digitação');
+
+  select count(*) into visto from public.reportes;
+  if visto = 1 then raise notice 'OK — autor vê o próprio reporte';
+  else raise warning 'FALHOU — autor vê % reportes; deveria ver 1', visto; end if;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', outro, 'role','authenticated')::text, true);
+  select count(*) into visto from public.reportes;
+  if visto = 0 then raise notice 'OK — outra pessoa não vê o reporte alheio';
+  else raise warning 'FALHOU — outra pessoa vê % reporte(s) que não são dela', visto; end if;
+
+  -- autor não pode se auto-resolver
+  perform set_config('request.jwt.claims', json_build_object('sub', autor, 'role','authenticated')::text, true);
+  update public.reportes set status = 'resolvido' where id = rep_id;
+  if found then
+    raise warning 'FALHOU — o autor conseguiu resolver o próprio reporte';
+  else
+    raise notice 'OK — autor não consegue resolver o próprio reporte';
+  end if;
+
+  -- revisor vê e resolve; resolvido_por vem do servidor
+  perform set_config('request.jwt.claims', json_build_object('sub', revisor, 'role','authenticated')::text, true);
+  select count(*) into visto from public.reportes;
+  if visto = 1 then raise notice 'OK — revisor vê o reporte de outra pessoa';
+  else raise warning 'FALHOU — revisor vê % reportes; deveria ver 1', visto; end if;
+
+  update public.reportes set status = 'resolvido', resolvido_por = autor where id = rep_id;
+  select resolvido_por, resolvido_em into visto_uuid, visto_ts from public.reportes where id = rep_id;
+  if visto_uuid = revisor then raise notice 'OK — resolvido_por vem do servidor, não do que o cliente mandou';
+  else raise warning 'FALHOU — resolvido_por = %, deveria ser o revisor (%)', visto_uuid, revisor; end if;
+  if visto_ts is not null then raise notice 'OK — resolvido_em foi preenchido pelo gatilho';
+  else raise warning 'FALHOU — resolvido_em ficou nulo'; end if;
+
+  reset role;
+end $$;
+
+
 rollback;
 
 -- ============================================================================

@@ -277,6 +277,14 @@ inteiro (Fases 3a a 4c: RLS, allowlist, `propostas`/`revisores`,
 preenchido, a conta fica indisponível e o app funciona exatamente como na
 Fase 2.
 
+**Reportar problema numa questão** (Bloco A do plano de melhorias):
+tabela `reportes` reaproveita os mesmos `revisores`/`sou_revisor()` de
+`propostas` — julgar se uma questão está certa é o mesmo tipo de trabalho,
+não precisou de um papel novo. Botão na tela de estudo (`reportarProblema()`,
+visível só com conta), tela "Reportes de questões" pro revisor
+(`pintarReportes()`/`decidirReporte()`). Ainda **não confirmado** contra o
+projeto real — rodar `schema.sql`/`conferir.sql` antes de usar.
+
 **Viés de comprimento — resolvido.** A resposta certa costumava ser visivelmente
 mais longa que os distratores, o que permitia acertar sem saber o conteúdo. Foram
 reescritas 564 questões ao todo: 150 nos dois primeiros passes e outras 414 no

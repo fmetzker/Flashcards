@@ -103,7 +103,7 @@ Precisa ser o Safari. Chrome, Firefox e outros navegadores do iPhone não oferec
 
 **3.** Role a lista e toque em **Adicionar à Tela de Início**.
 
-**4.** Confirme o nome (vem "Prova 20/09") e toque em **Adicionar**.
+**4.** Confirme o nome (vem "Flashcard") e toque em **Adicionar**.
 
 **5.** Feche o Safari. Abra o app pelo ícone novo na tela de início.
 Ele abre em tela cheia, sem barra de navegador — como um aplicativo normal.
@@ -167,17 +167,15 @@ Se tudo passou, está pronto. Pode desligar o modo avião.
 
 ---
 
-## Parte 6 — Backup (não pule esta parte)
+## Parte 6 — Backup (opcional, mas bom ter)
 
-Sua conta já sincroniza o progresso com o servidor — trocar de aparelho e logar de novo traz tudo de volta sozinho. Mas isso depende de o app ter tido internet recente para sincronizar; se você respondeu questões nos últimos dias sem rede, ou se algo der errado do lado do servidor, o backup manual é a rede de segurança que não depende de nada disso.
+Sua conta já sincroniza o progresso com o servidor — trocar de aparelho e logar de novo traz tudo de volta sozinho. Não existe mais aviso nem rotina obrigatória; isto aqui é só uma cópia extra pra quando o servidor ficar fora do ar ou algo sair errado do lado de lá.
 
-**Rotina semanal, 5 segundos:**
+**Se quiser fazer, 5 segundos:**
 
 1. Abra **Ajustes → Backup**
 2. Toque em **Baixar arquivo** (salva um `.json` no app Arquivos)
    ou em **Copiar texto** (copia o progresso, para você colar nas Notas ou mandar por e-mail para si mesmo)
-
-O app avisa sozinho na tela inicial quando passam 7 dias sem backup.
 
 **Para restaurar** (celular novo, ou depois de reinstalar):
 Instale o app de novo pelos passos da Parte 2, faça login com a mesma conta (a sincronização deve trazer o progresso sozinha) e, se algo faltar, use **Ajustes → Backup → Restaurar de arquivo** ou **Restaurar de texto**.

@@ -717,6 +717,48 @@ Diferente da Fase 4b, aqui o schema foi conferido contra o projeto real
 
 ---
 
+## Plano de melhorias — Bloco A (rápidas, sem risco) · **concluído**
+
+**Modelo usado:** Sonnet 5, esforço low/medium conforme o item.
+
+Pedido fora da numeração das fases, em sete itens; o Bloco A é a parte
+rápida — os blocos B (menu de navegação, meta por disciplina) e C
+(metodologia de criação/revisão dos flashcards) ficaram para depois.
+
+- [x] **Nome "Flashcard" na tela de início** — `apple-mobile-web-app-title`
+  e `manifest.json` (`short_name`). `name` do manifest e `<title>` do HTML
+  ficaram como estavam, de propósito: só foi pedido o nome do atalho, não um
+  rebranding completo.
+- [x] **Reportar problema numa questão** — botão na tela de estudo, visível
+  só com conta (mesma regra de "Propor questão"). Nova tabela `reportes`
+  (`schema.sql` 8.4), reaproveitando os revisores de `propostas`
+  (`sou_revisor()`) em vez de criar um papel novo — julgar se uma questão
+  está certa é o mesmo tipo de trabalho. Mesmas proteções de sempre: autor
+  não se auto-resolve, `resolvido_por` vem do servidor. Nova tela "Reportes
+  de questões", que lida com o caso de o revisor não ter aquela matéria
+  carregada localmente (mostra o id em vez de travar).
+- [x] **Backup deixou de cobrar toda semana** — a sincronização por conta já
+  cobre o caso comum (trocar de aparelho); o alerta que aparecia na tela
+  inicial depois de 7 dias foi removido. Exportar/restaurar continuam
+  disponíveis em Ajustes, só sem a cobrança.
+
+**Item 4 (remover o zoom) não entrou.** Investigado e descartado: desde o
+iOS 10 o Safari ignora `user-scalable=no`/`maximum-scale` de propósito, por
+acessibilidade — não haveria efeito nenhum no aparelho que o app realmente
+mira. Se o incômodo for outro (o zoom automático do Safari ao focar um campo
+de texto com fonte pequena), é um problema diferente e pode ser corrigido à
+parte.
+
+**Verificação.** `reportarProblema()` testado com sessão simulada: botão
+aparece logado, some deslogado. `pintarReportes()` testado com dois cenários
+mockados — questão presente no banco local (mostra enunciado) e questão de
+matéria fora dos concursos seguidos pelo revisor (mostra aviso em vez de
+quebrar). Erro de rede tratado sem travar a tela. `validar.ps1` sem erros,
+`schema.sql`/`conferir.sql` com blocos `do $$`/`end $$` balanceados — ainda
+não confirmados contra o projeto real (pendente, como sempre, de rodar lá).
+
+---
+
 ## Fase 5 — Social leve (opcional)
 
 **Modelo sugerido:** Sonnet 5, esforço **low** — telas de leitura sobre dado

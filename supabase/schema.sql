@@ -568,6 +568,83 @@ alter table public.propostas add column if not exists incorporada_em timestamptz
 
 
 -- ----------------------------------------------------------------------------
+-- 8.4 Reportar problema em questão
+--
+-- Canal simples pra quem estuda avisar "isso aqui está errado" — enunciado,
+-- alternativa, explicação ou fonte. Não vira uma fila de revisão paralela:
+-- usa os mesmos revisores de `propostas` (`sou_revisor()`), porque julgar se
+-- uma questão está certa é o mesmo tipo de trabalho que aprovar uma nova.
+--
+-- `id` gerado no cliente, mesmo motivo de sempre (reenvio depois de queda de
+-- rede não duplica, colide na chave primária).
+-- ----------------------------------------------------------------------------
+create table if not exists public.reportes (
+  id            uuid primary key,
+  autor_id      uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  questao_id    text not null check (questao_id ~ '^[0-9a-f]{10}$'),  -- regra 5 do CLAUDE.md
+  motivo        text not null,
+  status        text not null default 'pendente' check (status in ('pendente','resolvido','descartado')),
+  resolvido_por uuid references auth.users(id),
+  resolvido_em  timestamptz,
+  criado_em     timestamptz not null default now()
+);
+
+create index if not exists reportes_por_status on public.reportes (status, criado_em);
+
+alter table public.reportes enable row level security;
+
+drop policy if exists "autor: reportar"        on public.reportes;
+drop policy if exists "autor: ver os próprios" on public.reportes;
+drop policy if exists "revisor: ver todos"     on public.reportes;
+drop policy if exists "revisor: decidir"       on public.reportes;
+
+-- conta_aprovada() (seção 2.1): quem ainda não foi liberado não reporta nada
+create policy "autor: reportar"
+  on public.reportes for insert
+  with check (autor_id = auth.uid() and status = 'pendente' and public.conta_aprovada());
+
+create policy "autor: ver os próprios"
+  on public.reportes for select
+  using (autor_id = auth.uid() and public.conta_aprovada());
+
+-- sou_revisor(), não subquery direta em revisores — mesmo motivo do
+-- comentário na seção 7.1: uma subquery direta rodaria com o privilégio de
+-- quem consulta e bateria no revoke all de `revisores`.
+create policy "revisor: ver todos"
+  on public.reportes for select
+  using (public.sou_revisor());
+
+create policy "revisor: decidir"
+  on public.reportes for update
+  using (public.sou_revisor())
+  with check (public.sou_revisor());
+
+-- sem policy de delete: reporte descartado fica registrado, não some
+
+-- resolvido_por/resolvido_em vêm do servidor, nunca do cliente — mesmo
+-- desenho de marcar_revisor() (seção 8.1) pra propostas.
+create or replace function public.marcar_revisor_reporte()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if old.status = 'pendente' and new.status <> 'pendente' then
+    new.resolvido_por := auth.uid();
+    new.resolvido_em := now();
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists marcar_revisor_reporte on public.reportes;
+create trigger marcar_revisor_reporte
+  before update on public.reportes
+  for each row execute function public.marcar_revisor_reporte();
+
+
+-- ----------------------------------------------------------------------------
 -- 9. Convidados — NÃO É MAIS USADO
 --
 -- O cadastro virou aberto (ver seção 1): qualquer pessoa cria conta, e o
