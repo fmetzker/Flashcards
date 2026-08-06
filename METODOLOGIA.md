@@ -101,7 +101,7 @@ concurso de Enfermeiro (003/2026-SMA):
 
 | Bloco | Questões na prova | % da prova | Cartões hoje | % do banco |
 |---|--:|--:|--:|--:|
-| Conhecimentos Específicos | 50 | 71% | 654 | 75% |
+| Conhecimentos Específicos | 50 | 71% | 677 | 75% |
 | Língua Portuguesa | 10 | 14% | 99 | 11% |
 | Legislação do SUS | 10 | 14% | 99 | 11% |
 
@@ -115,13 +115,12 @@ Todo item do conteúdo programático precisa ter pelo menos alguns cartões.
 Item do edital com zero cartão é o pior caso possível: a pessoa estuda com
 sensação de cobertura completa e chega na prova sem ter visto o assunto.
 
-**Débito conhecido** (edital 003/2026-SMA, Conhecimentos Específicos):
-
-- **3.6 Saúde do Homem** — PNAISH, rastreamento de câncer de próstata, saúde
-  sexual e reprodutiva masculina. **Zero cartões.**
-- **3.18 Feridas, Estomias e Reabilitação** — avaliação e tratamento de feridas,
-  coberturas, classificação de lesão por pressão, paciente estomizado, atenção
-  à pessoa com deficiência. **Zero cartões.**
+Conferido contra o edital 003/2026-SMA: nenhum item do conteúdo
+programático de Conhecimentos Específicos está mais com zero cartões. As
+duas lacunas encontradas na primeira conferência (3.6 Saúde do Homem; 3.18
+Feridas, Estomias e Reabilitação) já foram fechadas, 10 e 13 cartões
+respectivamente. Ao acrescentar concurso novo, repetir esta conferência —
+comparar o Anexo do edital com os tópicos de `banco/<matéria>.json`.
 
 ### 3.4 Sinal 3 — onde a pessoa erra
 
