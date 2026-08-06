@@ -347,6 +347,25 @@ Invertendo, o problema não chega a existir: escreva **os quatro distratores
 primeiro**, como condutas que alguém adotaria por engano de verdade, e só
 então a correta. Ela nasce do tamanho do grupo em vez de destoar dele.
 
+**Alongar não é anexar a razão da rejeição dentro do distrator.** Descoberto
+tarde, numa leva inteira de Inglês: para alongar sem enviesar, cada distrator
+ganhou um rótulo da categoria certa e uma cláusula dizendo por que não serve
+— "is checking, Present Continuous — usado para ação em curso, não hábito"
+para uma pergunta que já dizia "no Simple Present" no enunciado. Some isso a
+qualquer rótulo que apareça em outro distrator do mesmo cartão, e dá pra
+acertar só por eliminação de palavra-chave, sem ler a frase em inglês nem
+saber a regra — o oposto exato do que a recordação ativa (1.1) exige. É a
+mesma violação da regra 1.1, só que por um caminho novo, criado tentando
+consertar outro problema.
+
+Teste antes de aceitar um distrator alongado: **cobrindo o resto do
+cartão, dá pra eliminar essa alternativa só lendo ela?** Se sim — porque
+ela nomeia a categoria certa, ou nega com as mesmas palavras do enunciado —
+o alongamento vazou a resposta. Alongar é tornar o distrator uma alternativa
+completa e plausível por si só (outra lei real, outro valor real, outra
+frase que também poderia ser dita), nunca um rótulo seguido do motivo da
+rejeição.
+
 ### 6.3 Um lote, uma fonte
 
 Prefira "extrair os fatos do art. 1º da Lei 8.142" a "escrever 4 cartões de
