@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v37-confirmacao-email";
+const VERSAO = "v38-cadastro-sem-confirmacao";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [

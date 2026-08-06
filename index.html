@@ -2141,12 +2141,18 @@ function pintarLogin(){
     await entrar(email, senha);
     location.reload();
   });
+  /* Este projeto desativou a confirmação por e-mail no painel do Supabase
+     (Authentication > Sign In / Providers > seção "User Signups"): a conta
+     já sai logada na hora do cadastro, e quem decide se ela entra de
+     verdade é a aprovação manual (RLS via conta_aprovada()), não um clique
+     em link de e-mail. Por isso criarConta() não é mais checado por
+     "confirme" aqui — se o toggle for religado um dia, esta mensagem fica
+     desatualizada e precisa ser revista junto. */
   btCriar.onclick = aoClicar(btCriar, async (email, senha)=>{
-    const resultado = await criarConta(email, senha);
-    if(resultado === "confirme"){
-      erro.style.color = "var(--verde)";
-      erro.textContent = "Conta criada — confirme pelo e-mail e depois entre.";
-    } else location.reload();
+    await criarConta(email, senha);
+    erro.style.color = "var(--verde)";
+    erro.textContent = "Conta criada — enviada para aprovação.";
+    setTimeout(()=>location.reload(), 1400);
   });
 }
 
@@ -2222,11 +2228,10 @@ function pintarConta(){
     pintarInicio();
   });
   btCriar.onclick = aoClicar(btCriar, async (email, senha)=>{
-    const resultado = await criarConta(email, senha);
-    if(resultado === "confirme"){
-      erro.style.color = "var(--verde)";
-      erro.textContent = "Conta criada — confirme pelo e-mail e depois entre.";
-    } else pintarConta();
+    await criarConta(email, senha);
+    erro.style.color = "var(--verde)";
+    erro.textContent = "Conta criada — enviada para aprovação.";
+    setTimeout(pintarConta, 1400);
   });
 }
 
