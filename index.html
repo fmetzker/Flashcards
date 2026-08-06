@@ -588,7 +588,17 @@ function blocosDaMeta(){
       });
     });
   });
-  return ORDEM_MATERIAS.filter(m=>porMateria[m]).map(m=>{
+  /* ORDEM_MATERIAS só decide a ORDEM de exibição — nunca quais matérias
+     entram. Antes esta linha era `ORDEM_MATERIAS.filter(...)`, e quando a
+     função rodava com a lista ainda vazia (o boot chamava aplicarFoco antes
+     de carregar materias.json) o resultado era [] e a meta caía no fallback
+     do concurso em foco, sem erro nenhum na tela. Matéria fora de
+     ORDEM_MATERIAS agora vai para o fim em vez de sumir. */
+  const ordenadas = Object.keys(porMateria).sort((a,b)=>{
+    const ia = ORDEM_MATERIAS.indexOf(a), ib = ORDEM_MATERIAS.indexOf(b);
+    return (ia < 0 ? Infinity : ia) - (ib < 0 ? Infinity : ib);
+  });
+  return ordenadas.map(m=>{
     const bl = porMateria[m];
     return {id: bl.id+"@"+m, nome: bl.nome, questoes: bl.questoes, materias: [m],
             topicos: escopo[m] ? Array.from(escopo[m]) : null};
@@ -627,18 +637,19 @@ async function carregarConfig(){
   // só há uma opção no total: não há o que escolher, entra direto nela
   if(!E.concursos.length && CONCURSOS.length === 1) E.concursos = [CONCURSOS[0].id];
 
-  /* de resto, fica [] de propósito: é o gatilho da tela de escolha de
-     concurso, no boot — ver exigeEscolherConcurso(). Sem isso, quem entra
-     pela primeira vez (ou perdeu o concurso que seguia) cairia direto no
-     primeiro item de concursos.json sem nunca ter escolhido nada. */
+  const mats = await pega("banco/materias.json");
+  mats.forEach(m=>{ MATERIAS[m.id] = m; });
+  ORDEM_MATERIAS = mats.map(m=>m.id);
+
+  /* ORDEM_MATERIAS precisa existir ANTES de aplicarFoco: blocosDaMeta() usa
+     ela para ordenar, e com a lista vazia devolvia [] — a meta caía no
+     fallback do concurso em foco e parava de somar os inscritos, em silêncio.
+     Foi exatamente esse o bug: no boot a meta vinha errada, e só ficava certa
+     se algo chamasse aplicarFoco() de novo depois. */
   if(E.concursos.length){
     INSCRITOS = CONCURSOS.filter(c=>E.concursos.indexOf(c.id) >= 0);
     aplicarFoco(E.concursoAtivo || E.concursos[0]);
   }
-
-  const mats = await pega("banco/materias.json");
-  mats.forEach(m=>{ MATERIAS[m.id] = m; });
-  ORDEM_MATERIAS = mats.map(m=>m.id);
 
   /* Árvore oficial do edital, para a tela Matérias conseguir mostrar o que a
      prova cobra mesmo onde ainda não há cartão escrito. É opcional de
