@@ -125,10 +125,10 @@ os concursos cadastrados em `concursos.json`:
 
 | id | nome | questões | tópicos | subtópicos |
 |---|---|--:|--:|--:|
-| `portugues` | Língua Portuguesa | 99 | 23 | — |
+| `portugues` | Língua Portuguesa | 109 | 23 | — |
 | `sus` | Legislação do SUS | 99 | 10 | — |
 | `enfermagem` | Conhecimentos Específicos de Enfermagem | 677 | 19 | 120 |
-| `matematica` | Matemática | 24 | 6 | — |
+| `matematica` | Matemática | 39 | 6 | — |
 
 Dentro delas, dois níveis: **tópico** (Imunização, Urgência, Saúde da Mulher)
 e **subtópico** (Rede de frio, Calendário vacinal). Português e SUS param no
