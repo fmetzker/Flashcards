@@ -446,6 +446,14 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   <div id="aprovar-corpo" style="margin-top:16px"></div>
 </div>
 
+<!-- ============ ESCOLHER CONCURSO ============ -->
+<div class="tela" id="tela-escolher-concurso">
+  <h1>Qual concurso você estuda?</h1>
+  <div class="sub">Pode marcar mais de um. Dá para mudar depois em Ajustes → Concursos.</div>
+  <div id="escolher-concurso-corpo" style="margin-top:16px"></div>
+  <button class="verde" style="width:100%;margin-top:16px" id="escolher-concurso-continuar" disabled>Continuar</button>
+</div>
+
 <!-- ============ AÇÕES FIXAS ============ -->
 <div class="acoes ativa" id="acoes">
   <div class="interno" id="acoes-interno"></div>
@@ -523,17 +531,26 @@ async function carregarConfig(){
   CONCURSOS = cfg.concursos;
 
   /* migração: até esta versão o perfil seguia um concurso só, em E.concurso.
-     Vira uma lista de um item, sem perder a escolha de quem já usava. */
-  if(!E.concursos || !E.concursos.length){
-    E.concursos = E.concurso ? [E.concurso] : [CONCURSOS[0].id];
+     Vira uma lista de um item, sem perder a escolha de quem já usava — não é
+     "primeira vez" de verdade, a pessoa já tinha escolhido antes. */
+  if((!E.concursos || !E.concursos.length) && E.concurso){
+    E.concursos = [E.concurso];
   }
   // descarta id que não existe mais em concursos.json (concurso removido do
-  // arquivo não pode deixar o perfil preso num estado inválido)
-  E.concursos = E.concursos.filter(id=>CONCURSOS.some(c=>c.id===id));
-  if(!E.concursos.length) E.concursos = [CONCURSOS[0].id];
+  // arquivo não pode deixar a conta presa num estado inválido)
+  E.concursos = (E.concursos||[]).filter(id=>CONCURSOS.some(c=>c.id===id));
 
-  INSCRITOS = CONCURSOS.filter(c=>E.concursos.indexOf(c.id) >= 0);
-  aplicarFoco(E.concursoAtivo || E.concursos[0]);
+  // só há uma opção no total: não há o que escolher, entra direto nela
+  if(!E.concursos.length && CONCURSOS.length === 1) E.concursos = [CONCURSOS[0].id];
+
+  /* de resto, fica [] de propósito: é o gatilho da tela de escolha de
+     concurso, no boot — ver exigeEscolherConcurso(). Sem isso, quem entra
+     pela primeira vez (ou perdeu o concurso que seguia) cairia direto no
+     primeiro item de concursos.json sem nunca ter escolhido nada. */
+  if(E.concursos.length){
+    INSCRITOS = CONCURSOS.filter(c=>E.concursos.indexOf(c.id) >= 0);
+    aplicarFoco(E.concursoAtivo || E.concursos[0]);
+  }
 
   const mats = await pega("banco/materias.json");
   mats.forEach(m=>{ MATERIAS[m.id] = m; });
@@ -1097,6 +1114,7 @@ function ir(nome){
   window.scrollTo(0,0);
   if(nome==="login") pintarLogin();
   if(nome==="espera") pintarEspera();
+  if(nome==="escolher-concurso") pintarEscolherConcurso();
   if(nome==="aprovar") pintarAprovar();
   if(nome==="inicio") pintarInicio();
   if(nome==="materias") pintarMaterias();
@@ -1121,7 +1139,7 @@ function rodape(nome){
     if(BANCO.length>=20) b("Começar simulado", iniciarSimulado, "verde");
   } else if(nome==="simulado"){
     box.classList.remove("ativa");
-  } else if(nome==="login" || nome==="espera"){
+  } else if(nome==="login" || nome==="espera" || nome==="escolher-concurso"){
     box.classList.remove("ativa");
   } else {
     b("Voltar ao início", ()=>ir("inicio"), "fantasma");
@@ -2183,6 +2201,52 @@ async function decidirConta(id, status, email){
 }
 
 /* =======================================================================
+   ESCOLHER CONCURSO
+   Tela cheia, sem rodapé, no mesmo padrão de login/espera — só que aparece
+   uma vez, na primeira entrada de verdade (ver exigeEscolherConcurso()).
+   Checklist igual à de Ajustes → Concursos, porque é a mesma decisão; só
+   muda o que acontece ao confirmar: aqui é a entrada no app, lá é ajuste.
+   ======================================================================= */
+function pintarEscolherConcurso(){
+  const c = document.getElementById("escolher-concurso-corpo");
+  c.innerHTML = "";
+  const marcados = new Set();
+  const bt = document.getElementById("escolher-concurso-continuar");
+  bt.disabled = true;
+  bt.textContent = "Continuar";
+
+  CONCURSOS.forEach(k=>{
+    const linha = document.createElement("label");
+    linha.style.cssText = "display:flex;gap:10px;align-items:flex-start;margin:0 0 10px;color:var(--tinta);font-size:15px";
+    const cx = document.createElement("input");
+    cx.type = "checkbox";
+    cx.style.cssText = "width:18px;height:18px;flex:0 0 auto;margin-top:2px";
+    cx.onchange = ()=>{
+      if(cx.checked) marcados.add(k.id); else marcados.delete(k.id);
+      bt.disabled = marcados.size === 0;
+    };
+    const txt = document.createElement("span");
+    const nome = document.createElement("div");
+    nome.textContent = k.cargo + (k.orgao ? " — "+k.orgao : "");
+    const det = document.createElement("div");
+    det.style.cssText = "font-size:12px;color:var(--tinta2)";
+    det.textContent = [k.banca, "prova "+k.data.split("-").reverse().join("/")].filter(Boolean).join(" · ");
+    txt.appendChild(nome); txt.appendChild(det);
+    linha.appendChild(cx); linha.appendChild(txt);
+    c.appendChild(linha);
+  });
+
+  // recarrega em vez de repintar, igual a alternarConcurso() em Ajustes: a
+  // lista de inscritos mudou, e com ela o banco inteiro (união de matérias)
+  bt.onclick = ()=>{
+    if(!marcados.size) return;
+    E.concursos = [...marcados];
+    salvar();
+    location.reload();
+  };
+}
+
+/* =======================================================================
    AJUSTES
    ======================================================================= */
 /* marcar/desmarcar quais concursos esta conta estuda. Mudar a lista muda o
@@ -2323,6 +2387,13 @@ function exigeAprovacao(){
   return !window.DADOS && !!SESSAO && SITUACAO && SITUACAO !== "aprovado";
 }
 
+/* primeira vez de verdade (ou o concurso que a pessoa seguia sumiu de
+   concursos.json): carregarConfig() deixa E.concursos vazio de propósito
+   nesse caso, em vez de escolher um concurso qualquer por conta própria. */
+function exigeEscolherConcurso(){
+  return !exigeLogin() && !exigeAprovacao() && (!E.concursos || !E.concursos.length);
+}
+
 carregarConfig()
   .then(carregarBanco)
   .then(migrarParaIds)
@@ -2335,6 +2406,7 @@ carregarConfig()
     salvar();
     if(exigeLogin()) ir("login");
     else if(exigeAprovacao()) ir("espera");
+    else if(exigeEscolherConcurso()) ir("escolher-concurso");
     else { ir("inicio"); sincronizar(); }   // puxa em segundo plano, não bloqueia a tela
   })
   .catch(err=>{

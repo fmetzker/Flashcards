@@ -252,6 +252,19 @@ aprovador liberar:
   ficar offline não pode trancar quem já usava o app, e a RLS nega os dados
   de qualquer jeito.
 
+**Depois de aprovada, a conta ainda passa por uma escolha de concurso na
+primeira vez.** `carregarConfig()` deixa `E.concursos` vazio de propósito
+quando não há nada escolhido ainda (nem o formato antigo `E.concurso`, nem
+uma lista válida) — em vez de cair sozinho no primeiro item de
+`concursos.json`. Com `E.concursos` vazio, `INSCRITOS` também fica vazio e
+`carregarBanco()` roda sem buscar nenhum arquivo de matéria; o boot então
+mostra `tela-escolher-concurso` (`exigeEscolherConcurso()`/
+`pintarEscolherConcurso()`) em vez da tela inicial. Confirmar a escolha salva
+e **recarrega a página** — mesmo padrão de `alternarConcurso()` — para que
+`carregarBanco()` rode de novo, agora buscando as matérias certas. Se só
+existe um concurso cadastrado no arquivo inteiro, não há o que escolher e a
+tela é pulada.
+
 **O conceito de perfil local foi removido** logo depois: com login
 obrigatório, a conta já era a identidade, e o id local (`p1`, `p2`...) só
 criava a chance de duas pessoas compartilharem a mesma gaveta de progresso no

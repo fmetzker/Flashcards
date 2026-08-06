@@ -122,7 +122,9 @@ Ele abre em tela cheia, sem barra de navegador — como um aplicativo normal.
 
 **2.** Depois de criar, você cai numa tela **"Conta aguardando aprovação"**. Isso é normal, não é erro. Avise quem administra o app (mande o e-mail que você usou) para que ele te libere.
 
-**3.** Quando avisarem que liberaram, toque em **"Verificar de novo"** na própria tela de espera — ou feche e abra o app de novo. Você deve cair na tela inicial.
+**3.** Quando avisarem que liberaram, toque em **"Verificar de novo"** na própria tela de espera — ou feche e abra o app de novo.
+
+**4.** Na primeira vez que entra de verdade, o app pergunta **qual concurso você estuda** (dá pra marcar mais de um). Só depois disso ele carrega o banco de questões e mostra a tela inicial. Se marcar errado ou quiser mudar depois, é só ir em Ajustes → Concursos.
 
 > Depois desse primeiro login, o app guarda a sessão no aparelho e continua abrindo offline normalmente — você não vai precisar repetir isso, a não ser que saia da conta ou apague os dados do Safari.
 
@@ -137,7 +139,7 @@ Faça este teste antes de confiar no app. Leva 1 minuto e evita descobrir o prob
 **2.** Abra o app pelo ícone da tela de início.
 
 **3.** Verifique:
-- [ ] A tela inicial carrega normalmente (não a tela de login nem a de espera)
+- [ ] A tela inicial carrega normalmente (não a tela de login, de espera nem a de escolher concurso)
 - [ ] Em "Questões no app" aparece um número (876, ou mais se o banco cresceu)
 - [ ] O botão "Estudar agora" abre uma questão
 - [ ] Responder a questão mostra a explicação e a fonte
