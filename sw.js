@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v59-sus-cf-organizacao-transferencia";
+const VERSAO = "v60-matematica-aritmetica-algebra-geometria";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
