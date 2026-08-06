@@ -101,17 +101,20 @@ concurso de Enfermeiro (003/2026-SMA):
 
 | Bloco | Questões na prova | % da prova | Cartões hoje | % do banco |
 |---|--:|--:|--:|--:|
-| Conhecimentos Específicos | 50 | 71% | 677 | 73% |
-| Língua Portuguesa | 10 | 14% | 109 | 12% |
-| Legislação do SUS | 10 | 14% | 99 | 11% |
+| Conhecimentos Específicos | 50 | 71% | 677 | 72% |
+| Língua Portuguesa | 10 | 14% | 127 | 13% |
+| Legislação do SUS | 10 | 14% | 103 | 11% |
 
 Português e Matemática (a matéria exclusiva do CAAQ-CDM) ganharam reforço
 depois da tabela acima ter sido escrita: Matemática saiu de 24 para 39
 cartões (densidade de 2,4 para 3,9 cartões por questão da prova — ainda a
-mais rala do banco, mas menos do que antes) e Português, de 99 para 109,
-focado nos tópicos que tinham só 1 cartão (Ambiguidade, Coerência, Sintaxe,
-Tipologia textual, Pronomes, Coordenação, Coordenação e subordinação,
-Intertextualidade).
+mais rala do banco, mas menos do que antes) e Português, de 99 para 127,
+em duas rodadas — a primeira levou de 1 para 2 cartões os tópicos
+Ambiguidade, Coerência, Sintaxe, Tipologia textual, Pronomes, Coordenação,
+Coordenação e subordinação e Intertextualidade; a segunda levou os mesmos
+oito de 2 para 4, mais 1 cartão cada em Colocação pronominal e Reescrita.
+SUS ganhou 4 cartões em Controle social (de 1 para 5), o tópico mais raro
+do banco até então.
 
 A distribuição atual já está **próxima do peso do edital**. Não há
 desequilíbrio grave a corrigir aqui — o que existe são lacunas pontuais
