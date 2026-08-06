@@ -368,15 +368,23 @@ para evitar:
    ativo usa e que têm fonte real para consultar (`banco/topicos.json` ou
    conteúdo já estabelecido). Matéria sem fonte — caso de `psicologia`
    enquanto não sai o edital — fica fora da conta; não é a mais fraca, é
-   inelegível (regra 11 do `CLAUDE.md`).
+   inelegível (regra 11 do `CLAUDE.md`). Empate se desfaz por menor cobertura
+   proporcional (tópicos com cartão ÷ tópicos totais) — quem tem mais chão
+   pela frente vence —, e a matéria escolhida na rodada anterior não se
+   repete enquanto houver outra tabela.
 2. **Tópico**: dentro dela, o de menor contagem — prioridade para os que
    `topicos.json` já lista com 0 cartão (Sinal 2, cobertura).
-3. **Uma fonte só**, igual à 6.3, e escreve-se até saturar (3.5): o tamanho
-   do lote é o que a fonte sustenta, não um número decidido antes de ler.
-4. **Um tópico por pedido.** Não espalhar por vários tópicos na mesma
-   leva — é exatamente o oposto do que essa regra busca: manter o raciocínio
-   numa fonte só do início ao fim custa menos do que trocar de assunto no
-   meio.
+3. **Uma fonte só por tópico**, igual à 6.3, e escreve-se até saturar (3.5):
+   o tamanho de CADA tópico é o que a fonte sustenta, não um número decidido
+   antes de ler.
+4. **Um tópico de cada vez — sem misturar dois no meio —, mas não um só por
+   pedido.** Depois de saturar um tópico, passa para o próximo mais fraco da
+   MESMA matéria (sem pular para outra) e repete, até a leva somar uma
+   quantidade que valha o pedido (a referência são uns 20 a 50 cartões,
+   variando com o que cada fonte realmente sustenta — nunca um número fixo
+   perseguido à custa de encher tópico saturado). "Um de cada vez" limita a
+   troca de assunto **dentro** da escrita de um cartão, não o número de
+   tópicos que uma leva cobre.
 
 ---
 

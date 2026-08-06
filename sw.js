@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v52-vocabulary-in-context";
+const VERSAO = "v53-lote-enf-trabalho";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
