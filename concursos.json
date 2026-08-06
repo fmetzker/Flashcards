@@ -133,7 +133,7 @@
       "cargo": "Psicologia",
       "orgao": "Transpetro",
       "banca": "Cesgranrio",
-      "edital": "PRÉ-EDITAL, PARCIAL. Psicologia é ênfase NOVA em 2026 — não existia no edital de nível superior de 2023, então não há conteúdo programático anterior deste cargo na Transpetro. Só os Conhecimentos Básicos abaixo estão fundamentados (idênticos para todas as ênfases de nível superior). Os 50 itens de Conhecimentos Específicos estão contados, mas SEM tópicos: nada foi inventado. Preencher quando o Edital nº 04 sair.",
+      "edital": "PRÉ-EDITAL, PARCIAL. Psicologia é ênfase NOVA em 2026 — não existia no edital de nível superior de 2023, então não há conteúdo programático anterior deste cargo na Transpetro. Só os Conhecimentos Básicos abaixo estão fundamentados (idênticos para todas as ênfases de nível superior). O bloco de Conhecimentos Específicos (50 questões na prova de verdade) foi RETIRADO daqui de propósito — sem tópicos, ele só inflava a meta diária sem ter cartão nenhum para cumprir a cota (20/70 era o teto possível, sempre travado). Recolocar assim que o Edital nº 04 sair.",
       "data": "2026-11-22",
       "inicio": "2026-08-06",
       "duracaoMin": 270,
@@ -149,18 +149,12 @@
           "nome": "Língua Inglesa",
           "questoes": 10,
           "materias": ["ingles"]
-        },
-        {
-          "id": "esp",
-          "nome": "Conhecimentos específicos",
-          "questoes": 50,
-          "materias": ["psicologia"]
         }
       ],
       "aprovacao": {
-        "minimoTotal": 35,
+        "minimoTotal": 10,
         "nenhumBlocoZerado": true,
-        "desempate": "Elimina quem fica abaixo de 50% em Básicos, abaixo de 50% em Específicos, ou tira ZERO em qualquer matéria dos Básicos. A classificação usa APENAS a nota de Conhecimentos Específicos. Empate: 60 anos ou mais primeiro, depois maior nota em Básicos, depois maior nota em Português, depois mais idoso."
+        "desempate": "Regra provisória, só para os Básicos (Específicos fora até o edital sair — ver campo 'edital'). Na prova de verdade: elimina quem fica abaixo de 50% em Básicos, abaixo de 50% em Específicos, ou tira ZERO em qualquer matéria dos Básicos; classificação usa APENAS a nota de Específicos. Empate: 60 anos ou mais primeiro, depois maior nota em Básicos, depois maior nota em Português, depois mais idoso."
       }
     }
   ]
