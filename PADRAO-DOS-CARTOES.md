@@ -358,6 +358,26 @@ Controle social". Partindo da fonte primária, três coisas saem de graça:
 - a **saturação** (3.5) fica visível: acabaram os fatos do artigo, acabou o
   lote.
 
+### 6.4 Quando o pedido é só "adicione cartões"
+
+Sem tópico indicado, a escolha é automática, não uma pergunta de volta —
+perguntar de novo a cada pedido é o próprio desperdício que essa seção existe
+para evitar:
+
+1. **Matéria**: a de menor contagem no banco, entre as que algum concurso
+   ativo usa e que têm fonte real para consultar (`banco/topicos.json` ou
+   conteúdo já estabelecido). Matéria sem fonte — caso de `psicologia`
+   enquanto não sai o edital — fica fora da conta; não é a mais fraca, é
+   inelegível (regra 11 do `CLAUDE.md`).
+2. **Tópico**: dentro dela, o de menor contagem — prioridade para os que
+   `topicos.json` já lista com 0 cartão (Sinal 2, cobertura).
+3. **Uma fonte só**, igual à 6.3, e escreve-se até saturar (3.5): o tamanho
+   do lote é o que a fonte sustenta, não um número decidido antes de ler.
+4. **Um tópico por pedido.** Não espalhar por vários tópicos na mesma
+   leva — é exatamente o oposto do que essa regra busca: manter o raciocínio
+   numa fonte só do início ao fim custa menos do que trocar de assunto no
+   meio.
+
 ---
 
 ## 7. Checklist para escrever um cartão
