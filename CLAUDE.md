@@ -23,7 +23,9 @@ código.
 | `manifest.json` | Metadados do PWA |
 | `icone-192.png`, `icone-512.png`, `apple-touch-icon.png` | Ícones |
 | `PADRAO-DOS-CARTOES.md` | O padrão dos cartões — como escrever, o que não fazer, como priorizar |
-| `validar.py` / `validar.ps1` | Verificação de integridade do banco — **rodar antes de publicar** |
+| `validar.py` / `validar.ps1` | Verificação de integridade do banco — **rodar antes de publicar**. Com `-Rascunho`/`--rascunho`, valida candidatos sem gravar |
+| `rascunho.json` | Cartões em elaboração, sem `id`. Vazio quando não há trabalho em curso |
+| `incorporar-rascunho.ps1` | Grava o rascunho no banco — só se o validador passar. Ver regra 9 |
 | `auditar-banco.py` / `.ps1` | Mede o banco contra `PADRAO-DOS-CARTOES.md`. Mede, não reprova |
 | `reescrever-questoes.ps1` | Corrige enunciado sem perder progresso — ver regra 5 |
 | `incorporar-propostas.ps1` | Grava proposta aprovada como questão de verdade — ver regra 9 |
@@ -91,8 +93,12 @@ no Safari do iPhone sem nenhuma etapa de compilação.
    existe em outro contexto antes de reusar.
 9. **O banco é sempre estático e versionado — nunca escrito em tempo real.**
    Propor/aprovar questão (Supabase) e reportar problema só alimentam uma
-   caixa de entrada; `incorporar-propostas.ps1` é o único caminho que grava
-   em `banco/*.json`, rodado à mão, seguido de `validar.py` e commit manuais.
+   caixa de entrada. Só **dois** scripts gravam em `banco/*.json`, os dois
+   rodados à mão e seguidos de `validar` e commit manuais:
+   `incorporar-propostas.ps1` (caixa do Supabase) e
+   `incorporar-rascunho.ps1` (cartão escrito localmente). **Não escrever
+   script de gravação por lote** — foi o que corrompeu o banco por encoding
+   e passou por cima de regra que o validador reprova.
 10. **`schema.sql`: a seção que torna as FKs para `auth.users` adiáveis
     precisa ser a ÚLTIMA do arquivo.** Ela descobre as chaves estrangeiras
     dinamicamente via `pg_constraint` — só enxerga o que já existe no

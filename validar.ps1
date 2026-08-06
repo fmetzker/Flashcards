@@ -4,11 +4,23 @@
 # PowerShell 5.1 sem nada instalado.
 #
 #   powershell -ExecutionPolicy Bypass -File validar.ps1
+#   powershell -ExecutionPolicy Bypass -File validar.ps1 -Rascunho banco/rascunho.json
 #
 # Sai com código 1 se encontrar erro que impeça a publicação.
 #
+# -Rascunho avalia cartões candidatos COMO SE já estivessem no banco, sem
+# gravar nada. Existe porque a ordem antiga era escrever no banco e só então
+# descobrir o que o validador reprova — e desfazer isso à mão já corrompeu o
+# banco uma vez. Com o rascunho, toda regra daqui (viés, formatação, id
+# duplicado, fonte, matéria) roda ANTES de a questão existir, e são as regras
+# de verdade, não uma cópia enfraquecida delas num script de uma vez só.
+#
 # ATENÇÃO ao editar: arquivos .ps1 com acentos precisam ser gravados em UTF-8
 # COM BOM, senão o PowerShell 5.1 os lê como ANSI e o parser quebra.
+
+param(
+  [string]$Rascunho
+)
 
 $ErrorActionPreference = 'Stop'
 $raiz = $PSScriptRoot
@@ -52,6 +64,30 @@ if ($erros.Count -gt 0 -or $B.Count -eq 0) {
   $erros | ForEach-Object { Write-Host "ERRO: $_" }
   Write-Host "`nNão publicar."
   exit 1
+}
+
+# ---- rascunho ----------------------------------------------------------------
+# Candidatos entram no MESMO $B que o banco real, para que todas as checagens
+# abaixo os alcancem sem precisar existir em duplicata. O id é calculado aqui
+# porque o rascunho não traz id — é justamente o que se quer conferir: se o
+# SHA-1 do enunciado colide com questão que já existe, a checagem de id
+# duplicado acusa antes de a questão ser gravada.
+$nRascunho = 0
+if ($Rascunho) {
+  $arqR = if ([System.IO.Path]::IsPathRooted($Rascunho)) { $Rascunho } else { Join-Path $raiz $Rascunho }
+  if (-not (Test-Path $arqR)) { Write-Host "ERRO: rascunho não encontrado: $arqR"; exit 1 }
+  $cands = [System.IO.File]::ReadAllText($arqR, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
+  if ($null -eq $cands) { $cands = @() }
+  foreach ($q in @($cands)) {
+    if ($q.PSObject.Properties.Name -contains 'id' -and $q.id) {
+      Erro "rascunho: questão não deve trazer 'id' — ele é calculado do enunciado ao incorporar"
+    } else {
+      $q | Add-Member -NotePropertyName id -NotePropertyValue (Id-Questao $q.q) -Force
+    }
+    $B += $q
+    $nRascunho++
+  }
+  Write-Host "Rascunho: $nRascunho candidato(s) avaliados junto do banco (nada foi gravado)`n"
 }
 
 # arquivo de matéria que não está no materias.json passaria despercebido

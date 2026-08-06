@@ -3,7 +3,15 @@
 """Verifica a integridade do banco de questões e mede os vieses estatísticos.
 
 Uso:  python3 validar.py
+      python3 validar.py --rascunho rascunho.json
+
 Sai com código 1 se encontrar erro que impeça a publicação.
+
+--rascunho avalia cartões candidatos COMO SE já estivessem no banco, sem
+gravar nada. É o que permite descobrir viés, formatação proibida, id duplicado
+ou fonte faltando antes de a questão existir — em vez de gravar, reprovar e
+desfazer à mão. Quem grava é o incorporar-rascunho.ps1, e só depois disto
+passar limpo.
 """
 import json, re, subprocess, sys, tempfile, os, collections, hashlib
 
@@ -329,12 +337,43 @@ def confere_chave_secreta():
                                  "ela ignora a RLS; use a chave anon e revogue esta no painel")
 
 
+def carrega_rascunho(B, caminho):
+    """Junta cartões candidatos ao banco em memória, sem gravar nada.
+
+    Existe para que toda regra deste arquivo — viés, formatação, id duplicado,
+    fonte, matéria — alcance a questão ANTES de ela ser gravada. A ordem antiga
+    era escrever no banco e só então descobrir o que o validador reprova; o
+    desfazer manual disso já corrompeu o banco por encoding uma vez."""
+    if not os.path.exists(caminho):
+        print(f"ERRO: rascunho não encontrado: {caminho}")
+        sys.exit(1)
+    cands = json.load(open(caminho, encoding='utf-8')) or []
+    if isinstance(cands, dict):
+        cands = [cands]
+    for q in cands:
+        if q.get('id'):
+            erros.append("rascunho: questão não deve trazer 'id' — ele é calculado do enunciado ao incorporar")
+        else:
+            q['id'] = id_questao(q.get('q', ''))
+        B.append(q)
+    print(f"Rascunho: {len(cands)} candidato(s) avaliados junto do banco (nada foi gravado)\n")
+    return B
+
+
 def main():
     B, fonte = carrega_banco()
     if B is None:
         for e in erros:
             print("ERRO:", e)
         sys.exit(1)
+
+    # --rascunho <arquivo>: avalia candidatos como se já estivessem no banco
+    if '--rascunho' in sys.argv:
+        i = sys.argv.index('--rascunho')
+        alvo = sys.argv[i + 1] if i + 1 < len(sys.argv) else 'rascunho.json'
+        if not os.path.isabs(alvo):
+            alvo = os.path.join(os.path.dirname(os.path.abspath(__file__)), alvo)
+        B = carrega_rascunho(B, alvo)
 
     valida_js(fonte)
     ids = valida_questoes(B)

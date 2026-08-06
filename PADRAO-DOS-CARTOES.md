@@ -291,7 +291,55 @@ cartão corrigido vale mais que um buraco.
 
 ---
 
-## 6. Checklist para escrever um cartão
+## 6. Como escrever um lote, na prática
+
+O fluxo abaixo existe porque o anterior — escrever um script por lote, gravar
+no banco, rodar o validador e desfazer o que ele reprovasse — falhou de quatro
+maneiras diferentes numa sessão só: encoding corrompido (`.ps1` sem BOM),
+regra do validador que o script não conhecia, viés descoberto tarde, e uma
+checagem caseira **mais fraca** que a de verdade (passava, enquanto o contador
+"correta é a mais longa" subia de 228 para 245 no banco inteiro).
+
+A correção não foi checar melhor: foi **parar de gravar antes de validar**.
+
+### 6.1 O ciclo
+
+```
+1. escreve em rascunho.json          (só conteúdo: m, t, q, o, c, e, f — sem id)
+2. validar.ps1 -Rascunho rascunho.json    (regras REAIS, nada gravado)
+3. corrige o que apontar, volta ao 2
+4. incorporar-rascunho.ps1           (grava só se o passo 2 passar limpo)
+5. validar.ps1 · gerar-offline.ps1 · VERSAO no sw.js · commit
+```
+
+O passo 2 é o ponto todo: são as regras do `validar`, não uma cópia delas.
+Nunca reimplementar checagem num script de lote — foi exatamente isso que
+deixou o viés crescer sem ninguém ver.
+
+### 6.2 Escreva os distratores primeiro
+
+O viés de comprimento não é acidente de digitação: é consequência da ordem.
+Escrevendo a correta primeiro, ela sai cuidadosa e longa; os distratores vêm
+depois, apressados e curtos — e a resposta certa fica entregue pelo tamanho.
+
+Invertendo, o problema não chega a existir: escreva **os quatro distratores
+primeiro**, como condutas que alguém adotaria por engano de verdade, e só
+então a correta. Ela nasce do tamanho do grupo em vez de destoar dele.
+
+### 6.3 Um lote, uma fonte
+
+Prefira "extrair os fatos do art. 1º da Lei 8.142" a "escrever 4 cartões de
+Controle social". Partindo da fonte primária, três coisas saem de graça:
+
+- a `fonte` fica correta e igual no lote inteiro;
+- "um fato por cartão" (1.2) vira consequência da leitura, não uma regra a
+  lembrar;
+- a **saturação** (3.5) fica visível: acabaram os fatos do artigo, acabou o
+  lote.
+
+---
+
+## 7. Checklist para escrever um cartão
 
 Antes de dar o cartão por pronto:
 
