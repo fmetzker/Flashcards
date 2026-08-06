@@ -322,8 +322,16 @@ tabela `reportes` reaproveita os mesmos `revisores`/`sou_revisor()` de
 `propostas` — julgar se uma questão está certa é o mesmo tipo de trabalho,
 não precisou de um papel novo. Botão na tela de estudo (`reportarProblema()`,
 visível só com conta), tela "Reportes de questões" pro revisor
-(`pintarReportes()`/`decidirReporte()`). Ainda **não confirmado** contra o
-projeto real — rodar `schema.sql`/`conferir.sql` antes de usar.
+(`pintarReportes()`/`decidirReporte()`). Confirmado contra o projeto real —
+`conferir.sql` roda sem `FALHOU` nem `WARNING`.
+
+Achado nessa confirmação, mesma classe de bug da Fase 4b: a FK de `reportes`
+para `auth.users` nunca virava adiável, porque a seção que faz isso
+(schema.sql, hoje 8.5) rodava antes de `reportes` existir — `pg_constraint`
+só enxerga o que já foi criado no momento da consulta. Corrigido movendo
+essa seção para o fim do arquivo. **Continua precisando ser a última seção
+real do arquivo** — qualquer tabela nova que referencie `auth.users` e
+entrar depois dela quebra do mesmo jeito.
 
 **Viés de comprimento — resolvido.** A resposta certa costumava ser visivelmente
 mais longa que os distratores, o que permitia acertar sem saber o conteúdo. Foram

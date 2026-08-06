@@ -753,9 +753,19 @@ parte.
 aparece logado, some deslogado. `pintarReportes()` testado com dois cenários
 mockados — questão presente no banco local (mostra enunciado) e questão de
 matéria fora dos concursos seguidos pelo revisor (mostra aviso em vez de
-quebrar). Erro de rede tratado sem travar a tela. `validar.ps1` sem erros,
-`schema.sql`/`conferir.sql` com blocos `do $$`/`end $$` balanceados — ainda
-não confirmados contra o projeto real (pendente, como sempre, de rodar lá).
+quebrar). Erro de rede tratado sem travar a tela. `validar.ps1` sem erros.
+
+**Correção posterior, achada só ao rodar contra o projeto real** — mesma
+classe de bug da Fase 4b: `reportes_autor_id_fkey` nunca virava adiável,
+porque a seção que faz isso (schema.sql, então 8.2) rodava **antes** de
+`reportes` (então 8.4) existir — `pg_constraint` só enxerga o que já foi
+criado no momento em que a consulta roda. `conferir.sql` quebrava com
+`violates foreign key constraint` ao inserir o autor de teste fictício.
+Corrigido movendo o bloco para o fim do arquivo (renomeado 8.5), com
+comentário deixando explícito que essa seção precisa continuar sendo a
+última do arquivo — qualquer tabela nova com FK para `auth.users` que entrar
+depois dela quebra do mesmo jeito. Confirmado depois: `conferir.sql` roda
+sem nenhum `FALHOU` nem `WARNING`.
 
 ---
 
