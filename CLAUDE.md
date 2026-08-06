@@ -282,8 +282,10 @@ Três pontos de lá que decidem trabalho:
 
 - **Um fato, um cartão — e só um cartão** (seção 1.5). Dois cartões cobrando
   o mesmo fato competem entre si e gastam duas revisões para fixar uma
-  informação. Teste rápido: se a resposta certa é a mesma frase, sobra um.
-  Enunciado parecido **não** é o problema — fato repetido é.
+  informação. **Não há atalho mecânico** (1.5.1): medido no banco, "mesma
+  resposta certa" dá 10 pares e os 10 são legítimos (`sen(30°)` e `cos(60°)`
+  valem 1/2), e enunciado parecido costuma ser boa prática. Só a combinação
+  dos dois indica algo, e o `validar` a trata como aviso — julgamento é seu.
 - **Saturação** (3.5): o critério de parada é cobertura de fatos, não número
   de cartões. Tópico saturado é onde o cartão novo não passaria no teste 1.5.
 - **Manutenção** (5): corrigir alternativa/explicação/fonte é livre; corrigir

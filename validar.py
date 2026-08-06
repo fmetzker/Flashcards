@@ -337,6 +337,60 @@ def confere_chave_secreta():
                                  "ela ignora a RLS; use a chave anon e revogue esta no painel")
 
 
+VAZIAS = {'a', 'o', 'as', 'os', 'um', 'uma', 'de', 'do', 'da', 'dos', 'das', 'em', 'no', 'na',
+          'nos', 'nas', 'e', 'ou', 'que', 'com', 'para', 'por', 'ao', 'aos', 'se', 'sua', 'seu',
+          'suas', 'seus', 'qual', 'é', 'ser', 'não', 'sobre', 'entre', 'como', 'mais', 'menos',
+          'pelo', 'pela', 'pelos', 'pelas'}
+
+
+def _tokens(t):
+    limpo = re.sub(r'[^\w\s]', ' ', t.lower(), flags=re.UNICODE)
+    return {p for p in limpo.split() if len(p) > 2 and p not in VAZIAS}
+
+
+def _norm_resp(t):
+    """Caixa, pontuação e espaço não distinguem um fato de outro."""
+    return re.sub(r'\s+', ' ', re.sub(r'[^\w\s]', '', t.lower(), flags=re.UNICODE)).strip()
+
+
+def valida_redundancia(B):
+    """Princípio 1.5: dois cartões que cobram o MESMO FATO competem entre si.
+
+    Os limiares saíram de medição no banco de 946 questões, não de chute:
+
+    - "mesma resposta correta" sozinho dá 10 pares, TODOS legítimos — sen(30°)
+      e cos(60°) valem 1/2, atropina é antídoto de organofosforado E droga da
+      bradicardia. Sozinho é 100% ruído e não serve de regra.
+    - "enunciado parecido" sozinho também não serve: fórmula repetida de
+      enunciado ("regência do verbo assistir/visar/aspirar") é boa prática.
+
+    Sobra a combinação, que hoje não ocorre nenhuma vez no banco. Por isso é
+    aviso, nunca erro: quando dispara, pede olho humano; não pode incomodar.
+    """
+    meta = {q['id']: (_tokens(q.get('q', '')), _norm_resp(q['o'][q['c']]))
+            for q in B if q.get('o') and isinstance(q.get('c'), int)}
+    grupos = collections.defaultdict(list)
+    for q in B:
+        if q['id'] in meta:
+            grupos[(q.get('m'), q.get('t'))].append(q)
+
+    for itens in grupos.values():
+        for i in range(len(itens)):
+            for j in range(i + 1, len(itens)):
+                ta, ca = meta[itens[i]['id']]
+                tb, cb = meta[itens[j]['id']]
+                if not ta or not tb:
+                    continue
+                sim = len(ta & tb) / len(ta | tb)
+                par = f"[{itens[i]['id']}] e [{itens[j]['id']}]"
+                if sim >= 0.85 and ca == cb:
+                    avisos.append(f"redundância provável {par}: enunciados {sim*100:.0f}% parecidos "
+                                  "E mesma resposta certa. Testam o mesmo fato? Ver princípio 1.5")
+                elif sim >= 0.90:
+                    avisos.append(f"{par}: enunciados {sim*100:.0f}% parecidos (respostas diferentes). "
+                                  "Confirme que o fato cobrado é outro")
+
+
 def carrega_rascunho(B, caminho):
     """Junta cartões candidatos ao banco em memória, sem gravar nada.
 
@@ -379,6 +433,7 @@ def main():
     ids = valida_questoes(B)
     valida_migracao(B, ids)
     valida_topicos(B, materias)
+    valida_redundancia(B)
     valida_concursos(B)
 
     print(f"\nBanco: {len(B)} questões em {len(materias)} matérias")

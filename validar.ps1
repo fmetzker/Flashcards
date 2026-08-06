@@ -190,6 +190,59 @@ if (-not (Test-Path $arqConcursos)) {
   }
 }
 
+# ---- redundância (princípio 1.5 do PADRAO-DOS-CARTOES) -----------------------
+# Dois cartões que cobram o MESMO FATO competem entre si: a pessoa decora a
+# diferença superficial e o Leitner gasta duas revisões para fixar uma
+# informação. O difícil é detectar isso sem afogar em falso positivo.
+#
+# Medido no banco de 946 questões antes de escolher os limiares:
+#   - "mesma resposta correta" sozinho: 10 pares, TODOS legítimos (sen 30° e
+#     cos 60° valem 1/2; atropina é antídoto de organofosforado E droga da
+#     bradicardia). Sozinho, é 100% ruído — não serve de regra.
+#   - "enunciado parecido" sozinho: fórmula repetida de enunciado é boa prática
+#     ("regência do verbo assistir/visar/aspirar"), não defeito.
+# O que sobra é a COMBINAÇÃO, que hoje não acontece nenhuma vez. Por isso é
+# aviso e não erro: quando dispara, merece olhar humano; nunca deve incomodar.
+$VAZIAS = @{}
+foreach ($p in @('a','o','as','os','um','uma','de','do','da','dos','das','em','no','na','nos','nas',
+                 'e','ou','que','com','para','por','ao','aos','se','sua','seu','suas','seus','qual',
+                 'é','ser','não','sobre','entre','como','mais','menos','pelo','pela','pelos','pelas')) { $VAZIAS[$p] = $true }
+
+function Tokens-De([string]$t) {
+  $set = New-Object 'System.Collections.Generic.HashSet[string]'
+  foreach ($p in (($t.ToLower() -replace '[^\p{L}\p{Nd}\s]', ' ') -split '\s+')) {
+    if ($p.Length -gt 2 -and -not $VAZIAS.ContainsKey($p)) { [void]$set.Add($p) }
+  }
+  $set
+}
+# caixa, pontuação e espaço não distinguem um fato de outro
+function Norm-Resp([string]$t) { (($t.ToLower() -replace '[^\p{L}\p{Nd}\s]', '') -replace '\s+', ' ').Trim() }
+
+$meta = @{}
+foreach ($q in $B) { $meta[$q.id] = @{ tok = (Tokens-De $q.q); cor = (Norm-Resp $q.o[$q.c]) } }
+
+foreach ($g in ($B | Group-Object { "$($_.m)|$($_.t)" })) {
+  $it = @($g.Group)
+  for ($i = 0; $i -lt $it.Count; $i++) {
+    for ($j = $i + 1; $j -lt $it.Count; $j++) {
+      $ta = $meta[$it[$i].id].tok; $tb = $meta[$it[$j].id].tok
+      if ($ta.Count -eq 0 -or $tb.Count -eq 0) { continue }
+      $inter = 0
+      foreach ($x in $ta) { if ($tb.Contains($x)) { $inter++ } }
+      $uniao = $ta.Count + $tb.Count - $inter
+      if ($uniao -eq 0) { continue }
+      $sim = [double]$inter / $uniao
+      $mesmaResp = $meta[$it[$i].id].cor -eq $meta[$it[$j].id].cor
+
+      if ($sim -ge 0.85 -and $mesmaResp) {
+        Aviso ("redundância provável [$($it[$i].id)] e [$($it[$j].id)]: enunciados {0:N0}% parecidos E mesma resposta certa. Testam o mesmo fato? Ver princípio 1.5" -f ($sim * 100))
+      } elseif ($sim -ge 0.90) {
+        Aviso ("[$($it[$i].id)] e [$($it[$j].id)]: enunciados {0:N0}% parecidos (respostas diferentes). Confirme que o fato cobrado é outro" -f ($sim * 100))
+      }
+    }
+  }
+}
+
 # ---- resumo ------------------------------------------------------------------
 
 Write-Host "`nBanco: $($B.Count) questões em $(@($materias).Count) matérias"

@@ -75,9 +75,6 @@ decorar a diferença superficial entre as duas versões ("aquele que começa
 com 'Segundo a lei...'"), que não vale nada na prova. E o Leitner agenda os
 dois, gastando duas revisões para consolidar uma informação só.
 
-Um teste que resolve quase todos os casos: **se a resposta certa dos dois
-cartões é a mesma frase, provavelmente sobra um.**
-
 - ✅ "Conduta na dengue grupo A" e "conduta na dengue grupo D" — enunciado
   quase idêntico, fatos diferentes, respostas diferentes. São dois cartões.
 - ✅ "Regência do verbo assistir", "de visar", "de aspirar" — a fórmula do
@@ -90,6 +87,30 @@ cartões é a mesma frase, provavelmente sobra um.**
 Note que **enunciado parecido não é o problema** — fórmula repetida de
 enunciado costuma ser bom sinal, não ruim: mantém o formato previsível e
 deixa a diferença de conteúdo em evidência. O problema é fato repetido.
+
+### 1.5.1 Por que não existe atalho mecânico aqui
+
+A primeira versão desta seção afirmava um teste rápido: *"se a resposta certa
+dos dois cartões é a mesma frase, provavelmente sobra um"*. **Isso está
+errado, e a medição no banco mostrou.** Dos 946 cartões, 10 pares dividem a
+resposta certa dentro do mesmo tópico — e os 10 são legítimos:
+
+| Par | Resposta comum | Por que são dois cartões |
+|---|---|---|
+| `sen(30°)` e `cos(60°)` | 1/2 | ângulos complementares, fatos distintos |
+| antídoto do organofosforado e droga da bradicardia | Atropina | mesma droga, indicações diferentes |
+| profilaxia da meningocócica e efeito adverso na TB | Rifampicina | mesma droga, contextos diferentes |
+| área do triângulo e área do trapézio | 30 cm² | coincidência dos números do enunciado |
+
+Resposta igual, portanto, é ruído puro como regra automática. E enunciado
+parecido sozinho também não serve, pelo motivo do quadro acima. O que
+realmente indica redundância é a **combinação** — enunciado quase idêntico
+*somado a* mesma resposta — e ela hoje não acontece nenhuma vez no banco.
+
+É por isso que o `validar` trata redundância como **aviso, nunca erro**:
+decidir se dois cartões cobram o mesmo fato é julgamento, e nenhum limiar
+substitui a leitura dos dois. O aviso serve para trazer o par até seus olhos,
+não para decidir por você.
 
 ---
 
