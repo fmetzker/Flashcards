@@ -1,7 +1,7 @@
 {
-  "name": "Prova 20/09 — Enfermeiro Volta Redonda",
+  "name": "Flashcard",
   "short_name": "Flashcard",
-  "description": "Questões e revisão espaçada para o concurso da Secretaria Municipal de Saúde de Volta Redonda, cargo Enfermeiro.",
+  "description": "Questões e revisão espaçada para concursos públicos, com contas e banco colaborativo.",
   "lang": "pt-BR",
   "start_url": "./index.html",
   "scope": "./",
