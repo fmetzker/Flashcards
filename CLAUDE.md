@@ -277,6 +277,35 @@ inteiro (Fases 3a a 4c: RLS, allowlist, `propostas`/`revisores`,
 preenchido, a conta fica indisponível e o app funciona exatamente como na
 Fase 2.
 
+**A meta diária vale só para o concurso em foco, e por área.** Antes, qualquer
+questão respondida enchia a meta — quem segue dois concursos batia a meta do
+concurso de Enfermeiro estudando só Matemática, que nem cai nele. Agora:
+
+- `E.diasMateria[dia][materia]` guarda as respostas **por matéria**. Chaveado
+  por matéria e não por bloco de propósito: id de bloco é por concurso (`lp`
+  num, `port` noutro), então guardar por bloco quebraria ao trocar o foco.
+- `progressoDoDia(k)` agrega esses números nos blocos do concurso **em foco**,
+  cada um limitado à sua cota (`bl.questoes`). Matéria fora do foco não conta;
+  excedente de um bloco não compensa outro. É isso que faz a meta só fechar
+  quando todas as áreas foram estudadas.
+- `iniciarSessao("normal")` monta a sessão respeitando essas cotas — antes
+  sorteava do banco inteiro e mandava estudar matéria que depois não contava.
+- A gravação **não** filtra pelo foco (`registrar()` e `aplicarEventoRemoto()`
+  gravam sempre): quem alterna o foco precisa do histórico certo para os dois
+  concursos. O filtro é na leitura.
+- O gráfico "Cartões estudados" segue usando a contagem **bruta** (`E.dias`),
+  de propósito: ali a pergunta é "quanto você estudou", e estudar matéria de
+  outro concurso é esforço real.
+- Dias anteriores a esta versão não têm `diasMateria` e caem no `dias` bruto —
+  mesmo tratamento de `diasTotal`/`diasCertas`.
+
+**Navegação por abas.** Barra fixa no rodapé com quatro destinos (Hoje,
+Matérias, Estatísticas, Ajustes). A tela inicial ficou só com o que é do
+**dia** (meta, cartela, sequência); os gráficos e o card "Banco" foram para
+Estatísticas. `SEM_NAV` lista as telas que escondem a barra: as de foco
+(estudo, simulado) e as de portão (login, espera, escolher concurso), onde
+navegar para o lado é justamente o que não pode.
+
 **Reportar problema numa questão** (Bloco A do plano de melhorias):
 tabela `reportes` reaproveita os mesmos `revisores`/`sou_revisor()` de
 `propostas` — julgar se uma questão está certa é o mesmo tipo de trabalho,

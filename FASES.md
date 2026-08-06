@@ -759,6 +759,63 @@ não confirmados contra o projeto real (pendente, como sempre, de rodar lá).
 
 ---
 
+## Plano de melhorias — Bloco B (estruturais) · **concluído**
+
+**Modelo usado:** Opus 5, esforço high (meta por disciplina) + Sonnet 5,
+esforço medium (navegação).
+
+### Item 7 — meta por disciplina
+
+O problema relatado: "a meta é contabilizada mesmo quando o usuário estuda
+matérias que pertencem exclusivamente a outro concurso".
+
+A divisão pedida **já existia nos dados** — cada bloco do concurso tem
+`questoes` (10 Português + 10 SUS + 50 Específicos). Não precisou de campo
+novo em `concursos.json`; precisou de contagem por matéria no estado
+(`E.diasMateria`) e de agregação por bloco na leitura (`progressoDoDia`).
+
+Três decisões que valem registro:
+
+- **Por matéria, não por bloco.** Id de bloco é por concurso (`lp` num,
+  `port` noutro): guardar por bloco quebraria ao trocar o foco.
+- **Filtro na leitura, não na gravação.** Quem alterna o foco precisa do
+  histórico certo para os dois concursos; filtrar ao gravar destruiria isso.
+- **A sessão de estudo também respeita a cota.** Sem isso o app mandaria
+  estudar matéria que depois não conta — pior que não contar, induz ao erro.
+
+**Verificação.** Os três cenários do pedido, medidos no navegador com o
+concurso de Enfermeiro em foco: 50 cartões só de Português → **10/70** (antes
+50/70); 50 Port + 10 SUS + 50 Esp → **70/70**; 40 cartões de Matemática, que
+só cai no CAAQ-CDM → **0/70** (antes 40/70). E a sessão de "Estudar agora"
+sai na composição da prova (10/10/50), passando a 60 questões sem Português
+quando a cota dele já fechou.
+
+### Item 1 — navegação por abas
+
+Barra fixa no rodapé (Hoje · Matérias · Estatísticas · Ajustes). A tela
+inicial ficou só com o que é do dia; gráficos e card "Banco" foram para
+Estatísticas. Some nas telas de foco e de portão (`SEM_NAV`).
+
+**Verificação.** Aba certa acesa em cada tela, barra some em estudo/login,
+barra de ações sobe para não sobrepor a nav, alvos de toque de 94×50px.
+
+### Confronto com o edital (003/2026-SMA)
+
+O edital de Enfermeiro foi lido e comparado com o banco. Duas conclusões:
+
+- **Todos os tópicos do banco contam para a meta** — decisão do usuário.
+  Crase, Lei 8.142/90 e Constituição Federal não aparecem literalmente no
+  edital, mas são cobrados escondidos dentro do que ele lista ("sintaxe",
+  "princípios e diretrizes do SUS"). Excluí-los seria apostar contra isso.
+  Por isso o filtro por tópico **não** foi implementado: seria código
+  especulativo sem nenhum caso de uso real hoje.
+- **Duas seções do edital estão com ZERO questões** — débito conhecido, a
+  pagar no Bloco C: **3.6 Saúde do Homem** (PNAISH, rastreamento de câncer de
+  próstata, saúde sexual masculina) e **3.18 Feridas, Estomias e
+  Reabilitação** (lesão por pressão, coberturas, ostomizados).
+
+---
+
 ## Fase 5 — Social leve (opcional)
 
 **Modelo sugerido:** Sonnet 5, esforço **low** — telas de leitura sobre dado

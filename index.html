@@ -223,6 +223,22 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
 .alt-proposta input[type=radio]{flex:0 0 auto;width:18px;height:18px}
 .alt-proposta input[type=text]{flex:1}
 .aviso{font-size:13px;color:var(--tinta2);line-height:1.45;margin-top:10px}
+
+/* barra de navegação fixa — some nas telas de foco (estudo, simulado) e nas
+   de portão (login, espera, escolher concurso), onde sair no meio é erro */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);
+  border-top:1px solid var(--traco);display:none;
+  padding-bottom:env(safe-area-inset-bottom)}
+.nav.ativa{display:block}
+.nav .interno{max-width:560px;margin:0 auto;display:flex}
+.nav button{flex:1;background:transparent;color:var(--tinta2);border:none;border-radius:0;
+  font-size:10.5px;font-weight:600;padding:8px 3px 7px;display:flex;flex-direction:column;
+  align-items:center;gap:3px;letter-spacing:.01em}
+.nav button.on{color:var(--verde)}
+.nav .ico{font-size:18px;line-height:1}
+/* com a nav no rodapé, a barra de ações sobe para não ficar por baixo */
+.acoes.com-nav{bottom:calc(56px + env(safe-area-inset-bottom))}
+
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -260,6 +276,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   <div class="card">
     <div class="linha"><div class="rotulo">Meta de hoje</div><div class="dado" id="meta-texto">0/35</div></div>
     <div class="barra"><i id="meta-barra" style="width:0%"></i></div>
+    <div id="meta-blocos" style="margin-top:12px"></div>
     <div class="linha" style="margin-top:11px;font-size:13px;color:var(--tinta2)">
       <span id="fila-info">–</span>
     </div>
@@ -270,33 +287,10 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
     <div id="streak-info" class="dado" style="font-size:28px;font-weight:700;margin-top:4px">–</div>
   </div>
 
-  <div class="card">
-    <div class="rotulo">Cartões estudados — últimos 7 dias</div>
-    <div class="barras" id="grafico-barras"></div>
-    <div class="donut-linha">
-      <svg id="grafico-donut" viewBox="0 0 80 80" width="80" height="80"></svg>
-      <div class="donut-legenda" id="grafico-legenda"></div>
-    </div>
-  </div>
-
   <div id="alerta-area"></div>
 
-  <div class="card">
-    <div class="rotulo">Banco</div>
-    <div class="stat"><span>Questões no app</span><span class="n" id="n-banco">0</span></div>
-    <div class="stat"><span>Já vistas</span><span class="n" id="n-vistas">0</span></div>
-    <div class="stat"><span>Acurácia geral</span><span class="n" id="n-acuracia">–</span></div>
-    <div class="stat"><span>Acurácia hoje</span><span class="n" id="n-acuracia-dia">–</span></div>
-    <div class="stat"><span>Acurácia — 7 dias</span><span class="n" id="n-acuracia-semana">–</span></div>
-    <div class="stat"><span>Acurácia — 30 dias</span><span class="n" id="n-acuracia-mes">–</span></div>
-    <div class="stat"><span>No caderno de erros</span><span class="n" id="n-erros">0</span></div>
-  </div>
-
   <div class="menu">
-    <button onclick="ir('materias')">Matérias</button>
-    <button onclick="ir('stats')">Estatísticas</button>
     <button onclick="ir('simulado-inicio')">Simulado</button>
-    <button onclick="ir('ajustes')">Ajustes</button>
     <button id="menu-propor" style="display:none" onclick="ir('propor')">Propor questão</button>
     <button id="menu-revisar" style="display:none" onclick="ir('revisar')">Revisar propostas</button>
     <button id="menu-reportes" style="display:none" onclick="ir('reportes')">Reportes de questões</button>
@@ -355,8 +349,30 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
 <!-- ============ ESTATÍSTICAS ============ -->
 <div class="tela" id="tela-stats">
   <h1>Estatísticas</h1>
-  <div class="sub">Acurácia por bloco do edital</div>
-  <div id="stats-corpo" style="margin-top:16px"></div>
+  <div class="sub">Seu desempenho e o estado do banco</div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="rotulo">Cartões estudados — últimos 7 dias</div>
+    <div class="barras" id="grafico-barras"></div>
+    <div class="donut-linha">
+      <svg id="grafico-donut" viewBox="0 0 80 80" width="80" height="80"></svg>
+      <div class="donut-legenda" id="grafico-legenda"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="rotulo">Banco</div>
+    <div class="stat"><span>Questões no app</span><span class="n" id="n-banco">0</span></div>
+    <div class="stat"><span>Já vistas</span><span class="n" id="n-vistas">0</span></div>
+    <div class="stat"><span>Acurácia geral</span><span class="n" id="n-acuracia">–</span></div>
+    <div class="stat"><span>Acurácia hoje</span><span class="n" id="n-acuracia-dia">–</span></div>
+    <div class="stat"><span>Acurácia — 7 dias</span><span class="n" id="n-acuracia-semana">–</span></div>
+    <div class="stat"><span>Acurácia — 30 dias</span><span class="n" id="n-acuracia-mes">–</span></div>
+    <div class="stat"><span>No caderno de erros</span><span class="n" id="n-erros">0</span></div>
+  </div>
+
+  <div class="rotulo" style="margin-top:24px">Acurácia por bloco do edital</div>
+  <div id="stats-corpo" style="margin-top:10px"></div>
 </div>
 
 <!-- ============ AJUSTES ============ -->
@@ -465,6 +481,16 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
 <!-- ============ AÇÕES FIXAS ============ -->
 <div class="acoes ativa" id="acoes">
   <div class="interno" id="acoes-interno"></div>
+</div>
+
+<!-- ============ NAVEGAÇÃO ============ -->
+<div class="nav" id="nav">
+  <div class="interno">
+    <button data-tela="inicio"   onclick="ir('inicio')"><span class="ico">◎</span>Hoje</button>
+    <button data-tela="materias" onclick="ir('materias')"><span class="ico">☰</span>Matérias</button>
+    <button data-tela="stats"    onclick="ir('stats')"><span class="ico">▲</span>Estatísticas</button>
+    <button data-tela="ajustes"  onclick="ir('ajustes')"><span class="ico">⚙</span>Ajustes</button>
+  </div>
 </div>
 
 <script>
@@ -706,6 +732,18 @@ const padrao = {
      sobrescreve com o total de questões da prova em foco (metaDoConcurso).
      Este 35 só existe como fallback antes do primeiro carregarConfig(). */
   meta:35, cartoes:{}, dias:{}, simulados:[], ultimoBackup:null, versaoEstado:0,
+  /* respostas do dia POR MATÉRIA. É o que permite a meta valer só para o
+     concurso em foco: estudar Matemática (que só cai no CAAQ-CDM) não pode
+     empurrar a meta de quem está focado no concurso de Enfermeiro.
+
+     Chaveado por matéria, e não por bloco, de propósito: id de bloco é por
+     concurso ("lp" num, "port" noutro), então guardar por bloco quebraria ao
+     trocar o foco. Por matéria, a mesma contagem serve a qualquer concurso —
+     a agregação por bloco acontece na leitura (ver progressoDoDia()).
+
+     Dias de antes desta versão não têm este campo e caem no `dias` bruto,
+     mesmo tratamento dado a diasTotal/diasCertas. */
+  diasMateria: {},
   /* concurso (singular) é o formato antigo, de quando o perfil seguia um só;
      fica aqui porque carregarConfig() ainda o lê para migrar. concursos é a
      lista que o perfil segue; concursoAtivo é qual está em foco na tela. */
@@ -947,6 +985,16 @@ function aplicarEventoRemoto(ev){
     E.dias[dia] = (E.dias[dia]||0) + 1;
     E.diasTotal[dia] = (E.diasTotal[dia]||0) + 1;
     if(ev.resultado === "sabia") E.diasCertas[dia] = (E.diasCertas[dia]||0) + 1;
+    /* mesma contagem por matéria de registrar(): sem isto, resposta dada em
+       outro aparelho encheria o total do dia mas não a cota do bloco, e a
+       meta nunca fecharia direito para quem estuda em dois aparelhos.
+       porId só tem as matérias dos concursos inscritos AQUI — evento de
+       matéria não carregada é ignorado, e volta a valer se ela entrar. */
+    const qRemota = porId[ev.questao_id];
+    if(qRemota){
+      E.diasMateria[dia] = E.diasMateria[dia] || {};
+      E.diasMateria[dia][qRemota.m] = (E.diasMateria[dia][qRemota.m]||0) + 1;
+    }
   }
   if(!c.ts || ev.ts > c.ts){ c.caixa = ev.caixa_depois; c.prox = ev.prox; c.ts = ev.ts; }
   E.cartoes[ev.questao_id] = c;
@@ -1111,7 +1159,39 @@ function fila(){
   revisar.sort((a,b)=> (E.cartoes[a].caixa) - (E.cartoes[b].caixa));
   return {revisar, novas};
 }
-function feitasHoje(){ return E.dias[hoje()] || 0; }
+/* Quanto do dia conta para a meta do concurso EM FOCO.
+
+   Duas regras, e as duas vêm do mesmo problema: antes, a meta enchia com
+   qualquer questão respondida, então quem segue dois concursos batia a meta
+   do concurso de Enfermeiro estudando só Matemática — que nem cai nele.
+
+   1. Matéria que não pertence a nenhum bloco do foco não conta.
+   2. Cada bloco tem teto próprio: a cota dele na prova (bl.questoes). Fazer
+      50 de Português numa prova que só pede 10 conta 10, não 50 — é isso que
+      faz a meta só fechar quando todas as áreas foram estudadas.
+
+   Dias anteriores a esta versão não têm diasMateria e caem no `dias` bruto,
+   sem detalhamento: retroagir seria inventar de qual matéria eram. */
+function progressoDoDia(k){
+  const porMat = E.diasMateria[k];
+  if(!porMat) return E.dias[k] || 0;
+  return BLOCOS.reduce((total, bl)=>{
+    const feitas = bl.materias.reduce((n,m)=> n + (porMat[m]||0), 0);
+    return total + Math.min(feitas, bl.questoes);
+  }, 0);
+}
+function feitasHoje(){ return progressoDoDia(hoje()); }
+
+/* detalhamento por bloco do dia de hoje, para a tela inicial mostrar onde
+   ainda falta — devolve [{nome, feitas, cota}] na ordem dos blocos */
+function progressoPorBloco(k){
+  const porMat = E.diasMateria[k] || {};
+  return BLOCOS.map(bl=>({
+    nome: bl.nome,
+    feitas: bl.materias.reduce((n,m)=> n + (porMat[m]||0), 0),
+    cota: bl.questoes
+  }));
+}
 
 /* =======================================================================
    NAVEGAÇÃO
@@ -1134,9 +1214,26 @@ function ir(nome){
   if(nome==="reportes") pintarReportes();
   rodape(nome);
 }
+/* telas sem navegação: as de foco (responder questão, fazer simulado), onde
+   sair no meio perde trabalho, e as de portão (login, espera, escolha do
+   concurso), onde navegar para o lado é justamente o que não pode */
+const SEM_NAV = ["estudo","simulado","login","espera","escolher-concurso"];
+/* qual aba fica acesa em cada tela — as que não estão aqui não acendem
+   nenhuma (Simulado, Propor, Revisar... são destinos de dentro do Hoje) */
+const ABA_DA_TELA = {inicio:"inicio", materias:"materias", stats:"stats", ajustes:"ajustes"};
+
 function rodape(nome){
   const box = document.getElementById("acoes"), alvo = document.getElementById("acoes-interno");
   box.classList.add("ativa"); alvo.innerHTML = "";
+
+  const nav = document.getElementById("nav");
+  const comNav = SEM_NAV.indexOf(nome) < 0;
+  nav.classList.toggle("ativa", comNav);
+  box.classList.toggle("com-nav", comNav);   // sobe a barra de ações para não sobrepor
+  nav.querySelectorAll("button").forEach(bt=>{
+    bt.classList.toggle("on", bt.dataset.tela === ABA_DA_TELA[nome]);
+  });
+
   const b=(txt,fn,cls)=>{const x=document.createElement("button");x.textContent=txt;x.onclick=fn;if(cls)x.className=cls;alvo.appendChild(x);};
   if(nome==="inicio"){
     const f = fila(), total = f.revisar.length + Math.max(0, E.meta - feitasHoje());
@@ -1149,6 +1246,10 @@ function rodape(nome){
   } else if(nome==="simulado"){
     box.classList.remove("ativa");
   } else if(nome==="login" || nome==="espera" || nome==="escolher-concurso"){
+    box.classList.remove("ativa");
+  } else if(ABA_DA_TELA[nome]){
+    /* destino da própria nav: não precisa de "Voltar ao início", a nav já
+       leva a qualquer lugar — o botão só ocuparia espaço */
     box.classList.remove("ativa");
   } else {
     b("Voltar ao início", ()=>ir("inicio"), "fantasma");
@@ -1213,18 +1314,45 @@ function pintarInicio(){
   document.getElementById("meta-texto").textContent = f+"/"+E.meta;
   document.getElementById("meta-barra").style.width = Math.min(100, f/E.meta*100)+"%";
 
+  /* detalhamento por área: sem ele, "12/70" não explica por que a meta não
+     anda quando a pessoa só estuda uma matéria — a cota de cada bloco fica
+     invisível */
+  const mb = document.getElementById("meta-blocos"); mb.innerHTML = "";
+  progressoPorBloco(hoje()).forEach(b=>{
+    const linha = document.createElement("div");
+    linha.style.cssText = "display:flex;align-items:center;gap:9px;font-size:12.5px;margin-top:6px;color:var(--tinta2)";
+    const nome = document.createElement("span");
+    nome.style.cssText = "flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
+    nome.textContent = b.nome;
+    const mini = document.createElement("span");
+    mini.style.cssText = "flex:0 0 54px;height:5px;background:#E7ECE8;border-radius:99px;overflow:hidden";
+    const dentro = document.createElement("i");
+    const cheio = Math.min(b.feitas, b.cota);
+    dentro.style.cssText = "display:block;height:100%;border-radius:99px;background:"+
+      (cheio >= b.cota ? "var(--verde)" : "var(--ambar)")+";width:"+Math.round(cheio/b.cota*100)+"%";
+    mini.appendChild(dentro);
+    const num = document.createElement("span");
+    num.className = "dado";
+    num.style.cssText = "flex:0 0 auto;font-size:12px";
+    // mostra o excedente: fez 50 de Português numa prova que pede 10 vira "10/10 (+40)"
+    num.textContent = cheio+"/"+b.cota + (b.feitas > b.cota ? " (+"+(b.feitas-b.cota)+")" : "");
+    linha.appendChild(nome); linha.appendChild(mini); linha.appendChild(num);
+    mb.appendChild(linha);
+  });
+
   const q = fila();
   document.getElementById("fila-info").textContent =
     q.revisar.length+" para revisar · "+q.novas.length+" ainda não vistas";
 
+  /* sequência e cartela usam progressoDoDia, não a contagem bruta: senão um
+     dia inteiro estudando matéria de outro concurso apareceria como meta
+     batida na cartela do concurso em foco */
   let seq=0, kStreak=hoje();
   for(let i=0;i<200;i++){
-    if(i===0 && !(E.dias[kStreak]>=E.meta)){ kStreak=somarDias(kStreak,-1); continue; }
-    if(E.dias[kStreak]>=E.meta){ seq++; kStreak=somarDias(kStreak,-1); } else break;
+    if(i===0 && !(progressoDoDia(kStreak)>=E.meta)){ kStreak=somarDias(kStreak,-1); continue; }
+    if(progressoDoDia(kStreak)>=E.meta){ seq++; kStreak=somarDias(kStreak,-1); } else break;
   }
   document.getElementById("streak-info").textContent = seq>0 ? seq+" dias seguidos" : "sem sequência";
-
-  pintarGraficos();
 
   // cartela
   const g = document.getElementById("grade"); g.innerHTML="";
@@ -1234,7 +1362,7 @@ function pintarInicio(){
     n++;
     const k = d2.toISOString().slice(0,10);
     const el = document.createElement("div"); el.className="dia";
-    const feito = E.dias[k]||0;
+    const feito = progressoDoDia(k);
     if(k === CONCURSO.data) el.className="dia prova";
     else if(feito >= E.meta) el.className="dia cheio";
     else if(feito > 0) el.className="dia parcial";
@@ -1245,30 +1373,6 @@ function pintarInicio(){
   }
   document.getElementById("cartela-info").textContent = n+" dias";
   ajustarGrade(g);
-
-  const vistas = Object.keys(E.cartoes).length;
-  let ac=0, tot=0, erros=0;
-  Object.values(E.cartoes).forEach(c=>{ac+=c.acertos;tot+=c.acertos+c.erros;if(c.caixa<=2&&c.erros>0)erros++;});
-  document.getElementById("n-banco").textContent = BANCO.length;
-  document.getElementById("n-vistas").textContent = vistas;
-  document.getElementById("n-acuracia").textContent = tot? Math.round(ac/tot*100)+"%" : "–";
-  document.getElementById("n-erros").textContent = erros;
-
-  // acurácia por período: soma diasCertas/diasTotal na janela de dias corridos
-  // terminando hoje. Dias sem os dois campos (de antes desta versão) somam
-  // 0/0 e não entram na conta — ver comentário em `padrao`.
-  const acuraciaJanela = n => {
-    let certas=0, total=0, k=hoje();
-    for(let i=0;i<n;i++){
-      certas += E.diasCertas[k]||0;
-      total += E.diasTotal[k]||0;
-      k = somarDias(k,-1);
-    }
-    return total ? Math.round(certas/total*100)+"%" : "–";
-  };
-  document.getElementById("n-acuracia-dia").textContent = acuraciaJanela(1);
-  document.getElementById("n-acuracia-semana").textContent = acuraciaJanela(7);
-  document.getElementById("n-acuracia-mes").textContent = acuraciaJanela(30);
 
   // alerta de área em risco
   // (o aviso semanal de backup foi removido: a sincronização por conta já
@@ -1298,6 +1402,10 @@ function pintarGraficos(){
   const NOMES_DIA = ["D","S","T","Q","Q","S","S"];
   const dias = [];
   for(let i=6;i>=0;i--) dias.push(somarDias(hoje(), -i));
+  /* contagem BRUTA de propósito, diferente da meta: aqui a pergunta é
+     "quanto você estudou", e estudar matéria de outro concurso é esforço de
+     verdade. A meta responde outra coisa — "quanto disso serve à prova em
+     foco" — e por isso usa progressoDoDia(). */
   const valores = dias.map(k => E.dias[k]||0);
   const maxV = Math.max(1, ...valores);
 
@@ -1522,10 +1630,36 @@ function iniciarSessao(modo, filtro){
     /* nada vencido e nada novo: revisa adiantado em vez de não fazer nada */
     if(lista.length===0) lista = alvo.map(x=>x.id).slice(0, E.meta);
   } else {
-    const restam = Math.max(0, E.meta - feitasHoje()) || E.meta;
-    lista = q.revisar.slice(0, Math.ceil(restam*0.5));
-    lista = lista.concat(q.novas.slice(0, restam - lista.length));
-    if(lista.length===0) lista = q.revisar.concat(q.novas).slice(0, E.meta);
+    /* Monta a sessão RESPEITANDO A COTA DE CADA BLOCO da prova em foco.
+
+       Antes isto sorteava do banco inteiro, e quem seguia dois concursos
+       recebia questões de matéria que nem cai na prova em foco — o app
+       mandava estudar algo que depois não contava para a meta. Pior que não
+       contar: induzia ao erro.
+
+       Cada bloco entra com o que ainda falta para fechar a cota dele, na
+       mesma ordem de sempre (vencido primeiro, depois nunca visto). */
+    const porBloco = progressoPorBloco(hoje());
+    lista = [];
+    BLOCOS.forEach((bl,i)=>{
+      const falta = Math.max(0, bl.questoes - Math.min(porBloco[i].feitas, bl.questoes));
+      if(!falta) return;
+      const daArea = id => bl.materias.indexOf((porId[id]||{}).m) >= 0;
+      const rev = q.revisar.filter(daArea);
+      const nov = q.novas.filter(daArea);
+      // metade revisão, metade nova — mesma proporção que valia antes
+      const parte = rev.slice(0, Math.ceil(falta*0.5));
+      lista = lista.concat(parte, nov.slice(0, falta - parte.length));
+    });
+    /* nenhuma cota aberta (meta do dia já fechada), ou nada nas matérias da
+       prova: cai no comportamento antigo em vez de deixar a pessoa sem nada
+       para estudar */
+    if(lista.length===0){
+      const restam = Math.max(0, E.meta - feitasHoje()) || E.meta;
+      lista = q.revisar.slice(0, Math.ceil(restam*0.5));
+      lista = lista.concat(q.novas.slice(0, restam - lista.length));
+      if(lista.length===0) lista = q.revisar.concat(q.novas).slice(0, E.meta);
+    }
   }
   if(lista.length===0){ alert("Nada na fila. Adicione mais questões ao banco."); return; }
   S = {lista, pos:0, respondida:false};
@@ -1616,6 +1750,14 @@ function registrar(id, resultado){
   E.dias[h] = (E.dias[h]||0)+1;
   E.diasTotal[h] = (E.diasTotal[h]||0)+1;
   if(resultado === "sabia") E.diasCertas[h] = (E.diasCertas[h]||0)+1;
+  /* grava a matéria SEM filtrar pelo foco atual: quem segue dois concursos
+     alterna o foco, e o histórico precisa continuar certo para os dois. O
+     filtro é na leitura (progressoDoDia), não aqui. */
+  const q0 = porId[id];
+  if(q0){
+    E.diasMateria[h] = E.diasMateria[h] || {};
+    E.diasMateria[h][q0.m] = (E.diasMateria[h][q0.m]||0) + 1;
+  }
 
   if(supaConfigurado() && SESSAO){
     const ev = {id:uuidv4(), questao_id:id, ts:agora, resultado, caixa_depois:c.caixa, prox:c.prox};
@@ -1773,6 +1915,34 @@ function finalizarSimulado(){
    trabalho é outro: ranquear o que está mais fraco, do pior para o melhor,
    considerando só o que já foi respondido. */
 function pintarStats(){
+  /* os cards de gráfico e de banco moravam na tela inicial e vieram para cá
+     quando a navegação por abas entrou: a tela inicial ficou só com o que é
+     do DIA (meta, cartela, sequência), e o histórico/panorama vive aqui */
+  pintarGraficos();
+
+  let ac=0, tot=0, erros=0;
+  Object.values(E.cartoes).forEach(c2=>{ac+=c2.acertos;tot+=c2.acertos+c2.erros;if(c2.caixa<=2&&c2.erros>0)erros++;});
+  document.getElementById("n-banco").textContent = BANCO.length;
+  document.getElementById("n-vistas").textContent = Object.keys(E.cartoes).length;
+  document.getElementById("n-acuracia").textContent = tot? Math.round(ac/tot*100)+"%" : "–";
+  document.getElementById("n-erros").textContent = erros;
+
+  /* acurácia por período: soma diasCertas/diasTotal na janela de dias
+     corridos terminando hoje. Dias sem os dois campos (de antes desta
+     métrica) somam 0/0 e não entram na conta — ver comentário em `padrao`. */
+  const acuraciaJanela = n => {
+    let certas=0, total=0, k=hoje();
+    for(let i=0;i<n;i++){
+      certas += E.diasCertas[k]||0;
+      total += E.diasTotal[k]||0;
+      k = somarDias(k,-1);
+    }
+    return total ? Math.round(certas/total*100)+"%" : "–";
+  };
+  document.getElementById("n-acuracia-dia").textContent = acuraciaJanela(1);
+  document.getElementById("n-acuracia-semana").textContent = acuraciaJanela(7);
+  document.getElementById("n-acuracia-mes").textContent = acuraciaJanela(30);
+
   /* ranqueia pelo nível mais fino que a questão tem: o subtópico quando
      existe, senão o tópico. É onde dá para agir. */
   const itens = {};
