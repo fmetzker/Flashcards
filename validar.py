@@ -20,7 +20,7 @@ nome_materia = {}      # id -> nome
 
 def id_questao(enunciado):
     """Id estável da questão: SHA-1 do enunciado, truncado em 10 hexadecimais.
-    Precisa dar o mesmo resultado aqui, no validar.ps1 e no extrair-banco.ps1."""
+    Precisa dar o mesmo resultado aqui, no validar.ps1 e no reescrever-questoes.ps1."""
     return hashlib.sha1(enunciado.encode('utf-8')).hexdigest()[:10]
 
 
