@@ -344,8 +344,14 @@ VAZIAS = {'a', 'o', 'as', 'os', 'um', 'uma', 'de', 'do', 'da', 'dos', 'das', 'em
 
 
 def _tokens(t):
+    """Número nunca é descartado por tamanho, mesmo com 1-2 dígitos: em questão
+    de aritmética é o número que distingue um fato do outro ("3 × 4" vs
+    "3 × 8"). Cortá-los pela mesma regra de tamanho das palavras (>2
+    caracteres) fazia toda questão de Tabuada colapsar no mesmo token só
+    ("quanto"), tratando dezenas de fatos aritméticos diferentes como se
+    fossem a mesma pergunta repetida."""
     limpo = re.sub(r'[^\w\s]', ' ', t.lower(), flags=re.UNICODE)
-    return {p for p in limpo.split() if len(p) > 2 and p not in VAZIAS}
+    return {p for p in limpo.split() if p.isdigit() or (len(p) > 2 and p not in VAZIAS)}
 
 
 def _norm_resp(t):

@@ -209,9 +209,19 @@ foreach ($p in @('a','o','as','os','um','uma','de','do','da','dos','das','em','n
                  'é','ser','não','sobre','entre','como','mais','menos','pelo','pela','pelos','pelas')) { $VAZIAS[$p] = $true }
 
 function Tokens-De([string]$t) {
+  # Número NUNCA é descartado por tamanho, mesmo com 1 ou 2 dígitos: em
+  # questão de aritmética (tabuada, cálculo) é o número que distingue um
+  # fato do outro -- "3 × 4" e "3 × 8" só diferem no número. Cortá-los pela
+  # mesma regra de tamanho das palavras (>2 caracteres) fazia toda questão
+  # de Tabuada colapsar no mesmo token só ("quanto"), tratando 56 fatos
+  # aritméticos diferentes como se fossem a mesma pergunta repetida —
+  # descoberto ao rodar contra o banco depois da Tabuada entrar (1553
+  # avisos numa leva de 5 candidatos sem nenhuma relação com ela).
   $set = New-Object 'System.Collections.Generic.HashSet[string]'
   foreach ($p in (($t.ToLower() -replace '[^\p{L}\p{Nd}\s]', ' ') -split '\s+')) {
-    if ($p.Length -gt 2 -and -not $VAZIAS.ContainsKey($p)) { [void]$set.Add($p) }
+    if ($p.Length -eq 0) { continue }
+    $ehNumero = $p -match '^\d+$'
+    if ($ehNumero -or ($p.Length -gt 2 -and -not $VAZIAS.ContainsKey($p))) { [void]$set.Add($p) }
   }
   $set
 }
