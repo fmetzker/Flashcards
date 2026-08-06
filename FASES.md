@@ -816,6 +816,71 @@ O edital de Enfermeiro foi lido e comparado com o banco. Duas conclusões:
 
 ---
 
+## Plano de melhorias — Bloco C (metodologia) · **primeira rodada concluída**
+
+**Modelo usado:** Opus 5, esforço high (padrão e prioridade) + Sonnet 5,
+esforço medium (auditoria e correções).
+
+### O achado que mudou o plano
+
+O pedido original era escrever a metodologia **e reescrever as 876 questões**
+para segui-la. Antes de reescrever, `auditar-banco.ps1` mediu o banco contra o
+padrão recém-escrito. Resultado: **91,8% das questões sem nenhum apontamento**,
+e apenas 12 de gravidade alta.
+
+Reescrever tudo teria custo enorme e ganho perto de zero — e ainda arriscaria
+o histórico de quem já estuda. O esforço foi redirecionado para as 12 reais.
+
+Duas coisas que só apareceram porque a medição veio antes da ação:
+
+- **O próprio script tinha falso positivo.** "15 x 60 = 900 mg" foi marcada
+  como explicação fraca por ter menos de 40 caracteres — mas em questão de
+  cálculo a explicação curta É a explicação inteira. O critério passou a
+  exigir também ausência de sinal de raciocínio (conta ou conectivo causal).
+- **Uma questão tinha explicação que explicava outra coisa.** Em
+  `fe95f27118` (tuberculose na gestação), a correta falava de piridoxina e a
+  explicação, de amamentação. Nenhuma verificação automática pegaria isso;
+  apareceu ao ler os casos apontados.
+
+### O que foi feito
+
+- [x] **`METODOLOGIA.md`** — o padrão: recordação ativa, um fato por cartão,
+  distratores plausíveis, explicação que ensina, o que não fazer, e como
+  priorizar sem inventar dado de incidência.
+- [x] **`auditar-banco.ps1`** (e `.py`) — mede o banco contra o padrão. Mede,
+  **não reprova**: qualidade é gradiente, não regra, e por isso não vira
+  portão de publicação como o `validar`.
+- [x] **`reescrever-questoes.ps1` + `banco/reescritas.json` +
+  `migrarReescritas()`** — o mecanismo que faltava. O id é o SHA-1 do
+  enunciado, então corrigir enunciado zerava o histórico do cartão para todo
+  mundo; isso tornava proibitivo consertar questão ruim, que é justamente o
+  que a metodologia manda fazer. Agora o progresso é transportado pelo mapa,
+  seguindo cadeia (A→B→C) e resolvendo conflito pelo evento mais recente.
+- [x] **6 enunciados corrigidos** — os que não eram pergunta respondível sem
+  ler as alternativas ("Sobre X, é correto afirmar que:").
+- [x] **`prioridade()`** — ordem dentro do que já venceu passa a considerar
+  caixa, taxa de erro e peso do bloco, sem adiantar nenhuma revisão.
+
+**Verificação.** Migração testada no navegador: progresso em id antigo
+(caixa 4, 7 acertos, data de revisão) chega intacto no id novo; conflito entre
+os dois ids resolve pelo `ts` mais recente nos dois sentidos, sem duplicar.
+Auditoria depois das correções: `sem-pergunta` de 6 para **0**, banco em
+92,8% limpo. `validar.ps1` sem erros — inclusive os dois que ele acusou no
+meio do caminho (`reescritas.json` não reconhecido; `indice-legado.json`
+apontando para ids que deixaram de existir), ambos corrigidos.
+
+### O que falta neste bloco
+
+- [ ] **As duas lacunas do edital** — 3.6 Saúde do Homem e 3.18 Feridas,
+  Estomias e Reabilitação continuam com zero questões. É o item de maior
+  ganho real que sobrou: o resto do banco está bom, isso está ausente.
+- [ ] 48 questões com distrator curto demais (gravidade média) e 3 com
+  explicação curta sem raciocínio. Sem urgência.
+- [ ] Priorização por **incidência real** continua bloqueada por falta das
+  provas anteriores da FEVRE/CIAGA.
+
+---
+
 ## Fase 5 — Social leve (opcional)
 
 **Modelo sugerido:** Sonnet 5, esforço **low** — telas de leitura sobre dado

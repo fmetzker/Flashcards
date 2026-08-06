@@ -1098,6 +1098,40 @@ async function migrarParaIds(){
   salvar();
 }
 
+/* Transporta o progresso quando uma questão é REESCRITA.
+
+   O id é o SHA-1 do enunciado (regra 5): corrigir um enunciado mal escrito
+   muda o id, e o histórico daquele cartão sumiria — o que na prática tornava
+   proibitivo consertar questão ruim. banco/reescritas.json guarda
+   {id_antigo: id_novo}, gravado por reescrever-questoes.ps1, e aqui o
+   progresso muda de chave.
+
+   Roda a cada boot, não uma vez só: o mapa cresce a cada lote de correções, e
+   um aparelho que ficou meses sem abrir precisa pegar os lotes que perdeu.
+   É barato — só percorre as chaves que existem no mapa.
+
+   Segue cadeia (A->B, B->C): questão reescrita duas vezes ainda encontra o
+   caminho até o id atual. O limite de 10 saltos é anel de segurança contra
+   um mapa cíclico gravado por engano. */
+async function migrarReescritas(){
+  let mapa;
+  try{ mapa = await pega("banco/reescritas.json"); }
+  catch(e){ return; }   // arquivo ausente: nada a migrar
+  let movidos = 0;
+  Object.keys(E.cartoes).forEach(velho=>{
+    let novo = mapa[velho], saltos = 0;
+    while(novo && mapa[novo] && saltos++ < 10) novo = mapa[novo];
+    if(!novo || novo === velho) return;
+    /* se o destino já tem progresso (respondeu a versão nova em outro
+       aparelho), o mais recente vence — mesma regra do merge da sincronização */
+    const atual = E.cartoes[novo];
+    if(!atual || (E.cartoes[velho].ts||"") > (atual.ts||"")) E.cartoes[novo] = E.cartoes[velho];
+    delete E.cartoes[velho];
+    movidos++;
+  });
+  if(movidos){ salvar(); console.info(movidos+" cartão(ões) migrado(s) para enunciado reescrito"); }
+}
+
 /* =======================================================================
    DATAS — sempre no fuso de Brasília, nunca no fuso do aparelho
    A prova é em Volta Redonda; o dia "vira" à meia-noite de Brasília, não à
@@ -1148,6 +1182,40 @@ function proximaData(caixa){
   return somarDias(hoje(), inter);
 }
 
+/* Prioridade dentro do que JÁ VENCEU (METODOLOGIA.md, seção 4.2).
+
+   Nada aqui adianta revisão: o espaçamento continua mandando em QUANDO o
+   cartão volta. Isto decide só a ORDEM entre os que já venceram, para o caso
+   comum de a fila ser maior que o tempo disponível — aí importa o que sai
+   primeiro.
+
+   Três critérios, nesta ordem de peso:
+
+   1. CAIXA — quanto mais baixa, mais recente é a dificuldade. Continua sendo
+      o sinal mais forte, como já era.
+   2. TAXA DE ERRO da própria questão — duas questões na caixa 2 não são
+      iguais: a que a pessoa já errou 4 vezes é mais urgente que a que ela
+      errou uma. Só entra com histórico suficiente (3 respostas), senão uma
+      única resposta azarada dominaria a ordem.
+   3. PESO DO BLOCO na prova — desempate por onde vale mais ponto. É o critério
+      mais fraco de propósito: peso de bloco não é sinal de dificuldade, só de
+      retorno, e não deve passar na frente do que a pessoa não sabe.
+
+   Os pesos (0.6 e 0.3) são calibrados para que a soma máxima do desconto
+   fique ABAIXO de 1 — ou seja, abaixo da distância entre duas caixas. Sem
+   isso, um cartão da caixa 2 que a pessoa erra muito passaria na frente de um
+   da caixa 1, e caixa 1 quer dizer "errei na revisão mais recente", que é o
+   sinal mais forte que existe. Erro histórico e peso do bloco ordenam DENTRO
+   da caixa; nunca atravessam a fronteira dela. */
+function prioridade(id){
+  const c = E.cartoes[id];
+  const respostas = c.acertos + c.erros;
+  const erro = respostas >= 3 ? c.erros / respostas : 0;   // 0..1
+  const bl = BLOCOS.find(b => b.id === blocoDe(porId[id]));
+  const peso = bl ? bl.questoes / Math.max(1, E.meta) : 0; // 0..1
+  return c.caixa - erro * 0.6 - peso * 0.3;
+}
+
 function fila(){
   const h = hoje();
   const revisar = [], novas = [];
@@ -1156,7 +1224,7 @@ function fila(){
     if(!c) novas.push(q.id);
     else if(c.prox <= h) revisar.push(q.id);
   });
-  revisar.sort((a,b)=> (E.cartoes[a].caixa) - (E.cartoes[b].caixa));
+  revisar.sort((a,b)=> prioridade(a) - prioridade(b));
   return {revisar, novas};
 }
 /* Quanto do dia conta para a meta do concurso EM FOCO.
@@ -1625,7 +1693,7 @@ function iniciarSessao(modo, filtro){
       const c = E.cartoes[x.id];
       if(!c) nov.push(x.id); else if(c.prox <= h) rev.push(x.id);
     });
-    rev.sort((a,b)=> E.cartoes[a].caixa - E.cartoes[b].caixa);
+    rev.sort((a,b)=> prioridade(a) - prioridade(b));   // mesma ordem do estudo normal
     lista = rev.concat(nov).slice(0, E.meta);
     /* nada vencido e nada novo: revisa adiantado em vez de não fazer nada */
     if(lista.length===0) lista = alvo.map(x=>x.id).slice(0, E.meta);
@@ -2688,6 +2756,7 @@ function exigeEscolherConcurso(){
 carregarConfig()
   .then(carregarBanco)
   .then(migrarParaIds)
+  .then(migrarReescritas)   // depois de migrarParaIds: só faz sentido com o progresso já em ids
   .then(carregarSupabase)   // arquivo ausente não é erro fatal, mas sem ele ninguém consegue logar
   .then(verificarSessao)    // desloga em silêncio se a sessão salva não presta mais
   .then(verificarSituacao)  // pendente/aprovado/rejeitado — decide entre tela de espera e app

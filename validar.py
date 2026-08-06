@@ -56,7 +56,7 @@ def carrega_banco():
     # arquivo de matéria que não está no materias.json passaria despercebido
     for nome in sorted(os.listdir(BANCO_DIR)):
         base = os.path.splitext(nome)[0]
-        if not nome.endswith('.json') or base in ('materias', 'indice-legado'):
+        if not nome.endswith('.json') or base in ('materias', 'indice-legado', 'reescritas'):
             continue
         if base not in nome_materia:
             erros.append(f"banco/{nome} não corresponde a nenhuma matéria de materias.json")

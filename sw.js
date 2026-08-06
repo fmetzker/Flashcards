@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v34-meta-por-disciplina";
+const VERSAO = "v35-metodologia";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
@@ -18,7 +18,10 @@ const ARQUIVOS = [
   "./concursos.json",
   "./supabase.json",
   "./banco/materias.json",
-  "./banco/indice-legado.json"
+  "./banco/indice-legado.json",
+  /* mapa de questões reescritas — sem ele no cache, abrir offline depois de
+     uma correção de enunciado perderia o histórico daqueles cartões */
+  "./banco/reescritas.json"
 ];
 
 /* Instalação: baixa tudo e guarda.

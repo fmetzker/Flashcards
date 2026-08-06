@@ -12,11 +12,15 @@ Edital 003/2026-SMA · banca FEVRE · cargo Enfermeiro.
 | `banco/materias.json` | Lista de matérias, na ordem de exibição |
 | `banco/<matéria>.json` | Questões daquela matéria, uma por linha |
 | `banco/indice-legado.json` | Ids na ordem antiga do array — migra progresso salvo antes da Fase 0 |
+| `banco/reescritas.json` | Mapa id antigo→novo de enunciados corrigidos — preserva o histórico |
 | `sw.js` | Service worker — faz o app funcionar offline |
 | `manifest.json` | Metadados do PWA |
 | `icone-192.png`, `icone-512.png`, `apple-touch-icon.png` | Ícones |
+| `METODOLOGIA.md` | **O padrão dos cartões** — como escrever, o que não fazer, como priorizar |
 | `validar.py` | Verificação de integridade do banco — **rodar sempre antes de publicar** |
 | `validar.ps1` | Mesma verificação, para máquinas sem Python |
+| `auditar-banco.py` / `.ps1` | Mede o banco contra `METODOLOGIA.md`. Mede, não reprova |
+| `reescrever-questoes.ps1` | Corrige enunciado sem perder o progresso de quem já estudou |
 | `extrair-banco.ps1` | Ferramenta da Fase 0: extraiu o array `BANCO` do HTML para os JSON |
 | `fase1-materias.ps1` | Ferramenta da Fase 1: reagrupou os tópicos em matérias |
 | `fase1b-topicos.ps1` | Ferramenta da Fase 1b: subdividiu as matérias em tópicos reais |
@@ -69,11 +73,18 @@ no Safari do iPhone sem nenhuma etapa de compilação.
 3. **Rodar `validar.py` (ou `validar.ps1`) antes de qualquer commit.** Falha se
    houver questão malformada, duplicada ou com viés estatístico piorando.
 4. **Não adicionar dependências externas nem CDN.**
-5. **O `id` da questão nunca muda.** Ele é o SHA-1 do enunciado truncado em 10
-   hexadecimais, e é o que amarra o progresso salvo à questão. Mudar o
-   enunciado muda o id e **zera o histórico daquela questão** para todo mundo —
-   corrija alternativas e explicação à vontade, mas pense duas vezes antes de
-   mexer no enunciado. O validador confere que `id == sha1(q)`.
+5. **O `id` da questão é o SHA-1 do enunciado**, truncado em 10 hexadecimais,
+   e é o que amarra o progresso salvo à questão. O validador confere que
+   `id == sha1(q)`. Corrigir alternativas, explicação e fonte é livre — não
+   mexe no id.
+
+   **Para mudar um enunciado, use `reescrever-questoes.ps1`.** Ele recalcula o
+   id e grava o par antigo→novo em `banco/reescritas.json`, que
+   `migrarReescritas()` aplica no boot para transportar o progresso (e o
+   script ainda acerta o `indice-legado.json`, que apontaria para um id
+   inexistente). Editar o enunciado à mão **zera o histórico daquele cartão
+   para todo mundo** — foi o que tornava proibitivo consertar questão ruim,
+   e é o problema que esse caminho resolve.
 6. **Arquivos `.ps1` com acento precisam de UTF-8 COM BOM.** Sem BOM, o Windows
    PowerShell 5.1 os lê como ANSI e o parser quebra com erro de chave faltando.
 7. **A chave `service_role` do Supabase nunca entra no repositório.** Ela
@@ -359,6 +370,30 @@ Godot em modo headless (extrair banco → aplicar patch JSON → medir → valid
 **Viés de letra — resolvido.** As alternativas são embaralhadas em tempo de
 execução (`embaralhaOrdem`), no estudo e no simulado. Não reintroduzir ordem fixa.
 
+## Metodologia dos cartões
+
+O padrão está em **`METODOLOGIA.md`**: recordação ativa, um fato por cartão,
+distratores plausíveis, explicação que ensina. Ler antes de escrever ou
+reescrever questão.
+
+`auditar-banco.ps1` mede o banco contra esse padrão — e, diferente do
+`validar.ps1`, **não reprova nada**: qualidade é gradiente, não regra. A saída
+serve para escolher o que corrigir primeiro.
+
+Estado da última auditoria: **92,8% das questões sem nenhum apontamento**. O
+banco já estava em boa forma, o que descartou a ideia inicial de reescrever
+tudo — reescrever 876 questões teria custo alto e ganho perto de zero. Foram
+corrigidas as 6 que tinham enunciado não respondível sem as alternativas.
+
+Restam, sem urgência: 48 casos de distrator curto demais (gravidade média) e
+3 de explicação curta sem raciocínio explícito.
+
+**Prioridade de conteúdo é declarada, não inventada.** Não existe dado de
+incidência de provas anteriores neste projeto — o banco veio de fontes
+primárias (manuais, leis), não de provas passadas. Enquanto ninguém juntar as
+provas da FEVRE/CIAGA, a priorização usa três sinais honestos: peso do bloco
+no edital, cobertura do conteúdo programático e onde a pessoa erra mais.
+
 ## Motor de repetição espaçada
 
 Leitner de 5 caixas, intervalos 1, 3, 7 e 14 dias, com **teto dinâmico**: nenhum
@@ -367,6 +402,15 @@ tudo vira revisão diária. Ver `proximaData()`.
 
 Três respostas possíveis: "Sabia" sobe uma caixa; "Chutei" e "Errei" voltam para
 a caixa 1. O botão "Chutei" é central — não removê-lo nem transformá-lo em acerto.
+
+**A ordem dentro do que já venceu** é decidida por `prioridade()`: caixa, taxa
+de erro da questão e peso do bloco na prova. Os pesos (0.6 e 0.3) são
+calibrados para o desconto somado ficar **abaixo de 1**, isto é, abaixo da
+distância entre duas caixas — erro e peso ordenam *dentro* da caixa e nunca
+atravessam a fronteira dela. Caixa 1 quer dizer "errei na revisão mais
+recente", que é o sinal mais forte que existe; nada pode passar na frente.
+Isso não adianta revisão nenhuma: o espaçamento continua mandando em *quando*
+o cartão volta.
 
 **O dia sempre vira no fuso de Brasília, nunca no fuso do aparelho.** `hoje()`
 usa `Intl.DateTimeFormat` com `timeZone:"America/Sao_Paulo"` fixo — não um

@@ -57,7 +57,7 @@ if ($erros.Count -gt 0 -or $B.Count -eq 0) {
 # arquivo de matéria que não está no materias.json passaria despercebido
 foreach ($f in Get-ChildItem $dir -Filter '*.json') {
   $nome = [System.IO.Path]::GetFileNameWithoutExtension($f.Name)
-  if ($nome -in 'materias','indice-legado') { continue }
+  if ($nome -in 'materias','indice-legado','reescritas') { continue }
   if (-not $idsMateria.ContainsKey($nome)) { Erro "banco/$($f.Name) não corresponde a nenhuma matéria de materias.json" }
 }
 
