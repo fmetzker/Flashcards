@@ -1,4 +1,4 @@
-﻿# Mede o banco contra o padrão de METODOLOGIA.md.
+﻿# Mede o banco contra o padrão de PADRAO-DOS-CARTOES.md.
 #
 # Equivalente ao auditar-banco.py, para máquinas sem Python (a mesma razão
 # pela qual validar.ps1 existe ao lado de validar.py).
@@ -150,7 +150,7 @@ foreach ($q in $B) {
 
 Write-Host "Banco: $($B.Count) questões`n"
 Write-Host ("=" * 66)
-Write-Host "ADERÊNCIA AO PADRÃO (METODOLOGIA.md)"
+Write-Host "ADERÊNCIA AO PADRÃO (PADRAO-DOS-CARTOES.md)"
 Write-Host ("=" * 66)
 
 foreach ($v in $VERIFICACOES) {
@@ -201,4 +201,4 @@ if ($Csv) {
   Write-Host "`nCSV gravado em $Csv ($($achados.Count) linhas)"
 }
 
-Write-Host "`nEste script mede, não reprova. Ver METODOLOGIA.md para o padrão."
+Write-Host "`nEste script mede, não reprova. Ver PADRAO-DOS-CARTOES.md para o padrão."

@@ -10,7 +10,7 @@
 # encontrar a questão: o histórico daquele cartão zera para todo mundo.
 #
 # Isso torna proibitivo corrigir uma questão mal escrita, que é justamente o
-# que a METODOLOGIA.md manda fazer. A saída é a mesma que a Fase 0 já usou
+# que a PADRAO-DOS-CARTOES.md manda fazer. A saída é a mesma que a Fase 0 já usou
 # para migrar de índice-de-array para id: um MAPA do id velho para o novo,
 # aplicado no boot do app (ver migrarReescritas em index.html).
 #
@@ -37,7 +37,7 @@ function Id-Questao([string]$enunciado) {
 #
 # Este lote vem da auditoria (auditar-banco.ps1): são as questões marcadas
 # como "sem-pergunta", cujo enunciado não era respondível sem ler as
-# alternativas — violação do princípio 1.1 da METODOLOGIA.md.
+# alternativas — violação do princípio 1.1 da PADRAO-DOS-CARTOES.md.
 
 $REESCRITAS = @{
   'fe95f27118' = @{

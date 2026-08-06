@@ -18,9 +18,9 @@ colaborativo. Hoje atende dois concursos: Enfermeiro/Volta Redonda (edital
 | `sw.js` | Service worker — faz o app funcionar offline |
 | `manifest.json` | Metadados do PWA |
 | `icone-192.png`, `icone-512.png`, `apple-touch-icon.png` | Ícones |
-| `METODOLOGIA.md` | O padrão dos cartões — como escrever, o que não fazer, como priorizar |
+| `PADRAO-DOS-CARTOES.md` | O padrão dos cartões — como escrever, o que não fazer, como priorizar |
 | `validar.py` / `validar.ps1` | Verificação de integridade do banco — **rodar antes de publicar** |
-| `auditar-banco.py` / `.ps1` | Mede o banco contra `METODOLOGIA.md`. Mede, não reprova |
+| `auditar-banco.py` / `.ps1` | Mede o banco contra `PADRAO-DOS-CARTOES.md`. Mede, não reprova |
 | `reescrever-questoes.ps1` | Corrige enunciado sem perder progresso — ver regra 5 |
 | `incorporar-propostas.ps1` | Grava proposta aprovada como questão de verdade — ver regra 9 |
 | `servidor.ps1` | Servidor local para desenvolver: `http://localhost:8080` |
@@ -116,7 +116,7 @@ Arquivos `banco/<matéria>.json`, um objeto por linha (mantém o diff pequeno):
 
 Ao acrescentar questão, **reusar um `t` e um `s` que já existam** em vez de
 inventar rótulos novos; a árvore só é útil enquanto os níveis se mantêm
-poucos. Antes de escrever, ler `METODOLOGIA.md`.
+poucos. Antes de escrever, ler `PADRAO-DOS-CARTOES.md`.
 
 ## Matéria, tópico e subtópico
 
@@ -234,13 +234,25 @@ conta o que pertence a esse concurso:
 - O gráfico "Cartões estudados" usa a contagem bruta (`E.dias`) de
   propósito: ali a pergunta é "quanto você estudou", não "quanto contou".
 
-## Metodologia dos cartões
+## Padrão dos cartões
 
-O padrão está em `METODOLOGIA.md`: recordação ativa, um fato por cartão,
+Está em `PADRAO-DOS-CARTOES.md`: recordação ativa, um fato por cartão,
 distratores plausíveis, explicação que ensina, como priorizar sem inventar
 dado de incidência que este projeto não tem (não existe base de provas
 anteriores da banca — a priorização usa peso do bloco no edital, cobertura
 do conteúdo programático e onde a pessoa erra mais).
+
+Três pontos de lá que decidem trabalho:
+
+- **Um fato, um cartão — e só um cartão** (seção 1.5). Dois cartões cobrando
+  o mesmo fato competem entre si e gastam duas revisões para fixar uma
+  informação. Teste rápido: se a resposta certa é a mesma frase, sobra um.
+  Enunciado parecido **não** é o problema — fato repetido é.
+- **Saturação** (3.5): o critério de parada é cobertura de fatos, não número
+  de cartões. Tópico saturado é onde o cartão novo não passaria no teste 1.5.
+- **Manutenção** (5): corrigir alternativa/explicação/fonte é livre; corrigir
+  **enunciado** só por `reescrever-questoes.ps1`, senão zera o histórico de
+  todo mundo (regra 5). Aposentar quase nunca é a resposta certa.
 
 `auditar-banco.ps1`/`.py` mede o banco contra esse padrão — diferente do
 `validar`, **não reprova nada**; a saída só ajuda a escolher o que corrigir

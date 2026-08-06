@@ -1,4 +1,4 @@
-# Metodologia — como escrever e revisar os cartões
+# Padrão dos cartões — como escrever, revisar e aposentar
 
 Este documento define o padrão do banco. Ele existe porque a qualidade do
 estudo é decidida na hora de **escrever** a questão, não na hora de estudá-la:
@@ -64,6 +64,33 @@ distrator mais tentador está errado.
   pessoas que estavam nela)."
 - ❌ "A alternativa correta é a letra B."
 
+### 1.5 Um fato, um cartão — e só um cartão
+
+O complemento necessário do princípio 1.2. Ali a regra é não juntar cinco
+fatos num cartão; aqui é não espalhar **o mesmo fato** por dois.
+
+Dois cartões que cobram o mesmo fato não dobram o aprendizado — competem
+entre si. É **interferência**: em vez de fixar o fato, a pessoa passa a
+decorar a diferença superficial entre as duas versões ("aquele que começa
+com 'Segundo a lei...'"), que não vale nada na prova. E o Leitner agenda os
+dois, gastando duas revisões para consolidar uma informação só.
+
+Um teste que resolve quase todos os casos: **se a resposta certa dos dois
+cartões é a mesma frase, provavelmente sobra um.**
+
+- ✅ "Conduta na dengue grupo A" e "conduta na dengue grupo D" — enunciado
+  quase idêntico, fatos diferentes, respostas diferentes. São dois cartões.
+- ✅ "Regência do verbo assistir", "de visar", "de aspirar" — a fórmula do
+  enunciado se repete de propósito; cada um cobra uma regência distinta.
+- ❌ O mesmo intervalo entre doses perguntado uma vez de forma direta e
+  outra "segundo o manual do MS". Mesma resposta, mesmo fato: é um cartão.
+- ❌ O mesmo cálculo com os números trocados, quando o que se testa é o
+  método e não a conta. Vira treino de aritmética, não recordação.
+
+Note que **enunciado parecido não é o problema** — fórmula repetida de
+enunciado costuma ser bom sinal, não ruim: mantém o formato previsível e
+deixa a diferença de conteúdo em evidência. O problema é fato repetido.
+
 ---
 
 ## 2. O que não fazer
@@ -76,6 +103,7 @@ distrator mais tentador está errado.
 | Enunciado que cita formatação ("o trecho **destacado**") | O app mostra texto puro — o `validar.py` já barra isso. |
 | Alternativa certa visivelmente mais longa | Deixa acertar sem saber. Já resolvido no banco; não reintroduzir. |
 | Pegadinha de leitura ("não é incorreto afirmar que não...") | Mede desatenção, não preparo. |
+| Dois cartões com a mesma resposta certa para o mesmo fato | Interferência: gasta duas revisões para fixar uma informação. Ver 1.5. |
 
 ---
 
@@ -143,6 +171,49 @@ material suficiente para consertar.
 Este sinal é individual, não serve para decidir o banco inteiro, mas serve
 para decidir **o que escrever a seguir** quando o tempo é limitado.
 
+### 3.5 Quando parar: a regra de saturação
+
+Os três sinais acima dizem *onde* escrever. Falta o critério de parada — sem
+ele, "faça mais cartões" não tem fim e o banco cresce torto, engordando o
+assunto que é fácil de escrever em vez do que precisa.
+
+Um tópico está **saturado** quando todos os fatos que o edital cobra já têm
+cartão. Não é número: é cobertura. Na prática, três perguntas resolvem:
+
+1. **Sobrou fato sem cartão?** Se sim, escreva — é o sinal mais forte,
+   independente de quantos cartões o tópico já tenha.
+2. **O cartão novo passaria no teste 1.5** (fato próprio, resposta certa
+   diferente das que já existem)? Se não, o tópico está saturado: o que
+   parece lacuna é repetição.
+3. **A densidade está muito fora do peso do edital** (seção 3.2)? Se o
+   tópico já está acima do peso e os dois testes acima não pediram cartão
+   novo, escreva em outro lugar.
+
+Corolário prático: **é melhor um tópico com 4 cartões cobrindo 4 fatos do
+que um com 10 cobrindo os mesmos 4.** Quantidade só conta quando cada
+unidade carrega informação nova.
+
+### 3.6 Sinal 4 — o que o erro coletivo revela sobre o cartão
+
+Os sinais 1 a 3 dizem o que escrever. Este diz o que **consertar**, e é
+diferente dos outros porque não fala do assunto: fala do cartão.
+
+Cartão que quase todo mundo erra costuma estar **mal escrito**, não difícil.
+Suspeite quando a taxa de erro é muito alta e persiste depois de várias
+revisões — as causas de longe mais comuns são:
+
+- **Distrator igualmente defensável.** Existe mais de uma resposta certa, ou
+  a "errada" só está errada num detalhe que o enunciado não cobrou.
+- **Enunciado ambíguo.** A pessoa entende outra pergunta e responde certo
+  para a pergunta errada.
+- **Fato desatualizado.** A fonte mudou (protocolo revisado, lei alterada) e
+  o cartão ficou para trás — este é o pior caso, porque ensina errado.
+
+A distinção prática: assunto difícil dá erro alto **e disperso** entre vários
+cartões do tópico; cartão defeituoso dá erro alto **concentrado** em um só,
+enquanto os vizinhos vão bem. O primeiro caso pede mais cartões (seção 3.4);
+o segundo pede conserto (seção 5).
+
 ---
 
 ## 4. Metodologia de revisão
@@ -176,15 +247,62 @@ a lógica do espaçamento (nada é adiantado além do que já venceu).
 
 ---
 
-## 5. Checklist para escrever um cartão
+## 5. Manter o que já existe
+
+Escrever cartão novo é metade do trabalho. A outra metade é cuidar dos 900 e
+tantos que já estão lá — e ela tem uma restrição técnica que mudar a conduta:
+**o `id` é o SHA-1 do enunciado**, e é o que amarra o progresso salvo ao
+cartão. Isso divide a manutenção em três casos bem diferentes.
+
+### 5.1 Corrigir sem mexer no enunciado — livre
+
+Alternativa, explicação, fonte, tópico e subtópico podem ser editados à mão,
+direto no `banco/<matéria>.json`. O id não muda, o histórico de todo mundo
+fica intacto. É o caso mais comum: distrator ruim, explicação que não
+ensina, fonte imprecisa.
+
+**Faça isso sempre que der.** Boa parte do que a seção 3.6 aponta como
+"cartão defeituoso" se resolve aqui, sem tocar no enunciado.
+
+### 5.2 Corrigir o enunciado — só pela ferramenta
+
+Editar o enunciado à mão **zera o histórico daquele cartão para todo mundo**:
+o id passa a ser outro, e o progresso salvo fica órfão, apontando para uma
+questão que não existe mais.
+
+Use `reescrever-questoes.ps1`. Ele recalcula o id, grava o par antigo→novo em
+`banco/reescritas.json` (que o app aplica no boot, transportando o progresso)
+e ainda acerta o `indice-legado.json`. Ver regra 5 do `CLAUDE.md`.
+
+### 5.3 Aposentar — o caso que quase nunca é o certo
+
+Apagar um cartão apaga o histórico dele. Como o banco é versionado e o custo
+de manter é quase zero, aposentar só se justifica quando o cartão **ensina
+errado e não dá para consertar**:
+
+- Fato que deixou de existir (protocolo revogado, artigo de lei suprimido) e
+  não há equivalente atual para o qual reescrever.
+- Cartão redundante encontrado depois (teste 1.5): aqui, prefira **fundir** —
+  reescrever o que tem mais histórico para cobrir o fato melhor, e aposentar
+  o outro.
+
+Na dúvida, **reescreva em vez de apagar**: 5.2 preserva o histórico, e um
+cartão corrigido vale mais que um buraco.
+
+---
+
+## 6. Checklist para escrever um cartão
 
 Antes de dar o cartão por pronto:
 
 - [ ] O enunciado é uma pergunta respondível **sem** ler as alternativas?
 - [ ] Testa **um** fato só?
+- [ ] **Já existe cartão cobrando este mesmo fato?** (Se a resposta certa
+      repete a de outro cartão do tópico, provavelmente sim — ver 1.5.)
 - [ ] Os 4 distratores são erros que alguém cometeria de verdade?
 - [ ] Nenhum "todas as anteriores" / "apenas I e III"?
 - [ ] A alternativa certa **não** é a mais longa?
 - [ ] A explicação diz *por que*, não *qual*?
 - [ ] Tem fonte verificável (lei e artigo, ou manual e capítulo)?
 - [ ] O tópico e o subtópico já existem no banco (em vez de rótulo novo)?
+- [ ] O tópico ainda **pede** este cartão, ou já está saturado (ver 3.5)?

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Mede o banco contra o padrão de METODOLOGIA.md.
+"""Mede o banco contra o padrão de PADRAO-DOS-CARTOES.md.
 
 Uso:  python3 auditar-banco.py            # relatório resumido
       python3 auditar-banco.py --listar    # + os ids de cada problema
@@ -146,7 +146,7 @@ def main():
 
     print(f"Banco: {len(B)} questões\n")
     print("=" * 66)
-    print("ADERÊNCIA AO PADRÃO (METODOLOGIA.md)")
+    print("ADERÊNCIA AO PADRÃO (PADRAO-DOS-CARTOES.md)")
     print("=" * 66)
 
     por_chave = collections.Counter(a[3] for a in achados)
@@ -189,7 +189,7 @@ def main():
             w.writerows(achados)
         print(f"\nCSV gravado em {csv_saida} ({len(achados)} linhas)")
 
-    print("\nEste script mede, não reprova. Ver METODOLOGIA.md para o padrão.")
+    print("\nEste script mede, não reprova. Ver PADRAO-DOS-CARTOES.md para o padrão.")
 
 
 if __name__ == '__main__':
