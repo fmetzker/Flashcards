@@ -518,7 +518,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
    q  = enunciado   o = 5 alternativas   c = índice da correta (0-4)
    e  = explicação   f = fonte
    ======================================================================= */
-let BANCO = [], CONCURSO = null, BLOCOS = [], ORDEM_MATERIAS = [], TOPICOS_EDITAL = {};
+let BANCO = [], CONCURSO = null, BLOCOS = [], BLOCOS_META = [], ORDEM_MATERIAS = [], TOPICOS_EDITAL = {};
 let CONCURSOS = [];          // todos os que existem em concursos.json
 let INSCRITOS = [];          // os que ESTE perfil segue (objetos, não ids)
 const porId = {}, MATERIAS = {}, blocoDaMateria = {};
@@ -553,11 +553,56 @@ function metaDoConcurso(c){
   return (c.blocos||[]).reduce((soma,bl)=> soma + (bl.questoes||0), 0) || 35;
 }
 
+/* Blocos que valem para a META DIÁRIA — a união de TODOS os concursos
+   inscritos, não só o que está em foco. Quem segue dois concursos precisa
+   estudar os dois todo dia; antes a meta só enxergava o foco, e a matéria
+   exclusiva do outro concurso não contava nada.
+
+   Matéria repetida NÃO soma: Português cai nos cinco concursos cadastrados,
+   e somar daria 50 questões/dia de Português. Fica valendo a MAIOR cota
+   entre eles — estudar 10 de Português serve para as cinco provas ao mesmo
+   tempo, não é trabalho multiplicado.
+
+   O escopo de tópicos é UNIÃO, não "o do bloco que venceu". Os editais
+   divergem de verdade: Português do Moço de Máquinas tem 8 itens e inclui
+   gêneros textuais; o de nível superior tem 12 e inclui regência, colocação
+   pronominal e coordenação/subordinação — mas NÃO cita gêneros. Nenhum é
+   subconjunto do outro, então escolher "o maior" perderia conteúdo que cai
+   numa das provas. Bloco sem `topicos` declarado significa matéria inteira,
+   e nesse caso a união também é a matéria inteira. */
+function blocosDaMeta(){
+  const porMateria = {};                       // matéria -> bloco vencedor
+  const escopo = {};                           // matéria -> Set de tópicos, ou null = tudo
+  (INSCRITOS.length ? INSCRITOS : (CONCURSO ? [CONCURSO] : [])).forEach(c=>{
+    (c.blocos||[]).forEach(bl=>{
+      (bl.materias||[]).forEach(m=>{
+        const cota = bl.questoes || 0;
+        if(!porMateria[m] || cota > porMateria[m].questoes){
+          porMateria[m] = {id: bl.id, nome: bl.nome, questoes: cota, materias: [m]};
+        }
+        // união do escopo: um bloco sem 'topicos' abre a matéria inteira
+        if(escopo[m] === null) return;
+        if(!bl.topicos || !bl.topicos.length){ escopo[m] = null; return; }
+        escopo[m] = escopo[m] || new Set();
+        bl.topicos.forEach(t=> escopo[m].add(t));
+      });
+    });
+  });
+  return ORDEM_MATERIAS.filter(m=>porMateria[m]).map(m=>{
+    const bl = porMateria[m];
+    return {id: bl.id+"@"+m, nome: bl.nome, questoes: bl.questoes, materias: [m],
+            topicos: escopo[m] ? Array.from(escopo[m]) : null};
+  });
+}
+
 function aplicarFoco(id){
   CONCURSO = INSCRITOS.find(c=>c.id === id) || INSCRITOS[0];
   E.concursoAtivo = CONCURSO.id;
   BLOCOS = CONCURSO.blocos;
-  E.meta = metaDoConcurso(CONCURSO);
+  /* A meta é dos INSCRITOS, não do foco — trocar o concurso em foco repinta
+     cabeçalho, cartela e simulado, mas não muda quanto se estuda por dia. */
+  BLOCOS_META = blocosDaMeta();
+  E.meta = BLOCOS_META.reduce((s,bl)=> s + bl.questoes, 0) || metaDoConcurso(CONCURSO);
   // blocoDaMateria é do concurso em foco: é ele que diz de que bloco da prova
   // cada matéria faz parte (e blocos são por concurso, não globais)
   Object.keys(blocoDaMateria).forEach(k=>delete blocoDaMateria[k]);
@@ -1292,7 +1337,7 @@ function fila(){
 function progressoDoDia(k){
   const porMat = E.diasMateria[k];
   if(!porMat) return E.dias[k] || 0;
-  return BLOCOS.reduce((total, bl)=>{
+  return BLOCOS_META.reduce((total, bl)=>{
     const feitas = bl.materias.reduce((n,m)=> n + (porMat[m]||0), 0);
     return total + Math.min(feitas, bl.questoes);
   }, 0);
@@ -1300,10 +1345,11 @@ function progressoDoDia(k){
 function feitasHoje(){ return progressoDoDia(hoje()); }
 
 /* detalhamento por bloco do dia de hoje, para a tela inicial mostrar onde
-   ainda falta — devolve [{nome, feitas, cota}] na ordem dos blocos */
+   ainda falta — devolve [{nome, feitas, cota}] na ordem dos blocos da meta
+   (união dos inscritos), não só do concurso em foco */
 function progressoPorBloco(k){
   const porMat = E.diasMateria[k] || {};
-  return BLOCOS.map(bl=>({
+  return BLOCOS_META.map(bl=>({
     nome: bl.nome,
     feitas: bl.materias.reduce((n,m)=> n + (porMat[m]||0), 0),
     cota: bl.questoes
@@ -1780,21 +1826,28 @@ function iniciarSessao(modo, filtro){
     /* nada vencido e nada novo: revisa adiantado em vez de não fazer nada */
     if(lista.length===0) lista = alvo.map(x=>x.id).slice(0, E.meta);
   } else {
-    /* Monta a sessão RESPEITANDO A COTA DE CADA BLOCO da prova em foco.
+    /* Monta a sessão RESPEITANDO A COTA DE CADA BLOCO DA META — a união dos
+       concursos inscritos, não só o que está em foco. Antes isto seguia o
+       foco, e quem seguia dois concursos nunca recebia a matéria exclusiva
+       do outro; agora a sessão cobre tudo que a meta cobra, na mesma sessão.
 
-       Antes isto sorteava do banco inteiro, e quem seguia dois concursos
-       recebia questões de matéria que nem cai na prova em foco — o app
-       mandava estudar algo que depois não contava para a meta. Pior que não
-       contar: induzia ao erro.
+       Sorteia dentro do escopo de tópicos do bloco, quando ele existe: um
+       concurso pode cobrar só parte da matéria (Português do Moço de
+       Máquinas não pede regência nem colocação pronominal). Sem `topicos`
+       declarado, a matéria entra inteira.
 
        Cada bloco entra com o que ainda falta para fechar a cota dele, na
        mesma ordem de sempre (vencido primeiro, depois nunca visto). */
     const porBloco = progressoPorBloco(hoje());
     lista = [];
-    BLOCOS.forEach((bl,i)=>{
+    BLOCOS_META.forEach((bl,i)=>{
       const falta = Math.max(0, bl.questoes - Math.min(porBloco[i].feitas, bl.questoes));
       if(!falta) return;
-      const daArea = id => bl.materias.indexOf((porId[id]||{}).m) >= 0;
+      const daArea = id => {
+        const x = porId[id];
+        if(!x || bl.materias.indexOf(x.m) < 0) return false;
+        return !bl.topicos || bl.topicos.indexOf(x.t) >= 0;
+      };
       const rev = q.revisar.filter(daArea);
       const nov = q.novas.filter(daArea);
       // metade revisão, metade nova — mesma proporção que valia antes

@@ -175,6 +175,26 @@ if (-not (Test-Path $arqConcursos)) {
         $usadas[$mid] = $true
         $disp += @($B | Where-Object m -eq $mid).Count
       }
+      # Escopo de tópicos do bloco (opcional): restringe quais tópicos da
+      # matéria caem NESTE concurso. Tópico escrito errado aqui não daria erro
+      # visível — só sumiria silenciosamente da sessão de estudo, que é pior.
+      if ($bl.topicos) {
+        $doBloco = @($B | Where-Object { $bl.materias -contains $_.m })
+        $existentes = @($doBloco | Select-Object -ExpandProperty t -Unique)
+        foreach ($t in $bl.topicos) {
+          if ($existentes -notcontains $t) {
+            Erro "concurso [$rot], bloco '$($bl.id)': tópico '$t' não existe no banco das matérias deste bloco"
+          }
+        }
+        if (@($bl.topicos | Select-Object -Unique).Count -ne @($bl.topicos).Count) {
+          Erro "concurso [$rot], bloco '$($bl.id)': tópico repetido na lista de escopo"
+        }
+        $dispEscopo = @($doBloco | Where-Object { $bl.topicos -contains $_.t }).Count
+        if ($dispEscopo -lt $bl.questoes) {
+          Aviso "concurso [$rot], bloco '$($bl.nome)': dentro do escopo declarado há $dispEscopo questões para $($bl.questoes) da prova"
+        }
+        $disp = $dispEscopo
+      }
       if ($disp -lt $bl.questoes) {
         Aviso "concurso [$rot], bloco '$($bl.nome)': o banco tem $disp questões para $($bl.questoes) da prova"
       }

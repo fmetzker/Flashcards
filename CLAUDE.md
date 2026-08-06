@@ -252,18 +252,43 @@ mesmo tipo de trabalho.
 
 ## Meta e progresso do dia
 
-A meta diária **não é configurável** — é sempre o total de questões da prova
-do concurso em foco (`metaDoConcurso()`, somada em `aplicarFoco()`), e só
-conta o que pertence a esse concurso:
+A meta diária **não é configurável** — é a soma das cotas de **todos os
+concursos inscritos** (`blocosDaMeta()` → `BLOCOS_META`, recalculado em
+`aplicarFoco()`). Não é do concurso em foco: trocar o foco repinta cabeçalho,
+cartela e simulado, mas não muda quanto se estuda por dia.
 
+- **Matéria repetida não soma, vale a maior cota.** Português cai nos cinco
+  concursos cadastrados; somar daria 50 questões/dia da mesma matéria.
+  Estudar 10 de Português serve para as cinco provas ao mesmo tempo.
+- **`BLOCOS` ≠ `BLOCOS_META`.** `BLOCOS` é do foco e manda no simulado, na
+  cartela, na contagem regressiva, na regra de aprovação e em
+  `blocoDaMateria` (peso usado por `prioridade()`). `BLOCOS_META` é a união
+  dos inscritos e manda só na meta: `progressoDoDia`, `progressoPorBloco` e
+  `iniciarSessao("normal")`. Não unificar os dois — são perguntas diferentes.
+- **Escopo de tópicos por bloco** (`blocos[].topicos`, opcional): a mesma
+  matéria pode ter conteúdo programático diferente por cargo. O Português do
+  Moço de Máquinas tem 8 itens no edital e não cobra regência, colocação
+  pronominal, coordenação/subordinação nem sintaxe; o de nível superior tem
+  12 e cobre praticamente tudo. Bloco sem `topicos` significa **matéria
+  inteira**, e por isso o nível superior não declara nada.
+  - Ao deduplicar, o escopo é **união**, não o do bloco vencedor: se um
+    concurso restringe e outro não, quem segue os dois estuda a matéria
+    inteira. União é o que garante não estudar de menos.
+  - O mapeamento item-do-edital → tópico-do-banco é **interpretação**, não
+    transcrição (os itens são categorias largas). Na dúvida, **inclui**:
+    acentuação entra em "ortografia oficial", pronomes em "classes de
+    palavras". Mapear ao pé da letra já cortou 67 de 127 questões de
+    Português por engano.
+  - `validar` confere cada tópico declarado contra o banco — tópico com
+    grafia errada some silenciosamente da sessão, que é pior que um erro.
 - `E.diasMateria[dia][materia]` guarda respostas **por matéria** (não por
   bloco: id de bloco é por concurso, guardar por bloco quebraria ao trocar
   o foco).
-- `progressoDoDia(k)` agrega esses números nos blocos do foco, cada um
-  limitado à própria cota (`bl.questoes`). Matéria fora do foco não conta;
-  excedente de um bloco não compensa outro.
-- `iniciarSessao("normal")` monta a sessão de estudo respeitando essas
-  cotas — não sorteia matéria que depois não vai contar para a meta.
+- `progressoDoDia(k)` agrega esses números nos blocos da meta, cada um
+  limitado à própria cota (`bl.questoes`). Matéria fora de todos os
+  inscritos não conta; excedente de um bloco não compensa outro.
+- `iniciarSessao("normal")` monta a sessão respeitando essas cotas **e** o
+  escopo de tópicos — não sorteia matéria nem tópico que depois não conta.
 - A **gravação** não filtra pelo foco (`registrar()`/`aplicarEventoRemoto()`
   gravam sempre); o filtro é só na **leitura**, porque quem alterna o foco
   precisa do histórico certo para os dois concursos.

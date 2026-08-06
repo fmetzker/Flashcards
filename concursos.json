@@ -78,7 +78,13 @@
           "id": "lp",
           "nome": "Língua Portuguesa",
           "questoes": 10,
-          "materias": ["portugues"]
+          "materias": ["portugues"],
+          "_topicos": "Os 8 itens de Língua Portuguesa do Anexo IV do Edital nº 03 (nível fundamental/médio), mapeados para os tópicos do banco. O mapeamento é INTERPRETAÇÃO, não transcrição: os itens do edital são categorias largas, e um tópico entra sempre que couber dentro de um deles — acentuação dentro de 'ortografia oficial', pronomes dentro de 'emprego das classes de palavras', coerência/ambiguidade/reescrita dentro de 'compreensão de textos'. Na dúvida, INCLUI: deixar de fora um tópico que a prova cobra é pior que estudar um a mais. Ficam de fora só os que o edital de nível superior acrescenta e este não menciona em nenhum item: regência, colocação pronominal, coordenação, subordinação e sintaxe.",
+          "topicos": ["Interpretação de textos", "Coerência", "Ambiguidade", "Reescrita",
+                      "Gêneros textuais", "Tipologia textual", "Intertextualidade",
+                      "Ortografia", "Acentuação", "Coesão",
+                      "Classes de palavras", "Pronomes", "Concordância", "Crase", "Pontuação",
+                      "Semântica", "Figuras de linguagem"]
         },
         {
           "id": "esp",
@@ -107,7 +113,8 @@
           "id": "lp",
           "nome": "Língua Portuguesa",
           "questoes": 10,
-          "materias": ["portugues"]
+          "materias": ["portugues"],
+          "_topicos": "Sem escopo declarado de propósito: os 12 itens do Edital nº 02 (nível superior) cobrem, uma vez mapeados com o mesmo critério do transpetro-mom, praticamente todos os tópicos de Português do banco. Declarar a lista inteira seria ruído — bloco sem 'topicos' já significa matéria inteira."
         },
         {
           "id": "ing",
@@ -142,7 +149,8 @@
           "id": "lp",
           "nome": "Língua Portuguesa",
           "questoes": 10,
-          "materias": ["portugues"]
+          "materias": ["portugues"],
+          "_topicos": "Sem escopo declarado, pelo mesmo motivo do transpetro-enf-trab: os Conhecimentos Básicos são idênticos entre as ênfases de nível superior e cobrem praticamente todo o Português do banco."
         },
         {
           "id": "ing",
