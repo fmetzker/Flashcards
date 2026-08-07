@@ -1617,7 +1617,7 @@ function pintarInicio(){
   }
   document.getElementById("streak-info").textContent = seq>0 ? seq+" dias seguidos" : "sem sequência";
 
-  /* Cartela de constância: janela móvel terminando HOJE, da CONTA — não do
+  /* Cartela de constância: janela móvel começando ONTEM, da CONTA — não do
      edital. Antes ia de CONCURSO.inicio até CONCURSO.data, o que amarrava um
      histórico de esforço pessoal às datas de uma prova: trocar de concurso
      redesenhava a cartela inteira, e depois da prova ela não faria sentido
@@ -1625,14 +1625,14 @@ function pintarInicio(){
      não pertence a concurso nenhum. */
   const g = document.getElementById("grade"); g.innerHTML="";
   let batidos = 0;
-  /* célula 1 é ontem, célula 2 é hoje, célula 3 em diante volta pro passado
-     a partir de ontem (anteontem, 3 dias atrás...) — só as duas primeiras
-     posições trocam de lugar; o resto da janela é a sequência normal de
-     100 dias terminando ontem. Confirmado célula por célula com a pessoa
-     que usa o app depois de várias tentativas erradas aqui. */
-  const dias = Array.from({length: DIAS_CARTELA}, (_,i)=> somarDias(hoje(), -i));
-  [dias[0], dias[1]] = [dias[1], dias[0]];
-  dias.forEach(k=>{
+  /* célula 1 é ontem, célula 2 é hoje, e dali em diante a janela segue pro
+     FUTURO — amanhã, depois de amanhã... — em vez de voltar pro passado.
+     As células futuras nascem em branco (função progressoDoDia devolve 0
+     pra um dia que ainda não aconteceu) e vão se colorindo sozinhas
+     conforme os dias chegam, sem precisar repintar nada além do de sempre.
+     Confirmado célula por célula com quem usa o app. */
+  for(let i=0; i<DIAS_CARTELA; i++){
+    const k = somarDias(hoje(), i-1);
     const el = document.createElement("div"); el.className="dia";
     const feito = progressoDoDia(k);
     if(feito >= E.meta && E.meta > 0){ el.className="dia cheio"; batidos++; }
@@ -1641,7 +1641,7 @@ function pintarInicio(){
     if(k===hoje()) el.classList.add("hoje");
     el.title = k+" · "+feito+" de "+E.meta;
     g.appendChild(el);
-  });
+  }
   document.getElementById("cartela-info").textContent =
     batidos+" de "+DIAS_CARTELA+" dias";
   ajustarGrade(g);
