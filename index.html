@@ -1625,14 +1625,10 @@ function pintarInicio(){
      não pertence a concurso nenhum. */
   const g = document.getElementById("grade"); g.innerHTML="";
   let batidos = 0;
-  /* o canto superior esquerdo é o início FIXO da janela (100 dias atrás) —
-     não muda de lugar. O tempo anda pra frente a partir dele, célula por
-     célula, sempre pra direita (e pra próxima linha quando a atual acaba),
-     terminando em hoje no canto inferior direito. Amanhã, a janela inteira
-     desliza um dia: quem era "100 dias atrás" sai da tela, e o novo hoje
-     ocupa a mesma célula final — sempre o próximo passo à direita de onde
-     estava o hoje de ontem, nunca à esquerda. */
-  for(let i=DIAS_CARTELA-1; i>=0; i--){
+  /* hoje é a célula 1, canto superior esquerdo; ontem é a célula 2, uma à
+     direita; e assim por diante, cada vez mais pro passado. Confirmado com
+     setas apontando exatamente pra essas duas células no print. */
+  for(let i=0; i<DIAS_CARTELA; i++){
     const k = somarDias(hoje(), -i);
     const el = document.createElement("div"); el.className="dia";
     const feito = progressoDoDia(k);
