@@ -1444,6 +1444,11 @@ function rodape(nome){
   const comNav = SEM_NAV.indexOf(nome) < 0;
   nav.classList.toggle("ativa", comNav);
   box.classList.toggle("com-nav", comNav);   // sobe a barra de ações para não sobrepor
+  /* "56px" no CSS é só a estimativa de reserva — a altura real da nav varia
+     um pouco por navegador/fonte, e a diferença sobrava como uma faixa vazia
+     entre o botão e a nav, deixando a página por trás aparecer ali. Medir de
+     verdade fecha esse vão sem depender de acertar o número no CSS. */
+  box.style.bottom = comNav ? nav.getBoundingClientRect().height+"px" : "";
   nav.querySelectorAll("button").forEach(bt=>{
     bt.classList.toggle("on", bt.dataset.tela === ABA_DA_TELA[nome]);
   });
@@ -1500,6 +1505,10 @@ function ajustarGrade(g){
 window.addEventListener("resize", ()=>{
   if(document.getElementById("tela-inicio").classList.contains("ativa")){
     ajustarGrade(document.getElementById("grade"));
+  }
+  const box = document.getElementById("acoes");
+  if(box.classList.contains("com-nav")){
+    box.style.bottom = document.getElementById("nav").getBoundingClientRect().height+"px";
   }
 });
 
