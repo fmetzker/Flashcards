@@ -2877,6 +2877,17 @@ function alternarConcurso(id, checkbox){
   if(E.concursos.indexOf(E.escopoEstudo) < 0) E.escopoEstudo = null;
   salvar();
   // recarrega: a união de matérias mudou, e com ela o banco inteiro
+  reiniciarEm("ajustes");
+}
+
+/* recarrega a página (precisa, pra reler o banco do zero) mas sem jogar a
+   pessoa pra tela inicial no meio da tarefa — o boot lê essa marca e pousa
+   na tela pedida em vez do padrão. sessionStorage porque é só uma dica de
+   navegação de uma recarga que a própria página disparou: não é progresso
+   nem sessão, não entra nas chaves da regra 1, e some sozinho se a aba
+   fechar antes do boot ler. */
+function reiniciarEm(tela){
+  try{ sessionStorage.setItem("vr:pos-reload", tela); }catch(e){}
   location.reload();
 }
 
@@ -2999,7 +3010,15 @@ carregarConfig()
     if(exigeLogin()) ir("login");
     else if(exigeAprovacao()) ir("espera");
     else if(exigeEscolherConcurso()) ir("escolher-concurso");
-    else { ir("inicio"); sincronizar(); }   // puxa em segundo plano, não bloqueia a tela
+    else {
+      // ver reiniciarEm(): recarga disparada pela própria página pousa onde ela pediu, não sempre no início
+      let tela = "inicio";
+      try{
+        const pedida = sessionStorage.getItem("vr:pos-reload");
+        if(pedida){ sessionStorage.removeItem("vr:pos-reload"); tela = pedida; }
+      }catch(e){}
+      ir(tela); sincronizar();   // puxa em segundo plano, não bloqueia a tela
+    }
   })
   .catch(err=>{
     falhaBoot(location.protocol === "file:"
