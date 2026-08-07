@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v83-constancia-hoje-logo-apos-todo-o-historico";
+const VERSAO = "v84-calibracao-eo-20-cartoes";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [

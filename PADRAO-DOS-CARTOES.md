@@ -97,10 +97,55 @@ plausibilidade da seção 1.3. Não vale a pena para "Apenas quando o paciente
 solicitar" ou outro distrator óbvio: aí o `e` sozinho já basta, e forçar uma
 nota por posição só encheria o cartão de texto sem ensinar nada a mais.
 
+**Dois casos concretos de "não vale a pena", vindos de uma calibração de 20
+cartões (7 Enfermagem, 7 SUS, 6 Matemática):**
+
+- **Fato de memorização pura, sem raciocínio a explicar.** Tabuada
+  (`banco/matematica.json`) tem 56 cartões do tipo "quanto é 3×7?", com
+  distratores que são só outros números — não há erro conceitual por trás
+  de "24" estar errado para "3×7", é só um número diferente de 21. `eo` ali
+  vira enchimento repetitivo. Vale para qualquer cartão do mesmo padrão:
+  se o distrator não representa um jeito específico de errar o raciocínio,
+  não escreva nota nenhuma.
+- **Distrator que já narra o próprio erro no texto.** Parte do banco de
+  Matemática (ex.: `"36, multiplicando 12 pela soma dos termos da razão"`)
+  já inclui a explicação do erro dentro da própria alternativa. `eo`
+  duplicaria o que a pessoa já lê ao errar — só vale a pena em alternativas
+  "cruas", com números ou termos soltos, sem a razão do erro embutida.
+
+Exemplo real do que vale a pena — vacina BCG (`banco/enfermagem.json`,
+id `7d3eda0f1d`), onde cada distrator é a via/local de OUTRA vacina real,
+uma confusão que quem estuda comete de verdade:
+
+```json
+"o": ["Intramuscular profunda, no músculo vasto lateral da coxa",
+      "Subcutânea, no deltoide",
+      "Intradérmica, na inserção inferior do deltoide direito",
+      "Intradérmica, no antebraço esquerdo",
+      "Oral, em duas gotas"],
+"c": 2,
+"eo": [
+  "Errada: essa é a via de outras vacinas do calendário infantil (ex.: pentavalente, hepatite B), não da BCG.",
+  "Errada: via subcutânea é usada por outras vacinas (ex.: tríplice viral), não pela BCG, que é intradérmica.",
+  "Correta: BCG é intradérmica, na inserção inferior do deltoide direito.",
+  "Errada: a via está certa, mas o local está errado — é no deltoide DIREITO, não no antebraço esquerdo.",
+  "Errada: essa é a via da vacina de rotavírus, não da BCG."
+]
+```
+
+Note que cada nota é verificável contra a fonte do próprio cartão — nenhuma
+inventa um fato novo, só nomeia de qual outra vacina/situação real vem a
+confusão. Quando não dá pra verificar de onde vem um número errado (um
+cartão de juros compostos da calibração foi descartado por esse motivo),
+**não escreva a nota** — explicação plausível mas não confirmada é pior que
+nenhuma (mesmo princípio da regra 11 do `CLAUDE.md`).
+
 As 1244 questões já escritas não precisam ser retrofitadas — regra 9 do
 `CLAUDE.md` proíbe script de gravação em lote no banco, e preencher `eo`
 retroativamente é trabalho de conteúdo, revisado um cartão de cada vez,
-não de automação. `eo` é para cartão novo ou em reescrita.
+não de automação. `eo` é para cartão novo ou em reescrita. A produção segue
+em lotes por matéria — Enfermagem primeiro (maior peso e volume), depois
+Português/SUS, depois as menores.
 
 ### 1.5 Um fato, um cartão — e só um cartão
 
