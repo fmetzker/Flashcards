@@ -288,14 +288,17 @@ o escopo alcança (`blocosDaMeta()` → `BLOCOS_META`, recalculado em
   trocar de concurso redesenhava tudo, e depois da prova não faria sentido.
   Não existe mais quadradinho de dia de prova (`.dia.prova` foi removido).
   **A janela não é retrospectiva** (não é "os últimos 100 dias"): célula 1
-  é ontem, célula 2 é hoje, e as 98 seguintes olham pra FRENTE — amanhã,
-  depois de amanhã, até 97 dias no futuro. As células futuras nascem em
-  branco (`progressoDoDia` de um dia que ainda não aconteceu é sempre 0) e
-  vão se colorindo sozinhas conforme os dias chegam, sem código extra pra
-  isso — é a fórmula `somarDias(hoje(), i-1)` em vez de voltar no tempo.
-  **Exceção:** conta sem nenhum dia estudado antes de hoje (primeiro dia de
-  uso) não tem "ontem" que preste — célula 1 já nasce em hoje, célula 2 é
-  amanhã. Detecção: `Object.keys(E.dias).some(d => d < hoje())`.
+  é o dia mais antigo com dado em `E.dias`, hoje ocupa a célula logo depois
+  de TODO o histórico da conta, e o resto olha pra FRENTE — amanhã, depois
+  de amanhã, até fechar as 100 células. Quem tem 30 dias de uso tem 30
+  células de passado e hoje é a 31ª. As células futuras nascem em branco
+  (`progressoDoDia` de um dia que ainda não aconteceu é sempre 0) e vão se
+  colorindo sozinhas conforme os dias chegam, sem código extra pra isso.
+  Conta sem nenhum dia estudado antes de hoje (primeiro dia de uso) não tem
+  passado pra mostrar — célula 1 já nasce em hoje. Histórico maior que 99
+  dias é limitado aos últimos 99 (`Math.min`) — sempre sobra pelo menos 1
+  célula pra hoje dentro das 100 fixas; nesse caso hoje vira a última
+  célula, sem sobra pra futuro.
 - **Escopo de tópicos por bloco** (`blocos[].topicos`, opcional): a mesma
   matéria pode ter conteúdo programático diferente por cargo. O Português do
   Moço de Máquinas tem 8 itens no edital e não cobra regência, colocação
