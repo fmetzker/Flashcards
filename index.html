@@ -1630,9 +1630,15 @@ function pintarInicio(){
      As células futuras nascem em branco (função progressoDoDia devolve 0
      pra um dia que ainda não aconteceu) e vão se colorindo sozinhas
      conforme os dias chegam, sem precisar repintar nada além do de sempre.
-     Confirmado célula por célula com quem usa o app. */
+
+     Exceção: conta sem NENHUM dia estudado antes de hoje (primeiro dia de
+     uso) não tem "ontem" que preste pra mostrar — seria só uma célula em
+     branco de antes da conta existir, gastando o lugar mais visível da
+     grade à toa. Nesse caso hoje já nasce na célula 1. */
+  const temHistoricoAntes = Object.keys(E.dias).some(d=> d < hoje());
+  const inicio = temHistoricoAntes ? -1 : 0;
   for(let i=0; i<DIAS_CARTELA; i++){
-    const k = somarDias(hoje(), i-1);
+    const k = somarDias(hoje(), inicio + i);
     const el = document.createElement("div"); el.className="dia";
     const feito = progressoDoDia(k);
     if(feito >= E.meta && E.meta > 0){ el.className="dia cheio"; batidos++; }
