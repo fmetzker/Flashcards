@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v76-constancia-hoje-primeiro-pra-nao-esconder-atividade";
+const VERSAO = "v77-constancia-tempo-anda-pra-frente-com-a-seta";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
