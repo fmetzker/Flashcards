@@ -281,13 +281,18 @@ o escopo alcança (`blocosDaMeta()` → `BLOCOS_META`, recalculado em
   `blocoDaMateria` (peso usado por `prioridade()`). `BLOCOS_META` manda só na
   meta: `progressoDoDia`, `progressoPorBloco` e `iniciarSessao("normal")`.
   Não unificar os dois — são perguntas diferentes.
-- **A cartela de Constância não é de concurso nenhum.** Janela móvel fixa de
-  `DIAS_CARTELA` (100, em 10 colunas: 10×10 exato) terminando hoje, colorida
-  por meta batida — mede constância da conta. Era de `CONCURSO.inicio` até
-  `CONCURSO.data`, o que
-  amarrava esforço pessoal às datas de uma prova: trocar de concurso
-  redesenhava tudo, e depois da prova não faria sentido. Não existe mais
-  quadradinho de dia de prova (`.dia.prova` foi removido).
+- **A cartela de Constância não é de concurso nenhum.** Janela fixa de
+  `DIAS_CARTELA` (100, em 10 colunas: 10×10 exato), colorida por meta
+  batida — mede constância da conta. Era de `CONCURSO.inicio` até
+  `CONCURSO.data`, o que amarrava esforço pessoal às datas de uma prova:
+  trocar de concurso redesenhava tudo, e depois da prova não faria sentido.
+  Não existe mais quadradinho de dia de prova (`.dia.prova` foi removido).
+  **A janela não é retrospectiva** (não é "os últimos 100 dias"): célula 1
+  é ontem, célula 2 é hoje, e as 98 seguintes olham pra FRENTE — amanhã,
+  depois de amanhã, até 97 dias no futuro. As células futuras nascem em
+  branco (`progressoDoDia` de um dia que ainda não aconteceu é sempre 0) e
+  vão se colorindo sozinhas conforme os dias chegam, sem código extra pra
+  isso — é a fórmula `somarDias(hoje(), i-1)` em vez de voltar no tempo.
 - **Escopo de tópicos por bloco** (`blocos[].topicos`, opcional): a mesma
   matéria pode ter conteúdo programático diferente por cargo. O Português do
   Moço de Máquinas tem 8 itens no edital e não cobra regência, colocação
