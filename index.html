@@ -103,7 +103,8 @@ h2{font-size:19px;font-weight:600}
    herdava esse padding e virava um retângulo enorme em vez de um quadrado */
 .dia.passada{background:#fff;border-color:var(--traco)}
 .dia.hoje{outline:2px solid var(--tinta);outline-offset:1px}
-.dia.prova{background:var(--coral)}
+/* não existe mais ".dia.prova": a cartela virou janela móvel de constância da
+   conta e não alcança mais a data da prova — ver DIAS_CARTELA */
 .legenda{display:flex;gap:14px;margin-top:10px;font-size:11px;color:var(--tinta2)}
 .legenda i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:-1px}
 
@@ -269,7 +270,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   </div>
 
   <div class="cartela">
-    <div class="linha"><div class="rotulo">Cartela até a prova</div><div class="dado" id="cartela-info" style="font-size:12px;color:var(--tinta2)"></div></div>
+    <div class="linha"><div class="rotulo">Constância</div><div class="dado" id="cartela-info" style="font-size:12px;color:var(--tinta2)"></div></div>
     <div class="grade" id="grade"></div>
     <div class="legenda">
       <span><i style="background:var(--verde)"></i>meta batida</span>
@@ -570,10 +571,12 @@ function metaDoConcurso(c){
    subconjunto do outro, então escolher "o maior" perderia conteúdo que cai
    numa das provas. Bloco sem `topicos` declarado significa matéria inteira,
    e nesse caso a união também é a matéria inteira. */
-function blocosDaMeta(){
+function blocosDaMeta(lista){
   const porMateria = {};                       // matéria -> bloco vencedor
   const escopo = {};                           // matéria -> Set de tópicos, ou null = tudo
-  (INSCRITOS.length ? INSCRITOS : (CONCURSO ? [CONCURSO] : [])).forEach(c=>{
+  const fonte = (lista && lista.length) ? lista
+              : (INSCRITOS.length ? INSCRITOS : (CONCURSO ? [CONCURSO] : []));
+  fonte.forEach(c=>{
     (c.blocos||[]).forEach(bl=>{
       (bl.materias||[]).forEach(m=>{
         const cota = bl.questoes || 0;
@@ -605,13 +608,31 @@ function blocosDaMeta(){
   });
 }
 
+/* prova mais próxima entre os inscritos — é ela que representa o conjunto
+   quando não há escopo escolhido (cabeçalho e contagem regressiva) */
+function provaMaisProxima(){
+  return INSCRITOS.reduce((a,c)=> (!a || diaUTC(c.data) < diaUTC(a.data)) ? c : a, null);
+}
+
+/* Escopo de estudo: null = estudar para TODOS os inscritos (meta somada);
+   um id = estudar só para aquele concurso, e a meta encolhe para a dele.
+
+   O banco carregado NÃO muda (isso é E.concursos, via materiasInscritas), só
+   o que conta no dia — por isso trocar o escopo repinta em vez de recarregar.
+
+   O teto do Leitner segue em diasAteMaisProxima(), sobre TODOS os inscritos,
+   de propósito: estudar só para um concurso hoje não adia a prova do outro,
+   e os cartões precisam continuar prontos para ela. */
 function aplicarFoco(id){
-  CONCURSO = INSCRITOS.find(c=>c.id === id) || INSCRITOS[0];
+  const escolhido = id ? INSCRITOS.find(c=>c.id === id) : null;
+  E.escopoEstudo = escolhido ? escolhido.id : null;
+  /* CONCURSO é quem responde "qual prova?" — simulado, regra de aprovação,
+     contagem regressiva. Com escopo, é o escolhido; sem escopo, a mais
+     próxima, que é a que aperta primeiro. */
+  CONCURSO = escolhido || provaMaisProxima() || INSCRITOS[0];
   E.concursoAtivo = CONCURSO.id;
   BLOCOS = CONCURSO.blocos;
-  /* A meta é dos INSCRITOS, não do foco — trocar o concurso em foco repinta
-     cabeçalho, cartela e simulado, mas não muda quanto se estuda por dia. */
-  BLOCOS_META = blocosDaMeta();
+  BLOCOS_META = blocosDaMeta(escolhido ? [escolhido] : INSCRITOS);
   E.meta = BLOCOS_META.reduce((s,bl)=> s + bl.questoes, 0) || metaDoConcurso(CONCURSO);
   // blocoDaMateria é do concurso em foco: é ele que diz de que bloco da prova
   // cada matéria faz parte (e blocos são por concurso, não globais)
@@ -648,7 +669,10 @@ async function carregarConfig(){
      se algo chamasse aplicarFoco() de novo depois. */
   if(E.concursos.length){
     INSCRITOS = CONCURSOS.filter(c=>E.concursos.indexOf(c.id) >= 0);
-    aplicarFoco(E.concursoAtivo || E.concursos[0]);
+    /* escopo salvo que não está mais entre os inscritos vira "todos" em vez
+       de prender a meta num concurso que a pessoa deixou de seguir */
+    const escopo = E.concursos.indexOf(E.escopoEstudo) >= 0 ? E.escopoEstudo : null;
+    aplicarFoco(escopo);
   }
 
   /* Árvore oficial do edital, para a tela Matérias conseguir mostrar o que a
@@ -851,8 +875,13 @@ const padrao = {
   diasMateria: {},
   /* concurso (singular) é o formato antigo, de quando o perfil seguia um só;
      fica aqui porque carregarConfig() ainda o lê para migrar. concursos é a
-     lista que o perfil segue; concursoAtivo é qual está em foco na tela. */
-  concurso:null, concursos:[], concursoAtivo:null,
+     lista que o perfil segue; concursoAtivo é qual está em foco na tela.
+
+     escopoEstudo: null = estudar para TODOS os inscritos (meta somada, o
+     padrão); um id = estudar só para aquele concurso, e aí a meta encolhe
+     para a dele. Não muda o banco carregado (isso é E.concursos), só o que
+     conta no dia — por isso trocar o escopo repinta em vez de recarregar. */
+  concurso:null, concursos:[], concursoAtivo:null, escopoEstudo:null,
   /* ids de eventos gerados por ESTE perfil, para o pull não contar de novo o
      que este aparelho já somou em acertos/erros/dias na hora da resposta —
      ver o bloco SINCRONIZAÇÃO, mais abaixo */
@@ -1433,6 +1462,12 @@ function rodape(nome){
 /* =======================================================================
    TELA INICIAL
    ======================================================================= */
+/* 84 = 12 semanas. Fixo de propósito: a cartela não pode crescer com o tempo,
+   senão em um ano vira 365 quadradinhos empurrando o resto da tela para
+   baixo. A grade tem 11 colunas e não é alinhada por dia da semana — nunca
+   foi, nem quando ia do início do edital até a prova; a última linha fica
+   parcial, com hoje na ponta. */
+const DIAS_CARTELA = 84;
 const GRADE_COLUNAS = 11, GRADE_GAP = 5;
 
 /* mede a largura disponível e fixa colunas e linhas no mesmo tamanho em
@@ -1450,23 +1485,31 @@ window.addEventListener("resize", ()=>{
   }
 });
 
-/* seletor de foco: só faz sentido com mais de um concurso seguido */
+/* Escopo de estudo: só aparece com mais de um concurso seguido — com um só,
+   não há o que restringir. Diferente do antigo seletor de foco, que só
+   trocava o cabeçalho: este muda a META do dia. */
 function pintarFocoConcurso(){
   const sel = document.getElementById("foco-concurso");
   if(INSCRITOS.length <= 1){ sel.style.display = "none"; return; }
   sel.style.display = "";
   sel.innerHTML = "";
+  const soma = blocosDaMeta(INSCRITOS).reduce((s,bl)=> s + bl.questoes, 0);
+  const opTodos = document.createElement("option");
+  opTodos.value = "";
+  opTodos.textContent = "Todos os concursos · "+soma+" por dia";
+  if(!E.escopoEstudo) opTodos.selected = true;
+  sel.appendChild(opTodos);
   INSCRITOS.forEach(c=>{
     const op = document.createElement("option");
     op.value = c.id;
-    op.textContent = c.cargo + (c.orgao ? " — "+c.orgao : "");
-    if(c.id === CONCURSO.id) op.selected = true;
+    op.textContent = "Só "+c.cargo + " · " + metaDoConcurso(c) + " por dia";
+    if(c.id === E.escopoEstudo) op.selected = true;
     sel.appendChild(op);
   });
   sel.onchange = ()=>{
-    aplicarFoco(sel.value);
+    aplicarFoco(sel.value || null);
     salvar();
-    pintarInicio();   // trocar foco só repinta: o banco já tem tudo carregado
+    pintarInicio();   // trocar escopo só repinta: o banco já tem tudo carregado
   };
 }
 
@@ -1479,10 +1522,16 @@ function pintarInicio(){
   document.getElementById("menu-aprovar").style.display = (supaConfigurado() && SESSAO && SOU_APROVADOR) ? "" : "none";
 
   pintarFocoConcurso();
-  document.getElementById("cabecalho-cargo").textContent = CONCURSO.cargo;
-  document.getElementById("cabecalho-sub").textContent =
-    [CONCURSO.orgao, CONCURSO.banca, "prova "+CONCURSO.data.slice(8)+"/"+CONCURSO.data.slice(5,7)]
-      .filter(Boolean).join(" · ");
+  /* Sem escopo escolhido, o cabeçalho fala do conjunto, não de um concurso:
+     CONCURSO aqui é apenas a prova mais próxima, e mostrá-la como se fosse
+     "o seu concurso" esconderia que a meta cobre vários. */
+  const varios = INSCRITOS.length > 1 && !E.escopoEstudo;
+  document.getElementById("cabecalho-cargo").textContent =
+    varios ? INSCRITOS.length+" concursos" : CONCURSO.cargo;
+  document.getElementById("cabecalho-sub").textContent = varios
+    ? "próxima: "+CONCURSO.cargo+" · "+CONCURSO.data.slice(8)+"/"+CONCURSO.data.slice(5,7)
+    : [CONCURSO.orgao, CONCURSO.banca, "prova "+CONCURSO.data.slice(8)+"/"+CONCURSO.data.slice(5,7)]
+        .filter(Boolean).join(" · ");
   document.getElementById("dias-falta").textContent = diasAte();
   const f = feitasHoje();
   document.getElementById("meta-texto").textContent = f+"/"+E.meta;
@@ -1528,24 +1577,27 @@ function pintarInicio(){
   }
   document.getElementById("streak-info").textContent = seq>0 ? seq+" dias seguidos" : "sem sequência";
 
-  // cartela
+  /* Cartela de constância: janela móvel terminando HOJE, da CONTA — não do
+     edital. Antes ia de CONCURSO.inicio até CONCURSO.data, o que amarrava um
+     histórico de esforço pessoal às datas de uma prova: trocar de concurso
+     redesenhava a cartela inteira, e depois da prova ela não faria sentido
+     nenhum. O que ela mede é com que frequência a meta foi batida, e isso
+     não pertence a concurso nenhum. */
   const g = document.getElementById("grade"); g.innerHTML="";
-  const ini = diaUTC(CONCURSO.inicio || hoje()), fim = diaUTC(CONCURSO.data);
-  let n=0;
-  for(let d2=new Date(ini); d2<=fim; d2.setUTCDate(d2.getUTCDate()+1)){
-    n++;
-    const k = d2.toISOString().slice(0,10);
+  let batidos = 0;
+  for(let i=DIAS_CARTELA-1; i>=0; i--){
+    const k = somarDias(hoje(), -i);
     const el = document.createElement("div"); el.className="dia";
     const feito = progressoDoDia(k);
-    if(k === CONCURSO.data) el.className="dia prova";
-    else if(feito >= E.meta) el.className="dia cheio";
+    if(feito >= E.meta && E.meta > 0){ el.className="dia cheio"; batidos++; }
     else if(feito > 0) el.className="dia parcial";
     else if(k < hoje()) el.className="dia passada";
     if(k===hoje()) el.classList.add("hoje");
-    el.title = k+" · "+feito+" questões";
+    el.title = k+" · "+feito+" de "+E.meta;
     g.appendChild(el);
   }
-  document.getElementById("cartela-info").textContent = n+" dias";
+  document.getElementById("cartela-info").textContent =
+    batidos+" de "+DIAS_CARTELA+" dias";
   ajustarGrade(g);
 
   // alerta de área em risco
@@ -2794,6 +2846,9 @@ function alternarConcurso(id, checkbox){
   E.concursos = marcado ? E.concursos.filter(x=>x!==id) : E.concursos.concat([id]);
   // se o foco saiu da lista, cai no primeiro que sobrou
   if(E.concursos.indexOf(E.concursoAtivo) < 0) E.concursoAtivo = E.concursos[0];
+  /* deixar de seguir o concurso que era o escopo de estudo volta para "todos"
+     — manter o escopo apontando para fora da lista travaria a meta em zero */
+  if(E.concursos.indexOf(E.escopoEstudo) < 0) E.escopoEstudo = null;
   salvar();
   // recarrega: a união de matérias mudou, e com ela o banco inteiro
   location.reload();

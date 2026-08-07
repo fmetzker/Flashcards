@@ -183,11 +183,21 @@ que não podem ser confundidas:
   `materiasInscritas()`) e o **teto do Leitner**, que usa
   `diasAteMaisProxima()`: seguir um concurso distante não pode afrouxar a
   revisão por causa de outro que é semana que vem.
-- `CONCURSO` / `E.concursoAtivo` — apenas o que está **em foco na tela**:
-  cabeçalho, contagem regressiva, cartela, simulado, alerta de bloco fraco,
-  e **meta diária** (ver "Meta e progresso do dia", abaixo). Trocar o foco
-  (`aplicarFoco()`) só repinta; **mudar a lista de inscritos recarrega**,
-  porque a união de matérias muda.
+- `E.escopoEstudo` — **o que conta hoje**: `null` estuda para todos (meta
+  somada, o padrão) e um id estuda só para aquele concurso, encolhendo a meta
+  para a dele. É o seletor da tela inicial, que só aparece com mais de um
+  inscrito. Muda `BLOCOS_META`, a meta e a sessão; **não** muda o banco
+  carregado, por isso trocar o escopo (`aplicarFoco()`) só repinta, enquanto
+  **mudar a lista de inscritos recarrega**.
+- `CONCURSO` / `E.concursoAtivo` — **qual prova**: simulado, regra de
+  aprovação, contagem regressiva, alerta de bloco fraco. Com escopo, é o
+  escolhido; sem escopo, é a **prova mais próxima** entre os inscritos
+  (`provaMaisProxima()`), que é a que aperta primeiro. Não é escolhido à mão
+  quando não há escopo — some a ideia de "foco cosmético" que existia antes.
+
+O teto do Leitner continua em `diasAteMaisProxima()` sobre **todos** os
+inscritos, mesmo com escopo restrito: estudar só para um concurso hoje não
+adia a prova do outro.
 
 Quem entra sem nenhum concurso escolhido (primeira vez, ou o que seguia
 sumiu de `concursos.json`) cai em `tela-escolher-concurso`
@@ -252,19 +262,25 @@ mesmo tipo de trabalho.
 
 ## Meta e progresso do dia
 
-A meta diária **não é configurável** — é a soma das cotas de **todos os
-concursos inscritos** (`blocosDaMeta()` → `BLOCOS_META`, recalculado em
-`aplicarFoco()`). Não é do concurso em foco: trocar o foco repinta cabeçalho,
-cartela e simulado, mas não muda quanto se estuda por dia.
+A meta diária **não é configurável** — é a soma das cotas dos concursos que
+o escopo alcança (`blocosDaMeta()` → `BLOCOS_META`, recalculado em
+`aplicarFoco()`): todos os inscritos por padrão, ou um só quando
+`E.escopoEstudo` aponta para um.
 
 - **Matéria repetida não soma, vale a maior cota.** Português cai nos cinco
   concursos cadastrados; somar daria 50 questões/dia da mesma matéria.
   Estudar 10 de Português serve para as cinco provas ao mesmo tempo.
-- **`BLOCOS` ≠ `BLOCOS_META`.** `BLOCOS` é do foco e manda no simulado, na
-  cartela, na contagem regressiva, na regra de aprovação e em
-  `blocoDaMateria` (peso usado por `prioridade()`). `BLOCOS_META` é a união
-  dos inscritos e manda só na meta: `progressoDoDia`, `progressoPorBloco` e
-  `iniciarSessao("normal")`. Não unificar os dois — são perguntas diferentes.
+- **`BLOCOS` ≠ `BLOCOS_META`.** `BLOCOS` é da prova (`CONCURSO`) e manda no
+  simulado, na contagem regressiva, na regra de aprovação e em
+  `blocoDaMateria` (peso usado por `prioridade()`). `BLOCOS_META` manda só na
+  meta: `progressoDoDia`, `progressoPorBloco` e `iniciarSessao("normal")`.
+  Não unificar os dois — são perguntas diferentes.
+- **A cartela de Constância não é de concurso nenhum.** Janela móvel fixa de
+  `DIAS_CARTELA` (84) dias terminando hoje, colorida por meta batida — mede
+  constância da conta. Era de `CONCURSO.inicio` até `CONCURSO.data`, o que
+  amarrava esforço pessoal às datas de uma prova: trocar de concurso
+  redesenhava tudo, e depois da prova não faria sentido. Não existe mais
+  quadradinho de dia de prova (`.dia.prova` foi removido).
 - **Escopo de tópicos por bloco** (`blocos[].topicos`, opcional): a mesma
   matéria pode ter conteúdo programático diferente por cargo. O Português do
   Moço de Máquinas tem 8 itens no edital e não cobra regência, colocação
