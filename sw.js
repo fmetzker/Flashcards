@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v93-eo-imunizacao-completo-66-de-66";
+const VERSAO = "v94-eo-fundamentos-procedimentos-26-cartoes";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
