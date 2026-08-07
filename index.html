@@ -1625,18 +1625,23 @@ function pintarInicio(){
      não pertence a concurso nenhum. */
   const g = document.getElementById("grade"); g.innerHTML="";
   let batidos = 0;
-  /* célula 1 é ontem, célula 2 é hoje, e dali em diante a janela segue pro
-     FUTURO — amanhã, depois de amanhã... — em vez de voltar pro passado.
-     As células futuras nascem em branco (função progressoDoDia devolve 0
-     pra um dia que ainda não aconteceu) e vão se colorindo sozinhas
-     conforme os dias chegam, sem precisar repintar nada além do de sempre.
+  /* Hoje ocupa a célula logo depois do histórico inteiro da conta — quem
+     tem 30 dias de uso tem 30 células de passado e hoje é a 31ª — e dali em
+     diante a janela segue pro FUTURO (amanhã, depois de amanhã...) até
+     fechar as 100 células. As futuras nascem em branco (progressoDoDia
+     devolve 0 pra um dia que ainda não aconteceu) e vão se colorindo
+     sozinhas conforme os dias chegam.
 
-     Exceção: conta sem NENHUM dia estudado antes de hoje (primeiro dia de
-     uso) não tem "ontem" que preste pra mostrar — seria só uma célula em
-     branco de antes da conta existir, gastando o lugar mais visível da
-     grade à toa. Nesse caso hoje já nasce na célula 1. */
-  const temHistoricoAntes = Object.keys(E.dias).some(d=> d < hoje());
-  const inicio = temHistoricoAntes ? -1 : 0;
+     Sem NENHUM dia estudado antes de hoje (primeiro dia de uso), não há
+     passado pra mostrar e hoje já nasce na célula 1. Histórico maior que
+     99 dias é limitado a 99 — sempre sobra pelo menos 1 célula pra hoje,
+     e são só 100 ao todo. */
+  const diasComDado = Object.keys(E.dias).filter(d=> d < hoje());
+  const maisAntigo = diasComDado.length ? diasComDado.reduce((a,b)=> a<b?a:b) : null;
+  const diasDeHistorico = maisAntigo
+    ? Math.min(DIAS_CARTELA-1, Math.round((diaUTC(hoje())-diaUTC(maisAntigo))/86400000))
+    : 0;
+  const inicio = -diasDeHistorico;
   for(let i=0; i<DIAS_CARTELA; i++){
     const k = somarDias(hoje(), inicio + i);
     const el = document.createElement("div"); el.className="dia";
