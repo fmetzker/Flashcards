@@ -33,7 +33,9 @@ function Id-Questao([string]$enunciado) {
 }
 
 # ---- o que reescrever --------------------------------------------------------
-# id antigo -> campos a trocar. Só 'q' muda o id; 'e' e 'o' podem vir junto.
+# id antigo -> campos a trocar. Só 'q' muda o id; 'e', 'o' e 'eo' podem vir
+# junto. 'eo' que já existir no cartão e não for mencionado aqui é preservado
+# automaticamente — só é sobrescrito se a entrada do lote trouxer 'eo'.
 #
 # Este lote vem da auditoria (auditar-banco.ps1): são as questões marcadas
 # como "sem-pergunta", cujo enunciado não era respondível sem ler as
@@ -89,6 +91,7 @@ foreach ($m in $materias) {
     if ($novo.ContainsKey('e')) { $q.e = $novo.e }
     if ($novo.ContainsKey('o')) { $q.o = $novo.o }
     if ($novo.ContainsKey('c')) { $q.c = $novo.c }
+    if ($novo.ContainsKey('eo')) { $q | Add-Member -NotePropertyName eo -NotePropertyValue $novo.eo -Force }
 
     $idNovo = Id-Questao $q.q
     $q.id = $idNovo
@@ -98,6 +101,9 @@ foreach ($m in $materias) {
     $obj = [ordered]@{ id = $q.id; m = $q.m; t = $q.t }
     if ($q.PSObject.Properties.Name -contains 's' -and $q.s) { $obj.s = $q.s }
     $obj.q = $q.q; $obj.o = @($q.o); $obj.c = [int]$q.c; $obj.e = $q.e; $obj.f = $q.f
+    # sem isto, reescrever um cartão que já tinha 'eo' apagava a explicação
+    # por alternativa em silêncio — o rebuild listava só os campos de sempre
+    if ($q.PSObject.Properties.Name -contains 'eo' -and $q.eo) { $obj.eo = @($q.eo) }
 
     $virgula = if ($linhas[$i].TrimEnd().EndsWith(',')) { ',' } else { '' }
     $linhas[$i] = ($obj | ConvertTo-Json -Compress -Depth 5) + $virgula

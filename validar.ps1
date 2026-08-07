@@ -5,6 +5,7 @@
 #
 #   powershell -ExecutionPolicy Bypass -File validar.ps1
 #   powershell -ExecutionPolicy Bypass -File validar.ps1 -Rascunho banco/rascunho.json
+#   powershell -ExecutionPolicy Bypass -File validar.ps1 -Patches explicacoes.json
 #
 # Sai com código 1 se encontrar erro que impeça a publicação.
 #
@@ -15,11 +16,17 @@
 # duplicado, fonte, matéria) roda ANTES de a questão existir, e são as regras
 # de verdade, não uma cópia enfraquecida delas num script de uma vez só.
 #
+# -Patches é o mesmo princípio pra EDITAR em vez de acrescentar: aplica 'eo'
+# (explicação por alternativa) em memória sobre cartão que já existe no banco,
+# casando por id, sem gravar nada. Quem grava é o explicar-alternativas.ps1,
+# só depois disto passar limpo.
+#
 # ATENÇÃO ao editar: arquivos .ps1 com acentos precisam ser gravados em UTF-8
 # COM BOM, senão o PowerShell 5.1 os lê como ANSI e o parser quebra.
 
 param(
-  [string]$Rascunho
+  [string]$Rascunho,
+  [string]$Patches
 )
 
 $ErrorActionPreference = 'Stop'
@@ -88,6 +95,26 @@ if ($Rascunho) {
     $nRascunho++
   }
   Write-Host "Rascunho: $nRascunho candidato(s) avaliados junto do banco (nada foi gravado)`n"
+}
+
+# ---- patches (eo em cartão existente) -----------------------------------------
+# Mesma ideia do rascunho, mas para EDITAR em vez de acrescentar: aplica 'eo'
+# em memória sobre a questão já carregada em $B, casando por id, antes de
+# qualquer checagem abaixo rodar. Quem grava é o explicar-alternativas.ps1.
+$nPatches = 0
+if ($Patches) {
+  $arqP = if ([System.IO.Path]::IsPathRooted($Patches)) { $Patches } else { Join-Path $raiz $Patches }
+  if (-not (Test-Path $arqP)) { Write-Host "ERRO: patches não encontrado: $arqP"; exit 1 }
+  $porId = @{}
+  foreach ($q in $B) { $porId[$q.id] = $q }
+  $pats = [System.IO.File]::ReadAllText($arqP, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
+  if ($null -eq $pats) { $pats = @() }
+  foreach ($p in @($pats)) {
+    if (-not $porId.ContainsKey($p.id)) { Erro "patches: id '$($p.id)' não existe no banco"; continue }
+    $porId[$p.id] | Add-Member -NotePropertyName eo -NotePropertyValue @($p.eo) -Force
+    $nPatches++
+  }
+  Write-Host "Patches: $nPatches de $(@($pats).Count) aplicado(s) em memória (nada foi gravado)`n"
 }
 
 # arquivo de matéria que não está no materias.json passaria despercebido

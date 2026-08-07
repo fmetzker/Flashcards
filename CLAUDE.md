@@ -23,9 +23,11 @@ código.
 | `manifest.json` | Metadados do PWA |
 | `icone-192.png`, `icone-512.png`, `apple-touch-icon.png` | Ícones |
 | `PADRAO-DOS-CARTOES.md` | O padrão dos cartões — como escrever, o que não fazer, como priorizar |
-| `validar.py` / `validar.ps1` | Verificação de integridade do banco — **rodar antes de publicar**. Com `-Rascunho`/`--rascunho`, valida candidatos sem gravar |
+| `validar.py` / `validar.ps1` | Verificação de integridade do banco — **rodar antes de publicar**. Com `-Rascunho`/`--rascunho`, valida candidatos sem gravar; com `-Patches`/`--patches`, valida `eo` aplicado em memória sobre cartão existente, também sem gravar |
 | `rascunho.json` | Cartões em elaboração, sem `id`. Vazio quando não há trabalho em curso |
 | `incorporar-rascunho.ps1` | Grava o rascunho no banco — só se o validador passar. Ver regra 9 |
+| `explicacoes.json` | Explicações por alternativa (`eo`) em elaboração, por `id`. Vazio quando não há trabalho em curso |
+| `explicar-alternativas.ps1` | Grava `eo` em cartão que já existe, casando por `id` — só se o validador passar. Ver regra 9 |
 | `auditar-banco.py` / `.ps1` | Mede o banco contra `PADRAO-DOS-CARTOES.md`. Mede, não reprova |
 | `reescrever-questoes.ps1` | Corrige enunciado sem perder progresso — ver regra 5 |
 | `incorporar-propostas.ps1` | Grava proposta aprovada como questão de verdade — ver regra 9 |
@@ -93,12 +95,17 @@ no Safari do iPhone sem nenhuma etapa de compilação.
    existe em outro contexto antes de reusar.
 9. **O banco é sempre estático e versionado — nunca escrito em tempo real.**
    Propor/aprovar questão (Supabase) e reportar problema só alimentam uma
-   caixa de entrada. Só **dois** scripts gravam em `banco/*.json`, os dois
+   caixa de entrada. Só **três** scripts gravam em `banco/*.json`, todos
    rodados à mão e seguidos de `validar` e commit manuais:
-   `incorporar-propostas.ps1` (caixa do Supabase) e
-   `incorporar-rascunho.ps1` (cartão escrito localmente). **Não escrever
-   script de gravação por lote** — foi o que corrompeu o banco por encoding
-   e passou por cima de regra que o validador reprova.
+   `incorporar-propostas.ps1` (caixa do Supabase), `incorporar-rascunho.ps1`
+   (cartão escrito localmente) e `explicar-alternativas.ps1` (acrescenta
+   `eo` a cartão que já existe, casando por `id`). **Não escrever script de
+   gravação por lote** — foi o que corrompeu o banco por encoding e passou
+   por cima de regra que o validador reprova. Os três não se qualificam como
+   isso porque nenhum reimplementa checagem: rodam `validar` de verdade
+   antes de gravar (via `-Patches` no caso de `explicar-alternativas.ps1`,
+   que valida a alteração em memória, contra o banco inteiro, sem tocar
+   disco) e falham fechado se ele reprovar.
 10. **`schema.sql`: a seção que torna as FKs para `auth.users` adiáveis
     precisa ser a ÚLTIMA do arquivo.** Ela descobre as chaves estrangeiras
     dinamicamente via `pg_constraint` — só enxerga o que já existe no
@@ -151,17 +158,16 @@ os concursos cadastrados em `concursos.json`:
 | id | nome | questões | tópicos | subtópicos |
 |---|---|--:|--:|--:|
 | `portugues` | Língua Portuguesa | 127 | 23 | — |
-| `ingles` | Língua Inglesa | 0 | 2¹ | — |
-| `sus` | Legislação do SUS | 103 | 10 | — |
+| `ingles` | Língua Inglesa | 34 | 8 | — |
+| `sus` | Legislação do SUS | 118 | 10 | — |
 | `enfermagem` | Conhecimentos Específicos de Enfermagem | 677 | 19 | 120 |
-| `enfermagem-trabalho` | Enfermagem do Trabalho | 0 | 17¹ | — |
-| `psicologia` | Psicologia | 0 | 0² | — |
-| `maritimo-maquinas` | Máquinas e Prática Marítima | 0 | 16¹ | — |
-| `matematica` | Matemática | 39 | 6 | — |
+| `enfermagem-trabalho` | Enfermagem do Trabalho | 84 | 17 | — |
+| `psicologia` | Psicologia | 0 | 0¹ | — |
+| `maritimo-maquinas` | Máquinas e Prática Marítima | 79 | 16 | — |
+| `matematica` | Matemática | 125 | 7 | — |
 
-¹ tópicos vindos só de `banco/topicos.json` (árvore do edital), ainda sem
-cartão escrito. ² Psicologia não tem árvore porque não existe edital
-anterior do cargo na Transpetro — ver regra 11.
+¹ Psicologia não tem árvore porque não existe edital anterior do cargo na
+Transpetro — ver regra 11.
 
 Dentro delas, dois níveis: **tópico** (Imunização, Urgência, Saúde da Mulher)
 e **subtópico** (Rede de frio, Calendário vacinal). Português e SUS param no

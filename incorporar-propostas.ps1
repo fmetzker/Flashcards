@@ -113,6 +113,9 @@ foreach ($p in $propostas) {
   $obj.c = [int]$p.correta
   $obj.e = $p.explicacao
   $obj.f = $p.fonte
+  # a tabela propostas hoje não tem coluna eo — isto só entra em ação se
+  # ela ganhar uma no futuro; passthrough barato, sem custo se ficar ocioso
+  if ($p.PSObject.Properties.Name -contains 'eo' -and $p.eo) { $obj.eo = @($p.eo) }
 
   $linha = $obj | ConvertTo-Json -Compress -Depth 5
 

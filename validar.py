@@ -4,6 +4,7 @@
 
 Uso:  python3 validar.py
       python3 validar.py --rascunho rascunho.json
+      python3 validar.py --patches explicacoes.json
 
 Sai com código 1 se encontrar erro que impeça a publicação.
 
@@ -12,6 +13,11 @@ gravar nada. É o que permite descobrir viés, formatação proibida, id duplica
 ou fonte faltando antes de a questão existir — em vez de gravar, reprovar e
 desfazer à mão. Quem grava é o incorporar-rascunho.ps1, e só depois disto
 passar limpo.
+
+--patches aplica 'eo' (explicação por alternativa) em memória sobre cartão
+que JÁ EXISTE no banco, casando por id, sem gravar nada — mesma ideia do
+--rascunho, mas para editar em vez de acrescentar. Quem grava é o
+explicar-alternativas.ps1, e só depois disto passar limpo.
 """
 import json, re, subprocess, sys, tempfile, os, collections, hashlib
 
@@ -432,6 +438,33 @@ def carrega_rascunho(B, caminho):
     return B
 
 
+def carrega_patches(B, caminho):
+    """Aplica 'eo' (explicação por alternativa) em memória sobre cartão que já
+    existe no banco, casando por 'id' — usado por explicar-alternativas.ps1.
+
+    Mesmo motivo do carrega_rascunho: toda regra deste arquivo precisa
+    alcançar a mudança ANTES dela ser gravada. Diferença aqui é que a questão
+    já existe — o patch só altera o campo 'eo' de um objeto que valida_questoes
+    já vai conferir do mesmo jeito que confere qualquer outro cartão."""
+    if not os.path.exists(caminho):
+        print(f"ERRO: patches não encontrado: {caminho}")
+        sys.exit(1)
+    patches = json.load(open(caminho, encoding='utf-8')) or []
+    if isinstance(patches, dict):
+        patches = [patches]
+    por_id = {q['id']: q for q in B}
+    aplicados = 0
+    for p in patches:
+        pid = p.get('id')
+        if not pid or pid not in por_id:
+            erros.append(f"patches: id '{pid}' não existe no banco")
+            continue
+        por_id[pid]['eo'] = p.get('eo')
+        aplicados += 1
+    print(f"Patches: {aplicados} de {len(patches)} aplicado(s) em memória (nada foi gravado)\n")
+    return B
+
+
 def main():
     B, fonte = carrega_banco()
     if B is None:
@@ -446,6 +479,14 @@ def main():
         if not os.path.isabs(alvo):
             alvo = os.path.join(os.path.dirname(os.path.abspath(__file__)), alvo)
         B = carrega_rascunho(B, alvo)
+
+    # --patches <arquivo>: aplica eo em memória sobre cartão existente
+    if '--patches' in sys.argv:
+        i = sys.argv.index('--patches')
+        alvo = sys.argv[i + 1] if i + 1 < len(sys.argv) else 'explicacoes.json'
+        if not os.path.isabs(alvo):
+            alvo = os.path.join(os.path.dirname(os.path.abspath(__file__)), alvo)
+        B = carrega_patches(B, alvo)
 
     valida_js(fonte)
     ids = valida_questoes(B)

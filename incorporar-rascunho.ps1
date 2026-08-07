@@ -46,7 +46,13 @@ if (-not (Test-Path $arqR)) { throw "rascunho não encontrado: $arqR" }
 # nome de matéria. Por isso a atribuição é direta, e o @() só entra quando o
 # JSON tem um objeto solto em vez de lista.
 $raw = [System.IO.File]::ReadAllText($arqR, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
-$cands = if ($null -eq $raw) { @() } elseif ($raw -is [Array]) { $raw } else { @($raw) }
+# @(...) por fora do if inteiro: um rascunho com EXATAMENTE um candidato faz
+# o próprio if/elseif/else desembrulhar o array pra um objeto solto (efeito
+# de pipeline do PowerShell 5.1, não da checagem `-is [Array]` em si), e
+# $cands.Count vira $null em vez de 1. Sem o @() de fora, isso não quebra o
+# foreach abaixo (que itera um objeto solto do mesmo jeito), mas quebraria
+# qualquer checagem futura que dependa de .Count.
+$cands = @( if ($null -eq $raw) { @() } elseif ($raw -is [Array]) { $raw } else { @($raw) } )
 if ($cands.Count -eq 0) {
   Write-Host "rascunho vazio — nada a incorporar."
   exit 0
@@ -94,6 +100,7 @@ foreach ($m in $porMateria.Keys) {
     $obj = [ordered]@{ id = Id-Questao $q.q; m = $q.m; t = $q.t }
     if ($q.s) { $obj.s = $q.s }
     $obj.q = $q.q; $obj.o = $q.o; $obj.c = $q.c; $obj.e = $q.e; $obj.f = $q.f
+    if ($q.PSObject.Properties.Name -contains 'eo' -and $q.eo) { $obj.eo = @($q.eo) }
     $obj | ConvertTo-Json -Compress -Depth 5
   }
 
