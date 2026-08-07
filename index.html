@@ -1625,13 +1625,12 @@ function pintarInicio(){
      não pertence a concurso nenhum. */
   const g = document.getElementById("grade"); g.innerHTML="";
   let batidos = 0;
-  /* hoje é a primeira célula (canto superior esquerdo) — a mesma linha da
-     seta que foi desenhada no print. Vai pro passado conforme a grade anda
-     pra direita e desce, então o dia mais antigo cai por último, canto
-     inferior direito. Com a conta ainda nova (poucos dias de histórico), é
-     isso que garante que os dias com dado apareçam já na primeira linha,
-     onde o olho bate primeiro, em vez de escondidos lá embaixo. */
-  for(let i=0; i<DIAS_CARTELA; i++){
+  /* dia mais antigo primeiro (canto superior esquerdo); hoje é sempre a
+     ÚLTIMA célula, canto inferior direito — como um calendário normal, onde
+     o tempo anda pra frente conforme a grade anda pra direita e desce. Se
+     a janela virasse amanhã, o próximo dia continuaria esse mesmo sentido,
+     mais à direita ainda (ou na linha de baixo, quando a linha atual acaba). */
+  for(let i=DIAS_CARTELA-1; i>=0; i--){
     const k = somarDias(hoje(), -i);
     const el = document.createElement("div"); el.className="dia";
     const feito = progressoDoDia(k);
