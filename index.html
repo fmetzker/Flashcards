@@ -1625,12 +1625,13 @@ function pintarInicio(){
      não pertence a concurso nenhum. */
   const g = document.getElementById("grade"); g.innerHTML="";
   let batidos = 0;
-  /* dia mais antigo primeiro (canto superior esquerdo); hoje é sempre a
-     ÚLTIMA célula, canto inferior direito — como um calendário normal, onde
-     o tempo anda pra frente conforme a grade anda pra direita e desce. Se
-     a janela virasse amanhã, o próximo dia continuaria esse mesmo sentido,
-     mais à direita ainda (ou na linha de baixo, quando a linha atual acaba). */
-  for(let i=DIAS_CARTELA-1; i>=0; i--){
+  /* hoje é a primeira célula (canto superior esquerdo), indo pro passado
+     conforme a grade anda pra direita e desce — não o sentido de calendário
+     normal, de propósito: numa janela fixa de 100 dias, o oposto de "hoje"
+     é sempre "antes da conta existir". Com a conta ainda nova, isso é o que
+     garante ver a atividade real logo na primeira linha, sem rolar até o
+     fim pra achar os únicos dias que têm dado. */
+  for(let i=0; i<DIAS_CARTELA; i++){
     const k = somarDias(hoje(), -i);
     const el = document.createElement("div"); el.className="dia";
     const feito = progressoDoDia(k);
