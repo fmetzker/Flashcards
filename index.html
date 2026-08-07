@@ -603,7 +603,12 @@ function blocosDaMeta(lista){
   });
   return ordenadas.map(m=>{
     const bl = porMateria[m];
-    return {id: bl.id+"@"+m, nome: bl.nome, questoes: bl.questoes, materias: [m],
+    /* nome da MATÉRIA, não do bloco: "Conhecimentos específicos" é o nome de
+       três blocos diferentes (um por concurso), cada um cobrindo uma matéria
+       diferente — usar bl.nome fazia a meta do dia mostrar três linhas
+       idênticas e impossíveis de distinguir. MATERIAS[m].nome é sempre único. */
+    return {id: bl.id+"@"+m, nome: (MATERIAS[m] && MATERIAS[m].nome) || bl.nome,
+            questoes: bl.questoes, materias: [m],
             topicos: escopo[m] ? Array.from(escopo[m]) : null};
   });
 }
