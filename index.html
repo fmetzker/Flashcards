@@ -1607,7 +1607,11 @@ function pintarInicio(){
      não pertence a concurso nenhum. */
   const g = document.getElementById("grade"); g.innerHTML="";
   let batidos = 0;
-  for(let i=DIAS_CARTELA-1; i>=0; i--){
+  /* hoje primeiro (canto superior esquerdo), indo pro passado conforme desce
+     e anda pra direita — não o contrário. Com o histórico da conta ainda
+     curto, o oposto (dia mais antigo em cima) empurrava os únicos dias com
+     dado lá pro fim da grade, na parte de baixo, como se estivesse vazia. */
+  for(let i=0; i<DIAS_CARTELA; i++){
     const k = somarDias(hoje(), -i);
     const el = document.createElement("div"); el.className="dia";
     const feito = progressoDoDia(k);
