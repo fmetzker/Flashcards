@@ -293,6 +293,9 @@ o escopo alcança (`blocosDaMeta()` → `BLOCOS_META`, recalculado em
   branco (`progressoDoDia` de um dia que ainda não aconteceu é sempre 0) e
   vão se colorindo sozinhas conforme os dias chegam, sem código extra pra
   isso — é a fórmula `somarDias(hoje(), i-1)` em vez de voltar no tempo.
+  **Exceção:** conta sem nenhum dia estudado antes de hoje (primeiro dia de
+  uso) não tem "ontem" que preste — célula 1 já nasce em hoje, célula 2 é
+  amanhã. Detecção: `Object.keys(E.dias).some(d => d < hoje())`.
 - **Escopo de tópicos por bloco** (`blocos[].topicos`, opcional): a mesma
   matéria pode ter conteúdo programático diferente por cargo. O Português do
   Moço de Máquinas tem 8 itens no edital e não cobra regência, colocação
