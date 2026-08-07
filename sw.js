@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v71-eliminar-alternativa-e-explicacao-por-opcao";
+const VERSAO = "v72-botao-eliminar-vira-pedaco-separado-do-cartao";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [

@@ -151,8 +151,9 @@ button.fechar{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;
 .cabQ{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;font-size:12px;color:var(--tinta2)}
 .tag{background:var(--verde-luz);color:var(--verde);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600}
 .enunciado{font-size:17.5px;line-height:1.5;margin-bottom:16px}
-.alt{display:flex;gap:11px;align-items:flex-start;background:var(--card);border:1px solid var(--traco);
-  border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,background .15s}
+.alt{display:flex;align-items:stretch;background:var(--card);border:1px solid var(--traco);
+  border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color .15s,background .15s}
+.corpo-alt{flex:1;display:flex;gap:11px;align-items:flex-start;padding:12px;cursor:pointer;min-width:0}
 .bolha{flex:0 0 30px;height:30px;border-radius:50%;border:2px solid var(--traco);display:flex;
   align-items:center;justify-content:center;font-family:var(--dado);font-size:13px;font-weight:600;
   color:var(--tinta2);transition:all .2s}
@@ -162,17 +163,17 @@ button.fechar{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;
 .alt.errada{border-color:var(--coral);background:var(--coral-luz)}
 .alt.errada .bolha{background:var(--coral);border-color:var(--coral);color:#fff}
 .alt.morta{opacity:.5}
-/* botão de eliminar: some no fundo enquanto a alternativa não foi marcada,
-   fica vermelho quando foi — igual à checkbox provisória de quem elimina
-   com caneta na prova de papel. Some de vez assim que a questão é
-   respondida (ver responder()), então nunca disputa espaço com certa/errada */
-.eliminar{flex:0 0 26px;width:26px;height:26px;align-self:center;padding:0;
-  border-radius:50%;border:1px solid var(--traco);background:var(--papel);
-  color:var(--tinta2);font-size:12px;font-weight:600;line-height:1}
+/* botão de eliminar: um pedaço separado do cartão, não um círculo boiando
+   dentro dele — divisória e fundo vermelho-claro já delimitam a área antes
+   mesmo de tocar, e o alvo de toque fica bem maior que os 26px de antes.
+   Some de vez assim que a questão é respondida (ver responder()), então
+   nunca disputa espaço com certa/errada */
+.eliminar{flex:0 0 48px;align-self:stretch;padding:0;border:none;border-left:1px solid var(--traco);
+  border-radius:0;background:var(--coral-luz);color:var(--coral);font-size:17px;font-weight:700}
 .eliminar:active{transform:none}
-.alt.eliminada{opacity:.45}
+.alt.eliminada .corpo-alt{opacity:.45}
 .alt.eliminada .txt{text-decoration:line-through}
-.alt.eliminada .eliminar{background:var(--coral-luz);border-color:var(--coral);color:var(--coral)}
+.alt.eliminada .eliminar{background:var(--coral);color:#fff}
 /* explicação por alternativa (campo opcional 'eo' — ver PADRAO-DOS-CARTOES.md
    seção 1.4.1): fica dentro do .txt da própria alternativa, não no bloco de
    explicação geral, porque é sobre AQUELA opção, não sobre a questão toda */
@@ -1997,17 +1998,16 @@ function mostrarQuestao(){
   const box = document.getElementById("q-alts"); box.innerHTML="";
   S.perm.forEach((orig,i)=>{
     const el = document.createElement("div"); el.className="alt";
-    el.innerHTML = '<div class="bolha">'+"ABCDE"[i]+'</div><div class="txt"></div>'
+    el.innerHTML = '<div class="corpo-alt"><div class="bolha">'+"ABCDE"[i]+'</div><div class="txt"></div></div>'
       +'<button type="button" class="eliminar" title="Marcar como errada, sem responder">✕</button>';
     el.querySelector(".txt").textContent = q.o[orig];
-    /* eliminar é só uma anotação de raciocínio, não uma resposta — clicar
-       no corpo de uma alternativa já eliminada não conta como escolha,
-       pra não confirmar sem querer o que a pessoa acabou de descartar */
-    el.onclick = ()=>{ if(!el.classList.contains("eliminada")) responder(i); };
-    el.querySelector(".eliminar").onclick = ev=>{
-      ev.stopPropagation();
-      el.classList.toggle("eliminada");
-    };
+    /* eliminar é um pedaço separado do cartão (ver CSS), então o clique nele
+       nunca cai em cima do corpo — não precisa nem de stopPropagation.
+       eliminar é só anotação de raciocínio, não resposta: clicar no corpo
+       de uma alternativa já eliminada não conta como escolha, pra não
+       confirmar sem querer o que a pessoa acabou de descartar */
+    el.querySelector(".corpo-alt").onclick = ()=>{ if(!el.classList.contains("eliminada")) responder(i); };
+    el.querySelector(".eliminar").onclick = ()=> el.classList.toggle("eliminada");
     box.appendChild(el);
   });
   document.getElementById("acoes").classList.remove("ativa");
@@ -2021,7 +2021,7 @@ function responder(escolha){
   const porAlternativa = Array.isArray(q.eo) && q.eo.length === q.o.length;
   const alts = document.querySelectorAll("#q-alts .alt");
   alts.forEach((el,i)=>{
-    el.onclick=null;
+    el.querySelector(".corpo-alt").onclick=null;
     el.classList.remove("eliminada");
     const btElim = el.querySelector(".eliminar");
     if(btElim) btElim.remove();
@@ -2188,12 +2188,15 @@ function mostrarSim(){
   document.getElementById("s-enunciado").textContent = q.q;
   const box = document.getElementById("s-alts"); box.innerHTML="";
   perm.forEach((orig,i)=>{
+    // sem o botão de eliminar (só faz sentido no estudo), mas com o mesmo
+    // .corpo-alt de dentro pra herdar o padding/gap — .alt sozinho não tem
+    // mais os dois desde que o eliminar virou um pedaço separado do cartão
     const el = document.createElement("div"); el.className="alt";
     if(SIM.respostas[SIM.pos]===i){ el.style.borderColor="var(--tinta)"; }
-    el.innerHTML = '<div class="bolha">'+"ABCDE"[i]+'</div><div class="txt"></div>';
+    el.innerHTML = '<div class="corpo-alt"><div class="bolha">'+"ABCDE"[i]+'</div><div class="txt"></div></div>';
     if(SIM.respostas[SIM.pos]===i){ const b=el.querySelector(".bolha"); b.style.background="var(--tinta)"; b.style.borderColor="var(--tinta)"; b.style.color="#fff"; }
     el.querySelector(".txt").textContent = q.o[orig];
-    el.onclick = ()=>{ SIM.respostas[SIM.pos]=i; mostrarSim(); };
+    el.querySelector(".corpo-alt").onclick = ()=>{ SIM.respostas[SIM.pos]=i; mostrarSim(); };
     box.appendChild(el);
   });
   const alvo = document.getElementById("acoes-interno"); alvo.innerHTML="";
