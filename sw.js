@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v65-meta-mostra-nome-da-materia";
+const VERSAO = "v66-constancia-por-coluna-e-botao-mais-perto-da-nav";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [

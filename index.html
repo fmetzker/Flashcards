@@ -94,7 +94,10 @@ h2{font-size:19px;font-weight:600}
    no Safari do iPhone, que é o alvo real do app — causando ora estouro
    horizontal, ora retângulos em vez de quadrados. Medir e fixar em px não
    deixa margem para ambiguidade. */
-.grade{display:grid;gap:5px;margin-top:10px}
+/* column: dentro de uma coluna o dia mais antigo fica em cima e desce — a
+   ordem de leitura de um calendário de constância é de cima para baixo
+   primeiro, e só depois da esquerda para a direita entre colunas */
+.grade{display:grid;grid-auto-flow:column;gap:5px;margin-top:10px}
 .dia{box-sizing:border-box;border-radius:3px;background:#EDF1EE;border:1px solid transparent}
 .dia.cheio{background:var(--verde)}
 .dia.parcial{background:var(--ambar);opacity:.55}
@@ -242,8 +245,11 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   align-items:center;gap:3px;letter-spacing:.01em}
 .nav button.on{color:var(--verde)}
 .nav .ico{font-size:18px;line-height:1}
-/* com a nav no rodapé, a barra de ações sobe para não ficar por baixo */
-.acoes.com-nav{bottom:calc(56px + env(safe-area-inset-bottom))}
+/* com a nav no rodapé, a barra de ações sobe para não ficar por baixo.
+   O padding-bottom de .acoes soma env(safe-area-inset-bottom) de novo — a
+   nav logo abaixo já reserva essa faixa sozinha, então somar duas vezes
+   deixava o botão flutuando bem acima da nav em vez de colado nela. */
+.acoes.com-nav{bottom:calc(56px + env(safe-area-inset-bottom));padding-bottom:12px}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -1478,13 +1484,18 @@ const DIAS_CARTELA = 100;
 const GRADE_COLUNAS = 10, GRADE_GAP = 5;
 
 /* mede a largura disponível e fixa colunas e linhas no mesmo tamanho em
-   pixels — é isso que garante o quadrado sem depender de aspect-ratio */
+   pixels — é isso que garante o quadrado sem depender de aspect-ratio.
+
+   O fluxo é por coluna (.grade tem grid-auto-flow:column), então o eixo
+   explícito aqui é o de LINHAS — é ele que decide onde cada coluna quebra
+   para a próxima. As colunas em si são implícitas: o navegador cria uma
+   nova a cada GRADE_COLUNAS itens, do tamanho de gridAutoColumns. */
 function ajustarGrade(g){
   const largura = g.getBoundingClientRect().width;
   if(!largura) return;   // tela ainda escondida (não é a ativa): recalcula quando pintarInicio() rodar de novo
   const tam = Math.floor((largura - GRADE_GAP*(GRADE_COLUNAS-1)) / GRADE_COLUNAS);
-  g.style.gridTemplateColumns = "repeat("+GRADE_COLUNAS+","+tam+"px)";
-  g.style.gridAutoRows = tam+"px";
+  g.style.gridTemplateRows = "repeat("+GRADE_COLUNAS+","+tam+"px)";
+  g.style.gridAutoColumns = tam+"px";
 }
 window.addEventListener("resize", ()=>{
   if(document.getElementById("tela-inicio").classList.contains("ativa")){
