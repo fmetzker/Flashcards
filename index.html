@@ -94,10 +94,10 @@ h2{font-size:19px;font-weight:600}
    no Safari do iPhone, que é o alvo real do app — causando ora estouro
    horizontal, ora retângulos em vez de quadrados. Medir e fixar em px não
    deixa margem para ambiguidade. */
-/* column: dentro de uma coluna o dia mais antigo fica em cima e desce — a
-   ordem de leitura de um calendário de constância é de cima para baixo
-   primeiro, e só depois da esquerda para a direita entre colunas */
-.grade{display:grid;grid-auto-flow:column;gap:5px;margin-top:10px}
+/* row (padrão do grid): o dia mais antigo começa no canto superior
+   esquerdo e a linha enche da esquerda para a direita antes de descer para
+   a próxima — ordem de leitura normal, não a de calendário por semana */
+.grade{display:grid;gap:5px;margin-top:10px}
 .dia{box-sizing:border-box;border-radius:3px;background:#EDF1EE;border:1px solid transparent}
 .dia.cheio{background:var(--verde)}
 .dia.parcial{background:var(--ambar);opacity:.55}
@@ -1489,18 +1489,13 @@ const DIAS_CARTELA = 100;
 const GRADE_COLUNAS = 10, GRADE_GAP = 5;
 
 /* mede a largura disponível e fixa colunas e linhas no mesmo tamanho em
-   pixels — é isso que garante o quadrado sem depender de aspect-ratio.
-
-   O fluxo é por coluna (.grade tem grid-auto-flow:column), então o eixo
-   explícito aqui é o de LINHAS — é ele que decide onde cada coluna quebra
-   para a próxima. As colunas em si são implícitas: o navegador cria uma
-   nova a cada GRADE_COLUNAS itens, do tamanho de gridAutoColumns. */
+   pixels — é isso que garante o quadrado sem depender de aspect-ratio */
 function ajustarGrade(g){
   const largura = g.getBoundingClientRect().width;
   if(!largura) return;   // tela ainda escondida (não é a ativa): recalcula quando pintarInicio() rodar de novo
   const tam = Math.floor((largura - GRADE_GAP*(GRADE_COLUNAS-1)) / GRADE_COLUNAS);
-  g.style.gridTemplateRows = "repeat("+GRADE_COLUNAS+","+tam+"px)";
-  g.style.gridAutoColumns = tam+"px";
+  g.style.gridTemplateColumns = "repeat("+GRADE_COLUNAS+","+tam+"px)";
+  g.style.gridAutoRows = tam+"px";
 }
 window.addEventListener("resize", ()=>{
   if(document.getElementById("tela-inicio").classList.contains("ativa")){
