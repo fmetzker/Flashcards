@@ -1462,13 +1462,15 @@ function rodape(nome){
 /* =======================================================================
    TELA INICIAL
    ======================================================================= */
-/* 84 = 12 semanas. Fixo de propósito: a cartela não pode crescer com o tempo,
-   senão em um ano vira 365 quadradinhos empurrando o resto da tela para
-   baixo. A grade tem 11 colunas e não é alinhada por dia da semana — nunca
-   foi, nem quando ia do início do edital até a prova; a última linha fica
-   parcial, com hoje na ponta. */
-const DIAS_CARTELA = 84;
-const GRADE_COLUNAS = 11, GRADE_GAP = 5;
+/* Fixo de propósito: a cartela não pode crescer com o tempo, senão em um ano
+   vira 365 quadradinhos empurrando o resto da tela para baixo.
+
+   100 dias em 10 colunas fecha um quadrado exato de 10×10, sem sobra na
+   última linha — com as 11 colunas de antes, hoje ficaria sozinho numa
+   décima linha. A grade não é alinhada por dia da semana, e nunca foi, nem
+   quando ia do início do edital até a prova. */
+const DIAS_CARTELA = 100;
+const GRADE_COLUNAS = 10, GRADE_GAP = 5;
 
 /* mede a largura disponível e fixa colunas e linhas no mesmo tamanho em
    pixels — é isso que garante o quadrado sem depender de aspect-ratio */
