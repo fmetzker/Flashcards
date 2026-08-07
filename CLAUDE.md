@@ -132,6 +132,12 @@ Arquivos `banco/<matéria>.json`, um objeto por linha (mantém o diff pequeno):
 - `c` — índice da correta, 0 a 4
 - `f` — **obrigatório**: lei e artigo, ou manual e capítulo. Questão sem
   fonte não entra
+- `eo` — explicação por alternativa, **opcional**. Array do mesmo tamanho de
+  `o`, uma posição por alternativa (`""` pula a posição, mas ela precisa
+  existir). Ao responder, o app mostra essa nota junto da própria
+  alternativa, ao lado de `e` (que continua sendo a explicação da questão
+  como um todo). Ver `PADRAO-DOS-CARTOES.md` seção 1.4.1 — não é retroativo
+  para as questões já escritas (regra 9), só para cartão novo ou em reescrita
 
 Ao acrescentar questão, **reusar um `t` e um `s` que já existam** em vez de
 inventar rótulos novos; a árvore só é útil enquanto os níveis se mantêm

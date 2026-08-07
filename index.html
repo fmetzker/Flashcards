@@ -162,6 +162,23 @@ button.fechar{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;
 .alt.errada{border-color:var(--coral);background:var(--coral-luz)}
 .alt.errada .bolha{background:var(--coral);border-color:var(--coral);color:#fff}
 .alt.morta{opacity:.5}
+/* botão de eliminar: some no fundo enquanto a alternativa não foi marcada,
+   fica vermelho quando foi — igual à checkbox provisória de quem elimina
+   com caneta na prova de papel. Some de vez assim que a questão é
+   respondida (ver responder()), então nunca disputa espaço com certa/errada */
+.eliminar{flex:0 0 26px;width:26px;height:26px;align-self:center;padding:0;
+  border-radius:50%;border:1px solid var(--traco);background:var(--papel);
+  color:var(--tinta2);font-size:12px;font-weight:600;line-height:1}
+.eliminar:active{transform:none}
+.alt.eliminada{opacity:.45}
+.alt.eliminada .txt{text-decoration:line-through}
+.alt.eliminada .eliminar{background:var(--coral-luz);border-color:var(--coral);color:var(--coral)}
+/* explicação por alternativa (campo opcional 'eo' — ver PADRAO-DOS-CARTOES.md
+   seção 1.4.1): fica dentro do .txt da própria alternativa, não no bloco de
+   explicação geral, porque é sobre AQUELA opção, não sobre a questão toda */
+.alt .porque{margin-top:6px;font-size:13px;line-height:1.4;color:var(--tinta2)}
+.alt.certa .porque{color:var(--verde)}
+.alt.errada .porque{color:var(--coral)}
 .expl{background:var(--card);border:1px solid var(--traco);border-left:3px solid var(--verde);
   border-radius:10px;padding:13px;margin-top:14px;font-size:15px;line-height:1.5}
 .expl .fonte{margin-top:8px;font-size:12px;color:var(--tinta2);font-family:var(--dado)}
@@ -1980,9 +1997,17 @@ function mostrarQuestao(){
   const box = document.getElementById("q-alts"); box.innerHTML="";
   S.perm.forEach((orig,i)=>{
     const el = document.createElement("div"); el.className="alt";
-    el.innerHTML = '<div class="bolha">'+"ABCDE"[i]+'</div><div class="txt"></div>';
+    el.innerHTML = '<div class="bolha">'+"ABCDE"[i]+'</div><div class="txt"></div>'
+      +'<button type="button" class="eliminar" title="Marcar como errada, sem responder">✕</button>';
     el.querySelector(".txt").textContent = q.o[orig];
-    el.onclick = ()=>responder(i);
+    /* eliminar é só uma anotação de raciocínio, não uma resposta — clicar
+       no corpo de uma alternativa já eliminada não conta como escolha,
+       pra não confirmar sem querer o que a pessoa acabou de descartar */
+    el.onclick = ()=>{ if(!el.classList.contains("eliminada")) responder(i); };
+    el.querySelector(".eliminar").onclick = ev=>{
+      ev.stopPropagation();
+      el.classList.toggle("eliminada");
+    };
     box.appendChild(el);
   });
   document.getElementById("acoes").classList.remove("ativa");
@@ -1992,12 +2017,24 @@ function responder(escolha){
   if(S.respondida) return;
   S.respondida = true;
   const id = S.lista[S.pos], q = porId[id];
+  // 'eo': explicação por alternativa (opcional) — precisa cobrir as 5 posições
+  const porAlternativa = Array.isArray(q.eo) && q.eo.length === q.o.length;
   const alts = document.querySelectorAll("#q-alts .alt");
   alts.forEach((el,i)=>{
     el.onclick=null;
-    if(S.perm[i]===q.c) el.classList.add("certa");
+    el.classList.remove("eliminada");
+    const btElim = el.querySelector(".eliminar");
+    if(btElim) btElim.remove();
+    const orig = S.perm[i];
+    if(orig===q.c) el.classList.add("certa");
     else if(i===escolha) el.classList.add("errada");
     else el.classList.add("morta");
+    if(porAlternativa && q.eo[orig] && q.eo[orig].trim()){
+      const porque = document.createElement("div");
+      porque.className = "porque";
+      porque.textContent = q.eo[orig];
+      el.querySelector(".txt").appendChild(porque);
+    }
   });
   const certo = S.perm[escolha]===q.c;
   const ex = document.getElementById("q-expl");

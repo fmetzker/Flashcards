@@ -114,6 +114,17 @@ foreach ($q in $B) {
   if (($q.o | Select-Object -Unique).Count -ne $q.o.Count) { Erro "[$rot] alternativas repetidas dentro da questão" }
   if ([string]::IsNullOrWhiteSpace($q.f)) { Erro "[$rot] sem fonte" }
 
+  # 'eo' é opcional (explicação por alternativa, ver PADRAO-DOS-CARTOES.md
+  # seção 1.4.1) — quando existe, precisa cobrir toda alternativa em posição
+  # (vazio = "sem nota pra esta", não elemento faltando)
+  if ($null -ne $q.eo) {
+    if ($q.eo.Count -ne $q.o.Count) {
+      Erro "[$rot] 'eo' precisa ter o mesmo tamanho de 'o' — uma posição por alternativa (string vazia pula, mas a posição tem que existir)"
+    } elseif (-not ($q.eo | Where-Object { $_ -and $_.Trim() -ne '' })) {
+      Erro "[$rot] 'eo' está presente mas vazio em todas as alternativas — tire o campo se nenhuma vai ser preenchida"
+    }
+  }
+
   # o id precisa continuar derivando do enunciado, senão o progresso salvo
   # deixa de encontrar a questão
   $esperado = Id-Questao $q.q
@@ -124,7 +135,7 @@ foreach ($q in $B) {
   if ($ids.ContainsKey($q.id))   { Erro "[$rot] id duplicado" }
   $ids[$q.id] = $true
 
-  $texto = $q.q + ($q.o -join ' ') + $q.e
+  $texto = $q.q + ($q.o -join ' ') + $q.e + (($q.eo | Where-Object { $_ }) -join ' ')
   if ($texto -match '(?i)destacad|grifad|sublinhad|em negrito') {
     Erro "[$rot] refere-se a formatação que não existe no texto puro"
   }

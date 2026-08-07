@@ -64,6 +64,44 @@ distrator mais tentador está errado.
   pessoas que estavam nela)."
 - ❌ "A alternativa correta é a letra B."
 
+### 1.4.1 Explicação por alternativa — campo `eo`, opcional
+
+O campo `e` é a explicação da questão como um todo, sempre obrigatório. O
+app também aceita um campo opcional, `eo`, que é uma explicação **por
+alternativa**: um array com o mesmo tamanho de `o`, cada posição dizendo por
+que aquela alternativa específica está certa ou errada. Ao responder, o app
+mostra essa nota junto da própria alternativa, destacando uma a uma — não
+só embaixo da questão como o `e` já faz.
+
+```json
+"o": ["Rifampicina", "Isoniazida", "Etambutol", "Pirazinamida", "Estreptomicina"],
+"c": 0,
+"eo": [
+  "Correta: é a droga usada tanto na profilaxia da meningocócica quanto no esquema da TB — mesmo fármaco, indicações diferentes.",
+  "Também trata TB, mas não é a profilaxia padrão para contato de meningocócica.",
+  "",
+  "",
+  ""
+]
+```
+
+Posição vazia (`""`) é válida e significa "sem nota para esta alternativa"
+— não precisa justificar a que é obviamente absurda. O `validar` só reprova
+duas coisas: array de tamanho diferente de `o`, e array presente mas vazio
+em **todas** as posições (nesse caso é melhor tirar o campo).
+
+**"Sempre que possível", não obrigatório.** Vale o esforço quando o
+distrator representa um erro conceitual real (a pessoa que errou vai querer
+saber por que pensou certo e escolheu errado) — é o mesmo critério de
+plausibilidade da seção 1.3. Não vale a pena para "Apenas quando o paciente
+solicitar" ou outro distrator óbvio: aí o `e` sozinho já basta, e forçar uma
+nota por posição só encheria o cartão de texto sem ensinar nada a mais.
+
+As 1244 questões já escritas não precisam ser retrofitadas — regra 9 do
+`CLAUDE.md` proíbe script de gravação em lote no banco, e preencher `eo`
+retroativamente é trabalho de conteúdo, revisado um cartão de cada vez,
+não de automação. `eo` é para cartão novo ou em reescrita.
+
 ### 1.5 Um fato, um cartão — e só um cartão
 
 O complemento necessário do princípio 1.2. Ali a regra é não juntar cinco

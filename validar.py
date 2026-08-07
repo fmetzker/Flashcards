@@ -202,6 +202,17 @@ def valida_questoes(B):
             erros.append(f"[{rot}] alternativas repetidas dentro da questão")
         if not q.get('f'):
             erros.append(f"[{rot}] sem fonte")
+        # 'eo' é opcional (explicação por alternativa, ver PADRAO-DOS-CARTOES.md
+        # seção 1.4.1) — quando existe, precisa cobrir toda alternativa em posição
+        # (vazio = "sem nota pra esta", não elemento faltando)
+        if 'eo' in q:
+            eo = q.get('eo')
+            if not isinstance(eo, list) or len(eo) != len(q.get('o', [])):
+                erros.append(f"[{rot}] 'eo' precisa ter o mesmo tamanho de 'o' — uma posição por "
+                              "alternativa (string vazia pula, mas a posição tem que existir)")
+            elif not any(isinstance(x, str) and x.strip() for x in eo):
+                erros.append(f"[{rot}] 'eo' está presente mas vazio em todas as alternativas — "
+                              "tire o campo se nenhuma vai ser preenchida")
         # o id precisa continuar derivando do enunciado, senão o progresso
         # salvo deixa de encontrar a questão
         esperado = id_questao(q.get('q', ''))
@@ -213,7 +224,8 @@ def valida_questoes(B):
         if q.get('id') in ids:
             erros.append(f"[{rot}] id duplicado")
         ids.add(q.get('id'))
-        texto = (q.get('q', '') + ' '.join(q.get('o', [])) + q.get('e', ''))
+        texto = (q.get('q', '') + ' '.join(q.get('o', [])) + q.get('e', '')
+                  + ' '.join(x for x in q.get('eo', []) if isinstance(x, str)))
         if re.search(r'destacad|grifad|sublinhad|em negrito', texto, re.I):
             erros.append(f"[{rot}] refere-se a formatação que não existe no texto puro")
     return ids
