@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v195-cartoes-enfermagem-trabalho-97-para-107";
+const VERSAO = "v196-cartoes-maquinas-102-para-112";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
