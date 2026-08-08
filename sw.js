@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v106-eo-saude-mental-completo-22-de-22";
+const VERSAO = "v107-eo-etica-exercicio-profissional-completo-20-de-20";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
