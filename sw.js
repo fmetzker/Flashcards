@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v191-cartoes-ingles-completo-34-para-77";
+const VERSAO = "v192-cartoes-maquinas-79-para-102";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
