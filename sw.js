@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v201-cartoes-matematica-125-para-129";
+const VERSAO = "v202-cartoes-maquinas-completo-112-para-136";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
