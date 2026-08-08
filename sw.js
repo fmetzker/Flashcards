@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v187-eo-ferramentaria-completo-maquinas-79-de-79";
+const VERSAO = "v188-eo-matematica-15-de-125";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
