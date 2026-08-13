@@ -62,7 +62,7 @@
         "Coordenação": ["Classes de palavras"],
         "Subordinação": ["Classes de palavras", "Sintaxe"],
         "Coordenação e subordinação": ["Coordenação", "Subordinação"],
-        "Coesão": ["Pronomes", "Coordenação e subordinação"],
+        "Coesão": ["Pronomes", "Coordenação e subordinação", "Semântica"],
         "Coerência": ["Coesão"],
         "Interpretação de textos": ["Semântica", "Coerência"],
         "Ambiguidade": ["Sintaxe", "Semântica"],

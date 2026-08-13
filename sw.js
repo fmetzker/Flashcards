@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v235-escada-concordancia-tipologia-textual";
+const VERSAO = "v236-escada-coesao-crase-colocacao-pontuacao-aposto";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
