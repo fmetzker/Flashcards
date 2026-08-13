@@ -196,7 +196,7 @@ pra quando algum concurso voltar a referenciá-la (é o caso de
 | `portugues` | Língua Portuguesa | 195 | 23 | — |
 | `ingles` | Língua Inglesa | 97 | 8 | — |
 | `sus` | Legislação do SUS | 122 | 10 | — |
-| `enfermagem` | Conhecimentos Específicos de Enfermagem | 678 | 19 | 120 |
+| `enfermagem` | Conhecimentos Específicos de Enfermagem | 686 | 19 | 120 |
 | `enfermagem-trabalho` | Enfermagem do Trabalho¹ | 126 | 17 | — |
 | `psicologia` | Psicologia | 0 | 0² | — |
 | `maritimo-maquinas` | Máquinas e Prática Marítima¹ | 136 | 16 | — |
