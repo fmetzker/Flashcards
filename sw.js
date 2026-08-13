@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v229-escada-de-niveis-dentro-do-topico-bloqueio";
+const VERSAO = "v230-escada-classes-de-palavras-e-regencia";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
