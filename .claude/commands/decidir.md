@@ -77,6 +77,16 @@ for prazo, _, mid, n, peso, dens in sorted(linhas):
     for t in zero: print(f"      0  {t}   <-- item do edital SEM CARTAO (Sinal 2)")
     for k, t in raso: print(f"      {k}  {t}")
     if not TOP.get(mid): print("      (sem arvore em topicos.json - cobertura nao conferivel contra o edital)")
+print(); print('=' * 72); print('RANKING GLOBAL - topicos com menos cartoes (regra 4.5, so importa sem zerado/raso acima)'); print('=' * 72)
+rank = []
+for prazo, _, mid, n, peso, dens in linhas:
+    if not peso: continue
+    do_banco = {}
+    for q in banco.get(mid, []): do_banco[q['t']] = do_banco.get(q['t'], 0) + 1
+    for t, k in sorted(do_banco.items(), key=lambda x: x[1]):
+        rank.append((k, prazo, nome[mid], t))
+for k, prazo, m, t in sorted(rank)[:15]:
+    print(f"  {k:>3}  D-{prazo:<5} {m[:35]:<35} {t}")
 PY
 ```
 
@@ -99,7 +109,16 @@ vai fazer hoje.
 3. **Gravidade ALTA no `auditar-banco` acima de ~3% de uma matéria** — cartão
    que ensina errado vale menos que cartão que não existe.
 4. **Tópico abaixo do piso** na matéria com maior `peso × urgência`.
-5. **App, Supabase, documentação.**
+5. **Nenhum zerado, nenhum abaixo do piso em nenhuma matéria ativa** — não é
+   sinal de acabou, é sinal de que a régua era curta demais. Vá para o
+   "RANKING GLOBAL" do diagnóstico e escreva no tópico de **menor contagem**
+   entre todas as matérias ativas, saturação (3.5) permitindo — se ele já
+   estiver saturado, desça para o próximo da lista. Esta regra não tem
+   critério de parada embutido: ela é o piso deslizando para cima com o
+   próprio banco, e continua valendo lote após lote até outra regra de
+   precedência mais alta (1 a 4) voltar a valer. Não pare para perguntar "e
+   agora?" quando chegar aqui — é aqui que "e agora?" já tem resposta.
+6. **App, Supabase, documentação.**
 
 Empate entre matérias: ganha a de **menor D-**; persistindo, a de **maior
 peso no bloco**; persistindo, a de **menor densidade** (cartões por questão
