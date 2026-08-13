@@ -201,7 +201,7 @@ pra quando algum concurso voltar a referenciá-la (é o caso de
 | `psicologia` | Psicologia | 0 | 0² | — |
 | `maritimo-maquinas` | Máquinas e Prática Marítima¹ | 136 | 16 | — |
 | `manutencao-mecanica` | Manutenção Mecânica | 207 | 23³ | — |
-| `matematica` | Matemática | 153 | 7⁴ | — |
+| `matematica` | Matemática | 156 | 7⁴ | — |
 
 ¹ Sem concurso ativo no momento — ver regra 12.
 
