@@ -1,12 +1,20 @@
 # App de estudo — Concursos públicos
 
 Aplicativo web de questões com repetição espaçada, contas e banco
-colaborativo. Hoje atende cinco concursos: Enfermeiro/Volta Redonda (edital
-003/2026-SMA, prova 20/09/2026), CAAQ-CDM/Marinha e três da Transpetro
-cadastrados como **pré-edital** (Moço de Máquinas, Enfermagem do Trabalho e
-Psicologia), com estrutura copiada dos editais de 2023 enquanto os de 2026
-não saem. Novo concurso é editar `concursos.json` — não exige mexer no
-código.
+colaborativo. Hoje atende três concursos: Enfermeiro/Volta Redonda (edital
+003/2026-SMA, prova 20/09/2026), CAAQ-CDM/Marinha e Psicologia/Transpetro,
+cadastrado como **pré-edital** (estrutura copiada do edital de 2023 enquanto
+o de 2026 não sai). Novo concurso é editar `concursos.json` — não exige
+mexer no código.
+
+Moço de Máquinas e Enfermagem do Trabalho, ambos da Transpetro, saíram de
+`concursos.json` porque ninguém mais vai prestar essas provas — mas os
+bancos de questões (`banco/maritimo-maquinas.json` e
+`banco/enfermagem-trabalho.json`) continuam no repositório, intactos, para
+o caso de precisarem voltar. Matéria sem concurso ativo é situação normal
+no app (Psicologia já vivia assim antes de ganhar um concurso próprio): a
+matéria só não aparece pra ninguém estudar até algum concurso voltar a
+referenciá-la em `blocos[].materias`.
 
 ## Estrutura
 
@@ -121,6 +129,18 @@ no Safari do iPhone sem nenhuma etapa de compilação.
     2026 e não há edital anterior da Transpetro para esse cargo. Assunto
     inventado é pior que assunto faltando: a pessoa estuda com sensação de
     cobertura e chega na prova sem ter visto o que caiu.
+12. **Concurso que ninguém mais vai prestar sai de `concursos.json`, mas o
+    banco de questões da matéria fica.** Remover o concurso é só parar de
+    oferecer aquele cargo pra estudo — não apaga o trabalho de escrever as
+    questões, que pode servir de novo se o concurso voltar (mudança de
+    edital, prova adiada) ou se outro concurso vier a usar a mesma matéria.
+    Foi o caso de Moço de Máquinas e Enfermagem do Trabalho, ambos da
+    Transpetro: saíram de `concursos.json`, e `banco/maritimo-maquinas.json`
+    e `banco/enfermagem-trabalho.json` continuam intactos. Matéria sem
+    concurso ativo não aparece pra ninguém estudar (nenhum bloco a
+    referencia em `materias`), mas também não é erro nem lixo — é
+    exatamente a mesma situação que `psicologia` viveu antes de ganhar
+    concurso próprio.
 
 ## Formato do banco de questões
 
@@ -152,21 +172,27 @@ poucos. Antes de escrever, ler `PADRAO-DOS-CARTOES.md`.
 
 ## Matéria, tópico e subtópico
 
-**Matéria é o bloco do edital.** O banco é a união das matérias de **todos**
-os concursos cadastrados em `concursos.json`:
+**Matéria é o bloco do edital.** O banco de cada matéria costuma vir da união
+dos concursos cadastrados em `concursos.json` que a usam, mas matéria sem
+nenhum concurso ativo é situação normal, não erro: fica no banco, disponível
+pra quando algum concurso voltar a referenciá-la (é o caso de
+`maritimo-maquinas` e `enfermagem-trabalho` hoje, e já foi o caso de
+`psicologia` antes dela ganhar um concurso próprio):
 
 | id | nome | questões | tópicos | subtópicos |
 |---|---|--:|--:|--:|
-| `portugues` | Língua Portuguesa | 127 | 23 | — |
-| `ingles` | Língua Inglesa | 34 | 8 | — |
-| `sus` | Legislação do SUS | 118 | 10 | — |
+| `portugues` | Língua Portuguesa | 172 | 23 | — |
+| `ingles` | Língua Inglesa | 97 | 8 | — |
+| `sus` | Legislação do SUS | 121 | 10 | — |
 | `enfermagem` | Conhecimentos Específicos de Enfermagem | 677 | 19 | 120 |
-| `enfermagem-trabalho` | Enfermagem do Trabalho | 84 | 17 | — |
-| `psicologia` | Psicologia | 0 | 0¹ | — |
-| `maritimo-maquinas` | Máquinas e Prática Marítima | 79 | 16 | — |
-| `matematica` | Matemática | 125 | 7 | — |
+| `enfermagem-trabalho` | Enfermagem do Trabalho¹ | 126 | 17 | — |
+| `psicologia` | Psicologia | 0 | 0² | — |
+| `maritimo-maquinas` | Máquinas e Prática Marítima¹ | 136 | 16 | — |
+| `matematica` | Matemática | 129 | 7 | — |
 
-¹ Psicologia não tem árvore porque não existe edital anterior do cargo na
+¹ Sem concurso ativo no momento — ver regra 12.
+
+² Psicologia não tem árvore porque não existe edital anterior do cargo na
 Transpetro — ver regra 11.
 
 Dentro delas, dois níveis: **tópico** (Imunização, Urgência, Saúde da Mulher)
@@ -306,11 +332,14 @@ o escopo alcança (`blocosDaMeta()` → `BLOCOS_META`, recalculado em
   célula pra hoje dentro das 100 fixas; nesse caso hoje vira a última
   célula, sem sobra pra futuro.
 - **Escopo de tópicos por bloco** (`blocos[].topicos`, opcional): a mesma
-  matéria pode ter conteúdo programático diferente por cargo. O Português do
-  Moço de Máquinas tem 8 itens no edital e não cobra regência, colocação
-  pronominal, coordenação/subordinação nem sintaxe; o de nível superior tem
-  12 e cobre praticamente tudo. Bloco sem `topicos` significa **matéria
-  inteira**, e por isso o nível superior não declara nada.
+  matéria pode ter conteúdo programático diferente por cargo — um cargo de
+  nível fundamental/médio, por exemplo, cobre menos itens de Português que
+  um de nível superior, que costuma cobrir praticamente tudo. Bloco sem
+  `topicos` significa **matéria inteira**. Nenhum concurso cadastrado hoje
+  usa esse escopo (o exemplo real, o Português do Moço de Máquinas com 8
+  itens sem regência/colocação pronominal/coordenação-subordinação/sintaxe,
+  saiu de `concursos.json` junto com o concurso) — o mecanismo continua
+  valendo para quando outro concurso de conteúdo parcial for cadastrado.
   - Ao deduplicar, o escopo é **união**, não o do bloco vencedor: se um
     concurso restringe e outro não, quem segue os dois estuda a matéria
     inteira. União é o que garante não estudar de menos.

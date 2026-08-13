@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v203-cartoes-fecha-piso-raso-enftrab-portugues";
+const VERSAO = "v204-remove-concursos-transpetro-mom-enf-trab";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [

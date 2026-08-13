@@ -65,77 +65,6 @@
       }
     },
     {
-      "id": "transpetro-mom",
-      "cargo": "Moço de Máquinas",
-      "orgao": "Transpetro",
-      "banca": "Cesgranrio",
-      "edital": "PRÉ-EDITAL. Estrutura copiada do Edital nº 03 - TRANSPETRO/PSP/MAR-2023.3 (prova 09/12/2023). O edital de 2026 ainda não saiu; provas previstas para novembro/2026 e a data abaixo é provisória.",
-      "data": "2026-11-22",
-      "inicio": "2026-08-06",
-      "duracaoMin": 240,
-      "blocos": [
-        {
-          "id": "lp",
-          "nome": "Língua Portuguesa",
-          "questoes": 10,
-          "materias": ["portugues"],
-          "_topicos": "Os 8 itens de Língua Portuguesa do Anexo IV do Edital nº 03 (nível fundamental/médio), mapeados para os tópicos do banco. O mapeamento é INTERPRETAÇÃO, não transcrição: os itens do edital são categorias largas, e um tópico entra sempre que couber dentro de um deles — acentuação dentro de 'ortografia oficial', pronomes dentro de 'emprego das classes de palavras', coerência/ambiguidade/reescrita dentro de 'compreensão de textos'. Na dúvida, INCLUI: deixar de fora um tópico que a prova cobra é pior que estudar um a mais. Ficam de fora só os que o edital de nível superior acrescenta e este não menciona em nenhum item: regência, colocação pronominal, coordenação, subordinação e sintaxe.",
-          "topicos": ["Interpretação de textos", "Coerência", "Ambiguidade", "Reescrita",
-                      "Gêneros textuais", "Tipologia textual", "Intertextualidade",
-                      "Ortografia", "Acentuação", "Coesão",
-                      "Classes de palavras", "Pronomes", "Concordância", "Crase", "Pontuação",
-                      "Semântica", "Figuras de linguagem"]
-        },
-        {
-          "id": "esp",
-          "nome": "Conhecimentos específicos",
-          "questoes": 30,
-          "materias": ["maritimo-maquinas"]
-        }
-      ],
-      "aprovacao": {
-        "minimoTotal": 20,
-        "nenhumBlocoZerado": true,
-        "desempate": "Elimina quem fica abaixo de 50% em Básicos OU abaixo de 50% em Específicos. A classificação usa APENAS a nota de Conhecimentos Específicos. Empate: 60 anos ou mais primeiro, depois maior nota em Básicos, depois mais idoso, depois quem foi jurado."
-      }
-    },
-    {
-      "id": "transpetro-enf-trab",
-      "cargo": "Enfermagem do Trabalho",
-      "orgao": "Transpetro",
-      "banca": "Cesgranrio",
-      "edital": "PRÉ-EDITAL. Estrutura e conteúdo copiados do Edital nº 02 - TERRA/NÍVEL SUPERIOR-2023.2, ênfase 14 (prova 10/12/2023). O edital de 2026 ainda não saiu; provas previstas para novembro/2026 e a data abaixo é provisória.",
-      "data": "2026-11-22",
-      "inicio": "2026-08-06",
-      "duracaoMin": 270,
-      "blocos": [
-        {
-          "id": "lp",
-          "nome": "Língua Portuguesa",
-          "questoes": 10,
-          "materias": ["portugues"],
-          "_topicos": "Sem escopo declarado de propósito: os 12 itens do Edital nº 02 (nível superior) cobrem, uma vez mapeados com o mesmo critério do transpetro-mom, praticamente todos os tópicos de Português do banco. Declarar a lista inteira seria ruído — bloco sem 'topicos' já significa matéria inteira."
-        },
-        {
-          "id": "ing",
-          "nome": "Língua Inglesa",
-          "questoes": 10,
-          "materias": ["ingles"]
-        },
-        {
-          "id": "esp",
-          "nome": "Conhecimentos específicos",
-          "questoes": 50,
-          "materias": ["enfermagem-trabalho"]
-        }
-      ],
-      "aprovacao": {
-        "minimoTotal": 35,
-        "nenhumBlocoZerado": true,
-        "desempate": "Elimina quem fica abaixo de 50% em Básicos, abaixo de 50% em Específicos, ou tira ZERO em qualquer matéria dos Básicos. A classificação usa APENAS a nota de Conhecimentos Específicos. Empate: 60 anos ou mais primeiro, depois maior nota em Básicos, depois maior nota em Português, depois mais idoso."
-      }
-    },
-    {
       "id": "transpetro-psi",
       "cargo": "Psicologia",
       "orgao": "Transpetro",
@@ -150,7 +79,7 @@
           "nome": "Língua Portuguesa",
           "questoes": 10,
           "materias": ["portugues"],
-          "_topicos": "Sem escopo declarado, pelo mesmo motivo do transpetro-enf-trab: os Conhecimentos Básicos são idênticos entre as ênfases de nível superior e cobrem praticamente todo o Português do banco."
+          "_topicos": "Sem escopo declarado de propósito: os Conhecimentos Básicos são idênticos entre as ênfases de nível superior e cobrem praticamente todo o Português do banco."
         },
         {
           "id": "ing",
