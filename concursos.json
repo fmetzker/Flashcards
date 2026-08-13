@@ -93,6 +93,71 @@
         "nenhumBlocoZerado": true,
         "desempate": "Regra provisória, só para os Básicos (Específicos fora até o edital sair — ver campo 'edital'). Na prova de verdade: elimina quem fica abaixo de 50% em Básicos, abaixo de 50% em Específicos, ou tira ZERO em qualquer matéria dos Básicos; classificação usa APENAS a nota de Específicos. Empate: 60 anos ou mais primeiro, depois maior nota em Básicos, depois maior nota em Português, depois mais idoso."
       }
+    },
+    {
+      "id": "transpetro-mec",
+      "cargo": "Profissional Transpetro de Nível Técnico — Manutenção Mecânica (Ênfase 11)",
+      "orgao": "Transpetro — polo de trabalho Rio de Janeiro",
+      "banca": "Cesgranrio",
+      "edital": "Edital nº 03 - TRANSPETRO/PSP/TERRA/NÍVEL MÉDIO-2026.3, de 11/08/2026. Requisito de escolaridade no Anexo III item 1.11 (curso técnico em Eletromecânica, Fabricação Mecânica, Manutenção de Aeronaves, Mecânica, Manutenção de Máquinas Pesadas, Mecânica de Precisão ou Soldagem, mais registro no Conselho de Classe como Técnico). Conteúdo programático no Anexo IV. Cronograma no Anexo V.",
+      "data": "2026-11-29",
+      "inicio": "2026-08-12",
+      "duracaoMin": 240,
+      "blocos": [
+        {
+          "id": "esp",
+          "nome": "Conhecimentos Específicos",
+          "questoes": 40,
+          "materias": ["manutencao-mecanica"],
+          "_topicos": "Sem escopo declarado: a matéria inteira É o conteúdo da ênfase 11, não há o que recortar."
+        },
+        {
+          "id": "lp",
+          "nome": "Língua Portuguesa",
+          "questoes": 10,
+          "materias": ["portugues"],
+          "topicos": [
+            "Interpretação de textos",
+            "Gêneros textuais",
+            "Tipologia textual",
+            "Coerência",
+            "Intertextualidade",
+            "Reescrita",
+            "Ambiguidade",
+            "Figuras de linguagem",
+            "Coesão",
+            "Ortografia",
+            "Acentuação",
+            "Classes de palavras",
+            "Pronomes",
+            "Concordância",
+            "Crase",
+            "Pontuação",
+            "Semântica"
+          ],
+          "_topicos": "Os 8 itens de Língua Portuguesa do Anexo IV mapeados para os tópicos do banco — interpretação, não transcrição, e na dúvida incluindo (item 1, 'compreensão de textos de gêneros variados', puxa gêneros, tipologia, coerência, intertextualidade, reescrita, ambiguidade e figuras de linguagem; item 2, 'ortografia oficial', puxa acentuação; item 4, 'emprego das classes de palavras', puxa pronomes). Ficam DE FORA os 40 cartões de Regência, Colocação pronominal, Coordenação, Subordinação, Coordenação e subordinação e Sintaxe: esta lista de nível médio não cita nenhum deles, ao contrário da de nível superior. Restam 132 dos 172 cartões."
+        },
+        {
+          "id": "mat",
+          "nome": "Matemática",
+          "questoes": 10,
+          "materias": ["matematica"],
+          "topicos": [
+            "Aritmética",
+            "Multiplicação",
+            "Álgebra",
+            "Funções",
+            "Trigonometria",
+            "Geometria"
+          ],
+          "_topicos": "Os 10 itens de Matemática do Anexo IV mapeados para os tópicos do banco. Fica DE FORA só Lógica (13 cartões), que não consta deste conteúdo programático. Análise combinatória, Probabilidade e Estatística são do edital mas ainda não têm cartão nenhum — por isso aparecem em banco/topicos.json e não aqui: tópico declarado no escopo precisa existir no banco, senão o validador reprova. Acrescentar aqui assim que os cartões forem escritos."
+        }
+      ],
+      "aprovacao": {
+        "minimoTotal": 30,
+        "nenhumBlocoZerado": true,
+        "desempate": "Eliminação (item 7.1.4.3): abaixo de 50% em Conhecimentos Específicos (menos de 20 de 40), OU abaixo de 50% em Conhecimentos Gerais (menos de 10 de 20), OU grau ZERO em Português ou em Matemática. A habilitação para prosseguir (item 7.1.2 'd') ranqueia SÓ pela nota de Específicos, até 2x o total de vagas mais cadastro de reserva da ênfase/polo — 42 no Rio de Janeiro, ou seja, 84 pessoas. A nota de Gerais só entra na soma depois disso (item 7.1.4.2.1). Empate: 60 anos ou mais primeiro, depois quem exerceu função de jurado, depois mais idoso, depois hora de nascimento."
+      }
     }
   ]
 }

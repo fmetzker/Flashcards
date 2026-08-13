@@ -113,6 +113,24 @@ def valida_concursos(B):
                     erros.append(f"concurso [{rot}]: matéria '{mid}' aparece em mais de um bloco")
                 usadas.add(mid)
                 disp += por_materia[mid]
+            # Escopo de tópicos do bloco (opcional): restringe quais tópicos da
+            # matéria caem NESTE concurso. Tópico escrito errado aqui não daria
+            # erro visível — só sumiria em silêncio da sessão de estudo, que é
+            # pior que um erro. Mesma checagem que o validar.ps1 já fazia.
+            if bl.get('topicos'):
+                do_bloco = [q for q in B if q['m'] in bl.get('materias', [])]
+                existentes = {q['t'] for q in do_bloco}
+                for t in bl['topicos']:
+                    if t not in existentes:
+                        erros.append(f"concurso [{rot}], bloco '{bl['id']}': tópico '{t}' "
+                                     "não existe no banco das matérias deste bloco")
+                if len(set(bl['topicos'])) != len(bl['topicos']):
+                    erros.append(f"concurso [{rot}], bloco '{bl['id']}': tópico repetido "
+                                 "na lista de escopo")
+                disp = sum(1 for q in do_bloco if q['t'] in bl['topicos'])
+                if disp < bl['questoes']:
+                    avisos.append(f"concurso [{rot}], bloco '{bl['nome']}': dentro do escopo "
+                                  f"declarado há {disp} questões para {bl['questoes']} da prova")
             if disp < bl['questoes']:
                 avisos.append(f"concurso [{rot}], bloco '{bl['nome']}': o banco tem {disp} "
                               f"questões para {bl['questoes']} da prova")
@@ -184,6 +202,11 @@ def valida_js(fonte):
         r = subprocess.run(['node', '--check', tmp], capture_output=True, text=True)
         if r.returncode != 0:
             erros.append("erro de sintaxe no JS do app: " + r.stderr.strip()[:300])
+    except FileNotFoundError:
+        # sem node instalado não dá para conferir a sintaxe — avisar e seguir,
+        # em vez de derrubar o validador inteiro e deixar o banco sem checagem
+        # nenhuma. O validar.ps1 não depende de node e cobre todo o resto.
+        avisos.append("node não encontrado: sintaxe do JS do index.html NÃO foi conferida")
     finally:
         os.unlink(tmp)
 

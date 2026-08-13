@@ -35,6 +35,48 @@
         "Ferramentaria"
       ]
     },
+    "manutencao-mecanica": {
+      "fonte": "Transpetro, Edital nº 03 - TRANSPETRO/PSP/TERRA/NÍVEL MÉDIO-2026.3, ANEXO IV, Ênfase 11: MANUTENÇÃO - MECÂNICA. Transcrição dos 23 itens, na ordem do edital.",
+      "topicos": [
+        "Noções de metrologia",
+        "Instrumentos de medição",
+        "Medidas de pressão, nível, temperatura e vazão",
+        "Sistema Internacional de Unidades",
+        "Sistema de ajuste e tolerância",
+        "Mecânica Geral",
+        "Resistência dos materiais",
+        "Elementos de máquinas",
+        "Mecânica dos Fluidos",
+        "Lubrificação",
+        "Desenho técnico mecânico",
+        "Gestão da Manutenção",
+        "Processos de fabricação mecânica",
+        "Sistemas hidráulicos e pneumáticos",
+        "Equipamentos mecânicos",
+        "Metalografia e tratamentos térmicos",
+        "Materiais de construção mecânica",
+        "Normas técnicas nacionais e internacionais",
+        "Segurança do trabalho, meio ambiente e saúde",
+        "Noções de soldagem",
+        "Ensaios mecânicos destrutivos e não destrutivos",
+        "Ensaios metalúrgicos",
+        "Noções de eletrotécnica"
+      ]
+    },
+    "matematica": {
+      "fonte": "Transpetro, Edital nº 03 - TRANSPETRO/PSP/TERRA/NÍVEL MÉDIO-2026.3, ANEXO IV, CONHECIMENTOS BÁSICOS - MATEMÁTICA (10 itens, iguais para todas as 18 ênfases). Os itens do edital foram MAPEADOS para os nomes de tópico que o banco já usa, não transcritos ao pé da letra: 'conjuntos numéricos / razão e proporção / porcentagem / matemática financeira' caem em Aritmética (que já tem cartão de regra de três, desconto sucessivo, juros simples e juros compostos); 'equações e sistemas lineares' em Álgebra; 'geometria plana e espacial' em Geometria (que já tem área e volume). Análise combinatória, Probabilidade e Estatística entram SEM nenhum cartão escrito de propósito: são os três assuntos do edital que o banco ainda não cobre. 'Lógica', que o banco tem, fica fora porque não consta deste conteúdo programático.",
+      "topicos": [
+        "Aritmética",
+        "Multiplicação",
+        "Álgebra",
+        "Funções",
+        "Trigonometria",
+        "Geometria",
+        "Análise combinatória",
+        "Probabilidade",
+        "Estatística"
+      ]
+    },
     "enfermagem-trabalho": {
       "fonte": "Transpetro, Edital nº 02 - TERRA/NÍVEL SUPERIOR-2023.2, ênfase 14 (Enfermagem do Trabalho)",
       "topicos": [

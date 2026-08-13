@@ -1,10 +1,12 @@
 # App de estudo — Concursos públicos
 
 Aplicativo web de questões com repetição espaçada, contas e banco
-colaborativo. Hoje atende três concursos: Enfermeiro/Volta Redonda (edital
-003/2026-SMA, prova 20/09/2026), CAAQ-CDM/Marinha e Psicologia/Transpetro,
+colaborativo. Hoje atende quatro concursos: Enfermeiro/Volta Redonda (edital
+003/2026-SMA, prova 20/09/2026), CAAQ-CDM/Marinha, Psicologia/Transpetro,
 cadastrado como **pré-edital** (estrutura copiada do edital de 2023 enquanto
-o de 2026 não sai). Novo concurso é editar `concursos.json` — não exige
+o de 2026 não sai), e Manutenção Mecânica/Transpetro (Edital nº 03 -
+TRANSPETRO/PSP/TERRA/NÍVEL MÉDIO-2026.3, ênfase 11, polo Rio de Janeiro,
+prova 29/11/2026). Novo concurso é editar `concursos.json` — não exige
 mexer no código.
 
 Moço de Máquinas e Enfermagem do Trabalho, ambos da Transpetro, saíram de
@@ -188,12 +190,25 @@ pra quando algum concurso voltar a referenciá-la (é o caso de
 | `enfermagem-trabalho` | Enfermagem do Trabalho¹ | 126 | 17 | — |
 | `psicologia` | Psicologia | 0 | 0² | — |
 | `maritimo-maquinas` | Máquinas e Prática Marítima¹ | 136 | 16 | — |
-| `matematica` | Matemática | 129 | 7 | — |
+| `manutencao-mecanica` | Manutenção Mecânica | 0 | 23³ | — |
+| `matematica` | Matemática | 129 | 7⁴ | — |
 
 ¹ Sem concurso ativo no momento — ver regra 12.
 
 ² Psicologia não tem árvore porque não existe edital anterior do cargo na
 Transpetro — ver regra 11.
+
+³ Os 23 tópicos são a árvore do edital em `banco/topicos.json` (Anexo IV,
+ênfase 11); o banco de questões ainda está vazio, então todos aparecem
+apagados e escritos "sem cartão" na tela Matérias. É dívida de cobertura
+declarada, não erro.
+
+⁴ Sete no banco, mas a árvore do edital tem nove: **Análise combinatória,
+Probabilidade e Estatística** constam do Anexo IV e ainda não têm cartão
+nenhum; **Lógica** tem 13 cartões e não consta daquele conteúdo
+programático. "Tabuada" foi renomeado para "Multiplicação" — mudança só no
+campo `t`, que não entra no `id` (o SHA-1 é do enunciado), então nenhum
+progresso foi perdido.
 
 Dentro delas, dois níveis: **tópico** (Imunização, Urgência, Saúde da Mulher)
 e **subtópico** (Rede de frio, Calendário vacinal). Português e SUS param no
@@ -305,9 +320,9 @@ o escopo alcança (`blocosDaMeta()` → `BLOCOS_META`, recalculado em
 `aplicarFoco()`): todos os inscritos por padrão, ou um só quando
 `E.escopoEstudo` aponta para um.
 
-- **Matéria repetida não soma, vale a maior cota.** Português cai nos cinco
-  concursos cadastrados; somar daria 50 questões/dia da mesma matéria.
-  Estudar 10 de Português serve para as cinco provas ao mesmo tempo.
+- **Matéria repetida não soma, vale a maior cota.** Português cai nos quatro
+  concursos cadastrados; somar daria 40 questões/dia da mesma matéria.
+  Estudar 10 de Português serve para as quatro provas ao mesmo tempo.
 - **`BLOCOS` ≠ `BLOCOS_META`.** `BLOCOS` é da prova (`CONCURSO`) e manda no
   simulado, na contagem regressiva, na regra de aprovação e em
   `blocoDaMateria` (peso usado por `prioridade()`). `BLOCOS_META` manda só na
@@ -335,11 +350,12 @@ o escopo alcança (`blocosDaMeta()` → `BLOCOS_META`, recalculado em
   matéria pode ter conteúdo programático diferente por cargo — um cargo de
   nível fundamental/médio, por exemplo, cobre menos itens de Português que
   um de nível superior, que costuma cobrir praticamente tudo. Bloco sem
-  `topicos` significa **matéria inteira**. Nenhum concurso cadastrado hoje
-  usa esse escopo (o exemplo real, o Português do Moço de Máquinas com 8
-  itens sem regência/colocação pronominal/coordenação-subordinação/sintaxe,
-  saiu de `concursos.json` junto com o concurso) — o mecanismo continua
-  valendo para quando outro concurso de conteúdo parcial for cadastrado.
+  `topicos` significa **matéria inteira**. Quem usa o escopo hoje é
+  `transpetro-mec`: o Anexo IV de nível médio lista 8 itens de Português
+  (sem regência, colocação pronominal, coordenação/subordinação nem
+  sintaxe — 132 dos 172 cartões entram) e 10 de Matemática (sem lógica —
+  116 dos 129). O bloco de Específicos não declara escopo porque a matéria
+  inteira *é* o conteúdo da ênfase.
   - Ao deduplicar, o escopo é **união**, não o do bloco vencedor: se um
     concurso restringe e outro não, quem segue os dois estuda a matéria
     inteira. União é o que garante não estudar de menos.
