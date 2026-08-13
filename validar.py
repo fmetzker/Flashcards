@@ -267,6 +267,44 @@ def valida_niveis(B, materias):
                         erros.append(f"niveis.json: matéria '{mid}': subtópico '{t}/{s}' aparece "
                                      f"nos níveis {visto_s[chave]} e {n} — ordem indefinida")
                     visto_s[chave] = n
+        # pré-requisitos: quais tópicos precisam ter a base dominada antes deste
+        # abrir. Grafia errada aqui é pior que erro visível — o tópico ficaria
+        # travado por uma dependência que não existe, ou destravado por engano.
+        req = dado.get('requisitos') or {}
+        for t, deps in req.items():
+            if t not in do_banco:
+                erros.append(f"niveis.json: matéria '{mid}': requisito declarado para tópico "
+                             f"'{t}', que não existe no banco desta matéria")
+            for d in deps:
+                if d not in do_banco:
+                    erros.append(f"niveis.json: matéria '{mid}', tópico '{t}': pré-requisito "
+                                 f"'{d}' não existe no banco desta matéria")
+                if d == t:
+                    erros.append(f"niveis.json: matéria '{mid}': tópico '{t}' é pré-requisito "
+                                 "de si mesmo")
+        # ciclo trancaria os tópicos envolvidos para sempre, sem nenhum aviso
+        # visível no app — a pessoa simplesmente nunca veria aqueles cartões
+        estado = {}
+        def ciclo(t, caminho):
+            if estado.get(t) == 'ok':
+                return None
+            if estado.get(t) == 'visitando':
+                return caminho[caminho.index(t):] + [t]
+            estado[t] = 'visitando'
+            for d in req.get(t, []):
+                achado = ciclo(d, caminho + [t])
+                if achado:
+                    return achado
+            estado[t] = 'ok'
+            return None
+        for t in list(req):
+            c = ciclo(t, [])
+            if c:
+                # sem seta unicode: o console do Windows é cp1252 e derrubava o
+                # validador inteiro ao tentar imprimir U+2192
+                erros.append(f"niveis.json: matéria '{mid}': ciclo de pré-requisitos "
+                             f"({' -> '.join(c)}) — esses tópicos nunca destravariam")
+                break
         # tópico sem nível não quebra nada (entra por último), mas some da ordenação
         sem_nivel = sorted(set(do_banco) - set(visto_t))
         if sem_nivel:

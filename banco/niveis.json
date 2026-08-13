@@ -50,7 +50,29 @@
             "Intertextualidade"
           ]
         }
-      ]
+      ],
+      "requisitos": {
+        "Pronomes": ["Classes de palavras"],
+        "Sintaxe": ["Classes de palavras"],
+        "Concordância": ["Classes de palavras", "Sintaxe"],
+        "Regência": ["Classes de palavras", "Sintaxe"],
+        "Crase": ["Classes de palavras", "Regência"],
+        "Colocação pronominal": ["Pronomes"],
+        "Pontuação": ["Sintaxe"],
+        "Coordenação": ["Classes de palavras"],
+        "Subordinação": ["Classes de palavras", "Sintaxe"],
+        "Coordenação e subordinação": ["Coordenação", "Subordinação"],
+        "Coesão": ["Pronomes", "Coordenação e subordinação"],
+        "Coerência": ["Coesão"],
+        "Interpretação de textos": ["Semântica", "Coerência"],
+        "Ambiguidade": ["Sintaxe", "Semântica"],
+        "Reescrita": ["Sintaxe", "Concordância", "Regência"],
+        "Figuras de linguagem": ["Semântica"],
+        "Tipologia textual": ["Classes de palavras"],
+        "Gêneros textuais": ["Tipologia textual"],
+        "Intertextualidade": ["Interpretação de textos"]
+      },
+      "_requisitos": "Cada aresta é uma dependência real, não a camada repetida: Crase exige Regência porque só há crase quando o termo regente pede a preposição 'a'; Colocação pronominal exige Pronomes, e não Classes de palavras inteiro; Tipologia textual exige Classes de palavras porque o tipo se reconhece pelo verbo (imperativo = injuntivo, ação em sequência = narrativo). Ficam SEM requisito, e portanto abertos desde o primeiro dia, quatro tópicos: Classes de palavras, Ortografia, Acentuação e Semântica — sempre há o que estudar, a trava nunca deixa a pessoa sem fila."
     }
   }
 }

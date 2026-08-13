@@ -465,8 +465,28 @@ Duas coisas se chamam "nível" e confundi-las quebra as duas:
 
 | | onde vive | o que faz |
 |---|---|---|
-| nível do **tópico** | `banco/niveis.json` | ordena tópicos entre si; **nunca trava** |
+| nível do **tópico** | `niveis.json`, chave `niveis` | ordena tópicos entre si; **não trava** |
+| **pré-requisito** entre tópicos | `niveis.json`, chave `requisitos` | **trava** o tópico até a base do exigido estar dominada |
 | nível do **cartão** (`n`) | campo do próprio cartão | escada dentro do tópico; **trava** |
+
+Os dois eixos que travam são independentes e se somam: um cartão novo só é
+oferecido se o **tópico** dele estiver aberto (pré-requisitos cumpridos) **e**
+o **degrau** dele já tiver sido alcançado dentro do tópico.
+
+`requisitos` é um mapa `tópico → tópicos que precisam vir antes`, e cada
+aresta é uma dependência real, não a camada repetida: Crase exige Regência
+porque só há crase quando o termo regente pede a preposição `a`; Colocação
+pronominal exige Pronomes, e não Classes de palavras inteiro. **Requisito
+cumprido = base (degrau 1) do tópico exigido dominada**, não o tópico
+inteiro — para começar Regência basta saber o que é cada classe de palavra,
+não ter terminado todos os exercícios de Classes de palavras.
+
+Tópico sem requisito declarado está sempre aberto. Em Português são quatro
+(Classes de palavras, Ortografia, Acentuação, Semântica), e isso é
+deliberado: **a trava nunca pode deixar a pessoa sem nada para estudar.**
+`validar.py` barra requisito com grafia que não existe no banco, tópico que
+é pré-requisito de si mesmo e **ciclo** — ciclo trancaria os tópicos
+envolvidos para sempre, sem nenhum aviso visível no app.
 
 **O degrau k+1 de um tópico abre quando todo cartão de degrau k daquele
 tópico está na caixa 2 ou acima** — respondido e acertado sem chute na última
@@ -485,8 +505,11 @@ Três invariantes que não podem ser afrouxados:
 - **O simulado ignora `n` por completo.** Ele imita a prova, e a prova não
   respeita escada nenhuma.
 
-Não há escape: a tela Matérias mostra `🔒 nível 2 travado · faltam 3 do nível
-1` e o botão Estudar leva **só ao degrau aberto** — inclusive o fallback de
+Não há escape em nenhum dos dois eixos. Tópico fechado por pré-requisito
+aparece apagado, com `🔒 estude antes: Pronomes` e **sem botão Estudar** —
+oferecer o botão só produziria sessão vazia. Tópico aberto mas com degrau
+interno fechado mostra `🔒 nível 2 travado · faltam 3 do nível 1` e o botão
+leva **só ao degrau aberto** — inclusive o fallback de
 "revisar adiantado", que filtra cartão de degrau fechado. `validar.py`
 (`valida_escadas`) avisa qual tópico tem nível 2+ sem nenhum cartão de nível
 1: nesse caso a escada não segura nada, porque "todo cartão do nível 1" é
