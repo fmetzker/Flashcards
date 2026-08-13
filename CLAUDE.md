@@ -200,7 +200,7 @@ pra quando algum concurso voltar a referenciá-la (é o caso de
 | `enfermagem-trabalho` | Enfermagem do Trabalho¹ | 126 | 17 | — |
 | `psicologia` | Psicologia | 0 | 0² | — |
 | `maritimo-maquinas` | Máquinas e Prática Marítima¹ | 136 | 16 | — |
-| `manutencao-mecanica` | Manutenção Mecânica | 197 | 23³ | — |
+| `manutencao-mecanica` | Manutenção Mecânica | 207 | 23³ | — |
 | `matematica` | Matemática | 153 | 7⁴ | — |
 
 ¹ Sem concurso ativo no momento — ver regra 12.
