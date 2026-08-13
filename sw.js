@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v238-escada-figuras-linguagem-generos-textuais";
+const VERSAO = "v240-portugues-23-de-23-topicos-completos";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
