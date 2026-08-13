@@ -211,12 +211,6 @@ button.fechar{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;
 .topico{display:flex;flex-wrap:wrap;align-items:center;gap:7px 9px;padding:10px 0;
   border-bottom:1px solid var(--traco);font-size:14.5px}
 .topico:last-of-type{border-bottom:none}
-/* faixa de nível: separa "a palavra" de "a relação entre palavras" na lista de
-   tópicos. Só aparece quando a matéria declara ordem em banco/niveis.json */
-.nivelCab{display:flex;align-items:baseline;gap:8px;padding:14px 0 4px;
-  font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta2)}
-.nivelCab:first-child{padding-top:4px}
-.nivelCab .n{flex:0 0 auto;font-weight:700;color:var(--tinta)}
 /* nota de degrau travado dentro do tópico — some junto com a linha inteira
    quando não há escada, então não ocupa espaço em matéria não classificada */
 .topico .trava{flex:0 0 auto;font-size:11.5px;color:var(--tinta2);white-space:nowrap}
@@ -557,7 +551,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
    e  = explicação   f = fonte
    ======================================================================= */
 let BANCO = [], CONCURSO = null, BLOCOS = [], BLOCOS_META = [], ORDEM_MATERIAS = [], TOPICOS_EDITAL = {};
-let NIVEIS = {}, NIVEL_T = {}, NIVEL_S = {}, NIVEL_NOME = {}, REQUISITOS = {};
+let REQ_MATERIA = {}, REQUISITOS = {};
 let CONCURSOS = [];          // todos os que existem em concursos.json
 let INSCRITOS = [];          // os que ESTE perfil segue (objetos, não ids)
 const porId = {}, MATERIAS = {}, blocoDaMateria = {};
@@ -725,57 +719,39 @@ async function carregarConfig(){
   try{ TOPICOS_EDITAL = (await pega("banco/topicos.json")).materias || {}; }
   catch(e){ TOPICOS_EDITAL = {}; }
 
-  /* Ordem de aprendizado: o que precisa vir antes do que dentro da matéria.
-     Também opcional — sem o arquivo, NIVEIS fica vazio e nivelDe() devolve o
-     mesmo número para todo cartão, o que faz a ordenação virar no-op e o app
-     se comportar exatamente como antes. */
-  try{ NIVEIS = (await pega("banco/niveis.json")).materias || {}; }
-  catch(e){ NIVEIS = {}; }
-  indexarNiveis();
+  /* Pré-requisitos entre tópicos. Opcional — sem o arquivo, REQUISITOS fica
+     vazio, nenhum tópico é travado por dependência, e só a escada interna
+     (campo `n`) continua valendo. */
+  try{ REQ_MATERIA = (await pega("banco/requisitos.json")).materias || {}; }
+  catch(e){ REQ_MATERIA = {}; }
+  indexarRequisitos();
 }
 
-/* Achata NIVEIS em dois mapas de consulta direta, uma vez no boot, porque
-   nivelDe() é chamado a cada ordenação da fila e varrer o JSON aninhado a
-   cada cartão seria desperdício.
+/* Achata REQ_MATERIA num mapa de consulta direta, uma vez no boot, porque
+   topicoAberto() é chamado a cada montagem de fila e varrer o JSON aninhado
+   a cada cartão seria desperdício.
 
-   NIVEL_T["portugues|Regência"] = 2
-   NIVEL_S["enfermagem|Urgência|Parada cardiorrespiratória"] = 3   */
-function indexarNiveis(){
-  NIVEL_T = {}; NIVEL_S = {}; NIVEL_NOME = {}; REQUISITOS = {};
-  Object.keys(NIVEIS).forEach(mid=>{
-    const req = NIVEIS[mid].requisitos || {};
+   REQUISITOS["portugues|Crase"] = ["Classes de palavras", "Regência"]   */
+function indexarRequisitos(){
+  REQUISITOS = {};
+  Object.keys(REQ_MATERIA).forEach(mid=>{
+    const req = REQ_MATERIA[mid].requisitos || {};
     Object.keys(req).forEach(t=>{ REQUISITOS[mid + "|" + t] = req[t] || []; });
-    (NIVEIS[mid].niveis || []).forEach(nv=>{
-      NIVEL_NOME[mid + "|" + nv.n] = nv.nome || ("Nível " + nv.n);
-      (nv.topicos || []).forEach(t=>{ NIVEL_T[mid + "|" + t] = nv.n; });
-      const subs = nv.subtopicos || {};
-      Object.keys(subs).forEach(t=>{
-        (subs[t] || []).forEach(s=>{ NIVEL_S[mid + "|" + t + "|" + s] = nv.n; });
-      });
-    });
   });
 }
 
-/* Nível de um cartão, da regra mais específica para a mais geral. Cartão sem
-   nível declarado vai para o fim (SEM_NIVEL alto), nunca para o começo: o
-   custo de errar para trás é ensinar o avançado antes do básico, que é
-   exatamente o que este mecanismo existe para evitar. */
-const SEM_NIVEL = 99;
+/* ===== nível do cartão: a ÚNICA noção de nível que existe no app ============
 
-/* ===== escada de níveis DENTRO do tópico =====================================
+   O nível vive dentro do tópico, no campo `n` do cartão: definição (1) antes
+   de aplicação (2) antes de síntese (3). Não existe nível ENTRE tópicos —
+   existiu, como camadas num niveis.json, e foi removido porque era rótulo
+   decorativo: quem decide o que abre é o grafo de pré-requisitos, e as duas
+   coisas discordavam na tela (um tópico da "camada 1" podia estar travado
+   enquanto um da "camada 3" abria).
 
-   Duas coisas diferentes se chamam "nível" neste app, e confundi-las quebra
-   as duas:
-
-   - banco/niveis.json ordena TÓPICOS entre si (Classes de palavras antes de
-     Regência). Só ordena, nunca trava — é nivelDe(), acima.
-   - o campo `n` do cartão é o degrau DENTRO do tópico: definição (1) antes de
-     aplicação (2) antes de síntese (3). Este trava.
-
-   Cartão sem `n` vale 1, e nível 1 nunca está travado. É o oposto do
-   SEM_NIVEL da ordenação, e de propósito: enquanto o banco não estiver todo
-   classificado, o desconhecido tem de passar. Ligar o recurso não pode
-   trancar 1.700 cartões que ninguém classificou ainda. */
+   Cartão sem `n` vale 1, e nível 1 nunca está travado — de propósito:
+   enquanto o banco não estiver todo classificado, o desconhecido tem de
+   passar. Ligar o recurso não pode trancar o que ninguém classificou. */
 function grauDe(q){ return (q && q.n) || 1; }
 
 /* Até que degrau deste tópico a pessoa já pode receber CARTÃO NOVO.
@@ -810,7 +786,7 @@ function limparCacheGrau(){ for(const k in _cacheGrau) delete _cacheGrau[k]; }
 
 /* ===== pré-requisito ENTRE tópicos ==========================================
 
-   O outro eixo da escada. banco/niveis.json declara, por tópico, de quais
+   O outro eixo da escada. banco/requisitos.json declara, por tópico, de quais
    outros tópicos ele depende: Regência exige Classes de palavras e Sintaxe;
    Crase exige Regência, porque só há crase quando o termo regente pede "a".
 
@@ -840,15 +816,6 @@ function topicoAberto(m, t){ return requisitosPendentes(m, t).length === 0; }
    já errou. */
 function grauAberto(q){
   return topicoAberto(q.m, q.t) && grauDe(q) <= grauLiberado(q.m, q.t);
-}
-
-function nivelDe(q){
-  if(!q) return SEM_NIVEL;
-  if(q.s){
-    const bs = NIVEL_S[q.m + "|" + q.t + "|" + q.s];
-    if(bs) return bs;
-  }
-  return NIVEL_T[q.m + "|" + q.t] || SEM_NIVEL;
 }
 
 /* união das matérias de TODOS os concursos inscritos — não só do que está em
@@ -1530,19 +1497,11 @@ function fila(){
     else if(c.prox <= h) revisar.push(q.id);
   });
   revisar.sort((a,b)=> prioridade(a) - prioridade(b));
-  /* CARTÃO NOVO entra na ordem de aprendizado (banco/niveis.json): não faz
-     sentido receber Regência antes de ter visto Classes de palavras.
-
-     A ordenação é DELIBERADAMENTE só aqui, nas novas. As vencidas seguem
-     ordenadas por prioridade() e nada mais: revisão atrasada é o sinal mais
-     forte que o Leitner produz, e adiá-la porque "é de nível 3" transformaria
-     um mecanismo de ordem num mecanismo de bloqueio — que é justamente o que
-     este recurso não é. Quem já viu o cartão avançado continua revisando ele
-     no dia certo, venha de onde vier.
-
-     Empate dentro do mesmo nível mantém a ordem do arquivo do banco, que é a
-     ordem em que os cartões foram escritos — estável e previsível. */
-  novas.sort((a,b)=> nivelDe(porId[a]) - nivelDe(porId[b]));
+  /* `novas` NÃO é reordenada: sai na ordem do arquivo do banco. A ordem
+     pedagógica já foi imposta pelo filtro acima — o cartão só chega aqui se
+     o tópico dele estiver aberto E o degrau dele alcançado. Ordenar de novo
+     por um segundo critério de "nível" foi o que criou a incoerência que
+     motivou a remoção das camadas entre tópicos. */
   return {revisar, novas};
 }
 /* Quanto do dia conta para a meta do concurso EM FOCO.
@@ -1966,18 +1925,6 @@ const abertas = {};
 const porTamanho = mapa => Object.keys(mapa)
   .sort((x,y)=> mapa[y].total - mapa[x].total || x.localeCompare(y,"pt"));
 
-/* Na tela Matérias, o tópico é listado na ORDEM DE APRENDIZADO, não por
-   tamanho: a lista é o mapa do caminho, e mostrar "Regência" antes de
-   "Classes de palavras" só porque tem mais cartão desfaz o que niveis.json
-   está tentando ensinar. Dentro do mesmo nível, volta a valer o tamanho.
-
-   Matéria sem nível declarado cai em SEM_NIVEL para todos os tópicos, o
-   empate resolve por tamanho e a tela fica idêntica à de antes. */
-const porNivel = (mid, mapa) => Object.keys(mapa)
-  .sort((x,y)=> (NIVEL_T[mid+"|"+x]||SEM_NIVEL) - (NIVEL_T[mid+"|"+y]||SEM_NIVEL)
-              || mapa[y].total - mapa[x].total
-              || x.localeCompare(y,"pt"));
-
 /* Estado da escada de um tópico, para a tela explicar a trava em vez de só
    esconder o botão. Devolve null quando o tópico não tem escada (um degrau
    só) ou quando tudo já está aberto — nesses casos não há nada a dizer. */
@@ -2074,24 +2021,8 @@ function pintarMaterias(){
     cx.appendChild(cab);
 
     const corpo = document.createElement("div"); corpo.className="corpoM";
-    let nivelAtual = null;
-    porNivel(mid, d.topicos).forEach(t=>{
+    porTamanho(d.topicos).forEach(t=>{
       const dt = d.topicos[t];
-
-      /* faixa de nível quando o grupo muda. Só existe se a matéria declarou
-         ordem: sem niveis.json todos caem em SEM_NIVEL e nenhuma faixa é
-         desenhada, deixando a tela como era antes. */
-      const nv = NIVEL_T[mid+"|"+t];
-      if(nv && nv !== nivelAtual){
-        nivelAtual = nv;
-        const cab = document.createElement("div"); cab.className = "nivelCab";
-        const num = document.createElement("span"); num.className = "n";
-        num.textContent = "Nível " + nv;
-        const nm = document.createElement("span");
-        nm.textContent = NIVEL_NOME[mid+"|"+nv] || "";
-        cab.appendChild(num); cab.appendChild(nm);
-        corpo.appendChild(cab);
-      }
       const temSub = Object.keys(dt.subs).length > 0;
       const chave = mid+"|"+t;
 
@@ -2175,7 +2106,6 @@ function iniciarSessao(modo, filtro){
       else if(c.prox <= h) rev.push(x.id);
     });
     rev.sort((a,b)=> prioridade(a) - prioridade(b));   // mesma ordem do estudo normal
-    nov.sort((a,b)=> nivelDe(porId[a]) - nivelDe(porId[b]));  // e a mesma ordem de aprendizado
     lista = rev.concat(nov).slice(0, E.meta);
     /* nada vencido e nada novo: revisa adiantado em vez de não fazer nada —
        mas só o que a pessoa JÁ VIU. Cartão de degrau fechado continua fora,

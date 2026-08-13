@@ -44,8 +44,7 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 | Eixo | Onde | Efeito |
 |---|---|---|
 | `t` / `s` | no cartão | agrupa por assunto |
-| `niveis[].topicos` | `banco/niveis.json` | **ordena** tópicos entre si |
-| `requisitos` | `banco/niveis.json` | **trava** tópico até a base do exigido |
+| `requisitos` | `banco/requisitos.json` | **trava** tópico até a base do exigido estar dominada |
 | `n` | no cartão | **trava** degrau dentro do tópico |
 
 ---
@@ -59,7 +58,7 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 | `banco/materias.json` | Lista de matérias, na ordem de exibição |
 | `banco/<matéria>.json` | Questões daquela matéria, uma por linha |
 | `banco/topicos.json` | Árvore oficial do edital — mostra tópico que a prova cobra e o banco não cobre |
-| `banco/niveis.json` | Ordem entre tópicos (`niveis`, ordena) e pré-requisitos (`requisitos`, **travam**) |
+| `banco/requisitos.json` | Pré-requisitos entre tópicos — **travam** cartão novo até a base do exigido |
 | `banco/indice-legado.json` | Ids na ordem antiga do array — migra progresso pré-id estável |
 | `banco/reescritas.json` | Mapa id antigo→novo de enunciados corrigidos — preserva progresso |
 | `sw.js` | Service worker, rede-primeiro. `VERSAO` sobe a cada mudança no app |
@@ -102,8 +101,8 @@ Um arquivo, ~3.300 linhas: CSS, HTML e JS. Ordem real do arquivo.
 | Função | Papel |
 |---|---|
 | `pega` | lê JSON; em `offline.html` lê de `window.DADOS` |
-| `carregarConfig` | concursos, matérias, `topicos.json`, `niveis.json` |
-| `indexarNiveis` | achata `niveis.json` em `NIVEL_T`, `NIVEL_S`, `REQUISITOS` |
+| `carregarConfig` | concursos, matérias, `topicos.json`, `requisitos.json` |
+| `indexarRequisitos` | achata `requisitos.json` em `REQUISITOS` |
 | `carregarBanco` | carrega só as matérias inscritas |
 | `blocosDaMeta` / `aplicarFoco` | monta `BLOCOS_META` e a meta do dia |
 | `provaMaisProxima` | define `CONCURSO` quando não há escopo |
@@ -133,7 +132,7 @@ Migrações que rodam no boot: `migrarSessaoDoPerfil`, `migrarEstadoDoPerfil`,
 | `grauLiberado` | até que degrau o tópico abriu (caixa ≥ 2 em todos do degrau) |
 | `requisitosPendentes` / `topicoAberto` | pré-requisitos entre tópicos |
 | `grauAberto` | tópico aberto **e** degrau alcançado |
-| `fila` | separa `revisar` (por `prioridade`) de `novas` (filtradas por `grauAberto`, ordenadas por `nivelDe`) |
+| `fila` | separa `revisar` (por `prioridade`) de `novas` (filtradas por `grauAberto`; sem reordenação) |
 | `iniciarSessao` | modos `normal`, `filtro`, `erros` |
 | `registrar` | grava resposta, atualiza caixa, alimenta a fila de sync |
 
@@ -148,7 +147,7 @@ Migrações que rodam no boot: `migrarSessaoDoPerfil`, `migrarEstadoDoPerfil`,
 `pintarReportes`, `pintarAprovar`.
 
 Auxiliares da tela Matérias: `resumoDoBanco` (agrega por matéria/tópico/
-subtópico **e por degrau**), `porNivel`, `travaDoTopico`, `linhaNivel`,
+subtópico **e por degrau**), `porTamanho`, `travaDoTopico`, `linhaNivel`,
 `miniBarra`.
 
 Simulado: `pintarSimuladoInicio`, `sorteia`, `iniciarSimulado`, `mostrarSim`,
@@ -175,7 +174,7 @@ matéria órfã.
 
 Os dois validadores precisam concordar: `validar.ps1` é o que roda antes de
 **gravar**, `validar.py` é o mais completo (só ele confere `topicos.json`,
-`niveis.json` e a sintaxe do JS, esta última se houver Node).
+`requisitos.json` e a sintaxe do JS, esta última se houver Node).
 
 ---
 
@@ -190,7 +189,7 @@ e/ou `{id, eo}` → `validar.py --patches` → `explicar-alternativas.ps1` →
 mesma cauda.
 
 **Um dia de estudo:** `fila()` separa vencidas de novas → novas passam por
-`grauAberto` e são ordenadas por `nivelDe` → `iniciarSessao("normal")`
+`grauAberto`, sem reordenação → `iniciarSessao("normal")`
 distribui pelas cotas de `BLOCOS_META` → `registrar` grava e enfileira sync.
 
 ---

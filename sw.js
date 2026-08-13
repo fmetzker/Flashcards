@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v240-portugues-23-de-23-topicos-completos";
+const VERSAO = "v241-remove-camadas-entre-topicos-nivel-so-dentro";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
@@ -25,9 +25,9 @@ const ARQUIVOS = [
   /* árvore oficial do conteúdo programático — sem ele, a tela Matérias offline
      deixa de mostrar os tópicos do edital que ainda não têm cartão */
   "./banco/topicos.json",
-  /* ordem de aprendizado — sem ele, o app offline volta a apresentar cartão
-     novo na ordem do arquivo do banco, ignorando o que vem antes do quê */
-  "./banco/niveis.json"
+  /* pré-requisitos entre tópicos — sem ele, o app offline deixa de travar
+     tópico por dependência; só a escada interna do cartão continua valendo */
+  "./banco/requisitos.json"
 ];
 
 /* Instalação: baixa tudo e guarda.

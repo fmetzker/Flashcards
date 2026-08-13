@@ -1,0 +1,32 @@
+{
+  "_leia": "Pre-requisitos entre topicos: de quais outros topicos cada topico depende para abrir. TRAVA cartao NOVO: enquanto a base do topico exigido nao estiver dominada, os cartoes novos daquele topico nao entram na fila e a tela Materias mostra o topico sem botao. Revisao vencida NUNCA e travada. O arquivo e OPCIONAL - sem ele, nenhum topico fica travado por dependencia, e so a escada interna (campo 'n' do cartao) continua valendo.",
+  "_requisito_cumprido": "Requisito cumprido = a BASE (degrau 1) do topico exigido dominada, ou seja, todo cartao de nivel 1 dele na caixa 2 ou acima. Nao o topico inteiro: para comecar Regencia basta saber o que e cada classe de palavra, nao ter terminado todos os exercicios de Classes de palavras.",
+  "_criterio_nao_e_fonte": "Cada materia declara 'criterio', nao 'fonte', e a diferenca e proposital. banco/topicos.json transcreve o conteudo programatico do edital e por isso exige fonte. Ordem de estudo e JULGAMENTO PEDAGOGICO nosso: nenhum edital diz de que topico depende qual. Chamar isso de 'fonte' fingiria uma autoridade que nao existe - mesmo cuidado da regra 11 do CLAUDE.md.",
+  "_por_que_nao_ha_camadas": "Existiu aqui uma segunda estrutura, 'niveis', que agrupava os topicos em tres camadas (a palavra / a relacao entre palavras / o texto) e servia para ORDENAR. Foi removida porque virou rotulo enganoso: quem decide o que abre e o grafo de requisitos, nao a camada. Ao dominar Classes de palavras abriam ao mesmo tempo Pronomes (rotulado camada 1) e Tipologia textual (rotulado camada 3) — a tela anunciava uma hierarquia que o motor nao usava. Nivel agora existe em UM lugar so: dentro do topico, no campo 'n' do cartao.",
+  "materias": {
+    "portugues": {
+      "criterio": "Cada aresta é uma dependência real de conceito, não uma ordem estética: um tópico só exige outro quando os exercícios dele pressupõem, de fato, a base do exigido. Crase exige Regência porque só há crase quando o termo regente pede a preposição 'a'; Colocação pronominal exige Pronomes, e não Classes de palavras inteiro; Tipologia textual exige Classes de palavras porque o tipo se reconhece pelo verbo (imperativo = injuntivo, ação em sequência = narrativo). Ficam SEM requisito, e portanto abertos desde o primeiro dia, quatro tópicos: Classes de palavras, Ortografia, Acentuação e Semântica — sempre há o que estudar, a trava nunca deixa a pessoa sem fila.",
+      "requisitos": {
+        "Pronomes": ["Classes de palavras"],
+        "Sintaxe": ["Classes de palavras"],
+        "Concordância": ["Classes de palavras", "Sintaxe"],
+        "Regência": ["Classes de palavras", "Sintaxe"],
+        "Crase": ["Classes de palavras", "Regência"],
+        "Colocação pronominal": ["Pronomes"],
+        "Pontuação": ["Sintaxe"],
+        "Coordenação": ["Classes de palavras"],
+        "Subordinação": ["Classes de palavras", "Sintaxe"],
+        "Coordenação e subordinação": ["Coordenação", "Subordinação"],
+        "Coesão": ["Pronomes", "Coordenação e subordinação", "Semântica"],
+        "Coerência": ["Coesão"],
+        "Interpretação de textos": ["Semântica", "Coerência"],
+        "Ambiguidade": ["Sintaxe", "Semântica"],
+        "Reescrita": ["Sintaxe", "Concordância", "Regência"],
+        "Figuras de linguagem": ["Semântica"],
+        "Tipologia textual": ["Classes de palavras"],
+        "Gêneros textuais": ["Tipologia textual"],
+        "Intertextualidade": ["Interpretação de textos"]
+      }
+    }
+  }
+}

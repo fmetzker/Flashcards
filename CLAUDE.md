@@ -386,48 +386,57 @@ Três pontos de lá que decidem trabalho:
 `validar`, **não reprova nada**; a saída só ajuda a escolher o que corrigir
 primeiro.
 
-## Ordem de aprendizado (níveis)
+## Ordem de aprendizado
 
-`banco/niveis.json` declara em que ordem estudar dentro de cada matéria, e o
-campo `n` do cartão declara a ordem dentro do tópico. **Os dois arquivos são
-opcionais**: sem eles o app volta ao comportamento antigo, sem ordem e sem
-trava. Mecânica detalhada e formato em `ESTRUTURA.md`.
+**Entender o conceito antes de exercitar.** É o único princípio, e ele se
+realiza por dois mecanismos, os dois de bloqueio — não existe mais nenhum
+mecanismo que apenas *ordene*:
 
-Três eixos, e é obrigatório não confundi-los:
-
-| | onde vive | efeito |
+| | onde vive | o que trava |
 |---|---|---|
-| nível do **tópico** | `niveis.json` → `niveis` | **ordena** tópicos entre si |
-| **pré-requisito** | `niveis.json` → `requisitos` | **trava** o tópico até a base do exigido estar dominada |
-| nível do **cartão** | campo `n` | **trava** o degrau dentro do tópico |
+| **pré-requisito** entre tópicos | `banco/requisitos.json` | o tópico, até a base do exigido estar dominada |
+| **nível do cartão** dentro do tópico | campo `n` | o degrau, até o anterior estar acertado |
+
+Os dois são opcionais: sem eles, nada trava. Formato e mecânica em
+`ESTRUTURA.md`.
+
+**Não existe nível ENTRE tópicos.** Existiu — camadas que agrupavam os
+tópicos em "a palavra / a relação entre palavras / o texto" — e foi removido
+porque era rótulo decorativo que contradizia o motor: ao dominar Classes de
+palavras abriam ao mesmo tempo um tópico rotulado camada 1 e outro rotulado
+camada 3, porque quem decide o que abre é o grafo de pré-requisitos. A tela
+anunciava uma hierarquia que não existia. **Nível é uma noção só, e ela vive
+dentro do tópico.**
 
 Os invariantes, que não podem ser afrouxados:
 
-- **Trava e ordenação agem só sobre cartão NOVO.** Revisão vencida entra
-  sempre, venha do degrau ou do tópico que vier. Travar revisão viraria um
-  jeito de esconder justamente o que a pessoa já errou.
-- **Cartão sem `n` vale 1, e o degrau 1 nunca trava.** É o oposto do
-  `SEM_NIVEL` da ordenação, de propósito: enquanto o banco não estiver todo
-  classificado, ligar o recurso não pode trancar o que ninguém classificou.
-- **Sempre existe tópico sem pré-requisito.** A trava nunca pode deixar a
-  pessoa sem nada para estudar.
-- **O simulado ignora os três eixos.** Ele imita a prova, e a prova não
+- **Trava só cartão NOVO.** Revisão vencida entra sempre, venha do degrau ou
+  do tópico que vier. Travar revisão viraria um jeito de esconder justamente
+  o que a pessoa já errou.
+- **Cartão sem `n` vale 1, e o degrau 1 nunca trava.** Enquanto o banco não
+  estiver todo classificado, ligar o recurso não pode trancar o que ninguém
+  classificou.
+- **Sempre existe tópico sem pré-requisito** — o validador reprova se não
+  houver nenhum. A trava não pode deixar a pessoa sem nada para estudar.
+- **O simulado ignora os dois eixos.** Ele imita a prova, e a prova não
   respeita escada nenhuma.
 - **A trava não tem escape.** Tópico fechado por pré-requisito não ganha
   botão Estudar; degrau fechado não é alcançável nem pelo atalho de "revisar
   adiantado".
 - **`criterio`, não `fonte`.** `topicos.json` transcreve edital e exige
-  `fonte`; ordem de estudo é julgamento nosso, e nenhum edital diz em que
-  ordem estudar. Chamar de "fonte" fingiria autoridade que não existe —
+  `fonte`; ordem de estudo é julgamento nosso, e nenhum edital diz de que
+  tópico depende qual. Chamar de "fonte" fingiria autoridade que não existe —
   mesmo cuidado da regra 11.
 
-`validar.py` barra grafia que não existe no banco, tópico em dois níveis,
-pré-requisito circular e nível fora de 1–9. E **avisa** qual tópico tem
-cartão de nível 2+ sem nenhum de nível 1: ali a escada não segura nada, e
-esse aviso é a lista de trabalho de quais definições ainda faltam escrever.
+`validar.py` barra grafia que não existe no banco, pré-requisito circular,
+tópico que exige a si mesmo, matéria em que nenhum tópico abriria, e nível
+fora de 1–9. E **avisa** qual tópico tem cartão de nível 2+ sem nenhum de
+nível 1: ali a escada não segura nada, e esse aviso é a lista de trabalho de
+quais definições ainda faltam escrever.
 
 O campo `n` é gravado pelos caminhos de sempre — `incorporar-rascunho.ps1` e
 `explicar-alternativas.ps1`. Nenhum script novo: a regra 9 segue com três.
+
 
 ## Motor de repetição espaçada
 

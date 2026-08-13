@@ -85,7 +85,7 @@ def carrega_banco():
     # arquivo de matéria que não está no materias.json passaria despercebido
     for nome in sorted(os.listdir(BANCO_DIR)):
         base = os.path.splitext(nome)[0]
-        if not nome.endswith('.json') or base in ('materias', 'indice-legado', 'reescritas', 'topicos', 'niveis'):
+        if not nome.endswith('.json') or base in ('materias', 'indice-legado', 'reescritas', 'topicos', 'requisitos'):
             continue
         if base not in nome_materia:
             erros.append(f"banco/{nome} não corresponde a nenhuma matéria de materias.json")
@@ -208,91 +208,50 @@ def valida_topicos(B, materias):
                           f"fora da árvore do edital: {', '.join(sorted(soltos)[:4])}")
 
 
-def valida_niveis(B, materias):
-    """A ordem de aprendizado (opcional) precisa apontar para coisa que existe.
+def valida_requisitos(B, materias):
+    """Os pré-requisitos entre tópicos (opcional) precisam apontar para coisa
+    que existe, e não podem formar ciclo.
 
-    Nível é julgamento pedagógico, não transcrição de edital — por isso exige
-    'criterio' e não 'fonte' (ver banco/niveis.json). O que o validador cobra
-    é coerência: tópico declarado tem de existir no banco com a mesma grafia,
-    porque tópico escrito errado aqui não daria erro visível — ele só sumiria
-    da ordenação em silêncio, e a pessoa receberia o cartão avançado antes do
-    básico sem ninguém perceber. Mesmo raciocínio do escopo de blocos[].topicos."""
-    caminho = os.path.join(BANCO_DIR, 'niveis.json')
+    Ordem de estudo é julgamento pedagógico, não transcrição de edital — por
+    isso o arquivo exige 'criterio' e não 'fonte' (ver banco/requisitos.json).
+    O que o validador cobra é coerência: tópico escrito errado aqui não daria
+    erro visível — ele travaria um tópico por uma dependência inexistente, ou
+    o destravaria por engano, em silêncio."""
+    caminho = os.path.join(BANCO_DIR, 'requisitos.json')
     if not os.path.exists(caminho):
         return
     reg = json.load(open(caminho, encoding='utf-8')).get('materias', {})
     ids_mat = {m['id'] for m in materias}
     for mid, dado in reg.items():
         if mid not in ids_mat:
-            erros.append(f"niveis.json: matéria '{mid}' não existe em materias.json")
+            erros.append(f"requisitos.json: matéria '{mid}' não existe em materias.json")
             continue
         if not dado.get('criterio'):
-            erros.append(f"niveis.json: matéria '{mid}' sem 'criterio' — por que esta ordem, e não outra?")
-        do_banco = collections.defaultdict(set)
-        for q in B:
-            if q.get('m') == mid:
-                do_banco[q['t']].add(q.get('s'))
-        niveis = dado.get('niveis', [])
-        if not niveis:
-            avisos.append(f"niveis.json: matéria '{mid}' está sem nenhum nível")
-        numeros = [nv.get('n') for nv in niveis]
-        if sorted(numeros) != list(range(1, len(niveis) + 1)):
-            erros.append(f"niveis.json: matéria '{mid}' tem níveis {numeros} — "
-                         "esperado 1..N, sem repetir nem pular")
-        # um tópico em dois níveis deixaria o cartão sem ordem definida
-        visto_t, visto_s = {}, {}
-        for nv in niveis:
-            n = nv.get('n')
-            if not nv.get('nome'):
-                erros.append(f"niveis.json: matéria '{mid}', nível {n}: sem 'nome'")
-            for t in nv.get('topicos', []):
-                if t not in do_banco:
-                    erros.append(f"niveis.json: matéria '{mid}', nível {n}: tópico '{t}' "
-                                 "não existe no banco desta matéria")
-                if t in visto_t:
-                    erros.append(f"niveis.json: matéria '{mid}': tópico '{t}' aparece nos "
-                                 f"níveis {visto_t[t]} e {n} — a ordem dele ficaria indefinida")
-                visto_t[t] = n
-            for t, subs in (nv.get('subtopicos') or {}).items():
-                if t not in do_banco:
-                    erros.append(f"niveis.json: matéria '{mid}', nível {n}: tópico '{t}' "
-                                 "(em subtopicos) não existe no banco desta matéria")
-                    continue
-                for s in subs:
-                    if s not in do_banco[t]:
-                        erros.append(f"niveis.json: matéria '{mid}', nível {n}: subtópico "
-                                     f"'{s}' não existe sob o tópico '{t}' no banco")
-                    chave = (t, s)
-                    if chave in visto_s:
-                        erros.append(f"niveis.json: matéria '{mid}': subtópico '{t}/{s}' aparece "
-                                     f"nos níveis {visto_s[chave]} e {n} — ordem indefinida")
-                    visto_s[chave] = n
-        # pré-requisitos: quais tópicos precisam ter a base dominada antes deste
-        # abrir. Grafia errada aqui é pior que erro visível — o tópico ficaria
-        # travado por uma dependência que não existe, ou destravado por engano.
+            erros.append(f"requisitos.json: matéria '{mid}' sem 'criterio' — por que esta ordem, e não outra?")
+        do_banco = {q['t'] for q in B if q.get('m') == mid}
         req = dado.get('requisitos') or {}
         for t, deps in req.items():
             if t not in do_banco:
-                erros.append(f"niveis.json: matéria '{mid}': requisito declarado para tópico "
+                erros.append(f"requisitos.json: matéria '{mid}': requisito declarado para tópico "
                              f"'{t}', que não existe no banco desta matéria")
             for d in deps:
                 if d not in do_banco:
-                    erros.append(f"niveis.json: matéria '{mid}', tópico '{t}': pré-requisito "
+                    erros.append(f"requisitos.json: matéria '{mid}', tópico '{t}': pré-requisito "
                                  f"'{d}' não existe no banco desta matéria")
                 if d == t:
-                    erros.append(f"niveis.json: matéria '{mid}': tópico '{t}' é pré-requisito "
+                    erros.append(f"requisitos.json: matéria '{mid}': tópico '{t}' é pré-requisito "
                                  "de si mesmo")
         # ciclo trancaria os tópicos envolvidos para sempre, sem nenhum aviso
         # visível no app — a pessoa simplesmente nunca veria aqueles cartões
         estado = {}
-        def ciclo(t, caminho):
+        def ciclo(t, caminho_atual):
             if estado.get(t) == 'ok':
                 return None
             if estado.get(t) == 'visitando':
-                return caminho[caminho.index(t):] + [t]
+                return caminho_atual[caminho_atual.index(t):] + [t]
             estado[t] = 'visitando'
             for d in req.get(t, []):
-                achado = ciclo(d, caminho + [t])
+                achado = ciclo(d, caminho_atual + [t])
                 if achado:
                     return achado
             estado[t] = 'ok'
@@ -302,21 +261,23 @@ def valida_niveis(B, materias):
             if c:
                 # sem seta unicode: o console do Windows é cp1252 e derrubava o
                 # validador inteiro ao tentar imprimir U+2192
-                erros.append(f"niveis.json: matéria '{mid}': ciclo de pré-requisitos "
+                erros.append(f"requisitos.json: matéria '{mid}': ciclo de pré-requisitos "
                              f"({' -> '.join(c)}) — esses tópicos nunca destravariam")
                 break
-        # tópico sem nível não quebra nada (entra por último), mas some da ordenação
-        sem_nivel = sorted(set(do_banco) - set(visto_t))
-        if sem_nivel:
-            avisos.append(f"niveis.json: matéria '{mid}' tem {len(sem_nivel)} tópico(s) sem nível "
-                          f"declarado, que entram por último: {', '.join(sem_nivel[:4])}")
-    # matéria ativa sem nenhum nível declarado: some da ordenação inteira
+        # tópico sem pré-requisito é NORMAL e necessário: se todos tivessem,
+        # nada abriria no primeiro dia. Só avisa se NENHUM ficou aberto.
+        raizes = [t for t in do_banco if not req.get(t)]
+        if do_banco and not raizes:
+            erros.append(f"requisitos.json: matéria '{mid}': todo tópico tem pré-requisito — "
+                         "nenhum abriria no primeiro dia")
+    # matéria ativa sem requisitos declarados: nenhum tópico dela trava
     declaradas = set(reg)
     ativas = materias_ativas()
     faltando = sorted(m['id'] for m in materias if m['id'] in ativas and m['id'] not in declaradas)
     if faltando:
-        avisos.append(f"niveis.json: {len(faltando)} matéria(s) ativa(s) sem ordem de aprendizado "
-                      f"declarada: {', '.join(faltando)}")
+        avisos.append(f"requisitos.json: {len(faltando)} matéria(s) ativa(s) sem pré-requisitos "
+                      f"declarados: {', '.join(faltando)}")
+
 
 
 def valida_escadas(B):
@@ -405,8 +366,9 @@ def valida_questoes(B):
                               "tire o campo se nenhuma vai ser preenchida")
         # 'n' é o nível do cartão DENTRO do tópico (definição → aplicação →
         # síntese), e é o que o app usa para travar o nível seguinte enquanto
-        # o anterior não foi acertado. Não confundir com banco/niveis.json,
-        # que ordena TÓPICOS entre si. Ausente vale 1: cartão sem nível nunca
+        # o anterior não foi acertado. É a ÚNICA noção de nível do app: o
+        # que separa tópicos é o grafo de banco/requisitos.json, não um
+        # nível. Ausente vale 1: cartão sem nível nunca
         # pode ficar travado, senão ligar o recurso trancaria o banco inteiro.
         if 'n' in q:
             n = q.get('n')
@@ -705,7 +667,7 @@ def main():
     ids = valida_questoes(B)
     valida_migracao(B, ids)
     valida_topicos(B, materias)
-    valida_niveis(B, materias)
+    valida_requisitos(B, materias)
     valida_escadas(B)
     valida_redundancia(B)
     valida_concursos(B)
