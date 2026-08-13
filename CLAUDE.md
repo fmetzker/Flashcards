@@ -193,7 +193,7 @@ pra quando algum concurso voltar a referenciá-la (é o caso de
 
 | id | nome | questões | tópicos | subtópicos |
 |---|---|--:|--:|--:|
-| `portugues` | Língua Portuguesa | 172 | 23 | — |
+| `portugues` | Língua Portuguesa | 195 | 23 | — |
 | `ingles` | Língua Inglesa | 97 | 8 | — |
 | `sus` | Legislação do SUS | 121 | 10 | — |
 | `enfermagem` | Conhecimentos Específicos de Enfermagem | 677 | 19 | 120 |
