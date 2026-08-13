@@ -78,8 +78,16 @@ if ($DryRun) {
 
 # ---- 2. acha em qual banco/<matéria>.json cada id mora ------------------------
 $materias = [System.IO.File]::ReadAllText((Join-Path $dir 'materias.json'), [System.Text.Encoding]::UTF8) | ConvertFrom-Json
-$eoPorId = @{}
-foreach ($p in $patches) { $eoPorId[$p.id] = @($p.eo) }
+# Um patch traz 'eo', 'n', ou os dois. Guardo em mapas separados porque campo
+# ausente no patch NÃO pode apagar o que o cartão já tem — quem só define 'n'
+# não deve perder o 'eo' escrito antes, e vice-versa.
+$eoPorId = @{}; $nPorId = @{}; $alvos = @{}
+foreach ($p in $patches) {
+  $campos = $p.PSObject.Properties.Name
+  if ($campos -contains 'eo') { $eoPorId[$p.id] = @($p.eo) }
+  if ($campos -contains 'n')  { $nPorId[$p.id]  = [int]$p.n }
+  $alvos[$p.id] = $true
+}
 
 $alterados = 0
 foreach ($m in $materias) {
@@ -92,16 +100,21 @@ foreach ($m in $materias) {
     $l = $linhas[$i].Trim().TrimEnd(',')
     if (-not $l.StartsWith('{')) { continue }
     $q = $l | ConvertFrom-Json
-    if (-not $eoPorId.ContainsKey($q.id)) { continue }
+    if (-not $alvos.ContainsKey($q.id)) { continue }
 
-    # regrava na MESMA ordem de campos do banco, com 'eo' por último — é o
-    # mesmo padrão de reescrever-questoes.ps1, pelo mesmo motivo: garante
+    # regrava na MESMA ordem de campos do banco, com 'n' e 'eo' por último — é
+    # o mesmo padrão de reescrever-questoes.ps1, pelo mesmo motivo: garante
     # formatação previsível em vez de depender da ordem que ConvertFrom-Json
     # devolveu as propriedades
+    $campoQ = $q.PSObject.Properties.Name
     $obj = [ordered]@{ id = $q.id; m = $q.m; t = $q.t }
-    if ($q.PSObject.Properties.Name -contains 's' -and $q.s) { $obj.s = $q.s }
+    if ($campoQ -contains 's' -and $q.s) { $obj.s = $q.s }
     $obj.q = $q.q; $obj.o = @($q.o); $obj.c = [int]$q.c; $obj.e = $q.e; $obj.f = $q.f
-    $obj.eo = $eoPorId[$q.id]
+    # o que o patch não trouxe é preservado do cartão original
+    if ($nPorId.ContainsKey($q.id))      { $obj.n = $nPorId[$q.id] }
+    elseif ($campoQ -contains 'n')       { $obj.n = [int]$q.n }
+    if ($eoPorId.ContainsKey($q.id))     { $obj.eo = $eoPorId[$q.id] }
+    elseif ($campoQ -contains 'eo')      { $obj.eo = @($q.eo) }
 
     $virgula = if ($linhas[$i].TrimEnd().EndsWith(',')) { ',' } else { '' }
     $linhas[$i] = ($obj | ConvertTo-Json -Compress -Depth 5) + $virgula
@@ -122,7 +135,7 @@ if ($vistos.Count -gt 0) {
   throw "id(s) aprovados no validador mas não encontrados na hora de gravar: $($vistos.Keys -join ', ')"
 }
 
-Write-Host "`n$alterados cartão(ões) com 'eo' gravado(s)."
+Write-Host "`n$alterados cartão(ões) alterado(s) ('eo' e/ou 'n' gravado(s))."
 
 # esvazia o arquivo de trabalho: o que foi incorporado não pode ser incorporado de novo
 [System.IO.File]::WriteAllText($arqP, "[`n]`n", (New-Object System.Text.UTF8Encoding $false))

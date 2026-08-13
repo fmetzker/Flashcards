@@ -100,6 +100,11 @@ foreach ($m in $porMateria.Keys) {
     $obj = [ordered]@{ id = Id-Questao $q.q; m = $q.m; t = $q.t }
     if ($q.s) { $obj.s = $q.s }
     $obj.q = $q.q; $obj.o = $q.o; $obj.c = $q.c; $obj.e = $q.e; $obj.f = $q.f
+    # 'n' (nível do cartão dentro do tópico) na mesma posição em que
+    # explicar-alternativas.ps1 o grava, para os dois caminhos produzirem
+    # exatamente a mesma linha; sem isto, cartão escrito já com nível
+    # perderia o campo em silêncio na hora de gravar
+    if ($q.PSObject.Properties.Name -contains 'n' -and $q.n) { $obj.n = [int]$q.n }
     if ($q.PSObject.Properties.Name -contains 'eo' -and $q.eo) { $obj.eo = @($q.eo) }
     $obj | ConvertTo-Json -Compress -Depth 5
   }

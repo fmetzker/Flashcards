@@ -37,8 +37,8 @@ referenciá-la em `blocos[].materias`.
 | `validar.py` / `validar.ps1` | Verificação de integridade do banco — **rodar antes de publicar**. Com `-Rascunho`/`--rascunho`, valida candidatos sem gravar; com `-Patches`/`--patches`, valida `eo` aplicado em memória sobre cartão existente, também sem gravar |
 | `rascunho.json` | Cartões em elaboração, sem `id`. Vazio quando não há trabalho em curso |
 | `incorporar-rascunho.ps1` | Grava o rascunho no banco — só se o validador passar. Ver regra 9 |
-| `explicacoes.json` | Explicações por alternativa (`eo`) em elaboração, por `id`. Vazio quando não há trabalho em curso |
-| `explicar-alternativas.ps1` | Grava `eo` em cartão que já existe, casando por `id` — só se o validador passar. Ver regra 9 |
+| `explicacoes.json` | Patches por `id` em elaboração: `eo` (explicação por alternativa) e/ou `n` (nível do cartão). Vazio quando não há trabalho em curso |
+| `explicar-alternativas.ps1` | Grava `eo` e/ou `n` em cartão que já existe, casando por `id` — só se o validador passar. Campo ausente no patch é preservado. Ver regra 9 |
 | `auditar-banco.py` / `.ps1` | Mede o banco contra `PADRAO-DOS-CARTOES.md`. Mede, não reprova |
 | `reescrever-questoes.ps1` | Corrige enunciado sem perder progresso — ver regra 5 |
 | `incorporar-propostas.ps1` | Grava proposta aprovada como questão de verdade — ver regra 9 |
@@ -172,6 +172,11 @@ Arquivos `banco/<matéria>.json`, um objeto por linha (mantém o diff pequeno):
 - `c` — índice da correta, 0 a 4
 - `f` — **obrigatório**: lei e artigo, ou manual e capítulo. Questão sem
   fonte não entra
+- `n` — **nível do cartão dentro do tópico**, opcional: definição (1) →
+  aplicação (2) → síntese (3). É o que o app usa para travar o nível seguinte
+  enquanto o anterior não foi acertado. Ausente vale 1. Não confundir com
+  `banco/niveis.json`, que ordena **tópicos entre si** e não trava nada — ver
+  a seção "Ordem de aprendizado"
 - `eo` — explicação por alternativa, **opcional**. Array do mesmo tamanho de
   `o`, uma posição por alternativa (`""` pula a posição, mas ela precisa
   existir). Ao responder, o app mostra essa nota junto da própria
@@ -453,6 +458,45 @@ A tela Matérias também continua deixando estudar qualquer tópico à mão.
 
 Declarado hoje só para `portugues` (piloto). As demais matérias ativas
 aparecem como aviso no validador até ganharem a sua ordem.
+
+### A escada dentro do tópico — o campo `n`, que **trava**
+
+Duas coisas se chamam "nível" e confundi-las quebra as duas:
+
+| | onde vive | o que faz |
+|---|---|---|
+| nível do **tópico** | `banco/niveis.json` | ordena tópicos entre si; **nunca trava** |
+| nível do **cartão** (`n`) | campo do próprio cartão | escada dentro do tópico; **trava** |
+
+**O degrau k+1 de um tópico abre quando todo cartão de degrau k daquele
+tópico está na caixa 2 ou acima** — respondido e acertado sem chute na última
+vez. Reaproveita o estado do Leitner em vez de inventar um segundo sistema de
+domínio. Cartão nunca visto não está dominado, então o degrau não avança: é o
+que faz a escada segurar. Errar um cartão do degrau de baixo **fecha o de
+cima de novo**, e isso é intencional.
+
+Três invariantes que não podem ser afrouxados:
+
+- **Trava só cartão NOVO.** Revisão vencida entra sempre, venha do degrau que
+  vier. Travar revisão viraria um jeito de esconder o que a pessoa já errou.
+- **Cartão sem `n` vale 1, e o degrau 1 nunca está travado.** É o oposto do
+  `SEM_NIVEL` da ordenação, de propósito: enquanto o banco não estiver todo
+  classificado, ligar o recurso não pode trancar o que ninguém classificou.
+- **O simulado ignora `n` por completo.** Ele imita a prova, e a prova não
+  respeita escada nenhuma.
+
+Não há escape: a tela Matérias mostra `🔒 nível 2 travado · faltam 3 do nível
+1` e o botão Estudar leva **só ao degrau aberto** — inclusive o fallback de
+"revisar adiantado", que filtra cartão de degrau fechado. `validar.py`
+(`valida_escadas`) avisa qual tópico tem nível 2+ sem nenhum cartão de nível
+1: nesse caso a escada não segura nada, porque "todo cartão do nível 1" é
+vacuamente verdadeiro. Esse aviso **é a lista de trabalho** de quais tópicos
+ainda precisam dos cartões de definição.
+
+O campo `n` é gravado pelos mesmos caminhos de sempre: `incorporar-rascunho.ps1`
+(cartão novo já nasce com nível) e `explicar-alternativas.ps1` (aplica `n` e/ou
+`eo` por `id` em cartão existente). Nenhum script novo — a regra 9 continua
+valendo com os mesmos três.
 
 ## Motor de repetição espaçada
 

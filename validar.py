@@ -281,6 +281,37 @@ def valida_niveis(B, materias):
                       f"declarada: {', '.join(faltando)}")
 
 
+def valida_escadas(B):
+    """A escada de níveis dentro de cada tópico precisa ter o primeiro degrau.
+
+    O app libera o nível k+1 de um tópico quando todo cartão de nível k já foi
+    acertado. Tópico que só tem cartão de nível 2 para cima libera tudo de
+    cara — a condição 'todo cartão do nível 1' é vacuamente verdadeira — então
+    a escada existe no papel e não segura nada na prática.
+
+    Isso não é erro: é exatamente o estado do banco enquanto os cartões de
+    definição não forem escritos. O aviso é a lista de trabalho: diz onde
+    falta o degrau de baixo."""
+    por_topico = collections.defaultdict(set)
+    for q in B:
+        por_topico[(q['m'], q['t'])].add(q.get('n', 1))
+    sem_base, com_buraco = [], []
+    for (mid, t), niveis in sorted(por_topico.items()):
+        if max(niveis) == 1:
+            continue                      # tópico ainda sem escada: nada a conferir
+        if 1 not in niveis:
+            sem_base.append(f"{mid}/{t}")
+        faltando = set(range(1, max(niveis) + 1)) - niveis
+        if faltando - {1}:
+            com_buraco.append(f"{mid}/{t} (sem nível {sorted(faltando - {1})[0]})")
+    if sem_base:
+        avisos.append(f"{len(sem_base)} tópico(s) com nível 2+ mas sem nenhum cartão de nível 1 — "
+                      f"a escada não segura nada até o degrau de baixo existir: {', '.join(sem_base[:4])}")
+    if com_buraco:
+        avisos.append(f"{len(com_buraco)} tópico(s) com buraco na escada de níveis: "
+                      f"{', '.join(com_buraco[:4])}")
+
+
 def valida_js(fonte):
     """Confere a sintaxe de todo o JavaScript do app."""
     scripts = re.findall(r'<script>(.*?)</script>', fonte, re.S)
@@ -334,6 +365,15 @@ def valida_questoes(B):
             elif not any(isinstance(x, str) and x.strip() for x in eo):
                 erros.append(f"[{rot}] 'eo' está presente mas vazio em todas as alternativas — "
                               "tire o campo se nenhuma vai ser preenchida")
+        # 'n' é o nível do cartão DENTRO do tópico (definição → aplicação →
+        # síntese), e é o que o app usa para travar o nível seguinte enquanto
+        # o anterior não foi acertado. Não confundir com banco/niveis.json,
+        # que ordena TÓPICOS entre si. Ausente vale 1: cartão sem nível nunca
+        # pode ficar travado, senão ligar o recurso trancaria o banco inteiro.
+        if 'n' in q:
+            n = q.get('n')
+            if not isinstance(n, int) or isinstance(n, bool) or not 1 <= n <= 9:
+                erros.append(f"[{rot}] 'n' inválido: {n!r} — nível do cartão é inteiro de 1 a 9")
         # o id precisa continuar derivando do enunciado, senão o progresso
         # salvo deixa de encontrar a questão
         esperado = id_questao(q.get('q', ''))
@@ -563,13 +603,18 @@ def carrega_rascunho(B, caminho):
 
 
 def carrega_patches(B, caminho):
-    """Aplica 'eo' (explicação por alternativa) em memória sobre cartão que já
-    existe no banco, casando por 'id' — usado por explicar-alternativas.ps1.
+    """Aplica em memória, sobre cartão que JÁ EXISTE no banco, os campos que
+    não entram no id: 'eo' (explicação por alternativa) e 'n' (nível do cartão
+    dentro do tópico) — usado por explicar-alternativas.ps1.
 
     Mesmo motivo do carrega_rascunho: toda regra deste arquivo precisa
     alcançar a mudança ANTES dela ser gravada. Diferença aqui é que a questão
-    já existe — o patch só altera o campo 'eo' de um objeto que valida_questoes
-    já vai conferir do mesmo jeito que confere qualquer outro cartão."""
+    já existe — o patch só altera campos de um objeto que valida_questoes já
+    vai conferir do mesmo jeito que confere qualquer outro cartão.
+
+    Os dois campos passam pelo mesmo caminho de propósito: é isso que evita um
+    QUARTO script de gravação, que a regra 9 do CLAUDE.md proíbe. Cada patch
+    traz 'eo', 'n', ou os dois; campo ausente no patch não mexe no cartão."""
     if not os.path.exists(caminho):
         print(f"ERRO: patches não encontrado: {caminho}")
         sys.exit(1)
@@ -583,7 +628,13 @@ def carrega_patches(B, caminho):
         if not pid or pid not in por_id:
             erros.append(f"patches: id '{pid}' não existe no banco")
             continue
-        por_id[pid]['eo'] = p.get('eo')
+        if 'eo' not in p and 'n' not in p:
+            erros.append(f"patches: id '{pid}' não traz 'eo' nem 'n' — nada a aplicar")
+            continue
+        if 'eo' in p:
+            por_id[pid]['eo'] = p.get('eo')
+        if 'n' in p:
+            por_id[pid]['n'] = p.get('n')
         aplicados += 1
     print(f"Patches: {aplicados} de {len(patches)} aplicado(s) em memória (nada foi gravado)\n")
     return B
@@ -617,6 +668,7 @@ def main():
     valida_migracao(B, ids)
     valida_topicos(B, materias)
     valida_niveis(B, materias)
+    valida_escadas(B)
     valida_redundancia(B)
     valida_concursos(B)
 

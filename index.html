@@ -217,6 +217,9 @@ button.fechar{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;
   font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta2)}
 .nivelCab:first-child{padding-top:4px}
 .nivelCab .n{flex:0 0 auto;font-weight:700;color:var(--tinta)}
+/* nota de degrau travado dentro do tópico — some junto com a linha inteira
+   quando não há escada, então não ocupa espaço em matéria não classificada */
+.topico .trava{flex:0 0 auto;font-size:11.5px;color:var(--tinta2);white-space:nowrap}
 .topico .nome{flex:1 1 100%;line-height:1.3}
 .topico .estudar{margin-left:auto}
 .topico.abrivel{cursor:pointer}
@@ -752,6 +755,58 @@ function indexarNiveis(){
    custo de errar para trás é ensinar o avançado antes do básico, que é
    exatamente o que este mecanismo existe para evitar. */
 const SEM_NIVEL = 99;
+
+/* ===== escada de níveis DENTRO do tópico =====================================
+
+   Duas coisas diferentes se chamam "nível" neste app, e confundi-las quebra
+   as duas:
+
+   - banco/niveis.json ordena TÓPICOS entre si (Classes de palavras antes de
+     Regência). Só ordena, nunca trava — é nivelDe(), acima.
+   - o campo `n` do cartão é o degrau DENTRO do tópico: definição (1) antes de
+     aplicação (2) antes de síntese (3). Este trava.
+
+   Cartão sem `n` vale 1, e nível 1 nunca está travado. É o oposto do
+   SEM_NIVEL da ordenação, e de propósito: enquanto o banco não estiver todo
+   classificado, o desconhecido tem de passar. Ligar o recurso não pode
+   trancar 1.700 cartões que ninguém classificou ainda. */
+function grauDe(q){ return (q && q.n) || 1; }
+
+/* Até que degrau deste tópico a pessoa já pode receber CARTÃO NOVO.
+
+   Regra: o degrau k+1 abre quando TODO cartão de degrau k daquele tópico está
+   na caixa 2 ou acima — ou seja, foi respondido e acertado sem chute na
+   última vez ("Sabia" sobe de caixa; "Chutei" e "Errei" voltam para a 1).
+   Reaproveita o estado do Leitner que já existe, em vez de inventar um
+   segundo sistema de domínio que precisaria ser guardado e sincronizado.
+
+   Cartão nunca visto não está dominado, então o degrau não avança — é o que
+   faz a escada segurar de verdade. */
+const _cacheGrau = {};
+function grauLiberado(m, t){
+  const chave = m + "|" + t;
+  if(chave in _cacheGrau) return _cacheGrau[chave];
+  const porGrau = {};
+  BANCO.forEach(q=>{
+    if(q.m !== m || q.t !== t) return;
+    (porGrau[grauDe(q)] = porGrau[grauDe(q)] || []).push(q.id);
+  });
+  let g = 1;
+  while(porGrau[g] && porGrau[g].every(id=>{
+    const c = E.cartoes[id];
+    return c && c.caixa >= 2;
+  })) g++;
+  return _cacheGrau[chave] = g;
+}
+/* o cache vale por montagem de fila: responder um cartão muda o que está
+   liberado, e a fila é remontada a cada sessão */
+function limparCacheGrau(){ for(const k in _cacheGrau) delete _cacheGrau[k]; }
+
+/* Cartão NOVO só entra se o degrau dele já estiver aberto. Vale só para
+   cartão novo: revisão vencida nunca é travada, porque travar revisão
+   transformaria a escada num jeito de esconder o que a pessoa já errou. */
+function grauAberto(q){ return grauDe(q) <= grauLiberado(q.m, q.t); }
+
 function nivelDe(q){
   if(!q) return SEM_NIVEL;
   if(q.s){
@@ -1430,10 +1485,13 @@ function prioridade(id){
 
 function fila(){
   const h = hoje();
+  limparCacheGrau();
   const revisar = [], novas = [];
   BANCO.forEach(q=>{
     const c = E.cartoes[q.id];
-    if(!c) novas.push(q.id);
+    /* cartão novo de degrau ainda fechado nem entra na fila: é o bloqueio da
+       escada. Revisão vencida entra sempre, venha de que degrau vier. */
+    if(!c){ if(grauAberto(q)) novas.push(q.id); }
     else if(c.prox <= h) revisar.push(q.id);
   });
   revisar.sort((a,b)=> prioridade(a) - prioridade(b));
@@ -1821,6 +1879,13 @@ function resumoDoBanco(){
       n.total++;
       if(c){ n.vistas++; n.ac += c.acertos; n.resp += c.acertos + c.erros; }
     });
+    /* quanto do tópico está atrás do degrau fechado, e quanto falta acertar
+       para abrir o próximo — a tela precisa dos dois para explicar a trava */
+    const g = grauDe(q);
+    dt.graus = dt.graus || {};
+    const dg = dt.graus[g] = dt.graus[g] || {total:0, dominados:0};
+    dg.total++;
+    if(c && c.caixa >= 2) dg.dominados++;
   });
 
   /* Acrescenta o que o edital cobra e o banco ainda não cobre: tópico com
@@ -1878,10 +1943,29 @@ const porNivel = (mid, mapa) => Object.keys(mapa)
               || mapa[y].total - mapa[x].total
               || x.localeCompare(y,"pt"));
 
+/* Estado da escada de um tópico, para a tela explicar a trava em vez de só
+   esconder o botão. Devolve null quando o tópico não tem escada (um degrau
+   só) ou quando tudo já está aberto — nesses casos não há nada a dizer. */
+function travaDoTopico(mid, t, dt){
+  if(!dt || !dt.graus) return null;
+  const graus = Object.keys(dt.graus).map(Number).sort((a,b)=>a-b);
+  if(graus.length < 2) return null;
+  const aberto = grauLiberado(mid, t);
+  if(aberto > graus[graus.length-1]) return null;
+  const dg = dt.graus[aberto] || {total:0, dominados:0};
+  const presos = graus.filter(g=> g > aberto)
+                      .reduce((s,g)=> s + dt.graus[g].total, 0);
+  return {aberto, faltam: Math.max(0, dg.total - dg.dominados), presos};
+}
+
 /* uma linha com nome, barra de acerto, contagem e botão de estudar.
    Tópico que veio só do edital (total 0) não ganha botão: não há o que
-   estudar ainda. Fica apagado, como dívida de cobertura visível. */
-function linhaNivel(cls, rotulo, d, aoEstudar){
+   estudar ainda. Fica apagado, como dívida de cobertura visível.
+
+   Tópico com degrau fechado ganha uma nota dizendo quanto falta para abrir —
+   e continua com botão, porque o degrau ABERTO ainda é estudável. Quem perde
+   o botão é só o tópico em que nem o primeiro degrau tem cartão liberado. */
+function linhaNivel(cls, rotulo, d, aoEstudar, trava){
   const linha = document.createElement("div"); linha.className = cls;
   const vazia = !d.total;
   if(vazia) linha.classList.add("sem-cartao");
@@ -1892,6 +1976,13 @@ function linhaNivel(cls, rotulo, d, aoEstudar){
   const num = document.createElement("span"); num.className = "num";
   num.textContent = vazia ? "sem cartão" : d.vistas+"/"+d.total;
   linha.appendChild(num);
+  if(trava){
+    const tv = document.createElement("span"); tv.className = "trava";
+    tv.textContent = "🔒 nível " + (trava.aberto+1) + " travado · faltam "
+                   + trava.faltam + " do nível " + trava.aberto;
+    tv.title = trava.presos + " cartão(ões) esperando este degrau abrir";
+    linha.appendChild(tv);
+  }
   if(!vazia){
     const bt = document.createElement("button");
     bt.className = "estudar"; bt.textContent = "Estudar";
@@ -1959,7 +2050,7 @@ function pintarMaterias(){
       const linha = linhaNivel("topico", t, dt, ev=>{
         ev.stopPropagation();
         iniciarSessao("filtro", {m:mid, t:t});
-      });
+      }, travaDoTopico(mid, t, dt));
 
       if(!temSub){ corpo.appendChild(linha); return; }
 
@@ -2027,15 +2118,25 @@ function iniciarSessao(modo, filtro){
       (!filtro.t || x.t===filtro.t) &&
       (!filtro.s || x.s===filtro.s));
     const h = hoje(), rev = [], nov = [];
+    limparCacheGrau();
     alvo.forEach(x=>{
       const c = E.cartoes[x.id];
-      if(!c) nov.push(x.id); else if(c.prox <= h) rev.push(x.id);
+      /* mesma escada do estudo normal: estudar um tópico pela tela Matérias
+         não pode ser um atalho para pular o degrau de baixo */
+      if(!c){ if(grauAberto(x)) nov.push(x.id); }
+      else if(c.prox <= h) rev.push(x.id);
     });
     rev.sort((a,b)=> prioridade(a) - prioridade(b));   // mesma ordem do estudo normal
     nov.sort((a,b)=> nivelDe(porId[a]) - nivelDe(porId[b]));  // e a mesma ordem de aprendizado
     lista = rev.concat(nov).slice(0, E.meta);
-    /* nada vencido e nada novo: revisa adiantado em vez de não fazer nada */
-    if(lista.length===0) lista = alvo.map(x=>x.id).slice(0, E.meta);
+    /* nada vencido e nada novo: revisa adiantado em vez de não fazer nada —
+       mas só o que a pessoa JÁ VIU. Cartão de degrau fechado continua fora,
+       senão este atalho desfaria a escada justamente no tópico em que ela
+       ainda não foi vencida. */
+    if(lista.length===0){
+      lista = alvo.filter(x => E.cartoes[x.id] || grauAberto(x))
+                  .map(x=>x.id).slice(0, E.meta);
+    }
   } else {
     /* Monta a sessão RESPEITANDO A COTA DE CADA BLOCO DA META — a união dos
        concursos inscritos, não só o que está em foco. Antes isto seguia o

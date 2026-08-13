@@ -119,10 +119,18 @@ if ($Rascunho) {
   Write-Host "Rascunho: $nRascunho candidato(s) avaliados junto do banco (nada foi gravado)`n"
 }
 
-# ---- patches (eo em cartão existente) -----------------------------------------
-# Mesma ideia do rascunho, mas para EDITAR em vez de acrescentar: aplica 'eo'
-# em memória sobre a questão já carregada em $B, casando por id, antes de
-# qualquer checagem abaixo rodar. Quem grava é o explicar-alternativas.ps1.
+# ---- patches (eo e/ou n em cartão existente) ----------------------------------
+# Mesma ideia do rascunho, mas para EDITAR em vez de acrescentar: aplica os
+# campos que não entram no id ('eo', explicação por alternativa, e 'n', nível
+# do cartão dentro do tópico) em memória sobre a questão já carregada em $B,
+# casando por id, antes de qualquer checagem abaixo rodar. Quem grava é o
+# explicar-alternativas.ps1.
+#
+# Campo AUSENTE no patch não pode ser aplicado: aplicar 'eo' vazio sobre um
+# cartão que só quer receber 'n' apagaria a explicação por alternativa e ainda
+# reprovaria na checagem de tamanho de 'eo'. Espelha carrega_patches do
+# validar.py — as duas implementações precisam concordar, senão o script grava
+# com base numa validação diferente da que o validar.py fez.
 $nPatches = 0
 if ($Patches) {
   $arqP = if ([System.IO.Path]::IsPathRooted($Patches)) { $Patches } else { Join-Path $raiz $Patches }
@@ -133,7 +141,16 @@ if ($Patches) {
   if ($null -eq $pats) { $pats = @() }
   foreach ($p in @($pats)) {
     if (-not $porId.ContainsKey($p.id)) { Erro "patches: id '$($p.id)' não existe no banco"; continue }
-    $porId[$p.id] | Add-Member -NotePropertyName eo -NotePropertyValue @($p.eo) -Force
+    $campos = $p.PSObject.Properties.Name
+    if ($campos -notcontains 'eo' -and $campos -notcontains 'n') {
+      Erro "patches: id '$($p.id)' não traz 'eo' nem 'n' — nada a aplicar"; continue
+    }
+    if ($campos -contains 'eo') {
+      $porId[$p.id] | Add-Member -NotePropertyName eo -NotePropertyValue @($p.eo) -Force
+    }
+    if ($campos -contains 'n') {
+      $porId[$p.id] | Add-Member -NotePropertyName n -NotePropertyValue ([int]$p.n) -Force
+    }
     $nPatches++
   }
   Write-Host "Patches: $nPatches de $(@($pats).Count) aplicado(s) em memória (nada foi gravado)`n"
