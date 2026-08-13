@@ -113,6 +113,11 @@ escrito para ela não serve para nada.
 
 ## 3. Escrever cartão — o que decidir antes da primeira linha
 
+- **Só matéria ativa.** Cartão novo só entra em matéria que algum concurso de
+  `concursos.json` referencia — o diagnóstico marca as outras como `inativa`.
+  Corrigir cartão que já existe em matéria inativa continua livre; escrever
+  cartão novo para ela, não (regra 12). O `validar` reprova o rascunho que
+  tente, então isto se descobre antes de gravar, mas não é para chegar lá.
 - **Um lote = uma matéria, uma fonte** (PADRAO 6.3), 10 a 25 cartões, um
   commit. Lote maior não passa por revisão de verdade.
 - **Reusar `t` e `s` existentes.** Rótulo novo só quando o edital cobra algo

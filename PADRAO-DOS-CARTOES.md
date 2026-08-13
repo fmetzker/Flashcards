@@ -468,9 +468,14 @@ para evitar:
 
 1. **Matéria**: a de menor contagem no banco, entre as que algum concurso
    ativo usa e que têm fonte real para consultar (`banco/topicos.json` ou
-   conteúdo já estabelecido). Matéria sem fonte — caso de `psicologia`
-   enquanto não sai o edital — fica fora da conta; não é a mais fraca, é
-   inelegível (regra 11 do `CLAUDE.md`). Empate se desfaz por menor cobertura
+   conteúdo já estabelecido). Duas exclusões, e as duas são inelegibilidade,
+   não fraqueza: matéria **sem fonte** — caso de `psicologia` enquanto não
+   sai o edital — fica fora pela regra 11 do `CLAUDE.md`; matéria **sem
+   concurso ativo** fica fora pela regra 12, porque ninguém consegue estudá-la
+   hoje. A segunda o `validar` reprova sozinho, no rascunho, antes de gravar;
+   a primeira depende de julgamento, porque "não existe fonte" é coisa que
+   nenhum script sabe conferir. Nenhuma das duas é definitiva: cadastrar o
+   concurso em `concursos.json`, ou sair o edital, devolve a matéria à fila. Empate se desfaz por menor cobertura
    proporcional (tópicos com cartão ÷ tópicos totais) — quem tem mais chão
    pela frente vence —, e a matéria escolhida na rodada anterior não se
    repete enquanto houver outra tabela.

@@ -38,6 +38,21 @@ def id_questao(enunciado):
     return hashlib.sha1(enunciado.encode('utf-8')).hexdigest()[:10]
 
 
+def materias_ativas():
+    """Matérias que algum concurso de concursos.json referencia em blocos[].materias.
+
+    São as únicas que alguém consegue estudar hoje: o app carrega o banco pela
+    união das matérias dos concursos inscritos. Matéria fora daqui continua no
+    repositório de propósito (regra 12 do CLAUDE.md) — o que não se faz é
+    ESCREVER cartão novo para ela, porque ninguém veria."""
+    if not os.path.exists(CONCURSOS):
+        return set()
+    cfg = json.load(open(CONCURSOS, encoding='utf-8'))
+    return {mid for c in cfg.get('concursos', [])
+            for bl in c.get('blocos', [])
+            for mid in bl.get('materias', [])}
+
+
 def carrega_banco():
     """Lê o banco: um arquivo por matéria, listadas em banco/materias.json.
     Desde a Fase 0 ele não vive mais no HTML; desde a Fase 1 é por matéria."""
@@ -138,10 +153,14 @@ def valida_concursos(B):
         if c.get('aprovacao', {}).get('minimoTotal', 0) > total:
             erros.append(f"concurso [{rot}]: mínimo para aprovação "
                          f"({c['aprovacao']['minimoTotal']}) é maior que o total da prova ({total})")
-        orfas = [m for m in nome_materia if m not in usadas]
-        if orfas:
-            avisos.append(f"concurso [{rot}]: {len(orfas)} matéria(s) do banco não entram "
-                          f"nesta prova ({', '.join(orfas)})")
+    # Uma linha só para o banco inteiro, em vez de uma por concurso repetindo
+    # tudo que não cai naquela prova — o que interessa é quem não cai em prova
+    # NENHUMA: é a matéria em que não se escreve cartão novo (regra 12).
+    inativas = [m for m in nome_materia if m not in materias_ativas()]
+    if inativas:
+        detalhe = ', '.join(f"{m} ({por_materia[m]} cartões)" for m in inativas)
+        avisos.append(f"{len(inativas)} matéria(s) sem concurso ativo, mantidas pela regra 12 "
+                      f"— não escrever cartão novo para elas: {detalhe}")
 
 
 def valida_migracao(B, ids):
@@ -451,11 +470,20 @@ def carrega_rascunho(B, caminho):
     cands = json.load(open(caminho, encoding='utf-8')) or []
     if isinstance(cands, dict):
         cands = [cands]
+    ativas = materias_ativas()
     for q in cands:
         if q.get('id'):
             erros.append("rascunho: questão não deve trazer 'id' — ele é calculado do enunciado ao incorporar")
         else:
             q['id'] = id_questao(q.get('q', ''))
+        # Cartão novo só entra em matéria que alguém pode estudar hoje. A regra
+        # é sobre ESCREVER, não sobre guardar: o banco de matéria sem concurso
+        # ativo fica intacto (regra 12), mas escrever mais para ela é trabalho
+        # que ninguém vê — enquanto matéria ativa tem item de edital sem cartão.
+        if q.get('m') and ativas and q['m'] not in ativas:
+            erros.append(f"rascunho: matéria '{q['m']}' não é referenciada por nenhum concurso de "
+                         "concursos.json — cartão novo só entra em matéria ativa (regra 12). "
+                         "Se o concurso vai voltar, cadastre-o primeiro")
         B.append(q)
     print(f"Rascunho: {len(cands)} candidato(s) avaliados junto do banco (nada foi gravado)\n")
     return B

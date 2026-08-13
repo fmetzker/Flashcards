@@ -144,6 +144,16 @@ no Safari do iPhone sem nenhuma etapa de compilação.
     exatamente a mesma situação que `psicologia` viveu antes de ganhar
     concurso próprio.
 
+    **Guardar é uma coisa, escrever é outra: cartão novo só entra em matéria
+    ativa.** O que já existe fica intacto — corrigir alternativa, explicação,
+    fonte ou `eo` de cartão de matéria inativa continua livre, é manutenção do
+    que já foi feito. Mas escrever cartão NOVO para matéria que nenhum
+    concurso referencia é trabalho que ninguém vai ver, enquanto matéria ativa
+    tem item de edital sem cartão nenhum. `validar` reprova o rascunho que
+    tente isso, e lista numa linha as matérias inativas a cada execução. Se o
+    concurso vai voltar, o caminho é cadastrá-lo em `concursos.json` primeiro
+    — aí a matéria volta a ser ativa e a escrita é legítima.
+
 ## Formato do banco de questões
 
 Arquivos `banco/<matéria>.json`, um objeto por linha (mantém o diff pequeno):
