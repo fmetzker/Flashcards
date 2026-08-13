@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v224-portugues-reforco-5-topicos-restantes";
+const VERSAO = "v225-manutencao-mecanica-reforco-13-topicos";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
