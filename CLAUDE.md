@@ -1,5 +1,14 @@
 # App de estudo — Concursos públicos
 
+> **Onde procurar o quê.** Este arquivo tem as **regras e os porquês** — o
+> que não pode ser quebrado e a razão de ser assim. O **mapa** (onde mora
+> cada função do `index.html`, o esquema completo do cartão, os fluxos de
+> gravação, as listas que precisam andar juntas) está em `ESTRUTURA.md`, e é
+> o que evita grepar o app de 3.300 linhas. O padrão de escrita dos cartões
+> está em `PADRAO-DOS-CARTOES.md`. Os três não se repetem de propósito:
+> fato duplicado é fato que vai envelhecer errado em um dos lados — **em
+> caso de conflito, este arquivo manda.**
+
 Aplicativo web de questões com repetição espaçada, contas e banco
 colaborativo. Hoje atende quatro concursos: Enfermeiro/Volta Redonda (edital
 003/2026-SMA, prova 20/09/2026), CAAQ-CDM/Marinha, Psicologia/Transpetro,
@@ -34,6 +43,7 @@ referenciá-la em `blocos[].materias`.
 | `manifest.json` | Metadados do PWA |
 | `icone-192.png`, `icone-512.png`, `apple-touch-icon.png` | Ícones |
 | `PADRAO-DOS-CARTOES.md` | O padrão dos cartões — como escrever, o que não fazer, como priorizar |
+| `ESTRUTURA.md` | O mapa: onde cada função do `index.html` mora, o esquema completo do cartão, os fluxos de gravação. **Leia antes de grepar o `index.html`** |
 | `validar.py` / `validar.ps1` | Verificação de integridade do banco — **rodar antes de publicar**. Com `-Rascunho`/`--rascunho`, valida candidatos sem gravar; com `-Patches`/`--patches`, valida `eo` aplicado em memória sobre cartão existente, também sem gravar |
 | `rascunho.json` | Cartões em elaboração, sem `id`. Vazio quando não há trabalho em curso |
 | `incorporar-rascunho.ps1` | Grava o rascunho no banco — só se o validador passar. Ver regra 9 |
