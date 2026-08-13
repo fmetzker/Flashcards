@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v231-pre-requisito-entre-topicos-trava";
+const VERSAO = "v232-escada-sintaxe-e-semantica";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
