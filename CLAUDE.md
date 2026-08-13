@@ -190,7 +190,7 @@ pra quando algum concurso voltar a referenciá-la (é o caso de
 | `enfermagem-trabalho` | Enfermagem do Trabalho¹ | 126 | 17 | — |
 | `psicologia` | Psicologia | 0 | 0² | — |
 | `maritimo-maquinas` | Máquinas e Prática Marítima¹ | 136 | 16 | — |
-| `manutencao-mecanica` | Manutenção Mecânica | 0 | 23³ | — |
+| `manutencao-mecanica` | Manutenção Mecânica | 24 | 23³ | — |
 | `matematica` | Matemática | 129 | 7⁴ | — |
 
 ¹ Sem concurso ativo no momento — ver regra 12.
@@ -199,9 +199,11 @@ pra quando algum concurso voltar a referenciá-la (é o caso de
 Transpetro — ver regra 11.
 
 ³ Os 23 tópicos são a árvore do edital em `banco/topicos.json` (Anexo IV,
-ênfase 11); o banco de questões ainda está vazio, então todos aparecem
-apagados e escritos "sem cartão" na tela Matérias. É dívida de cobertura
-declarada, não erro.
+ênfase 11). Só quatro deles têm cartão — Noções de metrologia, Instrumentos
+de medição, Sistema Internacional de Unidades e Sistema de ajuste e
+tolerância, 6 cada. Os outros 19 aparecem apagados e escritos "sem cartão"
+na tela Matérias: é dívida de cobertura declarada, não erro, e é hoje a
+maior do banco (40 questões de prova em 29/11/2026).
 
 ⁴ Sete no banco, mas a árvore do edital tem nove: **Análise combinatória,
 Probabilidade e Estatística** constam do Anexo IV e ainda não têm cartão
