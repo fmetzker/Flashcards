@@ -200,7 +200,7 @@ pra quando algum concurso voltar a referenciá-la (é o caso de
 | `enfermagem-trabalho` | Enfermagem do Trabalho¹ | 126 | 17 | — |
 | `psicologia` | Psicologia | 0 | 0² | — |
 | `maritimo-maquinas` | Máquinas e Prática Marítima¹ | 136 | 16 | — |
-| `manutencao-mecanica` | Manutenção Mecânica | 129 | 23³ | — |
+| `manutencao-mecanica` | Manutenção Mecânica | 184 | 23³ | — |
 | `matematica` | Matemática | 153 | 7⁴ | — |
 
 ¹ Sem concurso ativo no momento — ver regra 12.
@@ -209,9 +209,10 @@ pra quando algum concurso voltar a referenciá-la (é o caso de
 Transpetro — ver regra 11.
 
 ³ Os 23 tópicos são a árvore do edital em `banco/topicos.json` (Anexo IV,
-ênfase 11) e todos já têm cartão — piso raso fechado em seis lotes, uma
-fonte por tópico. Densidade ainda rala frente às 40 questões da prova
-(29/11/2026): 129 cartões dão 3,2 por questão, abaixo da média do banco.
+ênfase 11): todos têm cartão, e todos no piso mínimo de 8 (fechado em onze
+lotes, uma fonte por tópico). Densidade ainda rala frente às 40 questões
+da prova (29/11/2026): 184 cartões dão 4,6 por questão, abaixo da média do
+banco.
 
 ⁴ Dez no banco, cobrindo os nove tópicos do Anexo IV — **Análise
 combinatória, Probabilidade e Estatística** ganharam 7, 6 e 6 cartões,
