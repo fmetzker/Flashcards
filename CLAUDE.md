@@ -213,12 +213,13 @@ Transpetro — ver regra 11.
 fonte por tópico. Densidade ainda rala frente às 40 questões da prova
 (29/11/2026): 129 cartões dão 3,2 por questão, abaixo da média do banco.
 
-⁴ Sete no banco, mas a árvore do edital tem nove: **Análise combinatória,
-Probabilidade e Estatística** constam do Anexo IV e ainda não têm cartão
-nenhum; **Lógica** tem 13 cartões e não consta daquele conteúdo
-programático. "Tabuada" foi renomeado para "Multiplicação" — mudança só no
-campo `t`, que não entra no `id` (o SHA-1 é do enunciado), então nenhum
-progresso foi perdido.
+⁴ Dez no banco, cobrindo os nove tópicos do Anexo IV — **Análise
+combinatória, Probabilidade e Estatística** ganharam 7, 6 e 6 cartões,
+respectivamente, fechando o Sinal 2 que existia — mais **Lógica** (13
+cartões), que não consta daquele conteúdo programático mas fica no banco
+por ser matéria útil de qualquer forma. "Tabuada" foi renomeado para
+"Multiplicação" — mudança só no campo `t`, que não entra no `id` (o SHA-1 é
+do enunciado), então nenhum progresso foi perdido.
 
 Dentro delas, dois níveis: **tópico** (Imunização, Urgência, Saúde da Mulher)
 e **subtópico** (Rede de frio, Calendário vacinal). Português e SUS param no

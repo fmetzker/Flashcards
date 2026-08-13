@@ -148,9 +148,12 @@
             "Álgebra",
             "Funções",
             "Trigonometria",
-            "Geometria"
+            "Geometria",
+            "Análise combinatória",
+            "Probabilidade",
+            "Estatística"
           ],
-          "_topicos": "Os 10 itens de Matemática do Anexo IV mapeados para os tópicos do banco. Fica DE FORA só Lógica (13 cartões), que não consta deste conteúdo programático. Análise combinatória, Probabilidade e Estatística são do edital mas ainda não têm cartão nenhum — por isso aparecem em banco/topicos.json e não aqui: tópico declarado no escopo precisa existir no banco, senão o validador reprova. Acrescentar aqui assim que os cartões forem escritos."
+          "_topicos": "Os 10 itens de Matemática do Anexo IV mapeados para os tópicos do banco. Fica DE FORA só Lógica (13 cartões), que não consta deste conteúdo programático. Análise combinatória, Probabilidade e Estatística entraram aqui depois de ganharem cartão (19, sete cada): antes disso ficavam só em banco/topicos.json, porque tópico declarado no escopo precisa existir no banco, senão o validador reprova."
         }
       ],
       "aprovacao": {

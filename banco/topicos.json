@@ -64,7 +64,7 @@
       ]
     },
     "matematica": {
-      "fonte": "Transpetro, Edital nº 03 - TRANSPETRO/PSP/TERRA/NÍVEL MÉDIO-2026.3, ANEXO IV, CONHECIMENTOS BÁSICOS - MATEMÁTICA (10 itens, iguais para todas as 18 ênfases). Os itens do edital foram MAPEADOS para os nomes de tópico que o banco já usa, não transcritos ao pé da letra: 'conjuntos numéricos / razão e proporção / porcentagem / matemática financeira' caem em Aritmética (que já tem cartão de regra de três, desconto sucessivo, juros simples e juros compostos); 'equações e sistemas lineares' em Álgebra; 'geometria plana e espacial' em Geometria (que já tem área e volume). Análise combinatória, Probabilidade e Estatística entram SEM nenhum cartão escrito de propósito: são os três assuntos do edital que o banco ainda não cobre. 'Lógica', que o banco tem, fica fora porque não consta deste conteúdo programático.",
+      "fonte": "Transpetro, Edital nº 03 - TRANSPETRO/PSP/TERRA/NÍVEL MÉDIO-2026.3, ANEXO IV, CONHECIMENTOS BÁSICOS - MATEMÁTICA (10 itens, iguais para todas as 18 ênfases). Os itens do edital foram MAPEADOS para os nomes de tópico que o banco já usa, não transcritos ao pé da letra: 'conjuntos numéricos / razão e proporção / porcentagem / matemática financeira' caem em Aritmética (que já tem cartão de regra de três, desconto sucessivo, juros simples e juros compostos); 'equações e sistemas lineares' em Álgebra; 'geometria plana e espacial' em Geometria (que já tem área e volume). Análise combinatória, Probabilidade e Estatística ganharam cartão (7, 6 e 6, respectivamente), fechando a lacuna que existia. 'Lógica', que o banco tem, fica fora porque não consta deste conteúdo programático.",
       "topicos": [
         "Aritmética",
         "Multiplicação",
