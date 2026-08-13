@@ -29,39 +29,14 @@ referenciá-la em `blocos[].materias`.
 
 ## Estrutura
 
-| Arquivo | Papel |
-|---|---|
-| `index.html` | App inteiro: HTML, CSS e JS. O banco **não** vive aqui |
-| `concursos.json` | Receitas de prova: data, composição, regra de aprovação |
-| `banco/materias.json` | Lista de matérias, na ordem de exibição |
-| `banco/topicos.json` | Árvore oficial do edital — deixa a tela Matérias mostrar tópico que a prova cobra e o banco ainda não cobre |
-| `banco/niveis.json` | Ordem de aprendizado: o que vem antes do quê dentro da matéria. **Ordena** cartão novo, nunca bloqueia |
-| `banco/<matéria>.json` | Questões daquela matéria, uma por linha |
-| `banco/indice-legado.json` | Ids na ordem antiga do array — migra progresso pré-id estável |
-| `banco/reescritas.json` | Mapa id antigo→novo de enunciados corrigidos — preserva progresso |
-| `sw.js` | Service worker — faz o app funcionar offline |
-| `manifest.json` | Metadados do PWA |
-| `icone-192.png`, `icone-512.png`, `apple-touch-icon.png` | Ícones |
-| `PADRAO-DOS-CARTOES.md` | O padrão dos cartões — como escrever, o que não fazer, como priorizar |
-| `ESTRUTURA.md` | O mapa: onde cada função do `index.html` mora, o esquema completo do cartão, os fluxos de gravação. **Leia antes de grepar o `index.html`** |
-| `validar.py` / `validar.ps1` | Verificação de integridade do banco — **rodar antes de publicar**. Com `-Rascunho`/`--rascunho`, valida candidatos sem gravar; com `-Patches`/`--patches`, valida `eo` aplicado em memória sobre cartão existente, também sem gravar |
-| `rascunho.json` | Cartões em elaboração, sem `id`. Vazio quando não há trabalho em curso |
-| `incorporar-rascunho.ps1` | Grava o rascunho no banco — só se o validador passar. Ver regra 9 |
-| `explicacoes.json` | Patches por `id` em elaboração: `eo` (explicação por alternativa) e/ou `n` (nível do cartão). Vazio quando não há trabalho em curso |
-| `explicar-alternativas.ps1` | Grava `eo` e/ou `n` em cartão que já existe, casando por `id` — só se o validador passar. Campo ausente no patch é preservado. Ver regra 9 |
-| `auditar-banco.py` / `.ps1` | Mede o banco contra `PADRAO-DOS-CARTOES.md`. Mede, não reprova |
-| `reescrever-questoes.ps1` | Corrige enunciado sem perder progresso — ver regra 5 |
-| `incorporar-propostas.ps1` | Grava proposta aprovada como questão de verdade — ver regra 9 |
-| `servidor.ps1` | Servidor local para desenvolver: `http://localhost:8080` |
-| `gerar-offline.ps1` | Gera `offline.html`: o app inteiro num arquivo só |
-| `offline.html` | **Gerado** — abre com duplo clique, sem servidor e sem rede |
-| `supabase/schema.sql` | Tabelas, RLS, triggers — colar no SQL Editor do Supabase |
-| `supabase/conferir.sql` | Confere o que a RLS **nega**; rodar sempre depois do schema |
-| `supabase.json` | URL e chave pública do projeto Supabase |
-| `TUTORIAL.md` | Publicar e instalar — o único tutorial que existe |
+**A tabela completa de arquivos — o que é cada um e quem escreve nele — está
+em `ESTRUTURA.md` §2 e §3.** O que importa saber aqui, e que nenhuma tabela
+substitui: o banco **não** vive no `index.html`, e só três scripts escrevem
+em `banco/*.json` (regra 9).
 
 Sem build, sem dependências, sem framework. É proposital: o app precisa rodar
 no Safari do iPhone sem nenhuma etapa de compilação.
+
 
 ## Regras invioláveis
 
@@ -167,36 +142,22 @@ no Safari do iPhone sem nenhuma etapa de compilação.
 
 ## Formato do banco de questões
 
-Arquivos `banco/<matéria>.json`, um objeto por linha (mantém o diff pequeno):
+Arquivos `banco/<matéria>.json`, **um objeto por linha** — mantém o diff
+pequeno e é o que permite gravar cartão sem reescrever o arquivo inteiro.
 
-```json
-{"id":"a1b2c3d4e5","m":"enfermagem","t":"Imunização","s":"Rede de frio","q":"enunciado","o":["A","B","C","D","E"],"c":1,"e":"explicação","f":"fonte"}
-```
+**O esquema campo a campo está em `ESTRUTURA.md` §1**, com a coluna que mais
+importa: quais campos entram no `id`. Só `q` entra. O que fica aqui são as
+regras que o esquema não expressa:
 
-- `id` — SHA-1 do enunciado, 10 hexadecimais. Ver regra 5.
-- `m` — matéria; precisa existir em `banco/materias.json` e bater com o arquivo
-- `t` — tópico, o assunto dentro da matéria
-- `s` — subtópico, o detalhe dentro do tópico. **Opcional**: Português e SUS
-  não usam, porque os tópicos deles já são o nível certo. Quando existe, não
-  pode repetir o nome do tópico — o validador barra
-- `c` — índice da correta, 0 a 4
-- `f` — **obrigatório**: lei e artigo, ou manual e capítulo. Questão sem
-  fonte não entra
-- `n` — **nível do cartão dentro do tópico**, opcional: definição (1) →
-  aplicação (2) → síntese (3). É o que o app usa para travar o nível seguinte
-  enquanto o anterior não foi acertado. Ausente vale 1. Não confundir com
-  `banco/niveis.json`, que ordena **tópicos entre si** e não trava nada — ver
-  a seção "Ordem de aprendizado"
-- `eo` — explicação por alternativa, **opcional**. Array do mesmo tamanho de
-  `o`, uma posição por alternativa (`""` pula a posição, mas ela precisa
-  existir). Ao responder, o app mostra essa nota junto da própria
-  alternativa, ao lado de `e` (que continua sendo a explicação da questão
-  como um todo). Ver `PADRAO-DOS-CARTOES.md` seção 1.4.1 — não é retroativo
-  para as questões já escritas (regra 9), só para cartão novo ou em reescrita
+- **`f` é obrigatório**: lei e artigo, ou manual e capítulo. Questão sem
+  fonte não entra. Sem fonte à mão, não escreva o cartão (regra 11).
+- **`s` não pode repetir o nome do `t`** — o validador barra. Português e SUS
+  não usam subtópico porque os tópicos deles já são o nível certo.
+- **Reusar `t` e `s` que já existam** em vez de inventar rótulo novo: a
+  árvore só é útil enquanto os níveis se mantêm poucos.
+- `eo` não é retroativo (regra 9): só cartão novo ou em reescrita.
 
-Ao acrescentar questão, **reusar um `t` e um `s` que já existam** em vez de
-inventar rótulos novos; a árvore só é útil enquanto os níveis se mantêm
-poucos. Antes de escrever, ler `PADRAO-DOS-CARTOES.md`.
+Antes de escrever qualquer cartão, ler `PADRAO-DOS-CARTOES.md`.
 
 ## Matéria, tópico e subtópico
 
@@ -207,36 +168,27 @@ pra quando algum concurso voltar a referenciá-la (é o caso de
 `maritimo-maquinas` e `enfermagem-trabalho` hoje, e já foi o caso de
 `psicologia` antes dela ganhar um concurso próprio):
 
-| id | nome | questões | tópicos | subtópicos |
-|---|---|--:|--:|--:|
-| `portugues` | Língua Portuguesa | 213 | 23 | — |
-| `ingles` | Língua Inglesa | 97 | 8 | — |
-| `sus` | Legislação do SUS | 125 | 10 | — |
-| `enfermagem` | Conhecimentos Específicos de Enfermagem | 686 | 19 | 120 |
-| `enfermagem-trabalho` | Enfermagem do Trabalho¹ | 126 | 17 | — |
-| `psicologia` | Psicologia | 0 | 0² | — |
-| `maritimo-maquinas` | Máquinas e Prática Marítima¹ | 136 | 16 | — |
-| `manutencao-mecanica` | Manutenção Mecânica | 207 | 23³ | — |
-| `matematica` | Matemática | 156 | 7⁴ | — |
+**Não há tabela de contagem aqui de propósito.** Ela existiu, era atualizada
+à mão a cada lote e chegou a ter três números errados ao mesmo tempo —
+contagem mantida por humano num arquivo que ninguém relê é pior que
+contagem nenhuma, porque parece verdade. O número real sai de:
 
-¹ Sem concurso ativo no momento — ver regra 12.
+```bash
+python - <<'PY'
+import json, sys
+sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+for m in json.load(open('banco/materias.json', encoding='utf-8')):
+    qs = json.load(open(f"banco/{m['id']}.json", encoding='utf-8'))
+    print(f"{m['id']:<22}{len(qs):>5} cartões  {len({q['t'] for q in qs}):>3} tópicos")
+PY
+```
 
-² Psicologia não tem árvore porque não existe edital anterior do cargo na
-Transpetro — ver regra 11.
+Dois fatos sobre matérias que **não** saem de contagem nenhuma:
 
-³ Os 23 tópicos são a árvore do edital em `banco/topicos.json` (Anexo IV,
-ênfase 11): todos têm cartão, e todos no piso mínimo de 8 (fechado em onze
-lotes, uma fonte por tópico). Densidade ainda rala frente às 40 questões
-da prova (29/11/2026): 184 cartões dão 4,6 por questão, abaixo da média do
-banco.
-
-⁴ Dez no banco, cobrindo os nove tópicos do Anexo IV — **Análise
-combinatória, Probabilidade e Estatística** ganharam 7, 6 e 6 cartões,
-respectivamente, fechando o Sinal 2 que existia — mais **Lógica** (13
-cartões), que não consta daquele conteúdo programático mas fica no banco
-por ser matéria útil de qualquer forma. "Tabuada" foi renomeado para
-"Multiplicação" — mudança só no campo `t`, que não entra no `id` (o SHA-1 é
-do enunciado), então nenhum progresso foi perdido.
+- **`psicologia` não tem árvore em `topicos.json`** porque não existe edital
+  anterior do cargo na Transpetro — regra 11, e não esquecimento.
+- **`matematica` tem o tópico `Lógica`, que não consta do Anexo IV.** Fica no
+  banco por ser útil, mas está fora do escopo declarado do concurso.
 
 Dentro delas, dois níveis: **tópico** (Imunização, Urgência, Saúde da Mulher)
 e **subtópico** (Rede de frio, Calendário vacinal). Português e SUS param no
@@ -436,100 +388,46 @@ primeiro.
 
 ## Ordem de aprendizado (níveis)
 
-`banco/niveis.json` declara o que precisa vir antes do quê dentro de cada
-matéria — em Português, Classes de palavras (nível 1) antes de Regência
-(nível 2), porque transitividade verbal não faz sentido para quem ainda não
-classifica a palavra. O arquivo é **opcional**: sem ele, `NIVEIS` fica vazio,
-`nivelDe()` devolve o mesmo número para todo cartão e o app se comporta como
-antes.
+`banco/niveis.json` declara em que ordem estudar dentro de cada matéria, e o
+campo `n` do cartão declara a ordem dentro do tópico. **Os dois arquivos são
+opcionais**: sem eles o app volta ao comportamento antigo, sem ordem e sem
+trava. Mecânica detalhada e formato em `ESTRUTURA.md`.
 
-**Nível ordena, nunca bloqueia — e isso é a decisão central.** A ordenação
-acontece só sobre as **novas** em `fila()`; as **vencidas** continuam
-ordenadas por `prioridade()` e mais nada. Adiar uma revisão vencida porque
-"é de nível 3" transformaria um mecanismo de ordem num mecanismo de bloqueio:
-quem erra Regência a D-38 seria impedido de estudar justamente o que erra.
-A tela Matérias também continua deixando estudar qualquer tópico à mão.
+Três eixos, e é obrigatório não confundi-los:
 
-- **Precedência**: o nível de um cartão sai da regra mais específica que casa
-  com ele — primeiro `(matéria, tópico, subtópico)` em `subtopicos`, depois
-  `(matéria, tópico)` em `topicos`. Isso permite um tópico grande morar no
-  nível 2 e alguns subtópicos dele subirem para o 3, sem duplicar o tópico.
-- **Sem nível declarado vai para o fim** (`SEM_NIVEL = 99`), nunca para o
-  começo: errar para trás significaria ensinar o avançado antes do básico,
-  que é exatamente o que o mecanismo existe para evitar.
-- **`criterio`, não `fonte`.** `topicos.json` transcreve edital e por isso
-  exige `fonte`; nível é julgamento pedagógico nosso, e nenhum edital diz em
-  que ordem estudar. Chamar de "fonte" fingiria uma autoridade que não
-  existe — mesmo cuidado da regra 11.
-- `validar.py` (`valida_niveis`) barra tópico com grafia que não existe no
-  banco e tópico declarado em dois níveis; tópico sem nível vira **aviso**.
-  Tópico escrito errado aqui não daria erro visível — sumiria da ordenação em
-  silêncio, que é pior que um erro.
-
-Declarado hoje só para `portugues` (piloto). As demais matérias ativas
-aparecem como aviso no validador até ganharem a sua ordem.
-
-### A escada dentro do tópico — o campo `n`, que **trava**
-
-Duas coisas se chamam "nível" e confundi-las quebra as duas:
-
-| | onde vive | o que faz |
+| | onde vive | efeito |
 |---|---|---|
-| nível do **tópico** | `niveis.json`, chave `niveis` | ordena tópicos entre si; **não trava** |
-| **pré-requisito** entre tópicos | `niveis.json`, chave `requisitos` | **trava** o tópico até a base do exigido estar dominada |
-| nível do **cartão** (`n`) | campo do próprio cartão | escada dentro do tópico; **trava** |
+| nível do **tópico** | `niveis.json` → `niveis` | **ordena** tópicos entre si |
+| **pré-requisito** | `niveis.json` → `requisitos` | **trava** o tópico até a base do exigido estar dominada |
+| nível do **cartão** | campo `n` | **trava** o degrau dentro do tópico |
 
-Os dois eixos que travam são independentes e se somam: um cartão novo só é
-oferecido se o **tópico** dele estiver aberto (pré-requisitos cumpridos) **e**
-o **degrau** dele já tiver sido alcançado dentro do tópico.
+Os invariantes, que não podem ser afrouxados:
 
-`requisitos` é um mapa `tópico → tópicos que precisam vir antes`, e cada
-aresta é uma dependência real, não a camada repetida: Crase exige Regência
-porque só há crase quando o termo regente pede a preposição `a`; Colocação
-pronominal exige Pronomes, e não Classes de palavras inteiro. **Requisito
-cumprido = base (degrau 1) do tópico exigido dominada**, não o tópico
-inteiro — para começar Regência basta saber o que é cada classe de palavra,
-não ter terminado todos os exercícios de Classes de palavras.
-
-Tópico sem requisito declarado está sempre aberto. Em Português são quatro
-(Classes de palavras, Ortografia, Acentuação, Semântica), e isso é
-deliberado: **a trava nunca pode deixar a pessoa sem nada para estudar.**
-`validar.py` barra requisito com grafia que não existe no banco, tópico que
-é pré-requisito de si mesmo e **ciclo** — ciclo trancaria os tópicos
-envolvidos para sempre, sem nenhum aviso visível no app.
-
-**O degrau k+1 de um tópico abre quando todo cartão de degrau k daquele
-tópico está na caixa 2 ou acima** — respondido e acertado sem chute na última
-vez. Reaproveita o estado do Leitner em vez de inventar um segundo sistema de
-domínio. Cartão nunca visto não está dominado, então o degrau não avança: é o
-que faz a escada segurar. Errar um cartão do degrau de baixo **fecha o de
-cima de novo**, e isso é intencional.
-
-Três invariantes que não podem ser afrouxados:
-
-- **Trava só cartão NOVO.** Revisão vencida entra sempre, venha do degrau que
-  vier. Travar revisão viraria um jeito de esconder o que a pessoa já errou.
-- **Cartão sem `n` vale 1, e o degrau 1 nunca está travado.** É o oposto do
+- **Trava e ordenação agem só sobre cartão NOVO.** Revisão vencida entra
+  sempre, venha do degrau ou do tópico que vier. Travar revisão viraria um
+  jeito de esconder justamente o que a pessoa já errou.
+- **Cartão sem `n` vale 1, e o degrau 1 nunca trava.** É o oposto do
   `SEM_NIVEL` da ordenação, de propósito: enquanto o banco não estiver todo
   classificado, ligar o recurso não pode trancar o que ninguém classificou.
-- **O simulado ignora `n` por completo.** Ele imita a prova, e a prova não
+- **Sempre existe tópico sem pré-requisito.** A trava nunca pode deixar a
+  pessoa sem nada para estudar.
+- **O simulado ignora os três eixos.** Ele imita a prova, e a prova não
   respeita escada nenhuma.
+- **A trava não tem escape.** Tópico fechado por pré-requisito não ganha
+  botão Estudar; degrau fechado não é alcançável nem pelo atalho de "revisar
+  adiantado".
+- **`criterio`, não `fonte`.** `topicos.json` transcreve edital e exige
+  `fonte`; ordem de estudo é julgamento nosso, e nenhum edital diz em que
+  ordem estudar. Chamar de "fonte" fingiria autoridade que não existe —
+  mesmo cuidado da regra 11.
 
-Não há escape em nenhum dos dois eixos. Tópico fechado por pré-requisito
-aparece apagado, com `🔒 estude antes: Pronomes` e **sem botão Estudar** —
-oferecer o botão só produziria sessão vazia. Tópico aberto mas com degrau
-interno fechado mostra `🔒 nível 2 travado · faltam 3 do nível 1` e o botão
-leva **só ao degrau aberto** — inclusive o fallback de
-"revisar adiantado", que filtra cartão de degrau fechado. `validar.py`
-(`valida_escadas`) avisa qual tópico tem nível 2+ sem nenhum cartão de nível
-1: nesse caso a escada não segura nada, porque "todo cartão do nível 1" é
-vacuamente verdadeiro. Esse aviso **é a lista de trabalho** de quais tópicos
-ainda precisam dos cartões de definição.
+`validar.py` barra grafia que não existe no banco, tópico em dois níveis,
+pré-requisito circular e nível fora de 1–9. E **avisa** qual tópico tem
+cartão de nível 2+ sem nenhum de nível 1: ali a escada não segura nada, e
+esse aviso é a lista de trabalho de quais definições ainda faltam escrever.
 
-O campo `n` é gravado pelos mesmos caminhos de sempre: `incorporar-rascunho.ps1`
-(cartão novo já nasce com nível) e `explicar-alternativas.ps1` (aplica `n` e/ou
-`eo` por `id` em cartão existente). Nenhum script novo — a regra 9 continua
-valendo com os mesmos três.
+O campo `n` é gravado pelos caminhos de sempre — `incorporar-rascunho.ps1` e
+`explicar-alternativas.ps1`. Nenhum script novo: a regra 9 segue com três.
 
 ## Motor de repetição espaçada
 
@@ -579,31 +477,15 @@ estudo e no simulado — não reintroduzir ordem fixa.
 
 ## Rodar localmente
 
-Duas formas, para usos diferentes.
+Duas formas, e a escolha importa: **`servidor.ps1`** reflete o app publicado
+(service worker, PWA, arquivos separados) e é a de desenvolver;
+**`gerar-offline.ps1`** produz o `offline.html`, arquivo único que dispensa
+servidor e login — é onde dá para verificar mudança de JS sem Supabase.
+Comandos e detalhes em `ESTRUTURA.md` §7.
 
-**Servidor local** — reflete o app publicado (service worker, PWA, arquivos
-separados). Use esta para desenvolver:
+Abrir o `index.html` direto do disco **não** funciona: o banco é lido por
+`fetch`, que o navegador bloqueia em `file://`.
 
-```
-powershell -ExecutionPolicy Bypass -File servidor.ps1
-```
-
-e abra `http://localhost:8080`. Abrir o `index.html` direto do disco **não**
-funciona: o banco é lido por `fetch`, que o navegador bloqueia em `file://`.
-
-**Arquivo único** — para testar sem servidor, num aparelho sem nada
-instalado, ou para mandar por e-mail:
-
-```
-powershell -ExecutionPolicy Bypass -File gerar-offline.ps1
-```
-
-Gera `offline.html` com o banco embutido em `window.DADOS`, de onde `pega()`
-lê sem requisição nenhuma. Abre com duplo clique, salva progresso no
-`localStorage` normalmente (chave fixa `vr:conta:local`) e não toca a rede.
-Nunca exige login. É um **artefato gerado**: não editar à mão, e refazer
-depois de mexer no `index.html` ou no banco — o validador avisa quando está
-para trás.
 
 ## Publicação
 

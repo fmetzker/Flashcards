@@ -50,7 +50,34 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 
 ---
 
-## 2. Quem escreve em `banco/*.json`
+## 2. Os arquivos
+
+| Arquivo | Papel |
+|---|---|
+| `index.html` | App inteiro: HTML, CSS e JS. O banco **não** vive aqui |
+| `concursos.json` | Receitas de prova: data, composição, regra de aprovação |
+| `banco/materias.json` | Lista de matérias, na ordem de exibição |
+| `banco/<matéria>.json` | Questões daquela matéria, uma por linha |
+| `banco/topicos.json` | Árvore oficial do edital — mostra tópico que a prova cobra e o banco não cobre |
+| `banco/niveis.json` | Ordem entre tópicos (`niveis`, ordena) e pré-requisitos (`requisitos`, **travam**) |
+| `banco/indice-legado.json` | Ids na ordem antiga do array — migra progresso pré-id estável |
+| `banco/reescritas.json` | Mapa id antigo→novo de enunciados corrigidos — preserva progresso |
+| `sw.js` | Service worker, rede-primeiro. `VERSAO` sobe a cada mudança no app |
+| `manifest.json`, `icone-*.png`, `apple-touch-icon.png` | PWA |
+| `validar.py` / `validar.ps1` | Integridade do banco. `--rascunho` valida candidato, `--patches` valida `eo`/`n`, nenhum dos dois grava |
+| `auditar-banco.py` / `.ps1` | Mede contra o `PADRAO-DOS-CARTOES.md`. Mede, não reprova |
+| `rascunho.json` | Cartões em elaboração, sem `id`. Vazio quando não há trabalho |
+| `explicacoes.json` | Patches por `id`: `eo` e/ou `n`. Vazio quando não há trabalho |
+| `servidor.ps1` | Servidor local, `http://localhost:8080` |
+| `gerar-offline.ps1` → `offline.html` | App inteiro num arquivo. **Gerado — não editar** |
+| `supabase/schema.sql` | Tabelas, RLS, triggers |
+| `supabase/conferir.sql` | Confere o que a RLS **nega**; rodar sempre depois do schema |
+| `supabase.json` | URL e chave pública |
+| `CLAUDE.md` | Regras invioláveis e os porquês |
+| `PADRAO-DOS-CARTOES.md` | Como escrever cartão |
+| `TUTORIAL.md` | Publicar e instalar |
+
+## 3. Quem escreve em `banco/*.json`
 
 Três scripts, e só eles (regra 9). Todos rodam o validador de verdade antes e
 falham fechado.
@@ -66,11 +93,11 @@ Campo ausente no patch é **preservado**: mandar só `n` não apaga o `eo`.
 
 ---
 
-## 3. Anatomia do `index.html`
+## 4. Anatomia do `index.html`
 
 Um arquivo, ~3.300 linhas: CSS, HTML e JS. Ordem real do arquivo.
 
-### 3.1 Carga e configuração
+### 4.1 Carga e configuração
 
 | Função | Papel |
 |---|---|
@@ -81,7 +108,7 @@ Um arquivo, ~3.300 linhas: CSS, HTML e JS. Ordem real do arquivo.
 | `blocosDaMeta` / `aplicarFoco` | monta `BLOCOS_META` e a meta do dia |
 | `provaMaisProxima` | define `CONCURSO` quando não há escopo |
 
-### 3.2 Conta, sessão e sincronismo
+### 4.2 Conta, sessão e sincronismo
 
 `lerSessao`, `capturarSessaoDoHash`, `idDoToken`, `entrar`, `criarConta`,
 `sair`, `renovarSessao`, `verificarSituacao`, `verificarRevisor`,
@@ -91,12 +118,12 @@ Um arquivo, ~3.300 linhas: CSS, HTML e JS. Ordem real do arquivo.
 Migrações que rodam no boot: `migrarSessaoDoPerfil`, `migrarEstadoDoPerfil`,
 `migrarParaIds`, `migrarReescritas`.
 
-### 3.3 Datas — tudo no fuso de Brasília
+### 4.3 Datas — tudo no fuso de Brasília
 
 `FUSO_BRASILIA`, `fmtDiaBrasilia`, `hoje`, `diaUTC`, `somarDias`, `diasAte`,
 `diasAteMaisProxima`. Nenhum cálculo de data usa `new Date()` puro.
 
-### 3.4 Motor de estudo — o coração
+### 4.4 Motor de estudo — o coração
 
 | Função | Papel |
 |---|---|
@@ -113,7 +140,7 @@ Migrações que rodam no boot: `migrarSessaoDoPerfil`, `migrarEstadoDoPerfil`,
 **O invariante que nada pode quebrar:** trava e ordenação agem **só sobre
 `novas`**. `revisar` nunca é filtrado — revisão vencida sempre aparece.
 
-### 3.5 Telas
+### 4.5 Telas
 
 `ir` roteia. `pintarInicio`, `pintarMaterias`, `pintarStats`, `pintarGraficos`,
 `pintarConta`, `pintarLogin`, `pintarEspera`, `pintarConcursos`,
@@ -127,13 +154,13 @@ subtópico **e por degrau**), `porNivel`, `travaDoTopico`, `linhaNivel`,
 Simulado: `pintarSimuladoInicio`, `sorteia`, `iniciarSimulado`, `mostrarSim`,
 `finalizarSimulado`. **Ignora `n` e requisitos de propósito** — imita a prova.
 
-### 3.6 Portões do boot
+### 4.6 Portões do boot
 
 `falhaBoot`, `exigeLogin`, `exigeAprovacao`, `exigeEscolherConcurso`.
 
 ---
 
-## 4. Listas que precisam andar juntas
+## 5. Listas que precisam andar juntas
 
 Arquivo novo em `banco/` tem de entrar nos **quatro** lugares abaixo. Já
 falhou duas vezes: o app instalado fica sem o arquivo, ou o validador acusa
@@ -152,7 +179,7 @@ Os dois validadores precisam concordar: `validar.ps1` é o que roda antes de
 
 ---
 
-## 5. Dois fluxos, do início ao fim
+## 6. Dois fluxos, do início ao fim
 
 **Cartão novo:** escrever em `rascunho.json` (sem `id`) → `validar.py
 --rascunho` → `incorporar-rascunho.ps1` → `validar` → `VERSAO` no `sw.js` →
@@ -168,7 +195,7 @@ distribui pelas cotas de `BLOCOS_META` → `registrar` grava e enfileira sync.
 
 ---
 
-## 6. Diagnósticos que evitam grep
+## 7. Diagnósticos que evitam grep
 
 ```bash
 # contagem por tópico e nível de uma matéria
@@ -181,15 +208,25 @@ python -c "import json,collections,sys; sys.stdout.reconfigure(encoding='utf-8',
 python validar.py 2>&1 | tail -20
 ```
 
-Verificação no navegador sem login: `gerar-offline.ps1` e abrir
-`offline.html` — é o caminho que dispensa Supabase e onde as travas foram
-medidas. **Não há Node nesta máquina**, então `validar.py` não confere a
-sintaxe do JS: mudança em `index.html` só está verificada depois de rodar no
-navegador.
+### Rodar o app
+
+```bash
+powershell -ExecutionPolicy Bypass -File servidor.ps1        # http://localhost:8080
+powershell -ExecutionPolicy Bypass -File gerar-offline.ps1   # gera offline.html
+```
+
+`servidor.ps1` reflete o app publicado (service worker, PWA, arquivos
+separados) — é o de desenvolver. `offline.html` é arquivo único, dispensa
+servidor **e login**, e é onde dá para verificar mudança de JS sem Supabase.
+Abrir `index.html` direto do disco não funciona: o banco é lido por `fetch`,
+bloqueado em `file://`.
+
+**Não há Node nesta máquina**, então `validar.py` não confere a sintaxe do
+JS: mudança em `index.html` só está verificada depois de rodar no navegador.
 
 ---
 
-## 7. Onde cada coisa está documentada
+## 8. Onde cada coisa está documentada
 
 | Pergunta | Arquivo |
 |---|---|
