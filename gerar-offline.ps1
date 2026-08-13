@@ -26,7 +26,7 @@ $html = Join-Path $raiz 'index.html'
 # embutido), mas a seção Conta se declara indisponível nesta versão antes de
 # sequer olhar para ele — não há rede em file:// para autenticar.
 $arquivos = @('concursos.json', 'banco/materias.json', 'banco/indice-legado.json', 'supabase.json',
-                'banco/reescritas.json', 'banco/topicos.json')
+                'banco/reescritas.json', 'banco/topicos.json', 'banco/niveis.json')
 $materias = [System.IO.File]::ReadAllText((Join-Path $dir 'materias.json'), [System.Text.Encoding]::UTF8) | ConvertFrom-Json
 foreach ($m in $materias) { $arquivos += "banco/$($m.id).json" }
 

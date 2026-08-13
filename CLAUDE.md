@@ -26,6 +26,7 @@ referenciá-la em `blocos[].materias`.
 | `concursos.json` | Receitas de prova: data, composição, regra de aprovação |
 | `banco/materias.json` | Lista de matérias, na ordem de exibição |
 | `banco/topicos.json` | Árvore oficial do edital — deixa a tela Matérias mostrar tópico que a prova cobra e o banco ainda não cobre |
+| `banco/niveis.json` | Ordem de aprendizado: o que vem antes do quê dentro da matéria. **Ordena** cartão novo, nunca bloqueia |
 | `banco/<matéria>.json` | Questões daquela matéria, uma por linha |
 | `banco/indice-legado.json` | Ids na ordem antiga do array — migra progresso pré-id estável |
 | `banco/reescritas.json` | Mapa id antigo→novo de enunciados corrigidos — preserva progresso |
@@ -417,6 +418,41 @@ Três pontos de lá que decidem trabalho:
 `auditar-banco.ps1`/`.py` mede o banco contra esse padrão — diferente do
 `validar`, **não reprova nada**; a saída só ajuda a escolher o que corrigir
 primeiro.
+
+## Ordem de aprendizado (níveis)
+
+`banco/niveis.json` declara o que precisa vir antes do quê dentro de cada
+matéria — em Português, Classes de palavras (nível 1) antes de Regência
+(nível 2), porque transitividade verbal não faz sentido para quem ainda não
+classifica a palavra. O arquivo é **opcional**: sem ele, `NIVEIS` fica vazio,
+`nivelDe()` devolve o mesmo número para todo cartão e o app se comporta como
+antes.
+
+**Nível ordena, nunca bloqueia — e isso é a decisão central.** A ordenação
+acontece só sobre as **novas** em `fila()`; as **vencidas** continuam
+ordenadas por `prioridade()` e mais nada. Adiar uma revisão vencida porque
+"é de nível 3" transformaria um mecanismo de ordem num mecanismo de bloqueio:
+quem erra Regência a D-38 seria impedido de estudar justamente o que erra.
+A tela Matérias também continua deixando estudar qualquer tópico à mão.
+
+- **Precedência**: o nível de um cartão sai da regra mais específica que casa
+  com ele — primeiro `(matéria, tópico, subtópico)` em `subtopicos`, depois
+  `(matéria, tópico)` em `topicos`. Isso permite um tópico grande morar no
+  nível 2 e alguns subtópicos dele subirem para o 3, sem duplicar o tópico.
+- **Sem nível declarado vai para o fim** (`SEM_NIVEL = 99`), nunca para o
+  começo: errar para trás significaria ensinar o avançado antes do básico,
+  que é exatamente o que o mecanismo existe para evitar.
+- **`criterio`, não `fonte`.** `topicos.json` transcreve edital e por isso
+  exige `fonte`; nível é julgamento pedagógico nosso, e nenhum edital diz em
+  que ordem estudar. Chamar de "fonte" fingiria uma autoridade que não
+  existe — mesmo cuidado da regra 11.
+- `validar.py` (`valida_niveis`) barra tópico com grafia que não existe no
+  banco e tópico declarado em dois níveis; tópico sem nível vira **aviso**.
+  Tópico escrito errado aqui não daria erro visível — sumiria da ordenação em
+  silêncio, que é pior que um erro.
+
+Declarado hoje só para `portugues` (piloto). As demais matérias ativas
+aparecem como aviso no validador até ganharem a sua ordem.
 
 ## Motor de repetição espaçada
 

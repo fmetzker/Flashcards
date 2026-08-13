@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v227-matematica-fecha-combinatoria-estatistica-probabilidade";
+const VERSAO = "v228-niveis-ordem-de-aprendizado-piloto-portugues";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
@@ -24,7 +24,10 @@ const ARQUIVOS = [
   "./banco/reescritas.json",
   /* árvore oficial do conteúdo programático — sem ele, a tela Matérias offline
      deixa de mostrar os tópicos do edital que ainda não têm cartão */
-  "./banco/topicos.json"
+  "./banco/topicos.json",
+  /* ordem de aprendizado — sem ele, o app offline volta a apresentar cartão
+     novo na ordem do arquivo do banco, ignorando o que vem antes do quê */
+  "./banco/niveis.json"
 ];
 
 /* Instalação: baixa tudo e guarda.

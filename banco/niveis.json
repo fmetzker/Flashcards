@@ -1,0 +1,56 @@
+{
+  "_leia": "Ordem de aprendizado dentro de cada materia: o que precisa vir antes do que. Serve para o app apresentar CARTAO NOVO na ordem certa (quem nunca viu 'Classes de palavras' nao deveria receber 'Regencia' primeiro). NAO bloqueia nada: revisao vencida continua vencida, e a tela Materias permite estudar qualquer topico a mao. O arquivo e OPCIONAL - sem ele, o app volta a ordem antiga (a do arquivo do banco).",
+  "_criterio_nao_e_fonte": "Cada materia declara 'criterio', nao 'fonte', e a diferenca e proposital. banco/topicos.json transcreve o conteudo programatico do edital e por isso exige fonte. Nivel e JULGAMENTO PEDAGOGICO nosso: nenhum edital diz em que ordem estudar. Chamar isso de 'fonte' fingiria uma autoridade que nao existe - mesmo cuidado da regra 11 do CLAUDE.md.",
+  "_precedencia": "O nivel de um cartao sai da regra MAIS ESPECIFICA que casar com ele: primeiro procura (materia, topico, subtopico) em 'subtopicos'; se nao achar, procura (materia, topico) em 'topicos'; se nao achar nenhuma, o cartao fica sem nivel declarado e entra por ultimo, e o validador avisa. Isso permite um topico grande morar no nivel 2 e alguns subtopicos dele subirem para o 3, sem duplicar o topico inteiro.",
+  "materias": {
+    "portugues": {
+      "criterio": "Tres camadas, da menor unidade para a maior: a PALAVRA (o que ela e, como se escreve, o que significa), a RELACAO ENTRE PALAVRAS dentro da frase (quem concorda com quem, quem rege quem, como se separa e se liga oracao) e o TEXTO (o que emerge quando as frases se juntam). A ordem nao e estetica: quase todo item do nivel 2 pressupoe saber classificar a palavra, que e o nivel 1. Regencia so faz sentido para quem sabe o que e verbo e o que e objeto; crase pressupoe artigo e preposicao; colocacao pronominal pressupoe pronome. E o nivel 3 pressupoe a frase construida - nao da para discutir coesao entre oracoes antes de saber montar uma.",
+      "niveis": [
+        {
+          "n": 1,
+          "nome": "A palavra",
+          "descricao": "O que a palavra e, como se escreve e o que significa. Base de todo o resto: e aqui que se aprende a nomear o que as camadas seguintes vao relacionar.",
+          "topicos": [
+            "Classes de palavras",
+            "Pronomes",
+            "Ortografia",
+            "Acentuação",
+            "Semântica"
+          ]
+        },
+        {
+          "n": 2,
+          "nome": "A relação entre palavras",
+          "descricao": "Como as palavras se combinam dentro da frase: funcao sintatica, concordancia, regencia, e como as oracoes se ligam. Tudo aqui pressupoe saber classificar a palavra (nivel 1).",
+          "topicos": [
+            "Sintaxe",
+            "Concordância",
+            "Regência",
+            "Crase",
+            "Colocação pronominal",
+            "Pontuação",
+            "Coordenação",
+            "Subordinação",
+            "Coordenação e subordinação"
+          ]
+        },
+        {
+          "n": 3,
+          "nome": "O texto",
+          "descricao": "O que so existe quando as frases se juntam: coesao, coerencia, sentido global, genero, efeito de estilo. Pressupoe a frase construida (nivel 2).",
+          "topicos": [
+            "Coesão",
+            "Coerência",
+            "Interpretação de textos",
+            "Ambiguidade",
+            "Reescrita",
+            "Figuras de linguagem",
+            "Gêneros textuais",
+            "Tipologia textual",
+            "Intertextualidade"
+          ]
+        }
+      ]
+    }
+  }
+}

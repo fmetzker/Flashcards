@@ -139,10 +139,14 @@ if ($Patches) {
   Write-Host "Patches: $nPatches de $(@($pats).Count) aplicado(s) em memória (nada foi gravado)`n"
 }
 
-# arquivo de matéria que não está no materias.json passaria despercebido
+# arquivo de matéria que não está no materias.json passaria despercebido.
+# 'niveis' entra na lista de arquivos de sistema como 'topicos': o conteúdo
+# dele é conferido pelo validar.py (valida_niveis), o validador mais completo;
+# aqui basta não acusá-lo de matéria órfã, senão o incorporar-rascunho.ps1
+# passaria a falhar sem ter nada a ver com o cartão sendo gravado.
 foreach ($f in Get-ChildItem $dir -Filter '*.json') {
   $nome = [System.IO.Path]::GetFileNameWithoutExtension($f.Name)
-  if ($nome -in 'materias','indice-legado','reescritas','topicos') { continue }
+  if ($nome -in 'materias','indice-legado','reescritas','topicos','niveis') { continue }
   if (-not $idsMateria.ContainsKey($nome)) { Erro "banco/$($f.Name) não corresponde a nenhuma matéria de materias.json" }
 }
 
