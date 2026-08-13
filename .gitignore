@@ -6,5 +6,10 @@ __pycache__/
 # de conteúdo duplicado, refeito com um comando
 offline.html
 
-# config local do Claude Code (servidor de preview) — não é parte do app
-.claude/
+# config local do Claude Code (servidor de preview, worktrees) — não é parte
+# do app. Exceção: .claude/commands/ são os comandos de trabalho do projeto
+# (/decidir), que valem para qualquer máquina e por isso vão versionados.
+# Precisa ser `.claude/*` e não `.claude/`: diretório ignorado inteiro o git
+# nem percorre, e a negação abaixo não teria efeito.
+.claude/*
+!.claude/commands/
