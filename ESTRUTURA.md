@@ -63,10 +63,10 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 | `banco/reescritas.json` | Mapa id antigo→novo de enunciados corrigidos — preserva progresso |
 | `sw.js` | Service worker, rede-primeiro. `VERSAO` sobe a cada mudança no app |
 | `manifest.json`, `icone-*.png`, `apple-touch-icon.png` | PWA |
-| `validar.py` / `validar.ps1` | Integridade do banco. `--rascunho` valida candidato, `--patches` valida `eo`/`n`, nenhum dos dois grava |
+| `validar.py` / `validar.ps1` | Integridade do banco. `--rascunho` valida candidato, `--patches` valida `eo`/`n`/`o`, nenhum dos dois grava |
 | `auditar-banco.py` / `.ps1` | Mede contra o `PADRAO-DOS-CARTOES.md`. Mede, não reprova |
 | `rascunho.json` | Cartões em elaboração, sem `id`. Vazio quando não há trabalho |
-| `explicacoes.json` | Patches por `id`: `eo` e/ou `n`. Vazio quando não há trabalho |
+| `explicacoes.json` | Patches por `id`: `eo`, `n` e/ou `o`. Vazio quando não há trabalho |
 | `servidor.ps1` | Servidor local, `http://localhost:8080` |
 | `gerar-offline.ps1` → `offline.html` | App inteiro num arquivo. **Gerado — não editar** |
 | `supabase/schema.sql` | Tabelas, RLS, triggers |
@@ -84,7 +84,7 @@ falham fechado.
 | Script | Entrada | Escreve | Uso |
 |---|---|---|---|
 | `incorporar-rascunho.ps1` | `rascunho.json` | cartão novo inteiro | cartão escrito à mão |
-| `explicar-alternativas.ps1` | `explicacoes.json` | `eo` e/ou `n` por `id` | campo em cartão que já existe |
+| `explicar-alternativas.ps1` | `explicacoes.json` | `eo`, `n` e/ou `o` por `id` | campo em cartão que já existe |
 | `incorporar-propostas.ps1` | Supabase | cartão novo inteiro | caixa de entrada colaborativa |
 | `reescrever-questoes.ps1` | — | `q` + `banco/reescritas.json` | único jeito de mudar enunciado |
 
@@ -184,9 +184,12 @@ Os dois validadores precisam concordar: `validar.ps1` é o que roda antes de
 --rascunho` → `incorporar-rascunho.ps1` → `validar` → `VERSAO` no `sw.js` →
 `gerar-offline.ps1` → commit.
 
-**Nível/`eo` em cartão existente:** montar `explicacoes.json` com `{id, n}`
-e/ou `{id, eo}` → `validar.py --patches` → `explicar-alternativas.ps1` →
-mesma cauda.
+**Nível/`eo`/alternativas em cartão existente:** montar `explicacoes.json` com
+`{id, n}`, `{id, eo}` e/ou `{id, o}` → `validar.py --patches` →
+`explicar-alternativas.ps1` → mesma cauda. Patch de `o` serve para corrigir
+viés de comprimento e só pode mexer em **distrator**: os dois validadores
+reprovam se a correta mudar de texto ou de posição (`c` é índice, não texto).
+Mandando `o`, mande `eo` junto — `eo[i]` explica `o[i]`.
 
 **Um dia de estudo:** `fila()` separa vencidas de novas → novas passam por
 `grauAberto`, sem reordenação → `iniciarSessao("normal")`

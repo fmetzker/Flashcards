@@ -119,18 +119,24 @@ if ($Rascunho) {
   Write-Host "Rascunho: $nRascunho candidato(s) avaliados junto do banco (nada foi gravado)`n"
 }
 
-# ---- patches (eo e/ou n em cartão existente) ----------------------------------
+# ---- patches (eo, n e/ou o em cartão existente) -------------------------------
 # Mesma ideia do rascunho, mas para EDITAR em vez de acrescentar: aplica os
-# campos que não entram no id ('eo', explicação por alternativa, e 'n', nível
-# do cartão dentro do tópico) em memória sobre a questão já carregada em $B,
-# casando por id, antes de qualquer checagem abaixo rodar. Quem grava é o
-# explicar-alternativas.ps1.
+# campos que não entram no id ('eo', explicação por alternativa, 'n', nível do
+# cartão dentro do tópico, e 'o', as alternativas) em memória sobre a questão
+# já carregada em $B, casando por id, antes de qualquer checagem abaixo rodar.
+# Quem grava é o explicar-alternativas.ps1.
 #
 # Campo AUSENTE no patch não pode ser aplicado: aplicar 'eo' vazio sobre um
 # cartão que só quer receber 'n' apagaria a explicação por alternativa e ainda
 # reprovaria na checagem de tamanho de 'eo'. Espelha carrega_patches do
 # validar.py — as duas implementações precisam concordar, senão o script grava
 # com base numa validação diferente da que o validar.py fez.
+#
+# 'o' carrega o risco que 'eo' e 'n' não têm: 'c' é o ÍNDICE da correta, não o
+# texto. Patch que reordene as alternativas trocaria a resposta certa sem
+# aparecer no diff. Por isso a correta tem de vir idêntica e na mesma posição —
+# a mesma regra do validar.py, e ela é o que restringe o patch de 'o' a fazer
+# só o que a seção de viés do CLAUDE.md manda: mexer em DISTRATOR.
 $nPatches = 0
 if ($Patches) {
   $arqP = if ([System.IO.Path]::IsPathRooted($Patches)) { $Patches } else { Join-Path $raiz $Patches }
@@ -142,8 +148,18 @@ if ($Patches) {
   foreach ($p in @($pats)) {
     if (-not $porId.ContainsKey($p.id)) { Erro "patches: id '$($p.id)' não existe no banco"; continue }
     $campos = $p.PSObject.Properties.Name
-    if ($campos -notcontains 'eo' -and $campos -notcontains 'n') {
-      Erro "patches: id '$($p.id)' não traz 'eo' nem 'n' — nada a aplicar"; continue
+    if ($campos -notcontains 'eo' -and $campos -notcontains 'n' -and $campos -notcontains 'o') {
+      Erro "patches: id '$($p.id)' não traz 'eo', 'n' nem 'o' — nada a aplicar"; continue
+    }
+    if ($campos -contains 'o') {
+      $atual = @($porId[$p.id].o); $novo = @($p.o); $ci = [int]$porId[$p.id].c
+      if ($novo.Count -ne $atual.Count) {
+        Erro "patches: id '$($p.id)': 'o' precisa ter as mesmas $($atual.Count) alternativas (veio $($novo.Count))"; continue
+      }
+      if ($novo[$ci] -ne $atual[$ci]) {
+        Erro "patches: id '$($p.id)': a alternativa correta (índice $ci) mudou de texto ou de posição — patch de 'o' só pode reescrever distrator, nunca a correta"; continue
+      }
+      $porId[$p.id] | Add-Member -NotePropertyName o -NotePropertyValue $novo -Force
     }
     if ($campos -contains 'eo') {
       $porId[$p.id] | Add-Member -NotePropertyName eo -NotePropertyValue @($p.eo) -Force
@@ -408,6 +424,38 @@ foreach ($q in $B) {
 $taxa = if ($comPista) { $acertos / $comPista * 100 } else { 0.0 }
 Write-Host ("  pista 'mais longa' existe em:  {0} questões; acerta {1:N1}%   [acaso 20%]" -f $comPista, $taxa)
 if ($taxa -gt 40) { Erro ("chutar na alternativa mais longa acerta {0:N1}% das vezes (acaso = 20%)" -f $taxa) }
+
+# ...e a MESMA conta por matéria, que é onde ela significa alguma coisa. O
+# número do banco inteiro é média de coisas opostas e engana: já esteve em 18%
+# — dentro do acaso — com TODA matéria ativa em 0% e as duas inativas em 59%.
+# Zero por cento não é neutro, é a pista invertida ("a mais longa nunca é a
+# certa"). Espelha mede_vies do validar.py; as duas precisam concordar.
+$pistaM = @{}; $acertoM = @{}
+foreach ($q in $B) {
+  $tam = @($q.o | ForEach-Object { $_.Length })
+  $ord = @($tam | Sort-Object -Descending)
+  if ($ord[0] - $ord[1] -gt 10) {
+    $pistaM[$q.m] = 1 + $(if ($pistaM.ContainsKey($q.m)) { $pistaM[$q.m] } else { 0 })
+    if ([array]::IndexOf($tam, $ord[0]) -eq $q.c) {
+      $acertoM[$q.m] = 1 + $(if ($acertoM.ContainsKey($q.m)) { $acertoM[$q.m] } else { 0 })
+    }
+  }
+}
+Write-Host "  por matéria (só as com 20+ questões de pista):"
+foreach ($mid in ($pistaM.Keys | Sort-Object)) {
+  $p = $pistaM[$mid]
+  if ($p -lt 20) { continue }
+  $a = if ($acertoM.ContainsKey($mid)) { $acertoM[$mid] } else { 0 }
+  $r = $a / $p * 100
+  $flag = if ($r -ge 5 -and $r -le 40) { '' } else { '  <-- fora da faixa' }
+  Write-Host ("    {0,-22} {1,3}/{2,-4} {3,5:N1}%{4}" -f $mid, $a, $p, $r, $flag)
+  if (-not $ativas.ContainsKey($mid)) { continue }
+  if ($r -gt 40) {
+    Erro ("{0}: a alternativa mais longa é a correta em {1:N1}% das {2} questões com pista (acaso = 20%)" -f $mid, $r, $p)
+  } elseif ($r -lt 5) {
+    Aviso ("{0}: a mais longa quase nunca é a correta ({1} de {2}) — pista invertida, dá pra eliminar uma alternativa de graça. Corrigir enxugando o distrator que se destaca, não alongando a correta" -f $mid, $a, $p)
+  }
+}
 
 # ---- app ---------------------------------------------------------------------
 

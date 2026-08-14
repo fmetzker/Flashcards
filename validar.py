@@ -429,6 +429,41 @@ def mede_vies(B):
     if taxa > 40:
         erros.append(f"chutar na alternativa mais longa acerta {taxa:.1f}% das vezes (acaso = 20%)")
 
+    # ...e a MESMA conta por matéria, que é onde ela significa alguma coisa.
+    # O número do banco inteiro é média de coisas opostas e engana: já esteve em
+    # 18% — dentro do acaso — com TODA matéria ativa em 0% e as duas inativas em
+    # 59%. Zero por cento não é neutro, é a pista invertida ("a mais longa nunca
+    # é a certa"), que elimina uma alternativa de graça. Quem estuda vê uma
+    # matéria, não o banco.
+    ativas = materias_ativas()
+    por_m = {}
+    for q in B:
+        tam = [len(x) for x in q['o']]
+        maior = max(tam)
+        idx = tam.index(maior)
+        segundo = max(t for j, t in enumerate(tam) if j != idx)
+        if maior - segundo > 10:
+            p, a = por_m.get(q['m'], (0, 0))
+            por_m[q['m']] = (p + 1, a + (idx == q['c']))
+    print("  por matéria (só as com 20+ questões de pista):")
+    for mid in sorted(por_m):
+        p, a = por_m[mid]
+        if p < 20:
+            continue
+        r = a / p * 100
+        flag = '' if 5 <= r <= 40 else '  <-- fora da faixa'
+        print(f"    {mid:<22} {a:>3}/{p:<4} {r:>5.1f}%{flag}")
+        # Amostra pequena não diz nada: só matéria com 20+ questões de pista.
+        if mid not in ativas:
+            continue
+        if r > 40:
+            erros.append(f"{mid}: a alternativa mais longa é a correta em {r:.1f}% "
+                         f"das {p} questões com pista (acaso = 20%)")
+        elif r < 5:
+            avisos.append(f"{mid}: a mais longa quase nunca é a correta ({a} de {p}) — "
+                          "pista invertida, dá pra eliminar uma alternativa de graça. "
+                          "Corrigir enxugando o distrator que se destaca, não alongando a correta")
+
     # o viés de letra só importa se o embaralhamento for removido
     fonte = open(HTML, encoding='utf-8').read()
     if 'embaralhaOrdem' not in fonte:
@@ -604,17 +639,26 @@ def carrega_rascunho(B, caminho):
 
 def carrega_patches(B, caminho):
     """Aplica em memória, sobre cartão que JÁ EXISTE no banco, os campos que
-    não entram no id: 'eo' (explicação por alternativa) e 'n' (nível do cartão
-    dentro do tópico) — usado por explicar-alternativas.ps1.
+    não entram no id: 'eo' (explicação por alternativa), 'n' (nível do cartão
+    dentro do tópico) e 'o' (as alternativas) — usado por
+    explicar-alternativas.ps1.
 
     Mesmo motivo do carrega_rascunho: toda regra deste arquivo precisa
     alcançar a mudança ANTES dela ser gravada. Diferença aqui é que a questão
     já existe — o patch só altera campos de um objeto que valida_questoes já
     vai conferir do mesmo jeito que confere qualquer outro cartão.
 
-    Os dois campos passam pelo mesmo caminho de propósito: é isso que evita um
+    Os três campos passam pelo mesmo caminho de propósito: é isso que evita um
     QUARTO script de gravação, que a regra 9 do CLAUDE.md proíbe. Cada patch
-    traz 'eo', 'n', ou os dois; campo ausente no patch não mexe no cartão."""
+    traz 'eo', 'n', 'o', ou uma combinação; campo ausente não mexe no cartão.
+
+    'o' tem um perigo que 'eo' e 'n' não têm: 'c' é o ÍNDICE da correta, não o
+    texto dela. Um patch que reordene as alternativas, ou que reescreva a
+    correta, muda silenciosamente qual resposta o app considera certa — para
+    todo mundo, sem nada no diff que grite. Por isso a regra abaixo, que é
+    mecânica e não documental: o patch precisa devolver a correta IDÊNTICA e
+    na MESMA posição. Sobra exatamente o que a seção de viés do CLAUDE.md
+    manda fazer — reescrever distrator, nunca encurtar a correta."""
     if not os.path.exists(caminho):
         print(f"ERRO: patches não encontrado: {caminho}")
         sys.exit(1)
@@ -628,9 +672,22 @@ def carrega_patches(B, caminho):
         if not pid or pid not in por_id:
             erros.append(f"patches: id '{pid}' não existe no banco")
             continue
-        if 'eo' not in p and 'n' not in p:
-            erros.append(f"patches: id '{pid}' não traz 'eo' nem 'n' — nada a aplicar")
+        if 'eo' not in p and 'n' not in p and 'o' not in p:
+            erros.append(f"patches: id '{pid}' não traz 'eo', 'n' nem 'o' — nada a aplicar")
             continue
+        if 'o' in p:
+            atual, novo = por_id[pid]['o'], p.get('o')
+            c = por_id[pid]['c']
+            if not isinstance(novo, list) or len(novo) != len(atual):
+                erros.append(f"patches: id '{pid}': 'o' precisa ter as mesmas "
+                             f"{len(atual)} alternativas (veio {len(novo) if isinstance(novo, list) else type(novo).__name__})")
+                continue
+            if novo[c] != atual[c]:
+                erros.append(f"patches: id '{pid}': a alternativa correta (índice {c}) "
+                             "mudou de texto ou de posição — patch de 'o' só pode "
+                             "reescrever distrator, nunca a correta")
+                continue
+            por_id[pid]['o'] = novo
         if 'eo' in p:
             por_id[pid]['eo'] = p.get('eo')
         if 'n' in p:

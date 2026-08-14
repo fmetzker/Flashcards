@@ -481,6 +481,33 @@ adotaria por engano — não frases curtas do tipo "Apenas X" ou "Somente Y".
 Em boa parte dos casos, escrever pelo menos um distrator **mais longo** que
 a correta.
 
+**Medir por MATÉRIA, nunca pelo banco inteiro.** O número agregado é média de
+coisas opostas e mente com cara de saúde: já esteve em 18% — dentro do acaso —
+com *toda* matéria ativa em 0% e as duas inativas em 59%. Medido de outro
+jeito: com Português a 100% (viés máximo) injetado num teste, o número do banco
+chegou a 40,3%, mal cruzando o limiar. Quem estuda vê uma matéria, não o banco.
+Por isso `validar.py`/`validar.ps1` quebram a conta por matéria, e só olham
+matéria com 20+ questões de pista — abaixo disso a amostra não diz nada.
+
+**0% também é viés, e é o mais fácil de criar sem perceber.** "A mais longa
+nunca é a correta" elimina uma alternativa de graça, igual a 60% servir a
+correta de bandeja. O alvo é o **acaso: ~20%**, não o zero. Foi assim que uma
+correção deste viés já estragou três matérias que estavam saudáveis (Português
+a 25%, Matemática a 20%, SUS a 12,5%) — perseguindo o agregado, zeraram as
+três. Antes de "corrigir" uma matéria, olhe a taxa dela: entre ~5% e ~40% não
+há o que fazer.
+
+**Para corrigir matéria com pista invertida (abaixo de 5%), enxugue o distrator
+que se destaca — não alongue a correta.** Alongar a correta para bater uma
+estatística é fabricar o viés que a regra existe para impedir.
+
+O campo `o` é editável por `explicar-alternativas.ps1`, junto de `eo`, pelo
+mesmo caminho de patch de sempre (regra 9 segue com três scripts). Os dois
+validadores reprovam patch de `o` em que a correta mude de texto ou de posição:
+`c` é índice, não texto, e reordenar as alternativas trocaria a resposta certa
+para todo mundo sem aparecer no diff. Sobra exatamente o que esta seção manda —
+mexer em distrator.
+
 As alternativas são embaralhadas em tempo de execução (`embaralhaOrdem`), no
 estudo e no simulado — não reintroduzir ordem fixa.
 

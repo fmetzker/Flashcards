@@ -17,9 +17,17 @@
 #   .\explicar-alternativas.ps1             grava, se o validador passar
 #   .\explicar-alternativas.ps1 -Arquivo outro.json
 #
-# Formato de explicacoes.json: array de {id, eo}, onde eo é um array do
-# mesmo tamanho de 'o' da questão (string vazia pula a posição). Ver
-# PADRAO-DOS-CARTOES.md seção 1.4.1.
+# Formato de explicacoes.json: array de {id, ...}, com um ou mais destes:
+#   eo  array do mesmo tamanho de 'o' (string vazia pula a posição).
+#       Ver PADRAO-DOS-CARTOES.md seção 1.4.1.
+#   n   nível do cartão dentro do tópico (1 a 9).
+#   o   as alternativas, para corrigir viés de comprimento reescrevendo
+#       DISTRATOR. A correta tem de vir idêntica e na mesma posição: 'c' é
+#       índice, não texto, e trocar a ordem mudaria a resposta certa sem
+#       aparecer no diff. Quem reprova isso é o validar.py — mexeu na
+#       correta, não grava. Mandando 'o', mande o 'eo' junto: eo[i] explica
+#       o[i], e distrator novo com explicação velha vira cartão que ensina
+#       errado.
 #
 # Rodar de novo com o mesmo id SUBSTITUI o 'eo' anterior (idempotente) — útil
 # na calibração, quando a nota de uma alternativa precisa ser reescrita antes
@@ -78,14 +86,21 @@ if ($DryRun) {
 
 # ---- 2. acha em qual banco/<matéria>.json cada id mora ------------------------
 $materias = [System.IO.File]::ReadAllText((Join-Path $dir 'materias.json'), [System.Text.Encoding]::UTF8) | ConvertFrom-Json
-# Um patch traz 'eo', 'n', ou os dois. Guardo em mapas separados porque campo
-# ausente no patch NÃO pode apagar o que o cartão já tem — quem só define 'n'
-# não deve perder o 'eo' escrito antes, e vice-versa.
-$eoPorId = @{}; $nPorId = @{}; $alvos = @{}
+# Um patch traz 'eo', 'n', 'o', ou uma combinação. Guardo em mapas separados
+# porque campo ausente no patch NÃO pode apagar o que o cartão já tem — quem só
+# define 'n' não deve perder o 'eo' escrito antes, e vice-versa.
+#
+# 'o' (as alternativas) entra por aqui para corrigir viés de comprimento:
+# reescrever distrator curto demais, que denuncia a correta por ser a única
+# frase longa. Quem garante que o patch não troca a correta de lugar é o
+# validar.py, que roda logo acima e reprova se o índice 'c' deixar de apontar
+# para o mesmo texto — este script não reimplementa essa checagem (regra 9).
+$eoPorId = @{}; $nPorId = @{}; $oPorId = @{}; $alvos = @{}
 foreach ($p in $patches) {
   $campos = $p.PSObject.Properties.Name
   if ($campos -contains 'eo') { $eoPorId[$p.id] = @($p.eo) }
   if ($campos -contains 'n')  { $nPorId[$p.id]  = [int]$p.n }
+  if ($campos -contains 'o')  { $oPorId[$p.id]  = @($p.o) }
   $alvos[$p.id] = $true
 }
 
@@ -109,7 +124,9 @@ foreach ($m in $materias) {
     $campoQ = $q.PSObject.Properties.Name
     $obj = [ordered]@{ id = $q.id; m = $q.m; t = $q.t }
     if ($campoQ -contains 's' -and $q.s) { $obj.s = $q.s }
-    $obj.q = $q.q; $obj.o = @($q.o); $obj.c = [int]$q.c; $obj.e = $q.e; $obj.f = $q.f
+    $obj.q = $q.q
+    if ($oPorId.ContainsKey($q.id)) { $obj.o = $oPorId[$q.id] } else { $obj.o = @($q.o) }
+    $obj.c = [int]$q.c; $obj.e = $q.e; $obj.f = $q.f
     # o que o patch não trouxe é preservado do cartão original
     if ($nPorId.ContainsKey($q.id))      { $obj.n = $nPorId[$q.id] }
     elseif ($campoQ -contains 'n')       { $obj.n = [int]$q.n }
