@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v243-matematica-escada-geometria-funcoes-trig-combinatoria";
+const VERSAO = "v244-matematica-escada-probabilidade-estatistica-completa";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
