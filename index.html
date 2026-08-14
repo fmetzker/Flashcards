@@ -43,6 +43,29 @@ body{
 }
 .tela{display:none;max-width:560px;margin:0 auto;padding:18px 18px 130px}
 .tela.ativa{display:block}
+
+/* tela de carregamento — cobre o tempo do boot (fetch de concursos.json e
+   banco/*.json, ver BOOT mais abaixo). Fica por cima de tudo, tela cheia,
+   e não segue o max-width/padding das demais telas de propósito: some
+   inteira na primeira chamada de ir(), que já limpa a classe .ativa de
+   toda .tela. Girar respeita o prefers-reduced-motion global lá embaixo,
+   que zera toda animação. */
+#tela-carregando{
+  position:fixed;inset:0;z-index:100;max-width:none;margin:0;padding:0;
+  display:none;align-items:center;justify-content:center;
+  background:var(--escuro);
+}
+#tela-carregando.ativa{display:flex}
+.carregando-miolo{text-align:center;color:#fff}
+.carregando-miolo h1{color:#fff}
+.carregando-miolo .sub{color:#BFE0D6;margin-top:6px}
+.carregando-spinner{
+  width:32px;height:32px;margin:0 auto 18px;border-radius:50%;
+  border:3px solid rgba(255,255,255,.25);border-top-color:var(--verde-brilho);
+  animation:girar .8s linear infinite;
+}
+@keyframes girar{to{transform:rotate(360deg)}}
+
 h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.015em}
 h1{font-size:26px;font-weight:700}
 h2{font-size:19px;font-weight:600}
@@ -281,6 +304,21 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
 </head>
 <body>
 
+<!-- ============ CARREGANDO ============
+     Nasce ativa no HTML estático, antes de qualquer JS rodar: cobre o
+     tempo de fetch de concursos.json + banco/ (ver BOOT, mais abaixo).
+     Só sai do ar quando o boot chama ir() pela primeira vez — sucesso
+     leva pra login/espera/escolher-concurso/início, falha troca o body
+     inteiro por falhaBoot(). Não precisa de conteúdo dinâmico nem de
+     pintarCarregando() nenhum. -->
+<div class="tela ativa" id="tela-carregando" role="status" aria-live="polite">
+  <div class="carregando-miolo">
+    <div class="carregando-spinner" aria-hidden="true"></div>
+    <h1>Flashcard</h1>
+    <div class="sub">Carregando…</div>
+  </div>
+</div>
+
 <!-- ============ LOGIN OBRIGATÓRIO ============ -->
 <div class="tela" id="tela-login">
   <h1>Entrar</h1>
@@ -289,7 +327,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
 </div>
 
 <!-- ============ INÍCIO ============ -->
-<div class="tela ativa" id="tela-inicio">
+<div class="tela" id="tela-inicio">
   <div class="topo">
     <div style="min-width:0">
       <h1 id="cabecalho-cargo">–</h1>
