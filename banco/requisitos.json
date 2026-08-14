@@ -54,6 +54,14 @@
         "Rede Alyne": ["Organização do SUS"],
         "Transferência inter-hospitalar": ["PNAU"]
       }
+    },
+    "ingles": {
+      "criterio": "Verb Tenses é a base: modal verb muda a forma do verbo principal, e voz passiva é o tempo verbal de 'to be' aplicado ao particípio — os dois pressupõem already saber conjugar nos tempos verbais. Reading Comprehension exige três bases ao mesmo tempo (Verb Tenses, Connectors e Vocabulary in Context) porque um texto real mistura tempo verbal, conectivos lógicos e vocabulário em contexto — não dá para treinar compreensão de texto sem já ter alguma base nos três. Ficam sem requisito, abertos desde o primeiro dia: Verb Tenses (a base de tudo), Comparatives and Superlatives, Connectors, False Cognates e Vocabulary in Context — cinco tópicos de vocabulário/gramática que não dependem uns dos outros.",
+      "requisitos": {
+        "Modal Verbs": ["Verb Tenses"],
+        "Passive Voice": ["Verb Tenses"],
+        "Reading Comprehension": ["Verb Tenses", "Connectors", "Vocabulary in Context"]
+      }
     }
   }
 }
