@@ -40,6 +40,20 @@
         "Probabilidade": ["Análise combinatória", "Aritmética"],
         "Estatística": ["Aritmética"]
       }
+    },
+    "sus": {
+      "criterio": "Cada aresta segue a hierarquia normativa real: um tópico só exige outro quando o exigido é a norma que o institui ou estrutura. Lei 8.080/90 exige Constituição Federal porque é a lei que regulamenta os arts. 196-200 da Carta; Lei 8.142/90 exige Lei 8.080/90 por ser a mesma reforma sanitária, tratando de participação popular e financiamento; Organização do SUS exige Lei 8.080/90 porque a estrutura (direção única, regionalização, hierarquização) vem dela; Controle social exige Lei 8.142/90, que instituiu Conselhos e Conferências de Saúde; PNAB, PNAU e PNH exigem Organização do SUS porque são políticas que operam DENTRO da rede e dos níveis de atenção que ela define; Rede Alyne exige Organização do SUS pelo mesmo motivo (é uma rede temática dentro do SUS); Transferência inter-hospitalar exige PNAU porque o processo de transferência regulada é conduzido pela mesma central de regulação e rede de urgência/emergência da PNAU. Fica SEM requisito, e portanto aberta desde o primeiro dia, só a Constituição Federal — a base de tudo o que vem depois.",
+      "requisitos": {
+        "Lei 8.080/90": ["Constituição Federal"],
+        "Lei 8.142/90": ["Lei 8.080/90"],
+        "Organização do SUS": ["Lei 8.080/90"],
+        "Controle social": ["Lei 8.142/90"],
+        "PNAB": ["Organização do SUS"],
+        "PNAU": ["Organização do SUS"],
+        "PNH": ["Organização do SUS"],
+        "Rede Alyne": ["Organização do SUS"],
+        "Transferência inter-hospitalar": ["PNAU"]
+      }
     }
   }
 }
