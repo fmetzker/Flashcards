@@ -1,6 +1,6 @@
 {
-  "name": "Flashcard",
-  "short_name": "Flashcard",
+  "name": "Flashcards",
+  "short_name": "Flashcards",
   "description": "Questões e revisão espaçada para concursos públicos, com contas e banco colaborativo.",
   "lang": "pt-BR",
   "start_url": "./index.html",

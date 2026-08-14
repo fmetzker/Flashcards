@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Flashcard">
+<meta name="apple-mobile-web-app-title" content="Flashcards">
 <meta name="theme-color" content="#0E7C66">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Flashcard</title>
+<title>Flashcards</title>
 <style>
 :root{
   --tinta:#16232E;
@@ -59,6 +59,7 @@ body{
 .carregando-miolo{text-align:center;color:#fff}
 .carregando-miolo h1{color:#fff}
 .carregando-miolo .sub{color:#BFE0D6;margin-top:6px}
+.carregando-credito{color:#6FA095;font-size:12px;margin-top:28px}
 .carregando-spinner{
   width:32px;height:32px;margin:0 auto 18px;border-radius:50%;
   border:3px solid rgba(255,255,255,.25);border-top-color:var(--verde-brilho);
@@ -314,8 +315,9 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
 <div class="tela ativa" id="tela-carregando" role="status" aria-live="polite">
   <div class="carregando-miolo">
     <div class="carregando-spinner" aria-hidden="true"></div>
-    <h1>Flashcard</h1>
+    <h1>Flashcards</h1>
     <div class="sub">Carregando…</div>
+    <div class="carregando-credito">Francisco Metzker</div>
   </div>
 </div>
 

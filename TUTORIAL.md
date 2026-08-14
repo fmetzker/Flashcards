@@ -63,7 +63,7 @@ navegadores do iPhone não oferecem "Adicionar à Tela de Início" do mesmo
 jeito).
 
 **2.** Toque em **Compartilhar** → **Adicionar à Tela de Início** →
-confirme o nome ("Flashcard") → **Adicionar**.
+confirme o nome ("Flashcards") → **Adicionar**.
 
 **3.** Abra o app pelo ícone novo. Ele abre em tela cheia, como um
 aplicativo normal.
