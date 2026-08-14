@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v241-remove-camadas-entre-topicos-nivel-so-dentro";
+const VERSAO = "v242-matematica-escada-logica-aritmetica-algebra";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [

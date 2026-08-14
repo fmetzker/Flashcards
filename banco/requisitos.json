@@ -27,6 +27,19 @@
         "Gêneros textuais": ["Tipologia textual"],
         "Intertextualidade": ["Interpretação de textos"]
       }
+    },
+    "matematica": {
+      "criterio": "Cada aresta segue a dependência matemática real: um tópico só exige outro quando suas contas pressupõem, de fato, a base do exigido. Aritmética exige Multiplicação porque juros, MMC/MDC, razão e regra de três são, por baixo, contas de multiplicar e dividir; Álgebra exige Aritmética porque equação é conta com incógnita, não conta nova; Geometria exige Aritmética porque área e volume são produtos de medidas; Funções exige Álgebra porque função é a mesma manipulação simbólica aplicada a f(x); Trigonometria exige Geometria (Pitágoras, triângulo) e Funções (período, domínio); Análise combinatória exige Multiplicação porque o princípio multiplicativo generaliza a tabuada; Probabilidade exige Análise combinatória (contar casos favoráveis e possíveis) e Aritmética (razão/porcentagem); Estatística exige Aritmética (média é soma e divisão). Ficam SEM requisito, e portanto abertos desde o primeiro dia, dois tópicos: Multiplicação, a tabuada que sustenta o resto, e Lógica, que nem consta do Anexo IV e não depende de nenhum outro.",
+      "requisitos": {
+        "Aritmética": ["Multiplicação"],
+        "Álgebra": ["Aritmética"],
+        "Geometria": ["Aritmética"],
+        "Funções": ["Álgebra"],
+        "Trigonometria": ["Geometria", "Funções"],
+        "Análise combinatória": ["Multiplicação"],
+        "Probabilidade": ["Análise combinatória", "Aritmética"],
+        "Estatística": ["Aritmética"]
+      }
     }
   }
 }
