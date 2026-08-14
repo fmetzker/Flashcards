@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v255-maritimo-maquinas-escada-interna";
+const VERSAO = "v256-enfermagem-vies-invertido-corrigido";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
