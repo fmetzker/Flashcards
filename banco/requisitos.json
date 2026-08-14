@@ -62,6 +62,26 @@
         "Passive Voice": ["Verb Tenses"],
         "Reading Comprehension": ["Verb Tenses", "Connectors", "Vocabulary in Context"]
       }
+    },
+    "manutencao-mecanica": {
+      "criterio": "Aqui os 23 tópicos têm 9 cartões cada, e dentro de cada um os cartões são um glossário de fatos paralelos (cada instrumento, cada ensaio, cada elemento de máquina é seu próprio fato independente, sem um 'conceito geral' do qual os outros derivem) — por isso nenhum tópico ganhou escada interna (campo n), só a trava entre tópicos. As arestas seguem a dependência real de um currículo de mecânica: Ensaios metalúrgicos, Metalografia e tratamentos térmicos, Ensaios mecânicos destrutivos e não destrutivos, Processos de fabricação e Noções de soldagem exigem Materiais de construção mecânica porque testam, tratam ou transformam um material que precisa ser conhecido antes; Resistência dos materiais exige Materiais E Mecânica Geral (resistência é força aplicada a um material); Elementos de máquinas exige Mecânica Geral e Resistência dos materiais (engrenagem, mola e rolamento são objetos de análise de força e tensão); Mecânica dos Fluidos exige Mecânica Geral; Sistemas hidráulicos e pneumáticos exige Mecânica dos Fluidos; Instrumentos de medição exige Sistema Internacional de Unidades e Noções de metrologia; Medidas de pressão, nível, temperatura e vazão exige Instrumentos de medição; Sistema de ajuste e tolerância exige Noções de metrologia; Equipamentos mecânicos e Lubrificação exigem Elementos de máquinas (equipamento é montado com elementos de máquina, que precisam de lubrificação); Gestão da Manutenção exige Equipamentos mecânicos (só se gerencia a manutenção do que já se entende como equipamento). Ficam sem requisito, abertos desde o primeiro dia: Sistema Internacional de Unidades, Noções de metrologia, Desenho técnico mecânico, Segurança do trabalho/meio ambiente/saúde, Normas técnicas nacionais e internacionais, Materiais de construção mecânica, Mecânica Geral e Noções de eletrotécnica — oito tópicos-base que não dependem uns dos outros.",
+      "requisitos": {
+        "Ensaios metalúrgicos": ["Materiais de construção mecânica"],
+        "Metalografia e tratamentos térmicos": ["Materiais de construção mecânica"],
+        "Ensaios mecânicos destrutivos e não destrutivos": ["Materiais de construção mecânica"],
+        "Processos de fabricação mecânica": ["Materiais de construção mecânica"],
+        "Noções de soldagem": ["Materiais de construção mecânica"],
+        "Resistência dos materiais": ["Materiais de construção mecânica", "Mecânica Geral"],
+        "Elementos de máquinas": ["Mecânica Geral", "Resistência dos materiais"],
+        "Mecânica dos Fluidos": ["Mecânica Geral"],
+        "Sistemas hidráulicos e pneumáticos": ["Mecânica dos Fluidos"],
+        "Instrumentos de medição": ["Sistema Internacional de Unidades", "Noções de metrologia"],
+        "Medidas de pressão, nível, temperatura e vazão": ["Instrumentos de medição"],
+        "Sistema de ajuste e tolerância": ["Noções de metrologia"],
+        "Equipamentos mecânicos": ["Elementos de máquinas"],
+        "Lubrificação": ["Elementos de máquinas"],
+        "Gestão da Manutenção": ["Equipamentos mecânicos"]
+      }
     }
   }
 }
