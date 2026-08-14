@@ -196,7 +196,7 @@ foreach ($q in $B) {
   # o subtópico é opcional, mas quando existe não pode repetir o nome do tópico
   if ($q.s -and $q.s -eq $q.t) { Erro "[$rot] subtópico é cópia do tópico: '$($q.t)'" }
   if ($q.o.Count -ne 5)                  { Erro "[$rot] não tem exatamente 5 alternativas" }
-  if ($q.c -isnot [int] -or $q.c -lt 0 -or $q.c -gt 4) { Erro "[$rot] índice da correta inválido: $($q.c)" }
+  if (($q.c -isnot [int] -and $q.c -isnot [long]) -or $q.c -lt 0 -or $q.c -gt 4) { Erro "[$rot] índice da correta inválido: $($q.c)" }
   if (($q.o | Select-Object -Unique).Count -ne $q.o.Count) { Erro "[$rot] alternativas repetidas dentro da questão" }
   if ([string]::IsNullOrWhiteSpace($q.f)) { Erro "[$rot] sem fonte" }
 

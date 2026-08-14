@@ -102,6 +102,22 @@
         "Saúde do Homem": ["Anatomia e Fisiologia"],
         "Saúde Mental": ["Anatomia e Fisiologia"]
       }
+    },
+    "enfermagem-trabalho": {
+      "criterio": "Matéria SEM concurso ativo (regra 12 do CLAUDE.md) — Enfermagem do Trabalho saiu de concursos.json porque ninguém mais vai prestar essa prova, mas o banco de 126 cartões continua íntegro para o caso de o concurso voltar. Classificar aqui é manutenção de cartão que já existe (campo `n`, igual a corrigir `eo`ou fonte), não escrita de cartão novo — regra 12 permite. 17 tópicos, sem subtópico. As arestas seguem a dependência real do currículo de saúde ocupacional: PCMSO, Administração de Serviços de Saúde e dos SESMT, Biossegurança e Saúde, Ergonomia Aplicada ao Trabalho, Toxicologia da Indústria de Petróleo/Gás/Derivados e Bem-Estar/QVT exigem Elementos de Higiene Ocupacional porque todos partem da mesma base — as cinco categorias de risco (físico, químico, biológico, ergonômico, de acidentes), o Limite de Tolerância e a hierarquia de controle (eliminar > substituir > engenharia > administrativo > EPI) — antes de tratar do risco específico de cada programa ou atividade. Gestão de Segurança e Saúde do Trabalho (ISO 45001, SMS, PDCA) exige também Administração de Serviços de Saúde e dos SESMT, porque um sistema de gestão integrado pressupõe já entender os programas isolados (SESMT, PCMSO, PGR) que ele integra. Epidemiologia e Vigilância da Saúde do Trabalhador exige Bioestatística (incidência, taxa de frequência e de gravidade são cálculo estatístico aplicado ao trabalho) e Doenças Profissionais e Doenças Relacionadas ao Trabalho (o modelo de Schilling, que classifica o nexo causal em três grupos, pressupõe já saber a diferença legal entre doença profissional e doença do trabalho). Sistematização da Assistência de Enfermagem e Assistência de Enfermagem em Urgências e Emergências exigem Ética e Deontologia de Enfermagem, porque as duas se apoiam em atividades PRIVATIVAS do Enfermeiro (diagnóstico de enfermagem, classificação de risco) — o mesmo raciocínio jurídico da consulta de enfermagem visto ali primeiro. Níveis de Atenção à Saúde exige Sistema de Saúde Brasileiro, porque só faz sentido falar em atenção primária/secundária/terciária depois de saber que o SUS é universal e coexiste com a saúde suplementar. Ficam sem requisito, abertos desde o primeiro dia: Elementos de Higiene Ocupacional (a base de todo risco ocupacional), Legislação de Segurança e Medicina do Trabalho (base legal — CLT, NRs, hierarquia normativa), Sistema de Saúde Brasileiro (base do sistema, domínio próprio), Ética e Deontologia de Enfermagem (base legal/deontológica da profissão), Bioestatística (domínio matemático independente) e Doenças Profissionais e Doenças Relacionadas ao Trabalho (base própria na Lei 8.213/1991). A escada INTERNA (campo n) segue o mesmo corte da matéria enfermagem: nível 1 é RECONHECER (qual norma rege o quê, a definição do conceito, a classificação), nível 2 é FAZER ou APLICAR (a conduta diante de um caso, o prazo, a regra específica dentro da norma já reconhecida, o cálculo).",
+      "requisitos": {
+        "Programa de Controle Médico de Saúde Ocupacional (PCMSO)": ["Elementos de Higiene Ocupacional"],
+        "Administração de Serviços de Saúde e dos SESMT": ["Elementos de Higiene Ocupacional"],
+        "Biossegurança e Saúde": ["Elementos de Higiene Ocupacional"],
+        "Ergonomia Aplicada ao Trabalho": ["Elementos de Higiene Ocupacional"],
+        "Toxicologia da Indústria de Petróleo, Gás e Derivados": ["Elementos de Higiene Ocupacional"],
+        "Bem-Estar, Saúde e Qualidade de Vida no Trabalho": ["Elementos de Higiene Ocupacional"],
+        "Gestão de Segurança e Saúde do Trabalho": ["Elementos de Higiene Ocupacional", "Administração de Serviços de Saúde e dos SESMT"],
+        "Epidemiologia e Vigilância da Saúde do Trabalhador": ["Bioestatística", "Doenças Profissionais e Doenças Relacionadas ao Trabalho"],
+        "Sistematização da Assistência de Enfermagem": ["Ética e Deontologia de Enfermagem"],
+        "Assistência de Enfermagem em Urgências e Emergências": ["Ética e Deontologia de Enfermagem"],
+        "Níveis de Atenção à Saúde": ["Sistema de Saúde Brasileiro"]
+      }
     }
   }
 }
