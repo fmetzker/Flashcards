@@ -118,6 +118,18 @@
         "Assistência de Enfermagem em Urgências e Emergências": ["Ética e Deontologia de Enfermagem"],
         "Níveis de Atenção à Saúde": ["Sistema de Saúde Brasileiro"]
       }
+    },
+    "maritimo-maquinas": {
+      "criterio": "Matéria SEM concurso ativo (regra 12) — Máquinas e Prática Marítima saiu de concursos.json, mas o banco de 136 cartões continua íntegro. Classificar aqui é manutenção de cartão que já existe, não escrita de cartão novo. 16 tópicos, sem subtópico. Ferramentaria fica de propósito SEM escada interna (todos os 10 cartões em n1): cada ferramenta (macho, cossinete, escareador, alargador, paquímetro, torquímetro, lima, morsa...) é um fato isolado — 'qual ferramenta faz X' —, sem um conceito geral do qual os outros derivem, o mesmo caso já registrado para a matéria manutencao-mecanica. As arestas do grafo seguem a dependência real do currículo: Prevenção e Controle da Poluição do Meio Ambiente Aquaviário, Máquinas e Sistemas Auxiliares, Motores Diesel e Sistemas de Propulsão e Pintura e Conservação de Embarcação exigem Arquitetura Naval Aplicada, porque todos pressupõem o vocabulário estrutural do navio (casco, calado, praça de máquinas, popa/proa, bombordo/boreste) antes de tratar de um sistema, poluente ou revestimento específico montado sobre essa estrutura; Manutenção de Máquinas e Equipamentos Auxiliares e Serviço de Quarto de Máquinas de Apoio exigem Máquinas e Sistemas Auxiliares E Motores Diesel e Sistemas de Propulsão, porque manter e vigiar pressupõe já saber o que é cada sistema/motor antes de aplicar rotina de manutenção ou de quarto sobre ele; Procedimentos de Emergências exige Prevenção e Combate a Incêndio E Técnicas de Sobrevivência Pessoal, porque os exercícios de emergência da SOLAS combinam abandono (sobrevivência) e combate a incêndio, e o alarme geral já é apresentado em Técnicas de Sobrevivência Pessoal antes de reaparecer aqui como conduta. Ficam sem requisito, abertos desde o primeiro dia: Legislação Marítima e Ambiental, Segurança no Trabalho (as NRs, mesmo raciocínio de base legal usado em toda matéria), Arquitetura Naval Aplicada (o vocabulário estrutural, a base de tudo), Ferramentaria (glossário próprio), Relações Interpessoais e Responsabilidades Sociais, Conhecimentos Elementares de Primeiros Socorros, Técnicas de Sobrevivência Pessoal e Prevenção e Combate a Incêndio — os quatro últimos são os módulos básicos paralelos do STCW (Elementary First Aid, Personal Survival Techniques, Fire Prevention and Fire Fighting, Personal Safety and Social Responsibility, citados juntos no próprio banco) — e Conscientização sobre proteção de navio, regime internacional (Código ISPS) autocontido. A escada INTERNA segue o mesmo corte das outras matérias: nível 1 é RECONHECER (qual norma/convenção/documento rege o quê, a definição do componente ou conceito, a classificação), nível 2 é FAZER/APLICAR/COMPARAR (a conduta diante de um caso, o procedimento, a distinção mais fina entre dois conceitos já apresentados).",
+      "requisitos": {
+        "Prevenção e Controle da Poluição do Meio Ambiente Aquaviário": ["Arquitetura Naval Aplicada"],
+        "Máquinas e Sistemas Auxiliares": ["Arquitetura Naval Aplicada"],
+        "Motores Diesel e Sistemas de Propulsão": ["Arquitetura Naval Aplicada"],
+        "Pintura e Conservação de Embarcação": ["Arquitetura Naval Aplicada"],
+        "Manutenção de Máquinas e Equipamentos Auxiliares": ["Máquinas e Sistemas Auxiliares", "Motores Diesel e Sistemas de Propulsão"],
+        "Serviço de Quarto de Máquinas de Apoio": ["Máquinas e Sistemas Auxiliares", "Motores Diesel e Sistemas de Propulsão"],
+        "Procedimentos de Emergências": ["Prevenção e Combate a Incêndio", "Técnicas de Sobrevivência Pessoal"]
+      }
     }
   }
 }
