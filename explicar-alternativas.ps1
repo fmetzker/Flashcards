@@ -1,8 +1,9 @@
-﻿# Grava 'eo' (explicação por alternativa) em cartão que JÁ EXISTE no banco,
+﻿# Grava 'eo' (explicação por alternativa), 'n' (nível), 'o' (alternativas,
+# para corrigir viés) e/ou 's' (subtópico) em cartão que JÁ EXISTE no banco,
 # casando por id — só se o validador passar. Terceiro e último script
 # autorizado a escrever em banco/*.json (regra 9 do CLAUDE.md); os outros
 # dois (incorporar-rascunho.ps1, incorporar-propostas.ps1) ACRESCENTAM
-# questão nova, este só ACRESCENTA UM CAMPO a uma que já existe.
+# questão nova, este só ACRESCENTA/ALTERA CAMPOS de uma que já existe.
 #
 # A disciplina é a mesma dos outros dois:
 #   1. NADA é gravado antes de `validar.ps1 -Patches` passar limpo. O script
@@ -28,6 +29,9 @@
 #       correta, não grava. Mandando 'o', mande o 'eo' junto: eo[i] explica
 #       o[i], e distrator novo com explicação velha vira cartão que ensina
 #       errado.
+#   s   subtópico (substitui o que o cartão já tinha; string vazia REMOVE o
+#       subtópico). Não pode repetir o 't' do cartão — quem reprova é o
+#       validar.py de sempre (valida_questoes), nenhuma checagem nova aqui.
 #
 # Rodar de novo com o mesmo id SUBSTITUI o 'eo' anterior (idempotente) — útil
 # na calibração, quando a nota de uma alternativa precisa ser reescrita antes
@@ -86,21 +90,22 @@ if ($DryRun) {
 
 # ---- 2. acha em qual banco/<matéria>.json cada id mora ------------------------
 $materias = [System.IO.File]::ReadAllText((Join-Path $dir 'materias.json'), [System.Text.Encoding]::UTF8) | ConvertFrom-Json
-# Um patch traz 'eo', 'n', 'o', ou uma combinação. Guardo em mapas separados
-# porque campo ausente no patch NÃO pode apagar o que o cartão já tem — quem só
-# define 'n' não deve perder o 'eo' escrito antes, e vice-versa.
+# Um patch traz 'eo', 'n', 'o', 's', ou uma combinação. Guardo em mapas
+# separados porque campo ausente no patch NÃO pode apagar o que o cartão já
+# tem — quem só define 'n' não deve perder o 'eo' escrito antes, e vice-versa.
 #
 # 'o' (as alternativas) entra por aqui para corrigir viés de comprimento:
 # reescrever distrator curto demais, que denuncia a correta por ser a única
 # frase longa. Quem garante que o patch não troca a correta de lugar é o
 # validar.py, que roda logo acima e reprova se o índice 'c' deixar de apontar
 # para o mesmo texto — este script não reimplementa essa checagem (regra 9).
-$eoPorId = @{}; $nPorId = @{}; $oPorId = @{}; $alvos = @{}
+$eoPorId = @{}; $nPorId = @{}; $oPorId = @{}; $sPorId = @{}; $alvos = @{}
 foreach ($p in $patches) {
   $campos = $p.PSObject.Properties.Name
   if ($campos -contains 'eo') { $eoPorId[$p.id] = @($p.eo) }
   if ($campos -contains 'n')  { $nPorId[$p.id]  = [int]$p.n }
   if ($campos -contains 'o')  { $oPorId[$p.id]  = @($p.o) }
+  if ($campos -contains 's')  { $sPorId[$p.id]  = [string]$p.s }
   $alvos[$p.id] = $true
 }
 
@@ -123,7 +128,9 @@ foreach ($m in $materias) {
     # devolveu as propriedades
     $campoQ = $q.PSObject.Properties.Name
     $obj = [ordered]@{ id = $q.id; m = $q.m; t = $q.t }
-    if ($campoQ -contains 's' -and $q.s) { $obj.s = $q.s }
+    if ($sPorId.ContainsKey($q.id)) {
+      if ($sPorId[$q.id]) { $obj.s = $sPorId[$q.id] }   # string vazia = remove
+    } elseif ($campoQ -contains 's' -and $q.s) { $obj.s = $q.s }
     $obj.q = $q.q
     if ($oPorId.ContainsKey($q.id)) { $obj.o = $oPorId[$q.id] } else { $obj.o = @($q.o) }
     $obj.c = [int]$q.c; $obj.e = $q.e; $obj.f = $q.f

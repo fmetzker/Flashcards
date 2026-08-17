@@ -151,8 +151,13 @@ regras que o esquema não expressa:
 
 - **`f` é obrigatório**: lei e artigo, ou manual e capítulo. Questão sem
   fonte não entra. Sem fonte à mão, não escreva o cartão (regra 11).
-- **`s` não pode repetir o nome do `t`** — o validador barra. Português e SUS
-  não usam subtópico porque os tópicos deles já são o nível certo.
+- **`s` não pode repetir o nome do `t`** — o validador barra. Toda matéria
+  pode usar subtópico; a granularidade é decisão de quem escreve o cartão, e
+  não é mais exclusividade de matéria com árvore grande (Enfermagem). Desde
+  que `banco/requisitos.json` passou a poder travar por subtópico (não só por
+  tópico inteiro — ver seção "Ordem de aprendizado"), subtópico ganhou um
+  segundo uso: além de agrupar na tela Matérias, pode ser alvo de
+  pré-requisito.
 - **Reusar `t` e `s` que já existam** em vez de inventar rótulo novo: a
   árvore só é útil enquanto os níveis se mantêm poucos.
 - `eo` não é retroativo (regra 9): só cartão novo ou em reescrita.
@@ -399,6 +404,17 @@ mecanismo que apenas *ordene*:
 
 Os dois são opcionais: sem eles, nada trava. Formato e mecânica em
 `ESTRUTURA.md`.
+
+**Pré-requisito pode apontar para um subtópico, não só para o tópico
+inteiro.** Uma entrada de `requisitos.json` é uma lista onde cada item é uma
+string (tópico inteiro, como sempre foi) ou um objeto `{"t":"Tópico",
+"s":"Subtópico"}` (só aquele subtópico). Existe para o caso em que só uma
+fatia do tópico exigido é base de verdade — ex.: para abrir "Flexão verbal"
+não é preciso dominar Classes de palavras inteira, só o subtópico Verbo dela.
+Isso **não** cria uma segunda escada: o subtópico aqui é só o alvo do
+pré-requisito, e a trava continua sendo do tópico inteiro que o declara — o
+que muda é a granularidade do que precisa estar pronto do lado exigido, não
+como o lado exigente é travado.
 
 **Não existe nível ENTRE tópicos.** Existiu — camadas que agrupavam os
 tópicos em "a palavra / a relação entre palavras / o texto" — e foi removido

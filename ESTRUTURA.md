@@ -43,8 +43,8 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 
 | Eixo | Onde | Efeito |
 |---|---|---|
-| `t` / `s` | no cartão | agrupa por assunto |
-| `requisitos` | `banco/requisitos.json` | **trava** tópico até a base do exigido estar dominada |
+| `t` / `s` | no cartão | agrupa por assunto; `s` também pode ser alvo de `requisitos` |
+| `requisitos` | `banco/requisitos.json` | **trava** tópico até a base do exigido (tópico inteiro ou só um `{t,s}`) estar dominada |
 | `n` | no cartão | **trava** degrau dentro do tópico |
 
 ---
@@ -84,7 +84,7 @@ falham fechado.
 | Script | Entrada | Escreve | Uso |
 |---|---|---|---|
 | `incorporar-rascunho.ps1` | `rascunho.json` | cartão novo inteiro | cartão escrito à mão |
-| `explicar-alternativas.ps1` | `explicacoes.json` | `eo`, `n` e/ou `o` por `id` | campo em cartão que já existe |
+| `explicar-alternativas.ps1` | `explicacoes.json` | `eo`, `n`, `o` e/ou `s` por `id` | campo em cartão que já existe |
 | `incorporar-propostas.ps1` | Supabase | cartão novo inteiro | caixa de entrada colaborativa |
 | `reescrever-questoes.ps1` | — | `q` + `banco/reescritas.json` | único jeito de mudar enunciado |
 

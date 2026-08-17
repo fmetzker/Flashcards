@@ -119,12 +119,12 @@ if ($Rascunho) {
   Write-Host "Rascunho: $nRascunho candidato(s) avaliados junto do banco (nada foi gravado)`n"
 }
 
-# ---- patches (eo, n e/ou o em cartão existente) -------------------------------
+# ---- patches (eo, n, o e/ou s em cartão existente) ----------------------------
 # Mesma ideia do rascunho, mas para EDITAR em vez de acrescentar: aplica os
 # campos que não entram no id ('eo', explicação por alternativa, 'n', nível do
-# cartão dentro do tópico, e 'o', as alternativas) em memória sobre a questão
-# já carregada em $B, casando por id, antes de qualquer checagem abaixo rodar.
-# Quem grava é o explicar-alternativas.ps1.
+# cartão dentro do tópico, 'o', as alternativas, e 's', subtópico) em memória
+# sobre a questão já carregada em $B, casando por id, antes de qualquer
+# checagem abaixo rodar. Quem grava é o explicar-alternativas.ps1.
 #
 # Campo AUSENTE no patch não pode ser aplicado: aplicar 'eo' vazio sobre um
 # cartão que só quer receber 'n' apagaria a explicação por alternativa e ainda
@@ -148,8 +148,8 @@ if ($Patches) {
   foreach ($p in @($pats)) {
     if (-not $porId.ContainsKey($p.id)) { Erro "patches: id '$($p.id)' não existe no banco"; continue }
     $campos = $p.PSObject.Properties.Name
-    if ($campos -notcontains 'eo' -and $campos -notcontains 'n' -and $campos -notcontains 'o') {
-      Erro "patches: id '$($p.id)' não traz 'eo', 'n' nem 'o' — nada a aplicar"; continue
+    if ($campos -notcontains 'eo' -and $campos -notcontains 'n' -and $campos -notcontains 'o' -and $campos -notcontains 's') {
+      Erro "patches: id '$($p.id)' não traz 'eo', 'n', 'o' nem 's' — nada a aplicar"; continue
     }
     if ($campos -contains 'o') {
       $atual = @($porId[$p.id].o); $novo = @($p.o); $ci = [int]$porId[$p.id].c
@@ -166,6 +166,9 @@ if ($Patches) {
     }
     if ($campos -contains 'n') {
       $porId[$p.id] | Add-Member -NotePropertyName n -NotePropertyValue ([int]$p.n) -Force
+    }
+    if ($campos -contains 's') {
+      $porId[$p.id] | Add-Member -NotePropertyName s -NotePropertyValue ([string]$p.s) -Force
     }
     $nPatches++
   }

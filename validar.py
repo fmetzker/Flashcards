@@ -229,20 +229,36 @@ def valida_requisitos(B, materias):
         if not dado.get('criterio'):
             erros.append(f"requisitos.json: matéria '{mid}' sem 'criterio' — por que esta ordem, e não outra?")
         do_banco = {q['t'] for q in B if q.get('m') == mid}
+        # pares (tópico, subtópico) que existem de verdade nesta matéria —
+        # é contra isto que um requisito {"t":..,"s":..} é conferido
+        pares_banco = {(q['t'], q.get('s')) for q in B if q.get('m') == mid and q.get('s')}
         req = dado.get('requisitos') or {}
         for t, deps in req.items():
             if t not in do_banco:
                 erros.append(f"requisitos.json: matéria '{mid}': requisito declarado para tópico "
                              f"'{t}', que não existe no banco desta matéria")
             for d in deps:
-                if d not in do_banco:
-                    erros.append(f"requisitos.json: matéria '{mid}', tópico '{t}': pré-requisito "
-                                 f"'{d}' não existe no banco desta matéria")
-                if d == t:
-                    erros.append(f"requisitos.json: matéria '{mid}': tópico '{t}' é pré-requisito "
-                                 "de si mesmo")
+                # 'd' é string (tópico inteiro) ou {"t":..,"s":..} (só um
+                # subtópico daquele tópico) — ver '_forma_do_item' no arquivo
+                if isinstance(d, dict):
+                    if (d.get('t'), d.get('s')) not in pares_banco:
+                        erros.append(f"requisitos.json: matéria '{mid}', tópico '{t}': pré-requisito "
+                                     f"'{d.get('t')}/{d.get('s')}' não existe no banco desta matéria")
+                    if d.get('t') == t:
+                        erros.append(f"requisitos.json: matéria '{mid}': tópico '{t}' é pré-requisito "
+                                     "de um subtópico de si mesmo")
+                else:
+                    if d not in do_banco:
+                        erros.append(f"requisitos.json: matéria '{mid}', tópico '{t}': pré-requisito "
+                                     f"'{d}' não existe no banco desta matéria")
+                    if d == t:
+                        erros.append(f"requisitos.json: matéria '{mid}': tópico '{t}' é pré-requisito "
+                                     "de si mesmo")
         # ciclo trancaria os tópicos envolvidos para sempre, sem nenhum aviso
-        # visível no app — a pessoa simplesmente nunca veria aqueles cartões
+        # visível no app — a pessoa simplesmente nunca veria aqueles cartões.
+        # O grafo de ciclo é sempre em nível de TÓPICO: uma dependência de
+        # subtópico {"t":..,"s":..} vira aresta para aquele 't', porque uma
+        # trava por subtópico ainda tranca o mesmo jeito se formar ciclo.
         estado = {}
         def ciclo(t, caminho_atual):
             if estado.get(t) == 'ok':
@@ -251,7 +267,8 @@ def valida_requisitos(B, materias):
                 return caminho_atual[caminho_atual.index(t):] + [t]
             estado[t] = 'visitando'
             for d in req.get(t, []):
-                achado = ciclo(d, caminho_atual + [t])
+                d_topico = d['t'] if isinstance(d, dict) else d
+                achado = ciclo(d_topico, caminho_atual + [t])
                 if achado:
                     return achado
             estado[t] = 'ok'
@@ -640,7 +657,7 @@ def carrega_rascunho(B, caminho):
 def carrega_patches(B, caminho):
     """Aplica em memória, sobre cartão que JÁ EXISTE no banco, os campos que
     não entram no id: 'eo' (explicação por alternativa), 'n' (nível do cartão
-    dentro do tópico) e 'o' (as alternativas) — usado por
+    dentro do tópico), 'o' (as alternativas) e 's' (subtópico) — usado por
     explicar-alternativas.ps1.
 
     Mesmo motivo do carrega_rascunho: toda regra deste arquivo precisa
@@ -648,9 +665,11 @@ def carrega_patches(B, caminho):
     já existe — o patch só altera campos de um objeto que valida_questoes já
     vai conferir do mesmo jeito que confere qualquer outro cartão.
 
-    Os três campos passam pelo mesmo caminho de propósito: é isso que evita um
-    QUARTO script de gravação, que a regra 9 do CLAUDE.md proíbe. Cada patch
-    traz 'eo', 'n', 'o', ou uma combinação; campo ausente não mexe no cartão.
+    Os quatro campos passam pelo mesmo caminho de propósito: é isso que evita
+    um QUINTO script de gravação, que a regra 9 do CLAUDE.md proíbe. Cada
+    patch traz 'eo', 'n', 'o', 's', ou uma combinação; campo ausente não mexe
+    no cartão. 's' não tem checagem própria aqui: valida_questoes já confere
+    's' != 't' em qualquer cartão do banco, incluindo o patchado.
 
     'o' tem um perigo que 'eo' e 'n' não têm: 'c' é o ÍNDICE da correta, não o
     texto dela. Um patch que reordene as alternativas, ou que reescreva a
@@ -672,8 +691,8 @@ def carrega_patches(B, caminho):
         if not pid or pid not in por_id:
             erros.append(f"patches: id '{pid}' não existe no banco")
             continue
-        if 'eo' not in p and 'n' not in p and 'o' not in p:
-            erros.append(f"patches: id '{pid}' não traz 'eo', 'n' nem 'o' — nada a aplicar")
+        if 'eo' not in p and 'n' not in p and 'o' not in p and 's' not in p:
+            erros.append(f"patches: id '{pid}' não traz 'eo', 'n', 'o' nem 's' — nada a aplicar")
             continue
         if 'o' in p:
             atual, novo = por_id[pid]['o'], p.get('o')
@@ -692,6 +711,8 @@ def carrega_patches(B, caminho):
             por_id[pid]['eo'] = p.get('eo')
         if 'n' in p:
             por_id[pid]['n'] = p.get('n')
+        if 's' in p:
+            por_id[pid]['s'] = p.get('s')
         aplicados += 1
     print(f"Patches: {aplicados} de {len(patches)} aplicado(s) em memória (nada foi gravado)\n")
     return B

@@ -805,12 +805,17 @@ function grauDe(q){ return (q && q.n) || 1; }
    Cartão nunca visto não está dominado, então o degrau não avança — é o que
    faz a escada segurar de verdade. */
 const _cacheGrau = {};
-function grauLiberado(m, t){
-  const chave = m + "|" + t;
+/* 's' é opcional: sem ele, mede o tópico inteiro (comportamento de sempre).
+   Com 's', mede só os cartões daquele subtópico — usado por baseDominada()
+   quando um pré-requisito aponta para {t, s} em vez de para o tópico
+   inteiro (ver "Pré-requisito pode apontar para um subtópico" no CLAUDE.md). */
+function grauLiberado(m, t, s){
+  const chave = m + "|" + t + "|" + (s || "");
   if(chave in _cacheGrau) return _cacheGrau[chave];
   const porGrau = {};
   BANCO.forEach(q=>{
     if(q.m !== m || q.t !== t) return;
+    if(s && q.s !== s) return;
     (porGrau[grauDe(q)] = porGrau[grauDe(q)] || []).push(q.id);
   });
   let g = 1;
@@ -838,8 +843,15 @@ function limparCacheGrau(){ for(const k in _cacheGrau) delete _cacheGrau[k]; }
 
    Tópico sem requisito declarado está sempre aberto — em Português, quatro
    deles (Classes de palavras, Ortografia, Acentuação, Semântica), o que
-   garante que a trava nunca deixe a pessoa sem nada para estudar. */
-function baseDominada(m, t){ return grauLiberado(m, t) > 1; }
+   garante que a trava nunca deixe a pessoa sem nada para estudar.
+
+   'dep' é string (tópico inteiro) ou {t, s} (só um subtópico daquele
+   tópico) — banco/requisitos.json documenta a forma em '_forma_do_item'. */
+function baseDominada(m, dep){
+  return typeof dep === "string"
+    ? grauLiberado(m, dep) > 1
+    : grauLiberado(m, dep.t, dep.s) > 1;
+}
 
 /* Requisitos que ainda faltam para este tópico abrir; vazio = aberto. */
 function requisitosPendentes(m, t){
@@ -848,6 +860,11 @@ function requisitosPendentes(m, t){
   return req.filter(dep=> !baseDominada(m, dep));
 }
 function topicoAberto(m, t){ return requisitosPendentes(m, t).length === 0; }
+
+/* Rótulo de exibição de uma dependência pendente — string (tópico) sai como
+   está; {t, s} vira "Subtópico (em Tópico)", senão a tela mostraria
+   "[object Object]". */
+function rotuloDep(d){ return typeof d === "string" ? d : d.s + " (em " + d.t + ")"; }
 
 /* Cartão NOVO só entra se o tópico dele estiver aberto E o degrau dele já
    tiver sido alcançado dentro do tópico. Vale só para cartão novo: revisão
@@ -2007,8 +2024,8 @@ function linhaNivel(cls, rotulo, d, aoEstudar, trava){
   if(trava){
     const tv = document.createElement("span"); tv.className = "trava";
     if(fechado){
-      tv.textContent = "🔒 estude antes: " + trava.faltam.join(", ");
-      tv.title = "Este tópico abre quando a base desses tópicos estiver dominada";
+      tv.textContent = "🔒 estude antes: " + trava.faltam.map(rotuloDep).join(", ");
+      tv.title = "Este tópico abre quando a base do que falta estiver dominada";
     } else {
       tv.textContent = "🔒 nível " + (trava.aberto+1) + " travado · faltam "
                      + trava.faltam + " do nível " + trava.aberto;
