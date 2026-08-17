@@ -5,7 +5,7 @@
   "_por_que_nao_ha_camadas": "Existiu aqui uma segunda estrutura, 'niveis', que agrupava os topicos em tres camadas (a palavra / a relacao entre palavras / o texto) e servia para ORDENAR. Foi removida porque virou rotulo enganoso: quem decide o que abre e o grafo de requisitos, nao a camada. Ao dominar Classes de palavras abriam ao mesmo tempo Pronomes (rotulado camada 1) e Tipologia textual (rotulado camada 3) — a tela anunciava uma hierarquia que o motor nao usava. Nivel agora existe em UM lugar so: dentro do topico, no campo 'n' do cartao.",
   "materias": {
     "portugues": {
-      "criterio": "Cada aresta é uma dependência real de conceito, não uma ordem estética: um tópico só exige outro quando os exercícios dele pressupõem, de fato, a base do exigido. Crase exige Regência porque só há crase quando o termo regente pede a preposição 'a'; Colocação pronominal exige Pronomes, e não Classes de palavras inteiro; Tipologia textual exige Classes de palavras porque o tipo se reconhece pelo verbo (imperativo = injuntivo, ação em sequência = narrativo). Ficam SEM requisito, e portanto abertos desde o primeiro dia, quatro tópicos: Classes de palavras, Ortografia, Acentuação e Semântica — sempre há o que estudar, a trava nunca deixa a pessoa sem fila.",
+      "criterio": "Cada aresta é uma dependência real de conceito, não uma ordem estética: um tópico só exige outro quando os exercícios dele pressupõem, de fato, a base do exigido. Crase exige Regência porque só há crase quando o termo regente pede a preposição 'a'; Colocação pronominal exige Pronomes, e não Classes de palavras inteiro; Tipologia textual exige Classes de palavras porque o tipo se reconhece pelo verbo (imperativo = injuntivo, ação em sequência = narrativo). Flexão nominal e Flexão verbal exigem Classes de palavras pelo mesmo motivo de Pronomes e Sintaxe: para flexionar em gênero/número/grau ou em tempo/modo é preciso já saber o que é um substantivo, um adjetivo e um verbo. Reescrita passou a exigir também Flexão verbal, além de Sintaxe/Concordância/Regência, porque parte dela é justamente manipular o verbo (voz ativa/passiva, discurso direto/indireto) — não dá para reescrever na voz passiva sem já saber formar o particípio e o auxiliar. Ficam SEM requisito, e portanto abertos desde o primeiro dia, sete tópicos: os quatro de sempre (Classes de palavras, Ortografia, Acentuação e Semântica) mais três que entraram depois e são igualmente autocontidos — Formação de palavras (morfologia da palavra isolada, não pressupõe sintaxe nem outro tópico), Variação linguística (teoria da língua, não exercício mecânico que dependa de classificação gramatical) e Gramática (a introdução do que é gramática e suas divisões, mais básica que qualquer outro tópico) — sempre há o que estudar, a trava nunca deixa a pessoa sem fila.",
       "requisitos": {
         "Pronomes": ["Classes de palavras"],
         "Sintaxe": ["Classes de palavras"],
@@ -21,11 +21,13 @@
         "Coerência": ["Coesão"],
         "Interpretação de textos": ["Semântica", "Coerência"],
         "Ambiguidade": ["Sintaxe", "Semântica"],
-        "Reescrita": ["Sintaxe", "Concordância", "Regência"],
+        "Reescrita": ["Sintaxe", "Concordância", "Regência", "Flexão verbal"],
         "Figuras de linguagem": ["Semântica"],
         "Tipologia textual": ["Classes de palavras"],
         "Gêneros textuais": ["Tipologia textual"],
-        "Intertextualidade": ["Interpretação de textos"]
+        "Intertextualidade": ["Interpretação de textos"],
+        "Flexão nominal": ["Classes de palavras"],
+        "Flexão verbal": ["Classes de palavras"]
       }
     },
     "matematica": {
