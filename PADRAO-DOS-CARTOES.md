@@ -150,13 +150,17 @@ Português/SUS, depois as menores.
 ### 1.5 Um fato, um cartão — e só um cartão
 
 O complemento necessário do princípio 1.2. Ali a regra é não juntar cinco
-fatos num cartão; aqui é não espalhar **o mesmo fato** por dois.
+fatos num cartão; aqui é não espalhar **o mesmo fato** por dois. Vale cheia
+para **cartão de definição** (`n=1` — "o que é X", "qual é a regra"). Para
+**cartão de exercício** (`n≥2` — aplicar uma regra já definida a um caso
+novo), existe uma exceção deliberada: ver 1.5.2.
 
-Dois cartões que cobram o mesmo fato não dobram o aprendizado — competem
-entre si. É **interferência**: em vez de fixar o fato, a pessoa passa a
-decorar a diferença superficial entre as duas versões ("aquele que começa
-com 'Segundo a lei...'"), que não vale nada na prova. E o Leitner agenda os
-dois, gastando duas revisões para consolidar uma informação só.
+Dois cartões de definição que cobram o mesmo fato não dobram o
+aprendizado — competem entre si. É **interferência**: em vez de fixar o
+fato, a pessoa passa a decorar a diferença superficial entre as duas
+versões ("aquele que começa com 'Segundo a lei...'"), que não vale nada na
+prova. E o Leitner agenda os dois, gastando duas revisões para consolidar
+uma informação só.
 
 - ✅ "Conduta na dengue grupo A" e "conduta na dengue grupo D" — enunciado
   quase idêntico, fatos diferentes, respostas diferentes. São dois cartões.
@@ -164,8 +168,10 @@ dois, gastando duas revisões para consolidar uma informação só.
   enunciado se repete de propósito; cada um cobra uma regência distinta.
 - ❌ O mesmo intervalo entre doses perguntado uma vez de forma direta e
   outra "segundo o manual do MS". Mesma resposta, mesmo fato: é um cartão.
-- ❌ O mesmo cálculo com os números trocados, quando o que se testa é o
-  método e não a conta. Vira treino de aritmética, não recordação.
+- ❌ Duas versões do MESMO exercício com os números idênticos e só o rótulo
+  trocado (trocar "maçãs" por "laranjas" sem mudar nenhum valor do
+  problema). Isso não é uma aplicação nova — é cosmético, e continua
+  proibido mesmo em `n≥2` (ver 1.5.2).
 
 Note que **enunciado parecido não é o problema** — fórmula repetida de
 enunciado costuma ser bom sinal, não ruim: mantém o formato previsível e
@@ -195,6 +201,42 @@ decidir se dois cartões cobram o mesmo fato é julgamento, e nenhum limiar
 substitui a leitura dos dois. O aviso serve para trazer o par até seus olhos,
 não para decidir por você.
 
+### 1.5.2 Exercício não é definição
+
+A 1.5 barra repetir **o mesmo fato**. Mas "aplicar uma regra de novo, com
+dado diferente" não é repetir o fato — é treinar a aplicação dele, que é
+uma habilidade própria, separada de saber a regra. Cartão de definição
+("o que é MMC?") e cartão de exercício ("ache o MMC de 18 e 24") medem
+coisas diferentes, e quem já sabe a definição pode, ainda assim, errar a
+conta.
+
+Por isso, a partir de agora, o teste 1.5 se aplica **cheio a cartão de
+definição** (`n=1`, ou o tópico ainda sem nenhum cartão de nível 2+) e **de
+forma mais frouxa a cartão de exercício** (`n≥2`): dois exercícios do mesmo
+método, com números ou cenário genuinamente diferentes, são dois cartões
+legítimos — cada resolução é uma repetição de verdade, não uma decoreba de
+qual pergunta é qual.
+
+- ✅ Dois cartões de regra de três direta, um sobre litros de tinta por m²
+  de casco pintado, outro sobre horas-homem por container carregado —
+  método igual, dado e contexto diferentes. São dois cartões de exercício.
+- ✅ Três cartões de comparação de fração (encontrar a maior entre quatro),
+  cada um com um conjunto de frações diferente. Mesma habilidade, três
+  treinos.
+- ❌ Um cartão de definição de MMC e outro perguntando "o que é MMC?" de
+  novo com sinônimos. Isso ainda é o 1.5 cheio — dois cartões de definição
+  do mesmo fato continuam proibidos.
+- ❌ Encher um tópico de exercício até ele passar muito do peso do edital
+  (3.2) só porque "ainda cabe mais um". Exercício tem teto — é a saturação
+  da seção 3.5, calibrada agora para contar prática como valor real, não
+  só fato novo.
+
+Na prática, isso muda o corolário da 3.5 (ver lá) e libera exatamente o
+padrão que antes o 1.5 barrava: "o mesmo cálculo com os números trocados"
+deixa de ser automaticamente descarte — é descarte quando o tópico já tem
+exercício suficiente pro peso que carrega na prova, não porque o método se
+repete.
+
 ---
 
 ## 2. O que não fazer
@@ -207,7 +249,7 @@ não para decidir por você.
 | Enunciado que cita formatação ("o trecho **destacado**") | O app mostra texto puro — o `validar.py` já barra isso. |
 | Alternativa certa visivelmente mais longa | Deixa acertar sem saber. Já resolvido no banco; não reintroduzir. |
 | Pegadinha de leitura ("não é incorreto afirmar que não...") | Mede desatenção, não preparo. |
-| Dois cartões com a mesma resposta certa para o mesmo fato | Interferência: gasta duas revisões para fixar uma informação. Ver 1.5. |
+| Dois cartões de definição com a mesma resposta certa para o mesmo fato | Interferência: gasta duas revisões para fixar uma informação. Ver 1.5. (Exercício aplicando o mesmo método a dado novo é exceção — ver 1.5.2.) |
 
 ---
 
@@ -286,16 +328,19 @@ cartão. Não é número: é cobertura. Na prática, três perguntas resolvem:
 
 1. **Sobrou fato sem cartão?** Se sim, escreva — é o sinal mais forte,
    independente de quantos cartões o tópico já tenha.
-2. **O cartão novo passaria no teste 1.5** (fato próprio, resposta certa
-   diferente das que já existem)? Se não, o tópico está saturado: o que
-   parece lacuna é repetição.
+2. **O cartão novo passaria no teste 1.5** (fato próprio se for definição;
+   dado/cenário genuinamente novo se for exercício — ver 1.5.2)? Se não, o
+   tópico está saturado: o que parece lacuna é repetição.
 3. **A densidade está muito fora do peso do edital** (seção 3.2)? Se o
    tópico já está acima do peso e os dois testes acima não pediram cartão
    novo, escreva em outro lugar.
 
-Corolário prático: **é melhor um tópico com 4 cartões cobrindo 4 fatos do
-que um com 10 cobrindo os mesmos 4.** Quantidade só conta quando cada
-unidade carrega informação nova.
+Corolário prático: **para definição, é melhor um tópico com 4 cartões
+cobrindo 4 fatos do que um com 10 cobrindo os mesmos 4** — quantidade só
+conta quando cada unidade carrega fato novo. **Para exercício, quantidade
+conta como prática de verdade**, mas ainda tem teto: o peso do edital
+(3.2) decide quantos treinos daquele método cabem, não "sobrou mais um
+fato pra cobrir".
 
 ### 3.6 Sinal 4 — o que o erro coletivo revela sobre o cartão
 
@@ -502,7 +547,9 @@ Antes de dar o cartão por pronto:
 - [ ] O enunciado é uma pergunta respondível **sem** ler as alternativas?
 - [ ] Testa **um** fato só?
 - [ ] **Já existe cartão cobrando este mesmo fato?** (Se a resposta certa
-      repete a de outro cartão do tópico, provavelmente sim — ver 1.5.)
+      repete a de outro cartão do tópico, provavelmente sim — ver 1.5. Para
+      exercício de nível 2+, a pergunta certa é outra: o dado/cenário é
+      genuinamente novo, ou só o rótulo mudou? Ver 1.5.2.)
 - [ ] Os 4 distratores são erros que alguém cometeria de verdade?
 - [ ] Nenhum "todas as anteriores" / "apenas I e III"?
 - [ ] A alternativa certa **não** é a mais longa?
