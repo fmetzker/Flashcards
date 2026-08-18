@@ -237,6 +237,56 @@ deixa de ser automaticamente descarte — é descarte quando o tópico já tem
 exercício suficiente pro peso que carrega na prova, não porque o método se
 repete.
 
+### 1.6 Adaptar questão demorada, não herdar a demora
+
+Cartão de repetição espaçada é revisado dezenas de vezes ao longo de meses —
+o formato só compensa se cada revisão for rápida. Questão de prova de
+verdade não tem esse compromisso: pode gastar cinco linhas de conta ou um
+texto inteiro antes de perguntar, porque na prova ela aparece **uma vez**.
+Ao adaptar uma questão real (de prova antiga ou qualquer outra fonte) para
+cartão, a demora do original não pode virar demora do cartão — isso vale
+tanto pra cartão de definição quanto de exercício (1.5.2).
+
+Dois jeitos comuns de a demora aparecer, e o que fazer em cada um:
+
+- **Cálculo longo** (várias contas em sequência, números grandes, álgebra de
+  muitas linhas): manter o método, trocar os números por outros que cheguem
+  na resposta em menos passos. O que se testa é reconhecer e aplicar a
+  técnica, não a resistência a fazer conta grande. Se o método pede
+  intrinsecamente várias etapas (regra de três seguida de porcentagem, por
+  exemplo), tudo bem — o que se corta é o tamanho dos números dentro de cada
+  etapa, não as etapas em si.
+- **Texto longo** (crônica, notícia, poema inteiro antes da pergunta): não
+  copiar o texto pro cartão (e reproduzir um texto protegido por direito
+  autoral no banco é problema à parte). Reduzir a um trecho — uma frase, duas
+  no máximo — que sozinho sustente a pergunta, ou reescrever a situação de
+  forma compacta e autocontida. Ninguém deveria reler um texto de 300
+  palavras a cada revisão espaçada só pra responder uma questão de crase.
+
+O critério prático: **o enunciado adaptado precisa ser respondível em
+segundos por quem já domina o fato ou o método** — o mesmo padrão de
+recordação ativa da 1.1, agora aplicado à duração, não só ao formato da
+pergunta.
+
+- ✅ Prova original: comparar quatro cabos de aço em polegadas com
+  denominadores grandes (12, 16, 24...). Cartão: os mesmos quatro tipos de
+  fração, com denominadores pequenos (4, 6, 8, 12) — o método de comparação
+  é idêntico, a conta é rápida.
+- ✅ Prova original: texto jornalístico de 4 parágrafos, questão sobre o
+  emprego de uma vírgula no 2º parágrafo. Cartão: só a frase com a vírgula,
+  reescrita como frase autocontida — a regra de pontuação testada é a mesma.
+- ❌ Copiar pro cartão um problema de geometria espacial com três sólidos
+  inscritos em sequência, exigindo lembrar quatro fórmulas em cadeia. Se o
+  método não dá pra encurtar sem descaracterizar o que a prova realmente
+  cobra, ele não vira cartão de revisão diária — é material de simulado
+  (que já existe no app e não passa por este padrão).
+
+**Isso não é o mesmo que simplificar o conteúdo.** A dificuldade conceitual
+do fato ou método continua a mesma; só a execução mecânica em torno dele
+encolhe. Um cartão de regra de três inversa continua testando
+proporcionalidade inversa — só não obriga a dividir 8.472 por 132 pra provar
+que a pessoa entendeu a proporção.
+
 ---
 
 ## 2. O que não fazer
@@ -557,3 +607,6 @@ Antes de dar o cartão por pronto:
 - [ ] Tem fonte verificável (lei e artigo, ou manual e capítulo)?
 - [ ] O tópico e o subtópico já existem no banco (em vez de rótulo novo)?
 - [ ] O tópico ainda **pede** este cartão, ou já está saturado (ver 3.5)?
+- [ ] Se adaptado de uma questão real: dá pra responder em **segundos**
+      por quem domina o fato/método, ou ainda carrega a demora do
+      original (conta longa, texto longo)? Ver 1.6.
