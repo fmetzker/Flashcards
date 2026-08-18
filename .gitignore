@@ -2,6 +2,10 @@ __pycache__/
 *.pyc
 .DS_Store
 
+# provas antigas da Marinha Mercante, usadas como referência pra escrever
+# cartão parecido com questão real — material de trabalho, não parte do app
+PROVAS ANTIGAS/
+
 # gerado por gerar-offline.ps1 a partir do index.html e de banco/ — meio mega
 # de conteúdo duplicado, refeito com um comando
 offline.html
