@@ -64,7 +64,7 @@
       ]
     },
     "matematica": {
-      "fonte": "Transpetro, Edital nº 03 - TRANSPETRO/PSP/TERRA/NÍVEL MÉDIO-2026.3, ANEXO IV, CONHECIMENTOS BÁSICOS - MATEMÁTICA (10 itens, iguais para todas as 18 ênfases). Os itens do edital foram MAPEADOS para os nomes de tópico que o banco já usa, não transcritos ao pé da letra: 'conjuntos numéricos / razão e proporção / porcentagem / matemática financeira' caem em Aritmética (que já tem cartão de regra de três, desconto sucessivo, juros simples e juros compostos); 'equações e sistemas lineares' em Álgebra; 'geometria plana e espacial' em Geometria (que já tem área e volume). Análise combinatória, Probabilidade e Estatística ganharam cartão (7, 6 e 6, respectivamente), fechando a lacuna que existia. 'Lógica', que o banco tem, fica fora porque não consta deste conteúdo programático.",
+      "fonte": "Transpetro, Edital nº 03 - TRANSPETRO/PSP/TERRA/NÍVEL MÉDIO-2026.3, ANEXO IV, CONHECIMENTOS BÁSICOS - MATEMÁTICA (10 itens, iguais para todas as 18 ênfases). Os itens do edital foram MAPEADOS para os nomes de tópico que o banco já usa, não transcritos ao pé da letra: 'conjuntos numéricos / razão e proporção / porcentagem / matemática financeira' caem em Aritmética (que já tem cartão de regra de três, desconto sucessivo, juros simples e juros compostos); 'equações e sistemas lineares' em Álgebra; 'geometria plana e espacial' em Geometria (que já tem área e volume). Análise combinatória, Probabilidade e Estatística ganharam cartão (7, 6 e 6, respectivamente), fechando a lacuna que existia. 'Lógica', que o banco tem, fica fora porque não consta deste conteúdo programático. Matrizes e Vetores foram acrescentados à lista de tópicos por cobrirem conteúdo do Anexo II — PS CAAQ-CDM-01/2025 (nível superior/oficial, pasta 3 das provas antigas), que a árvore original (nível médio, Transpetro) não previa; não têm 'fonte' própria porque a árvore inteira já é mapeada, não transcrita ao pé da letra — mesmo critério usado para os demais. (Geometria analítica e Progressões, também cobradas nessa pasta, já existiam como subtópico de Geometria e de Aritmética, respectivamente — não precisaram de tópico novo.)",
       "topicos": [
         "Aritmética",
         "Multiplicação",
@@ -72,6 +72,8 @@
         "Funções",
         "Trigonometria",
         "Geometria",
+        "Matrizes",
+        "Vetores",
         "Análise combinatória",
         "Probabilidade",
         "Estatística"
