@@ -106,35 +106,6 @@ h2{font-size:19px;font-weight:600}
 .donut-legenda .nome{flex:1;color:var(--tinta2)}
 .donut-legenda b{font-family:var(--dado)}
 
-/* cartela de dias — assinatura */
-.cartela{
-  background:var(--card);border:1px solid var(--traco);border-radius:14px;
-  padding:14px;margin-bottom:16px;
-}
-/* O tamanho do quadrado é definido em pixels pelo JS (ver ajustarGrade), não
-   por aspect-ratio nem padding-top percentual. As duas técnicas de CSS puro
-   dependem de como cada motor resolve percentual dentro de uma grade com
-   linha automática, e o comportamento diverge entre navegadores — inclusive
-   no Safari do iPhone, que é o alvo real do app — causando ora estouro
-   horizontal, ora retângulos em vez de quadrados. Medir e fixar em px não
-   deixa margem para ambiguidade. */
-/* row (padrão do grid): o dia mais antigo começa no canto superior
-   esquerdo e a linha enche da esquerda para a direita antes de descer para
-   a próxima — ordem de leitura normal, não a de calendário por semana */
-.grade{display:grid;gap:5px;margin-top:10px}
-.dia{box-sizing:border-box;border-radius:3px;background:#EDF1EE;border:1px solid transparent}
-.dia.cheio{background:var(--verde)}
-.dia.parcial{background:var(--ambar);opacity:.55}
-/* nome "passada", não "vazio": ".vazio" já é a classe genérica de tela sem
-   dados (linha abaixo), com padding próprio — um <div class="dia vazio">
-   herdava esse padding e virava um retângulo enorme em vez de um quadrado */
-.dia.passada{background:#fff;border-color:var(--traco)}
-.dia.hoje{outline:2px solid var(--tinta);outline-offset:1px}
-/* não existe mais ".dia.prova": a cartela virou janela móvel de constância da
-   conta e não alcança mais a data da prova — ver DIAS_CARTELA */
-.legenda{display:flex;gap:14px;margin-top:10px;font-size:11px;color:var(--tinta2)}
-.legenda i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:-1px}
-
 /* meta */
 .barra{height:9px;background:#E7ECE8;border-radius:99px;overflow:hidden;margin-top:9px}
 .barra i{display:block;height:100%;background:var(--verde);border-radius:99px;transition:width .35s}
@@ -340,14 +311,9 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
     <div class="contagem"><b id="dias-falta">–</b><span>dias</span></div>
   </div>
 
-  <div class="cartela">
-    <div class="linha"><div class="rotulo">Constância</div><div class="dado" id="cartela-info" style="font-size:12px;color:var(--tinta2)"></div></div>
-    <div class="grade" id="grade"></div>
-    <div class="legenda">
-      <span><i style="background:var(--verde)"></i>meta batida</span>
-      <span><i style="background:var(--ambar);opacity:.55"></i>parcial</span>
-      <span><i style="background:#fff;border:1px solid var(--traco)"></i>zerado</span>
-    </div>
+  <div class="card escuro">
+    <div class="rotulo">Sequência de estudo</div>
+    <div id="streak-info" class="dado" style="font-size:28px;font-weight:700;margin-top:4px">–</div>
   </div>
 
   <div class="card">
@@ -357,11 +323,6 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
     <div class="linha" style="margin-top:11px;font-size:13px;color:var(--tinta2)">
       <span id="fila-info">–</span>
     </div>
-  </div>
-
-  <div class="card escuro">
-    <div class="rotulo">Sequência de estudo</div>
-    <div id="streak-info" class="dado" style="font-size:28px;font-weight:700;margin-top:4px">–</div>
   </div>
 
   <div id="alerta-area"></div>
@@ -594,6 +555,15 @@ let BANCO = [], CONCURSO = null, BLOCOS = [], BLOCOS_META = [], ORDEM_MATERIAS =
 let REQ_MATERIA = {}, REQUISITOS = {};
 let CONCURSOS = [];          // todos os que existem em concursos.json
 let INSCRITOS = [];          // os que ESTE perfil segue (objetos, não ids)
+/* Carregamento em duas fases (ver carregarBancoParcial): a tela pinta antes
+   do banco inteiro chegar. BANCO_FOCO_PRONTO vira true quando só as matérias
+   do concurso em foco já estão em BANCO — dá pra estudar/simular. BANCO_PRONTO
+   vira true quando TODAS as matérias inscritas chegaram — só aí telas que
+   olham o banco inteiro (Matérias, Estatísticas) têm o que mostrar de verdade.
+   AGUARDANDO_BANCO_PRONTO guarda telas que tentaram pintar cedo demais, para
+   repintar sozinhas quando o banco completo chegar. */
+let BANCO_FOCO_PRONTO = false, BANCO_PRONTO = false;
+let AGUARDANDO_BANCO_PRONTO = [];
 const porId = {}, MATERIAS = {}, blocoDaMateria = {};
 
 /* Toda leitura de dado passa por aqui. Na versão normal vem por fetch; na
@@ -884,12 +854,56 @@ function materiasInscritas(){
   return ORDEM_MATERIAS.filter(m=>usadas[m]);
 }
 
-async function carregarBanco(){
-  /* na ordem de materias.json: é a ordem em que as matérias aparecem na tela */
-  const usadas = materiasInscritas();
-  const partes = await Promise.all(usadas.map(m=>pega("banco/"+m+".json")));
-  BANCO = partes.reduce((tudo,p)=>tudo.concat(p), []);
-  BANCO.forEach(q=>{ porId[q.id] = q; });
+/* matérias do concurso EM FOCO (BLOCOS já é CONCURSO.blocos — ver
+   aplicarFoco) — é o que a pessoa vai estudar/simular agora, então é o que
+   carrega primeiro. Vazio antes de aplicarFoco() rodar (ex.: exigeLogin). */
+function materiasDoFoco(){
+  const usadas = {};
+  BLOCOS.forEach(b=> b.materias.forEach(m=>{ usadas[m] = true; }));
+  return ORDEM_MATERIAS.filter(m=>usadas[m]);
+}
+
+/* o resto: matérias de outros concursos inscritos, que não a do foco —
+   carrega depois, em segundo plano, sem prioridade nenhuma entre si */
+function materiasFora(materiasJaCarregadas){
+  const carregadas = {}; materiasJaCarregadas.forEach(m=>{ carregadas[m]=true; });
+  return materiasInscritas().filter(m=>!carregadas[m]);
+}
+
+/* Busca e ACRESCENTA a BANCO as matérias da lista — não reseta o array,
+   porque é chamada duas vezes (foco, depois o resto) para compor o banco aos
+   poucos. Repetir uma matéria já carregada é seguro (concat de novo), mas o
+   chamador nunca faz isso: materiasFora() já exclui o que materiasDoFoco()
+   trouxe. */
+async function carregarBancoParcial(lista){
+  if(!lista.length) return;
+  const partes = await Promise.all(lista.map(m=>pega("banco/"+m+".json")));
+  const novas = partes.reduce((tudo,p)=>tudo.concat(p), []);
+  BANCO = BANCO.concat(novas);
+  novas.forEach(q=>{ porId[q.id] = q; });
+}
+
+/* Dispara o carregamento em duas fases e cuida de repintar quem tentou
+   mostrar o banco antes da hora. Não é `await`ado pelo boot — ele roda por
+   conta própria enquanto a tela já está de pé (ver o final da cadeia de
+   boot). */
+async function carregarBancoEmFases(){
+  await carregarBancoParcial(materiasDoFoco());
+  BANCO_FOCO_PRONTO = true;
+  if(document.getElementById("tela-inicio").classList.contains("ativa")){ pintarInicio(); rodape("inicio"); }
+  if(document.getElementById("tela-simulado-inicio").classList.contains("ativa")){ pintarSimuladoInicio(); rodape("simulado-inicio"); }
+
+  await carregarBancoParcial(materiasFora(materiasDoFoco()));
+  BANCO_PRONTO = true;
+  /* só agora, com o banco INTEIRO carregado (porId cobre todas as matérias
+     inscritas): migrarParaIds() decide "perdido" comparando com porId, e
+     rodar isso cedo demais (só com o foco carregado) apagaria progresso
+     legado de cartão de matéria fora do foco por engano. */
+  await migrarParaIds();
+  await migrarReescritas();
+  salvar();
+  const pendentes = AGUARDANDO_BANCO_PRONTO.splice(0);
+  pendentes.forEach(fn=>fn());
 }
 
 const blocoDe = q => blocoDaMateria[q.m];
@@ -1644,13 +1658,18 @@ function rodape(nome){
 
   const b=(txt,fn,cls)=>{const x=document.createElement("button");x.textContent=txt;x.onclick=fn;if(cls)x.className=cls;alvo.appendChild(x);};
   if(nome==="inicio"){
-    const f = fila(), total = f.revisar.length + Math.max(0, E.meta - feitasHoje());
-    b(total>0 ? "Estudar agora" : "Estudar mesmo assim", ()=>iniciarSessao("normal"), "verde");
+    if(!BANCO_FOCO_PRONTO){
+      const carregando=document.createElement("button"); carregando.textContent="Carregando questões…";
+      carregando.disabled=true; carregando.className="fantasma"; alvo.appendChild(carregando);
+    } else {
+      const f = fila(), total = f.revisar.length + Math.max(0, E.meta - feitasHoje());
+      b(total>0 ? "Estudar agora" : "Estudar mesmo assim", ()=>iniciarSessao("normal"), "verde");
+    }
   } else if(nome==="estudo"){
     box.classList.remove("ativa");
   } else if(nome==="simulado-inicio"){
     b("Voltar", ()=>ir("inicio"), "fantasma");
-    if(BANCO.length>=20) b("Começar simulado", iniciarSimulado, "verde");
+    if(BANCO_FOCO_PRONTO && BANCO.length>=20) b("Começar simulado", iniciarSimulado, "verde");
   } else if(nome==="simulado"){
     box.classList.remove("ativa");
   } else if(nome==="login" || nome==="espera" || nome==="escolher-concurso"){
@@ -1667,29 +1686,7 @@ function rodape(nome){
 /* =======================================================================
    TELA INICIAL
    ======================================================================= */
-/* Fixo de propósito: a cartela não pode crescer com o tempo, senão em um ano
-   vira 365 quadradinhos empurrando o resto da tela para baixo.
-
-   100 dias em 10 colunas fecha um quadrado exato de 10×10, sem sobra na
-   última linha — com as 11 colunas de antes, hoje ficaria sozinho numa
-   décima linha. A grade não é alinhada por dia da semana, e nunca foi, nem
-   quando ia do início do edital até a prova. */
-const DIAS_CARTELA = 100;
-const GRADE_COLUNAS = 10, GRADE_GAP = 5;
-
-/* mede a largura disponível e fixa colunas e linhas no mesmo tamanho em
-   pixels — é isso que garante o quadrado sem depender de aspect-ratio */
-function ajustarGrade(g){
-  const largura = g.getBoundingClientRect().width;
-  if(!largura) return;   // tela ainda escondida (não é a ativa): recalcula quando pintarInicio() rodar de novo
-  const tam = Math.floor((largura - GRADE_GAP*(GRADE_COLUNAS-1)) / GRADE_COLUNAS);
-  g.style.gridTemplateColumns = "repeat("+GRADE_COLUNAS+","+tam+"px)";
-  g.style.gridAutoRows = tam+"px";
-}
 window.addEventListener("resize", ()=>{
-  if(document.getElementById("tela-inicio").classList.contains("ativa")){
-    ajustarGrade(document.getElementById("grade"));
-  }
   const box = document.getElementById("acoes");
   if(box.classList.contains("com-nav")){
     box.style.bottom = document.getElementById("nav").getBoundingClientRect().height+"px";
@@ -1774,59 +1771,27 @@ function pintarInicio(){
     mb.appendChild(linha);
   });
 
-  const q = fila();
-  document.getElementById("fila-info").textContent =
-    q.revisar.length+" para revisar · "+q.novas.length+" ainda não vistas";
+  /* fila() e o alerta de bloco fraco olham BANCO — só as matérias do foco
+     bastam pros dois (revisão/novas do concurso em foco; bloco fraco também
+     é só de BLOCOS, que é CONCURSO.blocos). Enquanto isso não chega, mostra
+     que está carregando em vez de contar um banco vazio como "zero pendências". */
+  if(BANCO_FOCO_PRONTO){
+    const q = fila();
+    document.getElementById("fila-info").textContent =
+      q.revisar.length+" para revisar · "+q.novas.length+" ainda não vistas";
+  } else {
+    document.getElementById("fila-info").textContent = "carregando questões…";
+  }
 
-  /* sequência e cartela usam progressoDoDia, não a contagem bruta: senão um
-     dia inteiro estudando matéria de outro concurso apareceria como meta
-     batida na cartela do concurso em foco */
+  /* sequência usa progressoDoDia, não a contagem bruta: senão um dia inteiro
+     estudando matéria de outro concurso apareceria como meta batida na
+     sequência do concurso em foco. Não depende de BANCO — pinta sempre. */
   let seq=0, kStreak=hoje();
   for(let i=0;i<200;i++){
     if(i===0 && !(progressoDoDia(kStreak)>=E.meta)){ kStreak=somarDias(kStreak,-1); continue; }
     if(progressoDoDia(kStreak)>=E.meta){ seq++; kStreak=somarDias(kStreak,-1); } else break;
   }
   document.getElementById("streak-info").textContent = seq>0 ? seq+" dias seguidos" : "sem sequência";
-
-  /* Cartela de constância: janela móvel começando ONTEM, da CONTA — não do
-     edital. Antes ia de CONCURSO.inicio até CONCURSO.data, o que amarrava um
-     histórico de esforço pessoal às datas de uma prova: trocar de concurso
-     redesenhava a cartela inteira, e depois da prova ela não faria sentido
-     nenhum. O que ela mede é com que frequência a meta foi batida, e isso
-     não pertence a concurso nenhum. */
-  const g = document.getElementById("grade"); g.innerHTML="";
-  let batidos = 0;
-  /* Hoje ocupa a célula logo depois do histórico inteiro da conta — quem
-     tem 30 dias de uso tem 30 células de passado e hoje é a 31ª — e dali em
-     diante a janela segue pro FUTURO (amanhã, depois de amanhã...) até
-     fechar as 100 células. As futuras nascem em branco (progressoDoDia
-     devolve 0 pra um dia que ainda não aconteceu) e vão se colorindo
-     sozinhas conforme os dias chegam.
-
-     Sem NENHUM dia estudado antes de hoje (primeiro dia de uso), não há
-     passado pra mostrar e hoje já nasce na célula 1. Histórico maior que
-     99 dias é limitado a 99 — sempre sobra pelo menos 1 célula pra hoje,
-     e são só 100 ao todo. */
-  const diasComDado = Object.keys(E.dias).filter(d=> d < hoje());
-  const maisAntigo = diasComDado.length ? diasComDado.reduce((a,b)=> a<b?a:b) : null;
-  const diasDeHistorico = maisAntigo
-    ? Math.min(DIAS_CARTELA-1, Math.round((diaUTC(hoje())-diaUTC(maisAntigo))/86400000))
-    : 0;
-  const inicio = -diasDeHistorico;
-  for(let i=0; i<DIAS_CARTELA; i++){
-    const k = somarDias(hoje(), inicio + i);
-    const el = document.createElement("div"); el.className="dia";
-    const feito = progressoDoDia(k);
-    if(feito >= E.meta && E.meta > 0){ el.className="dia cheio"; batidos++; }
-    else if(feito > 0) el.className="dia parcial";
-    else if(k < hoje()) el.className="dia passada";
-    if(k===hoje()) el.classList.add("hoje");
-    el.title = k+" · "+feito+" de "+E.meta;
-    g.appendChild(el);
-  }
-  document.getElementById("cartela-info").textContent =
-    batidos+" de "+DIAS_CARTELA+" dias";
-  ajustarGrade(g);
 
   // alerta de área em risco
   // (o aviso semanal de backup foi removido: a sincronização por conta já
@@ -1835,16 +1800,18 @@ function pintarInicio(){
   // semana. Ver "Bloco A" do plano de melhorias.)
   const box = document.getElementById("alerta-area"); box.innerHTML="";
 
-  BLOCOS.forEach(bl=>{
-    let acc=0, t=0;
-    BANCO.forEach(q2=>{ if(blocoDe(q2)!==bl.id) return; const c=E.cartoes[q2.id]; if(c){acc+=c.acertos;t+=c.acertos+c.erros;} });
-    if(t>=8 && acc/t < 0.4){
-      const d3=document.createElement("div"); d3.className="alerta";
-      d3.textContent = "Atenção: "+bl.nome+" está em "+Math.round(acc/t*100)+"% de acerto."+
-        (CONCURSO.aprovacao.nenhumBlocoZerado ? " Zerar um bloco elimina, mesmo com nota alta no resto." : "");
-      box.appendChild(d3);
-    }
-  });
+  if(BANCO_FOCO_PRONTO){
+    BLOCOS.forEach(bl=>{
+      let acc=0, t=0;
+      BANCO.forEach(q2=>{ if(blocoDe(q2)!==bl.id) return; const c=E.cartoes[q2.id]; if(c){acc+=c.acertos;t+=c.acertos+c.erros;} });
+      if(t>=8 && acc/t < 0.4){
+        const d3=document.createElement("div"); d3.className="alerta";
+        d3.textContent = "Atenção: "+bl.nome+" está em "+Math.round(acc/t*100)+"% de acerto."+
+          (CONCURSO.aprovacao.nenhumBlocoZerado ? " Zerar um bloco elimina, mesmo com nota alta no resto." : "");
+        box.appendChild(d3);
+      }
+    });
+  }
 }
 
 /* Gráfico de barras (últimos 7 dias, de E.dias) e donut de proporção
@@ -2045,8 +2012,18 @@ function linhaNivel(cls, rotulo, d, aoEstudar, trava){
 }
 
 function pintarMaterias(){
-  const dados = resumoDoBanco();
   const c = document.getElementById("materias-corpo");
+  /* precisa do banco INTEIRO (todas as matérias inscritas, não só o foco) —
+     senão mostraria a árvore incompleta como se fosse tudo que existe.
+     Enquanto falta, mostra que está carregando e se registra para repintar
+     sozinha quando carregarBancoEmFases() terminar. */
+  if(!BANCO_PRONTO){
+    c.innerHTML = '<p class="vazio">Carregando questões…</p>';
+    document.getElementById("materias-sub").textContent = "carregando…";
+    AGUARDANDO_BANCO_PRONTO.push(pintarMaterias);
+    return;
+  }
+  const dados = resumoDoBanco();
   c.innerHTML = "";
   const mats = ORDEM_MATERIAS.filter(m=>dados[m]);
   let nTopicos = 0, nSubs = 0;
@@ -2489,7 +2466,14 @@ function finalizarSimulado(){
 function pintarStats(){
   /* os cards de gráfico e de banco moravam na tela inicial e vieram para cá
      quando a navegação por abas entrou: a tela inicial ficou só com o que é
-     do DIA (meta, cartela, sequência), e o histórico/panorama vive aqui */
+     do DIA (meta, sequência), e o histórico/panorama vive aqui */
+  /* precisa do banco INTEIRO — ranqueia por matéria/tópico entre todas as
+     inscritas, não só as do concurso em foco. */
+  if(!BANCO_PRONTO){
+    document.getElementById("stats-corpo").innerHTML = '<div class="vazio">Carregando questões…</div>';
+    AGUARDANDO_BANCO_PRONTO.push(pintarStats);
+    return;
+  }
   pintarGraficos();
 
   let ac=0, tot=0, erros=0;
@@ -3277,9 +3261,11 @@ function exigeEscolherConcurso(){
 }
 
 carregarConfig()
-  .then(carregarBanco)
-  .then(migrarParaIds)
-  .then(migrarReescritas)   // depois de migrarParaIds: só faz sentido com o progresso já em ids
+  /* Carregamento em duas fases (ver carregarBancoEmFases): esta cadeia NÃO
+     espera o banco de questões (3+MB, ~15 matérias) — só concursos.json,
+     materias.json, topicos.json e requisitos.json, que juntos são poucos KB.
+     A tela pinta com isso, e o banco chega depois, sozinho, começando pela
+     matéria do concurso em foco (é o que a pessoa vai estudar agora). */
   .then(carregarSupabase)   // arquivo ausente não é erro fatal, mas sem ele ninguém consegue logar
   .then(verificarSessao)    // desloga em silêncio se a sessão salva não presta mais
   .then(verificarSituacao)  // pendente/aprovado/rejeitado — decide entre tela de espera e app
@@ -3297,7 +3283,9 @@ carregarConfig()
         const pedida = sessionStorage.getItem("vr:pos-reload");
         if(pedida){ sessionStorage.removeItem("vr:pos-reload"); tela = pedida; }
       }catch(e){}
-      ir(tela); sincronizar();   // puxa em segundo plano, não bloqueia a tela
+      ir(tela);                  // pinta já, com BANCO ainda vazio — telas que precisam dele mostram "carregando"
+      carregarBancoEmFases();    // não é await: continua em segundo plano
+      sincronizar();             // puxa em segundo plano, não bloqueia a tela
     }
   })
   .catch(err=>{

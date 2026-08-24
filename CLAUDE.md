@@ -313,24 +313,16 @@ o escopo alcança (`blocosDaMeta()` → `BLOCOS_META`, recalculado em
   `blocoDaMateria` (peso usado por `prioridade()`). `BLOCOS_META` manda só na
   meta: `progressoDoDia`, `progressoPorBloco` e `iniciarSessao("normal")`.
   Não unificar os dois — são perguntas diferentes.
-- **A cartela de Constância não é de concurso nenhum.** Janela fixa de
-  `DIAS_CARTELA` (100, em 10 colunas: 10×10 exato), colorida por meta
-  batida — mede constância da conta. Era de `CONCURSO.inicio` até
-  `CONCURSO.data`, o que amarrava esforço pessoal às datas de uma prova:
-  trocar de concurso redesenhava tudo, e depois da prova não faria sentido.
-  Não existe mais quadradinho de dia de prova (`.dia.prova` foi removido).
-  **A janela não é retrospectiva** (não é "os últimos 100 dias"): célula 1
-  é o dia mais antigo com dado em `E.dias`, hoje ocupa a célula logo depois
-  de TODO o histórico da conta, e o resto olha pra FRENTE — amanhã, depois
-  de amanhã, até fechar as 100 células. Quem tem 30 dias de uso tem 30
-  células de passado e hoje é a 31ª. As células futuras nascem em branco
-  (`progressoDoDia` de um dia que ainda não aconteceu é sempre 0) e vão se
-  colorindo sozinhas conforme os dias chegam, sem código extra pra isso.
-  Conta sem nenhum dia estudado antes de hoje (primeiro dia de uso) não tem
-  passado pra mostrar — célula 1 já nasce em hoje. Histórico maior que 99
-  dias é limitado aos últimos 99 (`Math.min`) — sempre sobra pelo menos 1
-  célula pra hoje dentro das 100 fixas; nesse caso hoje vira a última
-  célula, sem sobra pra futuro.
+- **A Sequência de estudo não é de concurso nenhum.** Card no topo da tela
+  inicial, contagem de dias consecutivos (terminando hoje ou ontem) em que
+  a meta do dia foi batida — mede constância da conta, não de uma prova
+  específica. Não conta a partir de `CONCURSO.inicio`: trocar de concurso
+  não redesenha nada, e a contagem continua fazendo sentido depois da
+  prova. Existiu antes uma cartela visual de 100 dias (janela fixa,
+  10×10, colorida por meta batida) que fazia esse mesmo papel de forma
+  mais elaborada; foi removida por ser cara de carregar/pintar sem
+  acrescentar informação que a contagem simples de dias seguidos já não
+  desse.
 - **Escopo de tópicos por bloco** (`blocos[].topicos`, opcional): a mesma
   matéria pode ter conteúdo programático diferente por cargo — um cargo de
   nível fundamental/médio, por exemplo, cobre menos itens de Português que
