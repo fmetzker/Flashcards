@@ -5,6 +5,49 @@
 > parcial (interrompida por limite de sessão da conta antes de cobrir o
 > banco inteiro). Serve de lista de trabalho para continuar depois.
 
+## Complemento — Português/Classes de palavras (auditoria focada, cobertura 100%)
+
+Pedido à parte, depois da rodada principal: reler os 118 cartões de
+`Classes de palavras` um por um (sem subagente — feito diretamente),
+checando também "existem boas definições antes dos exercícios?".
+
+**Conteúdo**: nenhum erro factual nos 118 cartões — resposta, `e` e `eo`
+conferidos um a um.
+
+**Definições antes do exercício**: para as classes gramaticais de verdade
+(substantivo, artigo, adjetivo, numeral, pronome, verbo, advérbio,
+preposição, conjunção, interjeição) está exemplar — cada uma tem um cartão
+`n=1` bem escrito antes dos cartões de aplicação, mais um cartão definindo
+"locução".
+
+**Achado estrutural, corrigido**: o subtópico "Formação de palavras" (17
+cartões, só aplicação — derivação prefixal/sufixal/parassintética,
+composição etc.) não tinha nenhuma definição própria. As definições reais
+desses processos (radical, prefixo×sufixo, parassintética, justaposição×
+aglutinação) já existiam, mas num **tópico separado e homônimo**
+("Formação de palavras", 23 cartões), sem nenhum pré-requisito ligando um
+ao outro — quem estudasse só "Classes de palavras" nunca era obrigado a
+ver a definição antes do exercício. Corrigido: os 17 cartões foram
+retagueados (`t`) do subtópico dentro de "Classes de palavras" para o
+tópico "Formação de palavras" já existente, que passou a ter 40 cartões
+num lugar só, definição incluída.
+
+**Achado menor, corrigido**: 9 dos 10 cartões sem subtópico marcado dentro
+de "Classes de palavras" ganharam `s` (Substantivo/Adjetivo/Advérbio,
+conforme o caso). Os outros 2 (um sobre "locução" em geral, outro que
+mistura várias classes na mesma questão) seguem sem subtópico único de
+propósito — não haveria um `s` que os descrevesse sem forçar.
+
+**Nota lateral, não corrigida**: um cartão classifica "pernilongo" como
+formado por processo diferente do de "girassol" (por causa da vogal de
+ligação `i`). É uma leitura gramatical defensável — alguns manuais tratam
+essa mudança fonética como aglutinação, não justaposição pura — mas é
+matéria de debate entre gramáticas, não erro claro. Fica registrado, não
+alterado.
+
+26 cartões corrigidos (17 retag de tópico + 9 subtópico completado), 0
+cartões com erro de conteúdo.
+
 ## Cobertura
 
 Auditados de verdade (cada cartão reverificado por um agente independente,
