@@ -657,7 +657,8 @@ def carrega_rascunho(B, caminho):
 def carrega_patches(B, caminho):
     """Aplica em memória, sobre cartão que JÁ EXISTE no banco, os campos que
     não entram no id: 'eo' (explicação por alternativa), 'n' (nível do cartão
-    dentro do tópico), 'o' (as alternativas) e 's' (subtópico) — usado por
+    dentro do tópico), 'o' (as alternativas), 's' (subtópico), 'c' (índice da
+    correta), 'e' (explicação principal) e 't' (tópico) — usado por
     explicar-alternativas.ps1.
 
     Mesmo motivo do carrega_rascunho: toda regra deste arquivo precisa
@@ -665,19 +666,24 @@ def carrega_patches(B, caminho):
     já existe — o patch só altera campos de um objeto que valida_questoes já
     vai conferir do mesmo jeito que confere qualquer outro cartão.
 
-    Os quatro campos passam pelo mesmo caminho de propósito: é isso que evita
+    Os sete campos passam pelo mesmo caminho de propósito: é isso que evita
     um QUINTO script de gravação, que a regra 9 do CLAUDE.md proíbe. Cada
-    patch traz 'eo', 'n', 'o', 's', ou uma combinação; campo ausente não mexe
-    no cartão. 's' não tem checagem própria aqui: valida_questoes já confere
-    's' != 't' em qualquer cartão do banco, incluindo o patchado.
+    patch traz um ou mais desses campos; campo ausente não mexe no cartão.
+    's' e 't' não têm checagem própria aqui além da de 't': valida_questoes já
+    confere 's' != 't' em qualquer cartão do banco, incluindo o patchado.
 
     'o' tem um perigo que 'eo' e 'n' não têm: 'c' é o ÍNDICE da correta, não o
     texto dela. Um patch que reordene as alternativas, ou que reescreva a
     correta, muda silenciosamente qual resposta o app considera certa — para
     todo mundo, sem nada no diff que grite. Por isso a regra abaixo, que é
-    mecânica e não documental: o patch precisa devolver a correta IDÊNTICA e
-    na MESMA posição. Sobra exatamente o que a seção de viés do CLAUDE.md
-    manda fazer — reescrever distrator, nunca encurtar a correta."""
+    mecânica e não documental: SE o patch não traz 'c' também, ele precisa
+    devolver a correta IDÊNTICA e na MESMA posição — sobra exatamente o que a
+    seção de viés do CLAUDE.md manda fazer, reescrever distrator, nunca
+    encurtar a correta. Quando a auditoria confirma que a resposta MARCADA
+    está errada (não é viés, é erro de fato), 'c' pode ser corrigido — mas só
+    junto com 'e' nova: a explicação antiga quase certamente não justifica a
+    resposta nova, e um 'c' trocado sem 'e' reescrita vira cartão que aponta
+    pra resposta certa com explicação da errada."""
     if not os.path.exists(caminho):
         print(f"ERRO: patches não encontrado: {caminho}")
         sys.exit(1)
@@ -686,27 +692,52 @@ def carrega_patches(B, caminho):
         patches = [patches]
     por_id = {q['id']: q for q in B}
     aplicados = 0
+    campos_validos = ('eo', 'n', 'o', 's', 'c', 'e', 't')
     for p in patches:
         pid = p.get('id')
         if not pid or pid not in por_id:
             erros.append(f"patches: id '{pid}' não existe no banco")
             continue
-        if 'eo' not in p and 'n' not in p and 'o' not in p and 's' not in p:
-            erros.append(f"patches: id '{pid}' não traz 'eo', 'n', 'o' nem 's' — nada a aplicar")
+        if not any(k in p for k in campos_validos):
+            erros.append(f"patches: id '{pid}' não traz 'eo', 'n', 'o', 's', 'c', 'e' nem 't' — nada a aplicar")
             continue
+        falhou = False
         if 'o' in p:
             atual, novo = por_id[pid]['o'], p.get('o')
-            c = por_id[pid]['c']
             if not isinstance(novo, list) or len(novo) != len(atual):
                 erros.append(f"patches: id '{pid}': 'o' precisa ter as mesmas "
                              f"{len(atual)} alternativas (veio {len(novo) if isinstance(novo, list) else type(novo).__name__})")
+                falhou = True
+            elif 'c' not in p:
+                c = por_id[pid]['c']
+                if novo[c] != atual[c]:
+                    erros.append(f"patches: id '{pid}': a alternativa correta (índice {c}) "
+                                 "mudou de texto ou de posição — patch de 'o' sem 'c' só pode "
+                                 "reescrever distrator, nunca a correta")
+                    falhou = True
+            if not falhou:
+                por_id[pid]['o'] = novo
+        if falhou:
+            continue
+        if 'c' in p:
+            novo_c = p.get('c')
+            o_final = por_id[pid]['o']
+            if not isinstance(novo_c, int) or isinstance(novo_c, bool) or novo_c < 0 or novo_c >= len(o_final):
+                erros.append(f"patches: id '{pid}': 'c' precisa ser um índice inteiro entre 0 e {len(o_final)-1}")
                 continue
-            if novo[c] != atual[c]:
-                erros.append(f"patches: id '{pid}': a alternativa correta (índice {c}) "
-                             "mudou de texto ou de posição — patch de 'o' só pode "
-                             "reescrever distrator, nunca a correta")
+            if 'e' not in p:
+                erros.append(f"patches: id '{pid}': patch de 'c' precisa vir junto com 'e' — "
+                             "a explicação antiga não justifica a resposta nova")
                 continue
-            por_id[pid]['o'] = novo
+            por_id[pid]['c'] = novo_c
+        if 'e' in p:
+            por_id[pid]['e'] = p.get('e')
+        if 't' in p:
+            novo_t = p.get('t')
+            if not isinstance(novo_t, str) or not novo_t.strip():
+                erros.append(f"patches: id '{pid}': 't' não pode ser vazio")
+                continue
+            por_id[pid]['t'] = novo_t
         if 'eo' in p:
             por_id[pid]['eo'] = p.get('eo')
         if 'n' in p:

@@ -148,18 +148,43 @@ if ($Patches) {
   foreach ($p in @($pats)) {
     if (-not $porId.ContainsKey($p.id)) { Erro "patches: id '$($p.id)' não existe no banco"; continue }
     $campos = $p.PSObject.Properties.Name
-    if ($campos -notcontains 'eo' -and $campos -notcontains 'n' -and $campos -notcontains 'o' -and $campos -notcontains 's') {
-      Erro "patches: id '$($p.id)' não traz 'eo', 'n', 'o' nem 's' — nada a aplicar"; continue
+    if ($campos -notcontains 'eo' -and $campos -notcontains 'n' -and $campos -notcontains 'o' -and $campos -notcontains 's' `
+        -and $campos -notcontains 'c' -and $campos -notcontains 'e' -and $campos -notcontains 't') {
+      Erro "patches: id '$($p.id)' não traz 'eo', 'n', 'o', 's', 'c', 'e' nem 't' — nada a aplicar"; continue
     }
+    $falhou = $false
     if ($campos -contains 'o') {
-      $atual = @($porId[$p.id].o); $novo = @($p.o); $ci = [int]$porId[$p.id].c
+      $atual = @($porId[$p.id].o); $novo = @($p.o)
       if ($novo.Count -ne $atual.Count) {
-        Erro "patches: id '$($p.id)': 'o' precisa ter as mesmas $($atual.Count) alternativas (veio $($novo.Count))"; continue
+        Erro "patches: id '$($p.id)': 'o' precisa ter as mesmas $($atual.Count) alternativas (veio $($novo.Count))"; $falhou = $true
+      } elseif ($campos -notcontains 'c') {
+        $ci = [int]$porId[$p.id].c
+        if ($novo[$ci] -ne $atual[$ci]) {
+          Erro "patches: id '$($p.id)': a alternativa correta (índice $ci) mudou de texto ou de posição — patch de 'o' sem 'c' só pode reescrever distrator, nunca a correta"; $falhou = $true
+        }
       }
-      if ($novo[$ci] -ne $atual[$ci]) {
-        Erro "patches: id '$($p.id)': a alternativa correta (índice $ci) mudou de texto ou de posição — patch de 'o' só pode reescrever distrator, nunca a correta"; continue
+      if (-not $falhou) { $porId[$p.id] | Add-Member -NotePropertyName o -NotePropertyValue $novo -Force }
+    }
+    if ($falhou) { continue }
+    if ($campos -contains 'c') {
+      $oFinal = @($porId[$p.id].o)
+      $novoC = $p.c
+      if ($novoC -isnot [int] -or $novoC -lt 0 -or $novoC -ge $oFinal.Count) {
+        Erro "patches: id '$($p.id)': 'c' precisa ser um índice inteiro entre 0 e $($oFinal.Count - 1)"; continue
       }
-      $porId[$p.id] | Add-Member -NotePropertyName o -NotePropertyValue $novo -Force
+      if ($campos -notcontains 'e') {
+        Erro "patches: id '$($p.id)': patch de 'c' precisa vir junto com 'e' — a explicação antiga não justifica a resposta nova"; continue
+      }
+      $porId[$p.id] | Add-Member -NotePropertyName c -NotePropertyValue ([int]$novoC) -Force
+    }
+    if ($campos -contains 'e') {
+      $porId[$p.id] | Add-Member -NotePropertyName e -NotePropertyValue ([string]$p.e) -Force
+    }
+    if ($campos -contains 't') {
+      if (-not $p.t -or -not ([string]$p.t).Trim()) {
+        Erro "patches: id '$($p.id)': 't' não pode ser vazio"; continue
+      }
+      $porId[$p.id] | Add-Member -NotePropertyName t -NotePropertyValue ([string]$p.t) -Force
     }
     if ($campos -contains 'eo') {
       $porId[$p.id] | Add-Member -NotePropertyName eo -NotePropertyValue @($p.eo) -Force

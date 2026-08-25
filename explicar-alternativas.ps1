@@ -1,5 +1,6 @@
 ﻿# Grava 'eo' (explicação por alternativa), 'n' (nível), 'o' (alternativas,
-# para corrigir viés) e/ou 's' (subtópico) em cartão que JÁ EXISTE no banco,
+# para corrigir viés), 's' (subtópico), 'c' (índice da correta), 'e'
+# (explicação principal) e/ou 't' (tópico) em cartão que JÁ EXISTE no banco,
 # casando por id — só se o validador passar. Terceiro e último script
 # autorizado a escrever em banco/*.json (regra 9 do CLAUDE.md); os outros
 # dois (incorporar-rascunho.ps1, incorporar-propostas.ps1) ACRESCENTAM
@@ -23,15 +24,26 @@
 #       Ver PADRAO-DOS-CARTOES.md seção 1.4.1.
 #   n   nível do cartão dentro do tópico (1 a 9).
 #   o   as alternativas, para corrigir viés de comprimento reescrevendo
-#       DISTRATOR. A correta tem de vir idêntica e na mesma posição: 'c' é
-#       índice, não texto, e trocar a ordem mudaria a resposta certa sem
-#       aparecer no diff. Quem reprova isso é o validar.py — mexeu na
-#       correta, não grava. Mandando 'o', mande o 'eo' junto: eo[i] explica
-#       o[i], e distrator novo com explicação velha vira cartão que ensina
-#       errado.
+#       DISTRATOR. Sem 'c' no mesmo patch, a correta tem de vir idêntica e na
+#       mesma posição: 'c' é índice, não texto, e trocar a ordem mudaria a
+#       resposta certa sem aparecer no diff. Quem reprova isso é o
+#       validar.py — mexeu na correta sem avisar, não grava. Mandando 'o',
+#       mande o 'eo' junto: eo[i] explica o[i], e distrator novo com
+#       explicação velha vira cartão que ensina errado.
 #   s   subtópico (substitui o que o cartão já tinha; string vazia REMOVE o
 #       subtópico). Não pode repetir o 't' do cartão — quem reprova é o
 #       validar.py de sempre (valida_questoes), nenhuma checagem nova aqui.
+#   c   índice da alternativa correta — só para quando a AUDITORIA confirma
+#       que a resposta marcada está factualmente errada (não é viés de
+#       comprimento, é erro de fato). Exige 'e' no mesmo patch: a explicação
+#       antiga quase certamente não justifica a resposta nova, e 'c' sem 'e'
+#       reescrita vira cartão que aponta pra resposta certa com explicação da
+#       errada. validar.py recusa 'c' sem 'e' junto.
+#   e   explicação principal (substitui a que o cartão já tinha).
+#   t   tópico (substitui o que o cartão já tinha) — para corrigir cartão
+#       classificado no tópico errado (ex.: rótulo que devia ser subtópico
+#       virou tópico, ou tópico que não existe na árvore do banco). Mesma
+#       checagem de sempre contra 's' != 't', nenhuma nova aqui.
 #
 # Rodar de novo com o mesmo id SUBSTITUI o 'eo' anterior (idempotente) — útil
 # na calibração, quando a nota de uma alternativa precisa ser reescrita antes
@@ -90,22 +102,27 @@ if ($DryRun) {
 
 # ---- 2. acha em qual banco/<matéria>.json cada id mora ------------------------
 $materias = [System.IO.File]::ReadAllText((Join-Path $dir 'materias.json'), [System.Text.Encoding]::UTF8) | ConvertFrom-Json
-# Um patch traz 'eo', 'n', 'o', 's', ou uma combinação. Guardo em mapas
-# separados porque campo ausente no patch NÃO pode apagar o que o cartão já
-# tem — quem só define 'n' não deve perder o 'eo' escrito antes, e vice-versa.
+# Um patch traz 'eo', 'n', 'o', 's', 'c', 'e', 't', ou uma combinação. Guardo
+# em mapas separados porque campo ausente no patch NÃO pode apagar o que o
+# cartão já tem — quem só define 'n' não deve perder o 'eo' escrito antes, e
+# vice-versa.
 #
 # 'o' (as alternativas) entra por aqui para corrigir viés de comprimento:
 # reescrever distrator curto demais, que denuncia a correta por ser a única
-# frase longa. Quem garante que o patch não troca a correta de lugar é o
-# validar.py, que roda logo acima e reprova se o índice 'c' deixar de apontar
-# para o mesmo texto — este script não reimplementa essa checagem (regra 9).
-$eoPorId = @{}; $nPorId = @{}; $oPorId = @{}; $sPorId = @{}; $alvos = @{}
+# frase longa. 'c' entra para corrigir resposta marcada errada de fato (não
+# viés). Quem garante que o patch de 'o' sem 'c' não troca a correta de
+# lugar, e que todo patch de 'c' vem com 'e' nova junto, é o validar.py, que
+# roda logo acima — este script não reimplementa essa checagem (regra 9).
+$eoPorId = @{}; $nPorId = @{}; $oPorId = @{}; $sPorId = @{}; $cPorId = @{}; $ePorId = @{}; $tPorId = @{}; $alvos = @{}
 foreach ($p in $patches) {
   $campos = $p.PSObject.Properties.Name
   if ($campos -contains 'eo') { $eoPorId[$p.id] = @($p.eo) }
   if ($campos -contains 'n')  { $nPorId[$p.id]  = [int]$p.n }
   if ($campos -contains 'o')  { $oPorId[$p.id]  = @($p.o) }
   if ($campos -contains 's')  { $sPorId[$p.id]  = [string]$p.s }
+  if ($campos -contains 'c')  { $cPorId[$p.id]  = [int]$p.c }
+  if ($campos -contains 'e')  { $ePorId[$p.id]  = [string]$p.e }
+  if ($campos -contains 't')  { $tPorId[$p.id]  = [string]$p.t }
   $alvos[$p.id] = $true
 }
 
@@ -127,13 +144,16 @@ foreach ($m in $materias) {
     # formatação previsível em vez de depender da ordem que ConvertFrom-Json
     # devolveu as propriedades
     $campoQ = $q.PSObject.Properties.Name
-    $obj = [ordered]@{ id = $q.id; m = $q.m; t = $q.t }
+    $tFinal = if ($tPorId.ContainsKey($q.id)) { $tPorId[$q.id] } else { $q.t }
+    $obj = [ordered]@{ id = $q.id; m = $q.m; t = $tFinal }
     if ($sPorId.ContainsKey($q.id)) {
       if ($sPorId[$q.id]) { $obj.s = $sPorId[$q.id] }   # string vazia = remove
     } elseif ($campoQ -contains 's' -and $q.s) { $obj.s = $q.s }
     $obj.q = $q.q
     if ($oPorId.ContainsKey($q.id)) { $obj.o = $oPorId[$q.id] } else { $obj.o = @($q.o) }
-    $obj.c = [int]$q.c; $obj.e = $q.e; $obj.f = $q.f
+    $obj.c = if ($cPorId.ContainsKey($q.id)) { $cPorId[$q.id] } else { [int]$q.c }
+    $obj.e = if ($ePorId.ContainsKey($q.id)) { $ePorId[$q.id] } else { $q.e }
+    $obj.f = $q.f
     # o que o patch não trouxe é preservado do cartão original
     if ($nPorId.ContainsKey($q.id))      { $obj.n = $nPorId[$q.id] }
     elseif ($campoQ -contains 'n')       { $obj.n = [int]$q.n }
@@ -159,7 +179,7 @@ if ($vistos.Count -gt 0) {
   throw "id(s) aprovados no validador mas não encontrados na hora de gravar: $($vistos.Keys -join ', ')"
 }
 
-Write-Host "`n$alterados cartão(ões) alterado(s) ('eo' e/ou 'n' gravado(s))."
+Write-Host "`n$alterados cartão(ões) alterado(s)."
 
 # esvazia o arquivo de trabalho: o que foi incorporado não pode ser incorporado de novo
 [System.IO.File]::WriteAllText($arqP, "[`n]`n", (New-Object System.Text.UTF8Encoding $false))
