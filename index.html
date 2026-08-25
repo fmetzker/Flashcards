@@ -566,13 +566,36 @@ let BANCO_FOCO_PRONTO = false, BANCO_PRONTO = false;
 let AGUARDANDO_BANCO_PRONTO = [];
 const porId = {}, MATERIAS = {}, blocoDaMateria = {};
 
-/* Toda leitura de dado passa por aqui. Na versão normal vem por fetch; na
-   versão de arquivo único, gerada por gerar-offline.ps1, os mesmos dados vêm
-   embutidos em window.DADOS e nenhuma requisição é feita — é isso que faz o
-   app abrir com duplo clique, sem servidor e sem rede. */
+/* fetch() sozinho não tem timeout: numa conexão ruim (não caída, só muito
+   lenta), a promessa fica pendurada indefinidamente sem nunca rejeitar. Como
+   o boot só mostra falhaBoot() no catch() da cadeia, isso travava a tela em
+   "carregando" pra sempre, sem erro nenhum visível — o sintoma relatado numa
+   internet limitada. Toda chamada de rede do app (pega, chamarAuth,
+   chamarRest — as três usadas no boot) passa por este helper para desistir
+   depois de um prazo em vez de pendurar, e cair no catch de quem chamou, que
+   aí sim decide (falhaBoot no boot; "arquivo ausente, segue sem" em
+   topicos.json/requisitos.json, que já eram opcionais). */
+const PRAZO_REDE_MS = 8000;
+async function fetchComPrazo(url, opcoes){
+  const ctrl = new AbortController();
+  const alarme = setTimeout(()=>ctrl.abort(), PRAZO_REDE_MS);
+  try{
+    return await fetch(url, Object.assign({}, opcoes, {signal: ctrl.signal}));
+  }catch(e){
+    if(e.name === "AbortError") throw new Error(url+" não respondeu em "+(PRAZO_REDE_MS/1000)+"s (conexão lenta ou instável)");
+    throw e;
+  }finally{
+    clearTimeout(alarme);
+  }
+}
+
+/* Toda leitura de dado estático passa por aqui. Na versão normal vem por
+   fetch; na versão de arquivo único, gerada por gerar-offline.ps1, os mesmos
+   dados vêm embutidos em window.DADOS e nenhuma requisição é feita — é isso
+   que faz o app abrir com duplo clique, sem servidor e sem rede. */
 async function pega(caminho){
   if(window.DADOS && DADOS[caminho]) return DADOS[caminho];
-  const r = await fetch(caminho);
+  const r = await fetchComPrazo(caminho);
   if(!r.ok) throw new Error(caminho+" respondeu "+r.status);
   return r.json();
 }
@@ -1136,7 +1159,7 @@ async function carregarSupabase(){
 }
 
 async function chamarAuth(caminho, corpo){
-  const r = await fetch(SUPA.url+"/auth/v1/"+caminho, {
+  const r = await fetchComPrazo(SUPA.url+"/auth/v1/"+caminho, {
     method: "POST",
     headers: {"Content-Type":"application/json", "apikey": SUPA.anonKey},
     body: JSON.stringify(corpo)
@@ -1172,7 +1195,7 @@ async function criarConta(email, senha){
 async function sair(){
   if(SESSAO && SUPA){
     try{
-      await fetch(SUPA.url+"/auth/v1/logout", {
+      await fetchComPrazo(SUPA.url+"/auth/v1/logout", {
         method:"POST",
         headers:{"apikey":SUPA.anonKey, "Authorization":"Bearer "+SESSAO.access_token}
       });
@@ -1297,7 +1320,7 @@ async function chamarRest(caminho, opcoes){
     "Authorization": "Bearer "+SESSAO.access_token,
     "Content-Type": "application/json"
   }, opcoes.headers || {});
-  const r = await fetch(SUPA.url+"/rest/v1/"+caminho, Object.assign({}, opcoes, {headers}));
+  const r = await fetchComPrazo(SUPA.url+"/rest/v1/"+caminho, Object.assign({}, opcoes, {headers}));
   if(r.status === 401){    // token expirado no meio do caminho: renova e tenta uma vez de novo
     await renovarSessao();
     if(!SESSAO) throw new Error("sessão expirou");
@@ -3269,8 +3292,11 @@ carregarConfig()
   .then(carregarSupabase)   // arquivo ausente não é erro fatal, mas sem ele ninguém consegue logar
   .then(verificarSessao)    // desloga em silêncio se a sessão salva não presta mais
   .then(verificarSituacao)  // pendente/aprovado/rejeitado — decide entre tela de espera e app
-  .then(verificarRevisor)   // precisa terminar antes do menu pintar, senão o botão pisca
-  .then(verificarAprovador) // idem
+  // revisor e aprovador são independentes um do outro (cada um só seta sua
+  // própria flag) — rodar em paralelo em vez de em série corta essa parte do
+  // boot pela metade. Os dois precisam terminar antes do menu pintar, senão
+  // o botão de revisor/aprovador pisca (aparece e some).
+  .then(()=>Promise.all([verificarRevisor(), verificarAprovador()]))
   .then(()=>{
     salvar();
     if(exigeLogin()) ir("login");

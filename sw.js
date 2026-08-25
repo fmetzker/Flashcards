@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v259-carregamento-em-fases";
+const VERSAO = "v260-prazo-de-rede";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
@@ -70,19 +70,44 @@ self.addEventListener("activate", evento => {
    ABAIXO deste service worker — sem sequer sair pro ar. "Rede primeiro"
    só é rede primeiro de verdade se a chamada ignorar esse cache; do
    contrário, fechar e reabrir o app dentro da mesma janela de 10 minutos
-   continua servindo a versão antiga, e parece que a v25 nunca chegou. */
+   continua servindo a versão antiga, e parece que a v25 nunca chegou.
+
+   PRAZO_FETCH_MS existe porque "rede primeiro" tem um furo: fetch() só cai
+   pro catch() quando a rede FALHA (caiu, DNS, CORS), nunca quando ela só está
+   LENTA. Numa internet limitada — que não caiu, só demora — a promessa fica
+   pendurada e o app trava na tela de "carregando" pra sempre, sem cair pro
+   cache nunca. Por isso a rede corre contra um prazo: se ela não responder a
+   tempo, o cache assume na hora (se tiver algo pra servir) e a rede continua
+   em segundo plano só pra atualizar o cache pro próximo carregamento. No
+   PRIMEIRO acesso — sem nada em cache ainda — não tem pra onde cair: o prazo
+   estourar aí só faz esperar a mesma promessa de rede que já estava a
+   caminho, em vez de abrir mão dela (desistir teria só trocado uma espera
+   por um erro, sem ganhar nada). */
+const PRAZO_FETCH_MS = 4000;
+function comPrazo(promessa, ms){
+  return new Promise((resolve, reject) => {
+    const alarme = setTimeout(() => reject(new Error("timeout")), ms);
+    promessa.then(
+      v => { clearTimeout(alarme); resolve(v); },
+      e => { clearTimeout(alarme); reject(e); }
+    );
+  });
+}
+
 self.addEventListener("fetch", evento => {
   if (evento.request.method !== "GET") return;
 
+  const buscaNaRede = fetch(evento.request, { cache: "no-store" }).then(resposta => {
+    if (resposta && resposta.status === 200 && resposta.type === "basic") {
+      const copia = resposta.clone();
+      caches.open(CACHE).then(cache => cache.put(evento.request, copia));
+    }
+    return resposta;
+  });
+
   evento.respondWith(
-    fetch(evento.request, { cache: "no-store" })
-      .then(resposta => {
-        if (resposta && resposta.status === 200 && resposta.type === "basic") {
-          const copia = resposta.clone();
-          caches.open(CACHE).then(cache => cache.put(evento.request, copia));
-        }
-        return resposta;
-      })
-      .catch(() => caches.match(evento.request))
+    comPrazo(buscaNaRede, PRAZO_FETCH_MS).catch(() =>
+      caches.match(evento.request).then(cacheado => cacheado || buscaNaRede)
+    )
   );
 });
