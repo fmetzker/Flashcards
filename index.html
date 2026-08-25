@@ -80,9 +80,6 @@ h2{font-size:19px;font-weight:600}
 }
 .topo h1{color:#fff}
 .topo .sub{color:#BFE0D6}
-.contagem{text-align:right;line-height:1}
-.contagem b{font-family:var(--dado);font-size:34px;display:block;color:var(--verde-brilho)}
-.contagem span{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:#BFE0D6}
 
 /* cartão de sequência — mesmo tom escuro, destaque separado da meta */
 .card.escuro{background:var(--escuro);border-color:var(--escuro);color:#fff}
@@ -308,7 +305,6 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
       <!-- só aparece quando o perfil segue mais de um concurso -->
       <select id="foco-concurso" style="display:none;margin-top:8px;font-size:13px;padding:6px 9px;width:auto;max-width:100%"></select>
     </div>
-    <div class="contagem"><b id="dias-falta">–</b><span>dias</span></div>
   </div>
 
   <div class="card escuro">
@@ -1523,9 +1519,6 @@ function somarDias(dataYMD, n){
   d.setUTCDate(d.getUTCDate()+n);
   return d.toISOString().slice(0,10);
 }
-/* dias até a prova do concurso EM FOCO — é o número que a tela mostra */
-function diasAte(){ return Math.max(0, Math.ceil((diaUTC(CONCURSO.data) - diaUTC(hoje()))/86400000)); }
-
 /* dias até a prova MAIS PRÓXIMA entre todos os inscritos. É este que manda no
    teto do Leitner: seguir um concurso distante não pode afrouxar a revisão
    por causa de outro que é semana que vem. */
@@ -1763,7 +1756,6 @@ function pintarInicio(){
     ? "próxima: "+CONCURSO.cargo+" · "+CONCURSO.data.slice(8)+"/"+CONCURSO.data.slice(5,7)
     : [CONCURSO.orgao, CONCURSO.banca, "prova "+CONCURSO.data.slice(8)+"/"+CONCURSO.data.slice(5,7)]
         .filter(Boolean).join(" · ");
-  document.getElementById("dias-falta").textContent = diasAte();
   const f = feitasHoje();
   document.getElementById("meta-texto").textContent = f+"/"+E.meta;
   document.getElementById("meta-barra").style.width = Math.min(100, f/E.meta*100)+"%";
