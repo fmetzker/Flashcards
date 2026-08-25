@@ -117,7 +117,7 @@
           "questoes": 10,
           "materias": ["portugues"],
           "topicos": [
-            "Interpretação de textos",
+            "Interpretação de texto",
             "Gêneros textuais",
             "Tipologia textual",
             "Coerência",
@@ -135,7 +135,7 @@
             "Pontuação",
             "Semântica"
           ],
-          "_topicos": "Os 8 itens de Língua Portuguesa do Anexo IV mapeados para os tópicos do banco — interpretação, não transcrição, e na dúvida incluindo (item 1, 'compreensão de textos de gêneros variados', puxa gêneros, tipologia, coerência, intertextualidade, reescrita, ambiguidade e figuras de linguagem; item 2, 'ortografia oficial', puxa acentuação; item 4, 'emprego das classes de palavras', puxa pronomes). Ficam DE FORA os 40 cartões de Regência, Colocação pronominal, Coordenação, Subordinação, Coordenação e subordinação e Sintaxe: esta lista de nível médio não cita nenhum deles, ao contrário da de nível superior. Restam 132 dos 172 cartões."
+          "_topicos": "Os 8 itens de Língua Portuguesa do Anexo IV mapeados para os tópicos do banco — interpretação, não transcrição, e na dúvida incluindo (item 1, 'compreensão de textos de gêneros variados', puxa gêneros, tipologia, coerência, intertextualidade, reescrita, ambiguidade e figuras de linguagem; item 2, 'ortografia oficial', puxa acentuação; item 4, 'emprego das classes de palavras', puxa pronomes). Ficam DE FORA os cartões de Regência, Colocação pronominal, Coordenação, Subordinação, Coordenação e subordinação e Sintaxe: esta lista de nível médio não cita nenhum deles, ao contrário da de nível superior. 'Interpretação de texto' (singular) é o nome unificado desde a fusão com 'Interpretação de textos' — os dois cobriam o mesmo assunto (compreensão de texto) com rótulos diferentes."
         },
         {
           "id": "mat",

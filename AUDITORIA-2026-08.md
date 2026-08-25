@@ -5,6 +5,53 @@
 > parcial (interrompida por limite de sessão da conta antes de cobrir o
 > banco inteiro). Serve de lista de trabalho para continuar depois.
 
+## Complemento — auditoria do grafo de pré-requisitos (barata, sem ler cartão)
+
+Pedido à parte: em vez de reler conteúdo de cartão, auditar só
+`banco/requisitos.json` — o grafo é pequeno (~5KB) e a checagem mecânica
+(ciclo, referência inexistente, escada sem degrau 1) já roda de graça em
+todo `validar`. O que sobrava era julgamento: o grafo faz sentido? falta
+algum elo óbvio? Bastou ler o arquivo inteiro + a contagem de tópicos por
+matéria (sem tocar em texto de cartão) para achar 4 coisas, todas
+corrigidas:
+
+- **Órfão real, corrigido**: "Interpretação de texto" (singular, 26
+  cartões — questões presas a texto nomeado de prova) e "Interpretação de
+  textos" (plural, 11 cartões — exercício genérico de inferência/coesão/
+  explícito×implícito, incluindo 2 cartões de definição) cobriam o mesmo
+  assunto sob nomes diferentes; só o plural tinha requisito declarado
+  (Semântica, Coerência), e nenhum dos dois estava na lista de tópicos
+  intencionalmente livres. Fundidos sob o nome singular (37 cartões), os
+  11 antigos "textos" ganharam o subtópico "Inferência e coesão" para
+  preservar a diferença de estilo. Precisou atualizar também
+  `Intertextualidade` (que exigia o nome antigo) e o escopo de Português
+  do bloco `lp` de `transpetro-mec` em `concursos.json`, que citava
+  "Interpretação de textos" nominalmente.
+- **Órfão por documentação, corrigido**: "Fonética" (6 cartões,
+  fonema/sílaba/dígrafo) não tinha requisito nem estava na lista dos
+  tópicos autocontidos — devia estar. Acrescentado à lista, sem mudança
+  de grafo.
+- **Lacuna de manutenção, corrigida**: "Vetores" e "Matrizes" (tópicos
+  que só existem desde a mineração da pasta 3 das provas antigas, depois
+  deste arquivo ter sido escrito) não apareciam em `requisitos.json` de
+  jeito nenhum. Adicionados: `Matrizes` exige `{Álgebra, Sistemas de
+  equações}` (os 4 cartões são sobre determinante/invertibilidade, que
+  decidem se um sistema linear tem solução); `Vetores` exige `{Geometria,
+  Geometria analítica}` (os 5 cartões são produto escalar/módulo/vetor
+  posição em coordenadas).
+- **Aresta sem base real, removida**: `Trigonometria` exigia `Funções`
+  além de `{Geometria, Triângulos}`, mas os subtópicos de Trigonometria no
+  banco (círculo trigonométrico, leis do triângulo, razões no triângulo
+  retângulo, ângulos notáveis) não pressupõem gráfico/domínio de função —
+  a aresta parecia estética, não uma dependência real. Removida.
+
+`Coordenação` exigir só `Classes de palavras` (sem `Sintaxe`, diferente da
+irmã `Subordinação`) foi revisto e **mantido**: classificar conjunção
+coordenativa (aditiva, adversativa...) não precisa de função sintática,
+mas classificar oração subordinada substantiva muitas vezes precisa saber
+qual função sintática ela substitui — a assimetria é intencional, não
+descuido.
+
 ## Complemento — Português/Classes de palavras (auditoria focada, cobertura 100%)
 
 Pedido à parte, depois da rodada principal: reler os 118 cartões de
