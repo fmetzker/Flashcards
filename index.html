@@ -313,7 +313,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   </div>
 
   <div class="card">
-    <div class="linha"><div class="rotulo">Meta de hoje</div><div class="dado" id="meta-texto">0/35</div></div>
+    <div class="linha"><div class="rotulo" id="meta-rotulo">Meta de hoje</div><div class="dado" id="meta-texto">0/35</div></div>
     <div class="barra"><i id="meta-barra" style="width:0%"></i></div>
     <div id="meta-blocos" style="margin-top:12px"></div>
     <div class="linha" style="margin-top:11px;font-size:13px;color:var(--tinta2)">
@@ -324,7 +324,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   <div id="alerta-area"></div>
 
   <div class="menu">
-    <button onclick="ir('simulado-inicio')">Simulado</button>
+    <button id="menu-simulado" onclick="ir('simulado-inicio')">Simulado</button>
     <button id="menu-propor" style="display:none" onclick="ir('propor')">Propor questão</button>
     <button id="menu-revisar" style="display:none" onclick="ir('revisar')">Revisar propostas</button>
     <button id="menu-reportes" style="display:none" onclick="ir('reportes')">Reportes de questões</button>
@@ -413,8 +413,8 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
 <div class="tela" id="tela-ajustes">
   <h1>Ajustes</h1>
 
-  <div class="rotulo">Concursos</div>
-  <div class="aviso">Marque todos que você estuda. O banco de questões passa a trazer as matérias de todos eles; a contagem e o simulado usam o que estiver em foco na tela inicial.</div>
+  <div class="rotulo">Concursos e matérias</div>
+  <div class="aviso">Marque tudo que você estuda. O banco de questões passa a trazer as matérias de todos eles; a meta e o simulado usam o que estiver em foco na tela inicial. Matéria avulsa não tem prova atrás — não conta pra meta nem entra no simulado, é só pra estudar por conta própria.</div>
   <div id="concursos-corpo" style="margin-top:10px"></div>
 
   <div style="margin-top:24px" class="rotulo">Conta</div>
@@ -688,18 +688,30 @@ function provaMaisProxima(){
 
    O teto do Leitner segue em diasAteMaisProxima(), sobre TODOS os inscritos,
    de propósito: estudar só para um concurso hoje não adia a prova do outro,
-   e os cartões precisam continuar prontos para ela. */
+   e os cartões precisam continuar prontos para ela.
+
+   Sem NENHUM concurso/processo seletivo seguido (só matéria avulsa, ou nada
+   ainda) CONCURSO fica null — não existe prova nenhuma pra responder "qual
+   prova?", e inventar uma (data, regra de aprovação) violaria a regra 11 do
+   CLAUDE.md. Simulado e a pergunta "quantos dias faltam" ficam indisponíveis
+   nesse estado (ver pintarInicio); "Estudar agora" continua funcionando,
+   porque fila() só depende do banco carregado, não de CONCURSO. */
+const SESSAO_SEM_CONCURSO = 20;   // tamanho de sessão quando não há meta de prova nenhuma atrás
 function aplicarFoco(id){
   const escolhido = id ? INSCRITOS.find(c=>c.id === id) : null;
   E.escopoEstudo = escolhido ? escolhido.id : null;
   /* CONCURSO é quem responde "qual prova?" — simulado, regra de aprovação,
      contagem regressiva. Com escopo, é o escolhido; sem escopo, a mais
-     próxima, que é a que aperta primeiro. */
-  CONCURSO = escolhido || provaMaisProxima() || INSCRITOS[0];
-  E.concursoAtivo = CONCURSO.id;
-  BLOCOS = CONCURSO.blocos;
+     próxima, que é a que aperta primeiro; sem NENHUM concurso inscrito, null. */
+  CONCURSO = escolhido || provaMaisProxima() || (INSCRITOS.length ? INSCRITOS[0] : null);
+  E.concursoAtivo = CONCURSO ? CONCURSO.id : null;
+  BLOCOS = CONCURSO ? CONCURSO.blocos : [];
   BLOCOS_META = blocosDaMeta(escolhido ? [escolhido] : INSCRITOS);
-  E.meta = BLOCOS_META.reduce((s,bl)=> s + bl.questoes, 0) || metaDoConcurso(CONCURSO);
+  /* E.meta dobra como "tamanho de sessão" dentro de iniciarSessao() (o
+     .slice(0, E.meta) que fecha a lista) — não pode virar 0 mesmo sem
+     concurso, senão "Estudar agora" monta sessão vazia com fila cheia. */
+  E.meta = BLOCOS_META.reduce((s,bl)=> s + bl.questoes, 0)
+    || (CONCURSO ? metaDoConcurso(CONCURSO) : SESSAO_SEM_CONCURSO);
   // blocoDaMateria é do concurso em foco: é ele que diz de que bloco da prova
   // cada matéria faz parte (e blocos são por concurso, não globais)
   Object.keys(blocoDaMateria).forEach(k=>delete blocoDaMateria[k]);
@@ -728,18 +740,25 @@ async function carregarConfig(){
   mats.forEach(m=>{ MATERIAS[m.id] = m; });
   ORDEM_MATERIAS = mats.map(m=>m.id);
 
+  // descarta matéria avulsa que não existe mais em materias.json (mesma
+  // rede de segurança que já existe para E.concursos acima)
+  E.materiasAvulsas = (E.materiasAvulsas||[]).filter(id=>MATERIAS[id]);
+
   /* ORDEM_MATERIAS precisa existir ANTES de aplicarFoco: blocosDaMeta() usa
      ela para ordenar, e com a lista vazia devolvia [] — a meta caía no
      fallback do concurso em foco e parava de somar os inscritos, em silêncio.
      Foi exatamente esse o bug: no boot a meta vinha errada, e só ficava certa
-     se algo chamasse aplicarFoco() de novo depois. */
-  if(E.concursos.length){
-    INSCRITOS = CONCURSOS.filter(c=>E.concursos.indexOf(c.id) >= 0);
-    /* escopo salvo que não está mais entre os inscritos vira "todos" em vez
-       de prender a meta num concurso que a pessoa deixou de seguir */
-    const escopo = E.concursos.indexOf(E.escopoEstudo) >= 0 ? E.escopoEstudo : null;
-    aplicarFoco(escopo);
-  }
+     se algo chamasse aplicarFoco() de novo depois.
+
+     Sempre roda, mesmo com E.concursos vazio (só matérias avulsas, ou nada
+     ainda): é aplicarFoco() que decide CONCURSO=null/BLOCOS=[]/meta de
+     sessão nesse caso — deixar de chamar aqui fazia E.meta ficar parado no
+     35 do padrão inicial, sem relação com o que a pessoa realmente segue. */
+  INSCRITOS = CONCURSOS.filter(c=>E.concursos.indexOf(c.id) >= 0);
+  /* escopo salvo que não está mais entre os inscritos vira "todos" em vez
+     de prender a meta num concurso que a pessoa deixou de seguir */
+  const escopo = E.concursos.indexOf(E.escopoEstudo) >= 0 ? E.escopoEstudo : null;
+  aplicarFoco(escopo);
 
   /* Árvore oficial do edital, para a tela Matérias conseguir mostrar o que a
      prova cobra mesmo onde ainda não há cartão escrito. É opcional de
@@ -864,22 +883,31 @@ function grauAberto(q){
   return topicoAberto(q.m, q.t) && grauDe(q) <= grauLiberado(q.m, q.t);
 }
 
-/* união das matérias de TODOS os concursos inscritos — não só do que está em
-   foco. Seguir dois concursos precisa trazer o conteúdo dos dois para a fila,
-   senão "seguir" não significa nada além de trocar o cabeçalho. */
+/* união das matérias de TODOS os concursos inscritos, MAIS as matérias
+   avulsas — não só do que está em foco. Seguir dois concursos precisa trazer
+   o conteúdo dos dois para a fila, senão "seguir" não significa nada além de
+   trocar o cabeçalho; matéria avulsa entra do mesmo jeito, sem bloco nenhum
+   por trás. */
 function materiasInscritas(){
   const usadas = {};
   INSCRITOS.forEach(c=> c.blocos.forEach(b=> b.materias.forEach(m=>{ usadas[m] = true; })));
+  E.materiasAvulsas.forEach(m=>{ usadas[m] = true; });
   return ORDEM_MATERIAS.filter(m=>usadas[m]);
 }
 
 /* matérias do concurso EM FOCO (BLOCOS já é CONCURSO.blocos — ver
    aplicarFoco) — é o que a pessoa vai estudar/simular agora, então é o que
-   carrega primeiro. Vazio antes de aplicarFoco() rodar (ex.: exigeLogin). */
+   carrega primeiro. Vazio antes de aplicarFoco() rodar (ex.: exigeLogin).
+
+   Sem concurso nenhum em foco (só matérias avulsas, ou nada ainda), as
+   avulsas viram o "foco" de carregamento — são a única coisa que a pessoa
+   pode estudar agora, então merecem chegar primeiro, do mesmo jeito que a
+   matéria do concurso em foco chegaria. */
 function materiasDoFoco(){
   const usadas = {};
   BLOCOS.forEach(b=> b.materias.forEach(m=>{ usadas[m] = true; }));
-  return ORDEM_MATERIAS.filter(m=>usadas[m]);
+  const doFoco = ORDEM_MATERIAS.filter(m=>usadas[m]);
+  return doFoco.length ? doFoco : ORDEM_MATERIAS.filter(m=>E.materiasAvulsas.indexOf(m)>=0);
 }
 
 /* o resto: matérias de outros concursos inscritos, que não a do foco —
@@ -1107,6 +1135,14 @@ const padrao = {
      para a dele. Não muda o banco carregado (isso é E.concursos), só o que
      conta no dia — por isso trocar o escopo repinta em vez de recarregar. */
   concurso:null, concursos:[], concursoAtivo:null, escopoEstudo:null,
+  /* matérias avulsas: ids de matéria que a pessoa segue por conta própria,
+     sem concurso/processo seletivo nenhum atrás — carrega o banco delas e
+     libera pra estudo livre na tela Matérias, mas não vira meta de dia nem
+     entra no simulado (isso exigiria inventar data de prova e regra de
+     aprovação que não existem — regra 11 do CLAUDE.md). Pode conviver com
+     E.concursos (extra sobre o que já é seguido) ou existir sozinha (dá pra
+     usar o app sem seguir concurso nenhum, só estudando matéria solta). */
+  materiasAvulsas:[],
   /* ids de eventos gerados por ESTE perfil, para o pull não contar de novo o
      que este aparelho já somou em acertos/erros/dias na hora da resposta —
      ver o bloco SINCRONIZAÇÃO, mais abaixo */
@@ -1603,10 +1639,15 @@ function fila(){
       faz a meta só fechar quando todas as áreas foram estudadas.
 
    Dias anteriores a esta versão não têm diasMateria e caem no `dias` bruto,
-   sem detalhamento: retroagir seria inventar de qual matéria eram. */
+   sem detalhamento: retroagir seria inventar de qual matéria eram.
+
+   BLOCOS_META vazio (nenhum concurso seguido, só matéria avulsa) cai no
+   mesmo bruto: não existe bloco/cota nenhum pra distribuir o progresso, mas
+   a pessoa ainda está estudando de verdade — contar tudo é melhor que travar
+   em 0 pra sempre. */
 function progressoDoDia(k){
   const porMat = E.diasMateria[k];
-  if(!porMat) return E.dias[k] || 0;
+  if(!porMat || !BLOCOS_META.length) return E.dias[k] || 0;
   return BLOCOS_META.reduce((total, bl)=>{
     const feitas = bl.materias.reduce((n,m)=> n + (porMat[m]||0), 0);
     return total + Math.min(feitas, bl.questoes);
@@ -1744,21 +1785,34 @@ function pintarInicio(){
   document.getElementById("menu-revisar").style.display = (supaConfigurado() && SESSAO && SOU_REVISOR) ? "" : "none";
   document.getElementById("menu-reportes").style.display = (supaConfigurado() && SESSAO && SOU_REVISOR) ? "" : "none";
   document.getElementById("menu-aprovar").style.display = (supaConfigurado() && SESSAO && SOU_APROVADOR) ? "" : "none";
+  // simulado imita uma prova de verdade — sem concurso/processo seletivo
+  // nenhum seguido não existe prova nenhuma pra imitar (só matéria avulsa)
+  document.getElementById("menu-simulado").style.display = CONCURSO ? "" : "none";
 
   pintarFocoConcurso();
-  /* Sem escopo escolhido, o cabeçalho fala do conjunto, não de um concurso:
-     CONCURSO aqui é apenas a prova mais próxima, e mostrá-la como se fosse
-     "o seu concurso" esconderia que a meta cobre vários. */
-  const varios = INSCRITOS.length > 1 && !E.escopoEstudo;
-  document.getElementById("cabecalho-cargo").textContent =
-    varios ? INSCRITOS.length+" concursos" : CONCURSO.cargo;
-  document.getElementById("cabecalho-sub").textContent = varios
-    ? "próxima: "+CONCURSO.cargo+" · "+CONCURSO.data.slice(8)+"/"+CONCURSO.data.slice(5,7)
-    : [CONCURSO.orgao, CONCURSO.banca, "prova "+CONCURSO.data.slice(8)+"/"+CONCURSO.data.slice(5,7)]
-        .filter(Boolean).join(" · ");
+  if(!CONCURSO){
+    // só matéria avulsa, nenhum concurso/processo seletivo seguido: não há
+    // "qual prova" pra responder, então o cabeçalho fala de estudo livre
+    document.getElementById("cabecalho-cargo").textContent = "Estudo livre";
+    document.getElementById("cabecalho-sub").textContent = "sem concurso ou processo seletivo seguido";
+  } else {
+    /* Sem escopo escolhido, o cabeçalho fala do conjunto, não de um concurso:
+       CONCURSO aqui é apenas a prova mais próxima, e mostrá-la como se fosse
+       "o seu concurso" esconderia que a meta cobre vários. */
+    const varios = INSCRITOS.length > 1 && !E.escopoEstudo;
+    document.getElementById("cabecalho-cargo").textContent =
+      varios ? INSCRITOS.length+" concursos" : CONCURSO.cargo;
+    document.getElementById("cabecalho-sub").textContent = varios
+      ? "próxima: "+CONCURSO.cargo+" · "+CONCURSO.data.slice(8)+"/"+CONCURSO.data.slice(5,7)
+      : [CONCURSO.orgao, CONCURSO.banca, "prova "+CONCURSO.data.slice(8)+"/"+CONCURSO.data.slice(5,7)]
+          .filter(Boolean).join(" · ");
+  }
+  // sem concurso nenhum, E.meta é só o tamanho de sessão (SESSAO_SEM_CONCURSO),
+  // não uma meta de prova de verdade — o rótulo muda pra não fingir que é
+  document.getElementById("meta-rotulo").textContent = CONCURSO ? "Meta de hoje" : "Sessão de hoje";
   const f = feitasHoje();
   document.getElementById("meta-texto").textContent = f+"/"+E.meta;
-  document.getElementById("meta-barra").style.width = Math.min(100, f/E.meta*100)+"%";
+  document.getElementById("meta-barra").style.width = (E.meta>0 ? Math.min(100, f/E.meta*100) : 0)+"%";
 
   /* detalhamento por área: sem ele, "12/70" não explica por que a meta não
      anda quando a pessoa só estuda uma matéria — a cota de cada bloco fica
@@ -3073,41 +3127,83 @@ async function decidirConta(id, status, email){
    uma vez, na primeira entrada de verdade (ver exigeEscolherConcurso()).
    Checklist igual à de Ajustes → Concursos, porque é a mesma decisão; só
    muda o que acontece ao confirmar: aqui é a entrada no app, lá é ajuste.
-   ======================================================================= */
+
+   Três divisórias, sempre nessa ordem: concurso público (Constituição art.
+   37, II — administração direta), processo seletivo (empresa de economia
+   mista como a Transpetro, ou o processo da Marinha — usam esse nome no
+   próprio edital, "PS"/"PSP", não é rótulo nosso) e matéria avulsa (nenhuma
+   prova atrás, só pra estudar por conta própria — ver E.materiasAvulsas). */
+function linhaSelecao(titulo, subtitulo, marcado, onchange){
+  const linha = document.createElement("label");
+  linha.style.cssText = "display:flex;gap:10px;align-items:flex-start;margin:0 0 10px;color:var(--tinta);font-size:15px";
+  const cx = document.createElement("input");
+  cx.type = "checkbox";
+  cx.checked = marcado;
+  cx.style.cssText = "width:18px;height:18px;flex:0 0 auto;margin-top:2px";
+  cx.onchange = ()=>onchange(cx);
+  const txt = document.createElement("span");
+  const nome = document.createElement("div");
+  nome.textContent = titulo;
+  txt.appendChild(nome);
+  if(subtitulo){
+    const det = document.createElement("div");
+    det.style.cssText = "font-size:12px;color:var(--tinta2)";
+    det.textContent = subtitulo;
+    txt.appendChild(det);
+  }
+  linha.appendChild(cx); linha.appendChild(txt);
+  return linha;
+}
+function tituloSecao(texto){
+  const h = document.createElement("div");
+  h.textContent = texto;
+  h.style.cssText = "font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tinta2);margin:18px 0 8px";
+  return h;
+}
+const detalheConcurso = k => [k.banca, "prova "+k.data.split("-").reverse().join("/")].filter(Boolean).join(" · ");
+
 function pintarEscolherConcurso(){
   const c = document.getElementById("escolher-concurso-corpo");
   c.innerHTML = "";
-  const marcados = new Set();
+  const concursosMarcados = new Set();
+  const avulsasMarcadas = new Set();
   const bt = document.getElementById("escolher-concurso-continuar");
   bt.disabled = true;
   bt.textContent = "Continuar";
+  const atualizaBotao = ()=>{ bt.disabled = concursosMarcados.size === 0 && avulsasMarcadas.size === 0; };
 
-  CONCURSOS.forEach(k=>{
-    const linha = document.createElement("label");
-    linha.style.cssText = "display:flex;gap:10px;align-items:flex-start;margin:0 0 10px;color:var(--tinta);font-size:15px";
-    const cx = document.createElement("input");
-    cx.type = "checkbox";
-    cx.style.cssText = "width:18px;height:18px;flex:0 0 auto;margin-top:2px";
-    cx.onchange = ()=>{
-      if(cx.checked) marcados.add(k.id); else marcados.delete(k.id);
-      bt.disabled = marcados.size === 0;
-    };
-    const txt = document.createElement("span");
-    const nome = document.createElement("div");
-    nome.textContent = k.cargo + (k.orgao ? " — "+k.orgao : "");
-    const det = document.createElement("div");
-    det.style.cssText = "font-size:12px;color:var(--tinta2)";
-    det.textContent = [k.banca, "prova "+k.data.split("-").reverse().join("/")].filter(Boolean).join(" · ");
-    txt.appendChild(nome); txt.appendChild(det);
-    linha.appendChild(cx); linha.appendChild(txt);
-    c.appendChild(linha);
-  });
+  const publicos = CONCURSOS.filter(k=>k.tipo === "concurso-publico");
+  const seletivos = CONCURSOS.filter(k=>k.tipo === "processo-seletivo");
+  if(publicos.length){
+    c.appendChild(tituloSecao("Concursos públicos"));
+    publicos.forEach(k=> c.appendChild(linhaSelecao(
+      k.cargo + (k.orgao ? " — "+k.orgao : ""), detalheConcurso(k), false,
+      cx=>{ if(cx.checked) concursosMarcados.add(k.id); else concursosMarcados.delete(k.id); atualizaBotao(); }
+    )));
+  }
+  if(seletivos.length){
+    c.appendChild(tituloSecao("Processos seletivos"));
+    seletivos.forEach(k=> c.appendChild(linhaSelecao(
+      k.cargo + (k.orgao ? " — "+k.orgao : ""), detalheConcurso(k), false,
+      cx=>{ if(cx.checked) concursosMarcados.add(k.id); else concursosMarcados.delete(k.id); atualizaBotao(); }
+    )));
+  }
+  c.appendChild(tituloSecao("Matérias avulsas"));
+  const aviso = document.createElement("div");
+  aviso.style.cssText = "font-size:12px;color:var(--tinta2);margin:-4px 0 10px";
+  aviso.textContent = "Sem prova nenhuma atrás — só pra estudar por conta própria, sem contar pra meta nem entrar no simulado.";
+  c.appendChild(aviso);
+  ORDEM_MATERIAS.forEach(mid=> c.appendChild(linhaSelecao(
+    (MATERIAS[mid]||{}).nome || mid, null, false,
+    cx=>{ if(cx.checked) avulsasMarcadas.add(mid); else avulsasMarcadas.delete(mid); atualizaBotao(); }
+  )));
 
   // recarrega em vez de repintar, igual a alternarConcurso() em Ajustes: a
   // lista de inscritos mudou, e com ela o banco inteiro (união de matérias)
   bt.onclick = ()=>{
-    if(!marcados.size) return;
-    E.concursos = [...marcados];
+    if(!concursosMarcados.size && !avulsasMarcadas.size) return;
+    E.concursos = [...concursosMarcados];
+    E.materiasAvulsas = [...avulsasMarcadas];
     salvar();
     location.reload();
   };
@@ -3122,40 +3218,61 @@ function pintarEscolherConcurso(){
 function pintarConcursos(){
   const c = document.getElementById("concursos-corpo");
   c.innerHTML = "";
-  CONCURSOS.forEach(k=>{
-    const linha = document.createElement("label");
-    linha.style.cssText = "display:flex;gap:10px;align-items:flex-start;margin:0 0 10px;color:var(--tinta);font-size:15px";
-    const cx = document.createElement("input");
-    cx.type = "checkbox"; cx.checked = E.concursos.indexOf(k.id) >= 0;
-    cx.style.cssText = "width:18px;height:18px;flex:0 0 auto;margin-top:2px";
-    cx.onchange = ()=>alternarConcurso(k.id, cx);
-    const txt = document.createElement("span");
-    const nome = document.createElement("div");
-    nome.textContent = k.cargo + (k.orgao ? " — "+k.orgao : "");
-    const det = document.createElement("div");
-    det.style.cssText = "font-size:12px;color:var(--tinta2)";
-    det.textContent = [k.banca, "prova "+k.data.split("-").reverse().join("/")].filter(Boolean).join(" · ");
-    txt.appendChild(nome); txt.appendChild(det);
-    linha.appendChild(cx); linha.appendChild(txt);
-    c.appendChild(linha);
-  });
+  const publicos = CONCURSOS.filter(k=>k.tipo === "concurso-publico");
+  const seletivos = CONCURSOS.filter(k=>k.tipo === "processo-seletivo");
+  if(publicos.length){
+    c.appendChild(tituloSecao("Concursos públicos"));
+    publicos.forEach(k=> c.appendChild(linhaSelecao(
+      k.cargo + (k.orgao ? " — "+k.orgao : ""), detalheConcurso(k), E.concursos.indexOf(k.id) >= 0,
+      cx=>alternarConcurso(k.id, cx)
+    )));
+  }
+  if(seletivos.length){
+    c.appendChild(tituloSecao("Processos seletivos"));
+    seletivos.forEach(k=> c.appendChild(linhaSelecao(
+      k.cargo + (k.orgao ? " — "+k.orgao : ""), detalheConcurso(k), E.concursos.indexOf(k.id) >= 0,
+      cx=>alternarConcurso(k.id, cx)
+    )));
+  }
+  c.appendChild(tituloSecao("Matérias avulsas"));
+  ORDEM_MATERIAS.forEach(mid=> c.appendChild(linhaSelecao(
+    (MATERIAS[mid]||{}).nome || mid, null, E.materiasAvulsas.indexOf(mid) >= 0,
+    cx=>alternarMateriaAvulsa(mid, cx)
+  )));
 }
 
 function alternarConcurso(id, checkbox){
   const marcado = E.concursos.indexOf(id) >= 0;
-  if(marcado && E.concursos.length === 1){
-    alert("Você precisa estudar pelo menos um concurso.");
+  if(marcado && E.concursos.length === 1 && E.materiasAvulsas.length === 0){
+    alert("Você precisa seguir pelo menos um concurso, processo seletivo ou matéria avulsa.");
     checkbox.checked = true;   // desfaz visualmente
     return;
   }
   E.concursos = marcado ? E.concursos.filter(x=>x!==id) : E.concursos.concat([id]);
-  // se o foco saiu da lista, cai no primeiro que sobrou
-  if(E.concursos.indexOf(E.concursoAtivo) < 0) E.concursoAtivo = E.concursos[0];
+  // se o foco saiu da lista, cai no primeiro que sobrou (ou null, se não sobrou nenhum)
+  if(E.concursos.indexOf(E.concursoAtivo) < 0) E.concursoAtivo = E.concursos[0] || null;
   /* deixar de seguir o concurso que era o escopo de estudo volta para "todos"
      — manter o escopo apontando para fora da lista travaria a meta em zero */
   if(E.concursos.indexOf(E.escopoEstudo) < 0) E.escopoEstudo = null;
   salvar();
   // recarrega: a união de matérias mudou, e com ela o banco inteiro
+  reiniciarEm("ajustes");
+}
+
+/* mesma ideia de alternarConcurso(), pro lado das matérias avulsas — mudar
+   a lista muda o banco carregado (materiasInscritas), então recarrega
+   também. Concurso e matéria avulsa se compensam no guard de "pelo menos
+   uma coisa seguida": dá pra desmarcar o último concurso se sobrar avulsa
+   marcada, e vice-versa. */
+function alternarMateriaAvulsa(id, checkbox){
+  const marcada = E.materiasAvulsas.indexOf(id) >= 0;
+  if(marcada && E.materiasAvulsas.length === 1 && E.concursos.length === 0){
+    alert("Você precisa seguir pelo menos um concurso, processo seletivo ou matéria avulsa.");
+    checkbox.checked = true;
+    return;
+  }
+  E.materiasAvulsas = marcada ? E.materiasAvulsas.filter(x=>x!==id) : E.materiasAvulsas.concat([id]);
+  salvar();
   reiniciarEm("ajustes");
 }
 
@@ -3270,9 +3387,13 @@ function exigeAprovacao(){
 
 /* primeira vez de verdade (ou o concurso que a pessoa seguia sumiu de
    concursos.json): carregarConfig() deixa E.concursos vazio de propósito
-   nesse caso, em vez de escolher um concurso qualquer por conta própria. */
+   nesse caso, em vez de escolher um concurso qualquer por conta própria.
+   Só exige a tela se NÃO houver concurso E também não houver matéria
+   avulsa — quem já marcou pelo menos uma matéria avulsa tem o que estudar,
+   mesmo sem seguir concurso nenhum. */
 function exigeEscolherConcurso(){
-  return !exigeLogin() && !exigeAprovacao() && (!E.concursos || !E.concursos.length);
+  return !exigeLogin() && !exigeAprovacao() &&
+    (!E.concursos || !E.concursos.length) && (!E.materiasAvulsas || !E.materiasAvulsas.length);
 }
 
 carregarConfig()

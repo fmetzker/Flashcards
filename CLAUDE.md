@@ -232,21 +232,45 @@ que não podem ser confundidas:
   escolhido; sem escopo, é a **prova mais próxima** entre os inscritos
   (`provaMaisProxima()`), que é a que aperta primeiro. Não é escolhido à mão
   quando não há escopo — some a ideia de "foco cosmético" que existia antes.
+  **Pode ser `null`** — ver `E.materiasAvulsas` abaixo.
+
+**`E.materiasAvulsas`** é um terceiro jeito de expandir o banco carregado,
+sem concurso nenhum por trás: matéria avulsa entra em `materiasInscritas()`
+do mesmo jeito que a de um concurso inscrito, mas **não** tem bloco, então
+não conta pra `BLOCOS_META` nem pra meta, e não entra no simulado (inventar
+data de prova e regra de aprovação pra ela violaria a regra 11). Dá pra
+seguir só matéria avulsa, sem concurso nenhum — nesse caso `CONCURSO` fica
+`null`, `BLOCOS`/`BLOCOS_META` ficam `[]`, a tela inicial mostra "Estudo
+livre" em vez do cabeçalho de prova, o botão Simulado some, e `E.meta` cai
+no fallback `SESSAO_SEM_CONCURSO` (20) só para `iniciarSessao()` ter quanto
+estudar — não é meta de prova nenhuma, e o rótulo na tela inicial muda para
+"Sessão de hoje" para não fingir que é. `exigeEscolherConcurso()` também
+aceita matéria avulsa sozinha: só força a tela de portão se não houver
+concurso **nem** avulsa nenhuma.
+
+Concurso e processo seletivo (campo `tipo` em `concursos.json`, usado só
+para agrupar as telas de seleção em três divisórias — não muda nenhuma
+regra do motor) seguem a nomenclatura do próprio edital: **concurso
+público** é administração direta (ex.: prefeitura, regra constitucional do
+art. 37, II); **processo seletivo** é o termo que empresa de economia mista
+(Transpetro) ou a Marinha já usam no nome oficial do próprio edital
+("PS"/"PSP") — não é rótulo nosso.
 
 O teto do Leitner continua em `diasAteMaisProxima()` sobre **todos** os
 inscritos, mesmo com escopo restrito: estudar só para um concurso hoje não
-adia a prova do outro.
+adia a prova do outro. Sem concurso nenhum inscrito, `INSCRITOS` fica vazio
+e a função devolve `Infinity` — sem prova nenhuma apertando, os intervalos
+do Leitner (1/3/7/14 dias) valem sem teto.
 
 Quem entra sem nenhum concurso escolhido (primeira vez, ou o que seguia
 sumiu de `concursos.json`) cai em `tela-escolher-concurso`
 (`exigeEscolherConcurso()`) antes da tela inicial. Se só existe um concurso
 cadastrado no arquivo inteiro, não há o que escolher e a tela é pulada.
 
-Consequência assumida desta modelagem: como "Conhecimentos Específicos de
-Enfermagem" é uma matéria só, o compartilhamento do acervo vale entre
-concursos **de enfermagem**. Português e Legislação do SUS, que caem em
-quase toda prova da área da saúde, continuam compartilháveis com qualquer
-cargo.
+Consequência assumida desta modelagem: como "Enfermagem" é uma matéria só,
+o compartilhamento do acervo vale entre concursos **de enfermagem**.
+Português e Legislação do SUS, que caem em quase toda prova da área da
+saúde, continuam compartilháveis com qualquer cargo.
 
 A tela **Matérias** mostra a árvore inteira, inclusive o que ainda não foi
 visto, e permite estudar qualquer um dos três níveis isoladamente. A tela

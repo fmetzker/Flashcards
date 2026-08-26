@@ -2,6 +2,7 @@
   "concursos": [
     {
       "id": "vr-enf-2026",
+      "tipo": "concurso-publico",
       "cargo": "Enfermeiro",
       "orgao": "Volta Redonda",
       "banca": "FEVRE",
@@ -37,6 +38,7 @@
     },
     {
       "id": "caaq-cdm",
+      "tipo": "processo-seletivo",
       "cargo": "Condutor de Máquinas",
       "orgao": "Marinha do Brasil — CIAGA",
       "banca": "CIAGA",
@@ -66,6 +68,7 @@
     },
     {
       "id": "transpetro-psi",
+      "tipo": "processo-seletivo",
       "cargo": "Psicologia",
       "orgao": "Transpetro",
       "banca": "Cesgranrio",
@@ -96,6 +99,7 @@
     },
     {
       "id": "transpetro-mec",
+      "tipo": "processo-seletivo",
       "cargo": "Manutenção Mecânica - Transpetro",
       "orgao": "Transpetro — polo de trabalho Rio de Janeiro",
       "banca": "Cesgranrio",
