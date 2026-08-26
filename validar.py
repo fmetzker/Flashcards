@@ -39,18 +39,35 @@ def id_questao(enunciado):
 
 
 def materias_ativas():
-    """Matérias que algum concurso de concursos.json referencia em blocos[].materias.
+    """Matérias que algum concurso de concursos.json referencia em blocos[].materias,
+    MAIS as marcadas "avulsa": true em banco/materias.json.
 
-    São as únicas que alguém consegue estudar hoje: o app carrega o banco pela
-    união das matérias dos concursos inscritos. Matéria fora daqui continua no
-    repositório de propósito (regra 12 do CLAUDE.md) — o que não se faz é
-    ESCREVER cartão novo para ela, porque ninguém veria."""
-    if not os.path.exists(CONCURSOS):
-        return set()
-    cfg = json.load(open(CONCURSOS, encoding='utf-8'))
-    return {mid for c in cfg.get('concursos', [])
-            for bl in c.get('blocos', [])
-            for mid in bl.get('materias', [])}
+    As duas são "alguém consegue estudar hoje", só que por caminhos diferentes:
+    a união das matérias dos concursos inscritos carrega o banco de quem segue
+    algum concurso; `avulsa` é o mesmo carregamento para quem NÃO segue nenhum
+    — E.materiasAvulsas no app, ver CLAUDE.md "Matéria, tópico e subtópico".
+    A UI de matéria avulsa lista TODAS as matérias de materias.json (qualquer
+    uma pode ser seguida avulsa), mas isso sozinho não bastaria pra abrir a
+    porta de ESCREVER cartão novo — sem o flag, "ativa" viraria todo mundo, e
+    a regra 12 perderia sentido. `avulsa: true` é o oposto: uma declaração
+    explícita de que ALGUÉM VAI estudar aquela matéria por conta própria,
+    agora, sem concurso — não uma possibilidade genérica que qualquer matéria
+    do arquivo já tem.
+
+    Matéria fora das duas listas continua no repositório de propósito (regra
+    12 do CLAUDE.md) — o que não se faz é ESCREVER cartão novo para ela,
+    porque ninguém a estuda hoje."""
+    ativas = set()
+    if os.path.exists(CONCURSOS):
+        cfg = json.load(open(CONCURSOS, encoding='utf-8'))
+        ativas |= {mid for c in cfg.get('concursos', [])
+                   for bl in c.get('blocos', [])
+                   for mid in bl.get('materias', [])}
+    caminho = os.path.join(BANCO_DIR, 'materias.json')
+    if os.path.exists(caminho):
+        mats = json.load(open(caminho, encoding='utf-8'))
+        ativas |= {m['id'] for m in mats if m.get('avulsa')}
+    return ativas
 
 
 def carrega_banco():
@@ -155,12 +172,13 @@ def valida_concursos(B):
                          f"({c['aprovacao']['minimoTotal']}) é maior que o total da prova ({total})")
     # Uma linha só para o banco inteiro, em vez de uma por concurso repetindo
     # tudo que não cai naquela prova — o que interessa é quem não cai em prova
-    # NENHUMA: é a matéria em que não se escreve cartão novo (regra 12).
+    # NENHUMA e não é avulsa declarada: é a matéria em que não se escreve
+    # cartão novo (regra 12).
     inativas = [m for m in nome_materia if m not in materias_ativas()]
     if inativas:
         detalhe = ', '.join(f"{m} ({por_materia[m]} cartões)" for m in inativas)
-        avisos.append(f"{len(inativas)} matéria(s) sem concurso ativo, mantidas pela regra 12 "
-                      f"— não escrever cartão novo para elas: {detalhe}")
+        avisos.append(f"{len(inativas)} matéria(s) sem concurso ativo nem avulsa declarada, mantidas "
+                      f"pela regra 12 — não escrever cartão novo para elas: {detalhe}")
 
 
 def valida_migracao(B, ids):
@@ -643,12 +661,15 @@ def carrega_rascunho(B, caminho):
             q['id'] = id_questao(q.get('q', ''))
         # Cartão novo só entra em matéria que alguém pode estudar hoje. A regra
         # é sobre ESCREVER, não sobre guardar: o banco de matéria sem concurso
-        # ativo fica intacto (regra 12), mas escrever mais para ela é trabalho
-        # que ninguém vê — enquanto matéria ativa tem item de edital sem cartão.
+        # ativo nem avulsa declarada fica intacto (regra 12), mas escrever mais
+        # para ela é trabalho que ninguém vê — enquanto matéria ativa tem item
+        # de edital sem cartão.
         if q.get('m') and ativas and q['m'] not in ativas:
             erros.append(f"rascunho: matéria '{q['m']}' não é referenciada por nenhum concurso de "
-                         "concursos.json — cartão novo só entra em matéria ativa (regra 12). "
-                         "Se o concurso vai voltar, cadastre-o primeiro")
+                         "concursos.json nem marcada \"avulsa\": true em banco/materias.json — "
+                         "cartão novo só entra em matéria ativa (regra 12). Se o concurso vai "
+                         "voltar, cadastre-o primeiro; se é conteúdo avulso de propósito, marque "
+                         "\"avulsa\": true na matéria")
         B.append(q)
     print(f"Rascunho: {len(cands)} candidato(s) avaliados junto do banco (nada foi gravado)\n")
     return B

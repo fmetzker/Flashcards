@@ -57,10 +57,15 @@ $materias = [System.IO.File]::ReadAllText($arqMaterias, [System.Text.Encoding]::
 $idsMateria = @{}
 foreach ($m in $materias) { $idsMateria[$m.id] = $m.nome }
 
-# Matérias que algum concurso referencia em blocos[].materias — as únicas que
-# alguém consegue estudar hoje, porque o app carrega o banco pela união das
-# matérias dos concursos inscritos. Matéria fora daqui continua no repositório
-# de propósito (regra 12); o que não se faz é ESCREVER cartão novo para ela.
+# Matérias que algum concurso referencia em blocos[].materias, MAIS as
+# marcadas "avulsa": true em banco/materias.json — as duas são "alguém
+# consegue estudar hoje", só que por caminhos diferentes (concurso inscrito,
+# ou E.materiasAvulsas sem concurso nenhum — ver CLAUDE.md "Matéria, tópico e
+# subtópico"). A UI de matéria avulsa lista TODAS as matérias do arquivo, mas
+# isso sozinho não abre a porta de ESCREVER cartão novo — sem o flag, "ativa"
+# viraria todo mundo e a regra 12 perderia sentido. Matéria fora das duas
+# listas continua no repositório de propósito (regra 12); o que não se faz é
+# ESCREVER cartão novo para ela.
 $ativas = @{}
 $arqConc = Join-Path $raiz 'concursos.json'
 if (Test-Path $arqConc) {
@@ -71,6 +76,7 @@ if (Test-Path $arqConc) {
     }
   }
 }
+foreach ($m in $materias) { if ($m.avulsa) { $ativas[$m.id] = $true } }
 
 $B = @()
 foreach ($m in $materias) {
@@ -108,10 +114,11 @@ if ($Rascunho) {
     }
     # Cartão novo só entra em matéria que alguém pode estudar hoje. A regra é
     # sobre ESCREVER, não sobre guardar: o banco de matéria sem concurso ativo
-    # fica intacto (regra 12), mas escrever mais para ela é trabalho que ninguém
-    # vê — enquanto matéria ativa tem item de edital sem cartão nenhum.
+    # nem avulsa declarada fica intacto (regra 12), mas escrever mais para ela
+    # é trabalho que ninguém vê — enquanto matéria ativa tem item de edital
+    # sem cartão nenhum.
     if ($q.m -and $ativas.Count -gt 0 -and -not $ativas.ContainsKey($q.m)) {
-      Erro "rascunho: matéria '$($q.m)' não é referenciada por nenhum concurso de concursos.json — cartão novo só entra em matéria ativa (regra 12). Se o concurso vai voltar, cadastre-o primeiro"
+      Erro "rascunho: matéria '$($q.m)' não é referenciada por nenhum concurso de concursos.json nem marcada `"avulsa`": true em banco/materias.json — cartão novo só entra em matéria ativa (regra 12). Se o concurso vai voltar, cadastre-o primeiro; se é conteúdo avulso de propósito, marque `"avulsa`": true na matéria"
     }
     $B += $q
     $nRascunho++
@@ -330,15 +337,16 @@ if (-not (Test-Path $arqConcursos)) {
     }
   }
   # Uma linha só para o banco inteiro, em vez de uma por concurso repetindo tudo
-  # que não cai naquela prova — o que interessa é quem não cai em prova NENHUMA:
-  # é a matéria em que não se escreve cartão novo (regra 12).
+  # que não cai naquela prova — o que interessa é quem não cai em prova NENHUMA
+  # e não é avulsa declarada: é a matéria em que não se escreve cartão novo
+  # (regra 12).
   $inativas = @($idsMateria.Keys | Where-Object { -not $ativas.ContainsKey($_) })
   if ($inativas.Count -gt 0) {
     $detalhe = ($inativas | ForEach-Object {
       $mid = $_
       "$mid ($(@($B | Where-Object { $_.m -eq $mid }).Count) cartões)"
     }) -join ', '
-    Aviso "$($inativas.Count) matéria(s) sem concurso ativo, mantidas pela regra 12 — não escrever cartão novo para elas: $detalhe"
+    Aviso "$($inativas.Count) matéria(s) sem concurso ativo nem avulsa declarada, mantidas pela regra 12 — não escrever cartão novo para elas: $detalhe"
   }
 }
 

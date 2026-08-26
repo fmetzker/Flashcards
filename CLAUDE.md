@@ -125,8 +125,9 @@ no Safari do iPhone sem nenhuma etapa de compilação.
     Foi o caso de Moço de Máquinas e Enfermagem do Trabalho, ambos da
     Transpetro: saíram de `concursos.json`, e `banco/maritimo-maquinas.json`
     e `banco/enfermagem-trabalho.json` continuam intactos. Matéria sem
-    concurso ativo não aparece pra ninguém estudar (nenhum bloco a
-    referencia em `materias`), mas também não é erro nem lixo — é
+    concurso ativo não é estudada automaticamente por ninguém — só entra na
+    sessão de quem, na tela de seleção, marcá-la à mão como matéria avulsa
+    (ver "Matéria, tópico e subtópico"). Isso não é erro nem lixo — é
     exatamente a mesma situação que `psicologia` viveu antes de ganhar
     concurso próprio.
 
@@ -136,9 +137,19 @@ no Safari do iPhone sem nenhuma etapa de compilação.
     que já foi feito. Mas escrever cartão NOVO para matéria que nenhum
     concurso referencia é trabalho que ninguém vai ver, enquanto matéria ativa
     tem item de edital sem cartão nenhum. `validar` reprova o rascunho que
-    tente isso, e lista numa linha as matérias inativas a cada execução. Se o
-    concurso vai voltar, o caminho é cadastrá-lo em `concursos.json` primeiro
-    — aí a matéria volta a ser ativa e a escrita é legítima.
+    tente isso, e lista numa linha as matérias inativas a cada execução.
+
+    **Ativa** é referenciada por algum concurso de `concursos.json` OU
+    marcada `"avulsa": true` em `banco/materias.json`. O flag existe porque a
+    tela de seleção lista TODAS as matérias do arquivo na seção "matérias
+    avulsas", sem distinção — sem um jeito de declarar qual delas tem alguém
+    de verdade estudando por conta própria agora, "ativa" viraria a lista
+    inteira, e a regra perderia sentido. `"avulsa": true` é essa declaração:
+    não "alguém poderia estudar isso um dia", mas "isso é conteúdo avulso de
+    propósito — sem concurso nenhum atrás, ex.: uma matéria de curso próprio
+    que a conta usa o app pra revisar". Se o concurso vai voltar, o caminho é
+    cadastrá-lo em `concursos.json`; se é avulso de propósito, marcar o flag
+    — os dois caminhos tornam a matéria ativa e a escrita legítima.
 
 ## Formato do banco de questões
 

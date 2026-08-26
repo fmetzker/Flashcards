@@ -7,5 +7,6 @@
 {"id":"enfermagem-trabalho","nome":"Enfermagem do Trabalho"},
 {"id":"psicologia","nome":"Psicologia"},
 {"id":"maritimo-maquinas","nome":"Máquinas e Prática Marítima"},
-{"id":"manutencao-mecanica","nome":"Manutenção Mecânica"}
+{"id":"manutencao-mecanica","nome":"Manutenção Mecânica"},
+{"id":"biologia-celular","nome":"Biologia Celular","avulsa":true}
 ]
