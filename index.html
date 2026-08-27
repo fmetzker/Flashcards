@@ -91,12 +91,13 @@ h2{font-size:19px;font-weight:600}
 .barras .col .b{width:100%;max-width:26px;background:var(--verde);border-radius:5px 5px 2px 2px;min-height:3px}
 .barras .col .rot{font-size:10px;color:var(--tinta2);margin-top:5px}
 
-/* donut de proporção — novas / em dia / a revisar */
+/* donut de proporção — novas / em dia / a revisar / travadas */
 .donut-linha{display:flex;align-items:center;gap:16px;margin-top:16px;padding-top:14px;border-top:1px solid var(--traco)}
 .donut-linha svg{flex:0 0 auto}
 .arco-verde{stroke:var(--verde)}
 .arco-ambar{stroke:var(--ambar)}
 .arco-neutro{stroke:var(--neutro)}
+.arco-travada{stroke:var(--tinta2)}
 .donut-legenda{flex:1;display:flex;flex-direction:column;gap:7px;font-size:13px;min-width:0}
 .donut-legenda .legenda-linha{display:flex;align-items:center;gap:7px}
 .donut-legenda i{width:9px;height:9px;border-radius:2px;flex:0 0 auto}
@@ -1884,10 +1885,10 @@ function pintarInicio(){
 }
 
 /* Gráfico de barras (últimos 7 dias, de E.dias) e donut de proporção
-   (novas / em dia / a revisar, de fila()+BANCO) da tela inicial. SVG à mão,
-   sem biblioteca — regra do projeto (CLAUDE.md, "não adicionar dependências
-   externas"). stroke por classe CSS, não var() no atributo: mais garantido
-   no Safari do iPhone, que é o alvo real do app. */
+   (em dia / a revisar / novas / travadas, varredura direta de BANCO) da tela
+   inicial. SVG à mão, sem biblioteca — regra do projeto (CLAUDE.md, "não
+   adicionar dependências externas"). stroke por classe CSS, não var() no
+   atributo: mais garantido no Safari do iPhone, que é o alvo real do app. */
 function pintarGraficos(){
   const NOMES_DIA = ["D","S","T","Q","Q","S","S"];
   const dias = [];
@@ -1912,13 +1913,27 @@ function pintarGraficos(){
     barrasBox.appendChild(col);
   });
 
-  const f = fila(), totalBanco = BANCO.length;
-  const novas = f.novas.length, revisar = f.revisar.length;
-  const emDia = Math.max(0, totalBanco - novas - revisar);
+  /* Classificação direta, cartão por cartão — não por subtração.
+     A versão antiga fazia emDia = total - novas - revisar, mas fila().novas
+     só conta cartão nunca visto E DESTRAVADO (grauAberto): cartão nunca visto
+     e travado por pré-requisito/degrau não entrava em nenhum dos dois lados
+     da subtração e sobrava, por acidente, dentro de "Em dia" — questão nunca
+     estudada aparecendo como se estivesse em dia. Contar os quatro estados
+     na mesma varredura elimina a sobra. */
+  const h = hoje(), totalBanco = BANCO.length;
+  limparCacheGrau();
+  let novas = 0, revisar = 0, travadas = 0, emDia = 0;
+  BANCO.forEach(q=>{
+    const c = E.cartoes[q.id];
+    if(!c){ if(grauAberto(q)) novas++; else travadas++; }
+    else if(c.prox <= h) revisar++;
+    else emDia++;
+  });
   const segmentos = [
-    {rotulo:"Em dia",        n:emDia,   classe:"arco-verde"},
-    {rotulo:"Para revisar",  n:revisar, classe:"arco-ambar"},
-    {rotulo:"Novas",         n:novas,   classe:"arco-neutro"}
+    {rotulo:"Em dia",        n:emDia,    classe:"arco-verde"},
+    {rotulo:"Para revisar",  n:revisar,  classe:"arco-ambar"},
+    {rotulo:"Novas",         n:novas,    classe:"arco-neutro"},
+    {rotulo:"Travadas",      n:travadas, classe:"arco-travada"}
   ];
   const raio = 32, cx = 40, cy = 40, circ = 2*Math.PI*raio;
   let acumulado = 0;
@@ -1932,7 +1947,7 @@ function pintarGraficos(){
   }).join("");
 
   const leg = document.getElementById("grafico-legenda"); leg.innerHTML = "";
-  const corDe = {"arco-verde":"var(--verde)", "arco-ambar":"var(--ambar)", "arco-neutro":"var(--neutro)"};
+  const corDe = {"arco-verde":"var(--verde)", "arco-ambar":"var(--ambar)", "arco-neutro":"var(--neutro)", "arco-travada":"var(--tinta2)"};
   segmentos.forEach(s=>{
     const linha = document.createElement("span"); linha.className = "legenda-linha";
     const i = document.createElement("i"); i.style.background = corDe[s.classe];
