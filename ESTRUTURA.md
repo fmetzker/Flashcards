@@ -126,13 +126,14 @@ Migrações que rodam no boot: `migrarSessaoDoPerfil`, `migrarEstadoDoPerfil`,
 
 | Função | Papel |
 |---|---|
-| `proximaData` | Leitner: caixas 1–5, intervalos 1/3/7/14, teto por proximidade da prova |
+| `proximaData` | Leitner: caixas 1–8, intervalos 1/3/7/14/30/60/120, teto por proximidade da prova |
 | `prioridade` | ordena **vencidas**: caixa, taxa de erro, peso do bloco |
 | `grauDe` | nível do cartão; ausente = 1 |
 | `grauLiberado` | até que degrau o tópico abriu (caixa ≥ 2 em todos do degrau) |
 | `requisitosPendentes` / `topicoAberto` | pré-requisitos entre tópicos |
 | `grauAberto` | tópico aberto **e** degrau alcançado |
 | `fila` | separa `revisar` (por `prioridade`) de `novas` (filtradas por `grauAberto`; sem reordenação) |
+| `intercalar` | entrelaça revisão e novas na sessão, proporcional ao tamanho de cada lista |
 | `iniciarSessao` | modos `normal`, `filtro`, `erros` |
 | `registrar` | grava resposta, atualiza caixa, alimenta a fila de sync |
 

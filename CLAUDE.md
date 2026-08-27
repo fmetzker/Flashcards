@@ -483,13 +483,24 @@ O campo `n` é gravado pelos caminhos de sempre — `incorporar-rascunho.ps1` e
 
 ## Motor de repetição espaçada
 
-Leitner de 5 caixas, intervalos 1, 3, 7 e 14 dias, com **teto dinâmico**:
-nenhum intervalo pode passar de ⅓ dos dias restantes até a prova, e a partir
-de D-10 tudo vira revisão diária. Ver `proximaData()`.
+Leitner de 8 caixas, intervalos 1, 3, 7, 14, 30, 60 e 120 dias, com **teto
+dinâmico**: nenhum intervalo pode passar de ⅓ dos dias restantes até a
+prova, e a partir de D-10 tudo vira revisão diária. Ver `proximaData()`.
+`CAIXA_MAX` (hoje 8) e o `check (caixa_depois between 1 and 8)` de
+`eventos_resposta` em `supabase/schema.sql` precisam concordar — nada os
+liga automaticamente, e o Postgres rejeita o evento se `index.html` gravar
+caixa mais alta do que o banco aceita.
 
 Três respostas possíveis: "Sabia" sobe uma caixa; "Chutei" e "Errei" voltam
 para a caixa 1. O botão "Chutei" é central — não removê-lo nem transformá-lo
 em acerto.
+
+**A sessão intercala revisão e cartão novo, não concatena.** `intercalar()`
+espalha as duas listas já escolhidas pela sessão (proporção de cada uma no
+total, tipo Bresenham) — sem isso, uma fila de revisão grande engolia o
+`E.meta` inteiro da sessão e cartão novo nunca aparecia enquanto o backlog
+não zerasse. Só muda a ORDEM de apresentação; quem entra na sessão continua
+decidido por fora (cota do bloco, escada de pré-requisito).
 
 **A ordem dentro do que já venceu** é decidida por `prioridade()`: caixa,
 taxa de erro da questão e peso do bloco na prova. Os pesos são calibrados

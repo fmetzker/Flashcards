@@ -1566,12 +1566,23 @@ function diasAteMaisProxima(){
   }, Infinity);
 }
 
-/* Leitner com teto: nenhum intervalo passa de 1/3 dos dias restantes */
-const INTERVALOS = [0,1,3,7,14];
+/* Leitner com teto: nenhum intervalo passa de 1/3 dos dias restantes.
+
+   8 caixas — eram 5, com o intervalo travado em 14 dias pra sempre depois
+   disso: quem acertava um cartão 10 vezes seguidas continuava revisando a
+   cada 14 dias, sem o espaçamento crescer com o domínio. As 3 caixas novas
+   (30/60/120 dias) dão o que fazer pro cartão bem sabido, e a distância
+   praticamente dobra a cada caixa, igual a curva de esquecimento pede. O
+   teto de 1/3 dos dias até a prova continua cortando essas caixas mais
+   longas sozinho perto do exame — nada aqui precisou mudar pra isso valer:
+   prova a 90 dias já limita a 30, então 60/120 só valem de verdade quando a
+   prova está bem longe. */
+const INTERVALOS = [0,1,3,7,14,30,60,120];
+const CAIXA_MAX = INTERVALOS.length;   // caixa mais alta que existe
 function proximaData(caixa){
   const d = diasAteMaisProxima();
   const teto = d<=10 ? 1 : Math.max(1, Math.floor(d/3));
-  const inter = Math.min(INTERVALOS[Math.max(0,Math.min(4,caixa-1))], teto);
+  const inter = Math.min(INTERVALOS[Math.max(0,Math.min(CAIXA_MAX-1,caixa-1))], teto);
   return somarDias(hoje(), inter);
 }
 
@@ -1628,6 +1639,29 @@ function fila(){
      motivou a remoção das camadas entre tópicos. */
   return {revisar, novas};
 }
+
+/* Entrelaça duas listas já escolhidas, preservando a ordem INTERNA de cada
+   uma (revisão continua saindo por prioridade; novas continuam saindo na
+   ordem do banco) — só decide em que POSIÇÃO da sessão cada lista aparece.
+
+   Sem isto, iniciarSessao concatenava as listas (rev.concat(nov)): a sessão
+   virava um bloco inteiro de revisão seguido de um bloco inteiro de cartão
+   novo, o que dá a sensação de "só fica repetindo o que falta aprender"
+   quando a fila de revisão é grande. Espalha cada lista pela proporção que
+   ela representa do total, tipo Bresenham: length 7 e 3 não vira 7 seguidos
+   de 3, vira algo como A A B A A B A A A B. */
+function intercalar(a, b){
+  const out = [];
+  let i = 0, j = 0;
+  while(i < a.length || j < b.length){
+    const fa = a.length ? i / a.length : 1;
+    const fb = b.length ? j / b.length : 1;
+    if(i < a.length && (fa <= fb || j >= b.length)) out.push(a[i++]);
+    else out.push(b[j++]);
+  }
+  return out;
+}
+
 /* Quanto do dia conta para a meta do concurso EM FOCO.
 
    Duas regras, e as duas vêm do mesmo problema: antes, a meta enchia com
@@ -2224,7 +2258,7 @@ function iniciarSessao(modo, filtro){
       else if(c.prox <= h) rev.push(x.id);
     });
     rev.sort((a,b)=> prioridade(a) - prioridade(b));   // mesma ordem do estudo normal
-    lista = rev.concat(nov).slice(0, E.meta);
+    lista = intercalar(rev, nov).slice(0, E.meta);
     /* nada vencido e nada novo: revisa adiantado em vez de não fazer nada —
        mas só o que a pessoa JÁ VIU. Cartão de degrau fechado continua fora,
        senão este atalho desfaria a escada justamente no tópico em que ela
@@ -2258,18 +2292,19 @@ function iniciarSessao(modo, filtro){
       };
       const rev = q.revisar.filter(daArea);
       const nov = q.novas.filter(daArea);
-      // metade revisão, metade nova — mesma proporção que valia antes
+      // metade revisão, metade nova — mesma proporção que valia antes;
+      // intercalar() só muda a ORDEM em que as duas metades aparecem
       const parte = rev.slice(0, Math.ceil(falta*0.5));
-      lista = lista.concat(parte, nov.slice(0, falta - parte.length));
+      lista = lista.concat(intercalar(parte, nov.slice(0, falta - parte.length)));
     });
     /* nenhuma cota aberta (meta do dia já fechada), ou nada nas matérias da
        prova: cai no comportamento antigo em vez de deixar a pessoa sem nada
        para estudar */
     if(lista.length===0){
       const restam = Math.max(0, E.meta - feitasHoje()) || E.meta;
-      lista = q.revisar.slice(0, Math.ceil(restam*0.5));
-      lista = lista.concat(q.novas.slice(0, restam - lista.length));
-      if(lista.length===0) lista = q.revisar.concat(q.novas).slice(0, E.meta);
+      const parte = q.revisar.slice(0, Math.ceil(restam*0.5));
+      lista = intercalar(parte, q.novas.slice(0, restam - parte.length));
+      if(lista.length===0) lista = intercalar(q.revisar, q.novas).slice(0, E.meta);
     }
   }
   if(lista.length===0){ alert("Nada na fila. Adicione mais questões ao banco."); return; }
@@ -2370,7 +2405,7 @@ function responder(escolha){
    colapsava chutei/errei no mesmo caso; agora o motivo real chega ao evento. */
 function registrar(id, resultado){
   const c = E.cartoes[id] || {caixa:1, acertos:0, erros:0, prox:hoje(), ts:null};
-  if(resultado === "sabia"){ c.caixa = Math.min(5, c.caixa+1); c.acertos++; }
+  if(resultado === "sabia"){ c.caixa = Math.min(CAIXA_MAX, c.caixa+1); c.acertos++; }
   else { c.caixa = 1; c.erros++; }
   const agora = new Date().toISOString();
   c.prox = proximaData(c.caixa);

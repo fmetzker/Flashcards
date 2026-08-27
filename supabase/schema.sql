@@ -290,7 +290,7 @@ create table if not exists public.eventos_resposta (
   questao_id   text not null check (questao_id ~ '^[0-9a-f]{10}$'),  -- regra 5 do CLAUDE.md
   ts           timestamptz not null,        -- quando a pessoa respondeu (relógio do aparelho)
   resultado    text not null check (resultado in ('sabia','chutei','errei')),
-  caixa_depois smallint not null check (caixa_depois between 1 and 5),
+  caixa_depois smallint not null check (caixa_depois between 1 and 8),
   prox         date not null,
   criado_em    timestamptz not null default now()  -- relógio do servidor: cursor do pull
 );
@@ -315,6 +315,17 @@ create policy "eventos próprios: criar"
   on public.eventos_resposta for insert with check (usuario_id = auth.uid() and public.conta_aprovada());
 -- Sem policy de update nem de delete, de propósito: é a AUSÊNCIA delas que
 -- torna o log append-only de verdade, no banco, e não só por convenção do app.
+
+-- 3.1 Leitner de 8 caixas (eram 5) — index.html:CAIXA_MAX é a outra metade
+-- desta constante; os dois lados têm de concordar, e nada os liga automa-
+-- ticamente. `create table if not exists`, acima, não altera uma constraint
+-- que já existe num banco publicado — precisa deste ALTER explícito, e ele
+-- roda de novo sem erro a cada reexecução do arquivo (mesmo nome de sempre
+-- para o check sem nome: <tabela>_<coluna>_check).
+alter table public.eventos_resposta
+  drop constraint if exists eventos_resposta_caixa_depois_check;
+alter table public.eventos_resposta
+  add constraint eventos_resposta_caixa_depois_check check (caixa_depois between 1 and 8);
 
 
 -- ----------------------------------------------------------------------------
