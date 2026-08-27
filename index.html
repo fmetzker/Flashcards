@@ -449,6 +449,8 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
 
   <div style="margin-top:24px" class="rotulo">Uso offline</div>
   <div class="aviso" id="offline-msg">–</div>
+  <div class="aviso" id="versao-msg" style="margin-top:2px"></div>
+  <button class="pequeno fantasma" id="versao-checar" style="margin-top:8px;display:none">Verificar atualização agora</button>
 
   <div style="margin-top:28px" class="rotulo">Zona de risco</div>
   <button class="pequeno fantasma" style="margin-top:10px;color:var(--coral);border-color:#E9C4C1" onclick="zerar()">Apagar todo o progresso</button>
@@ -3497,6 +3499,53 @@ function pintarAjustes(){
   else navigator.serviceWorker.getRegistration().then(r=>{
     off.textContent = r ? "App guardado no aparelho: funciona sem internet." : "Ainda não guardado. Abra o app uma vez com internet para concluir.";
   });
+
+  /* qual versão está guardada neste aparelho, lida do nome do cache
+     ("prova-enf-vNNN") em vez de duplicar VERSAO aqui dentro — os dois
+     ficariam fora de sincronia um dia. Existe pra responder "por que estou
+     vendo algo desatualizado?" sem precisar abrir o DevTools: se o número
+     aqui já bate com o do sw.js publicado, o aparelho está em dia e o que
+     sobrou na tela é HTML antigo ainda vivo na memória, que só um
+     recarregamento de verdade troca — Verificar atualização agora força
+     essa checagem contra o servidor, do mesmo jeito que reg.update() já
+     roda sozinho ao voltar de segundo plano (ver o registro do service
+     worker, mais abaixo). */
+  const versaoMsg = document.getElementById("versao-msg");
+  const btChecar = document.getElementById("versao-checar");
+  if(window.DADOS || !("caches" in window) || !("serviceWorker" in navigator)){
+    versaoMsg.textContent = "";
+    btChecar.style.display = "none";
+  } else {
+    caches.keys().then(nomes=>{
+      const atual = nomes.find(n=>n.startsWith("prova-enf-"));
+      versaoMsg.textContent = atual
+        ? "Versão guardada neste aparelho: "+atual.replace("prova-enf-","")
+        : "Ainda sem versão guardada.";
+    });
+    btChecar.style.display = "";
+    btChecar.disabled = false;
+    btChecar.textContent = "Verificar atualização agora";
+    btChecar.onclick = ()=>{
+      btChecar.disabled = true; btChecar.textContent = "Verificando…";
+      navigator.serviceWorker.getRegistration().then(reg=>{
+        if(!reg) throw new Error("sem registro");
+        return reg.update();
+      }).then(()=>{
+        // se achou versão nova, o controllerchange (registro do SW, mais
+        // abaixo) já está cuidando do reload nesse instante; se não achou,
+        // não há o que recarregar — só avisa que está em dia
+        setTimeout(()=>{
+          btChecar.disabled = false;
+          btChecar.textContent = "Verificar atualização agora";
+          versaoMsg.textContent = "Já está na versão mais recente.";
+        }, 1200);
+      }).catch(()=>{
+        btChecar.disabled = false;
+        btChecar.textContent = "Verificar atualização agora";
+        versaoMsg.textContent = "Não foi possível checar agora — sem internet?";
+      });
+    };
+  }
 }
 function marcarBackup(){ E.ultimoBackup = hoje(); salvar(); }
 function exportar(){
