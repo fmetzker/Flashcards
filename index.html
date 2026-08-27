@@ -44,6 +44,13 @@ body{
 .tela{display:none;max-width:560px;margin:0 auto;padding:18px 18px 130px}
 .tela.ativa{display:block}
 
+/* barra do gesto de puxar-pra-atualizar — ver o listener de touchmove no
+   fim do arquivo. Começa com altura 0 (invisível) e cresce junto do dedo. */
+#puxa-atualizar{position:fixed;top:0;left:0;right:0;height:0;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--verde-luz);color:var(--verde);font-size:13px;font-weight:600;
+  transition:height .15s;z-index:80}
+
 /* tela de carregamento — cobre o tempo do boot (fetch de concursos.json e
    banco/*.json, ver BOOT mais abaixo). Fica por cima de tudo, tela cheia,
    e não segue o max-width/padding das demais telas de propósito: some
@@ -199,6 +206,12 @@ button.fechar{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;
 .cabM .num{font-family:var(--dado);font-size:12px;color:var(--tinta2);font-weight:500;white-space:nowrap}
 .corpoM{display:none;padding:2px 14px 12px;border-top:1px solid var(--traco)}
 .materia.aberta .corpoM{display:block}
+/* alterna entre tópicos disponíveis e a aba Bloqueados, dentro de cada
+   matéria — só aparece quando a matéria tem pelo menos um tópico travado */
+.subabas{display:flex;gap:6px;margin:9px 0 2px}
+.subabas button{flex:1;font-size:12.5px;font-weight:600;padding:7px 8px;border-radius:99px;
+  border:1px solid var(--traco);background:transparent;color:var(--tinta2)}
+.subabas button.on{background:var(--verde-luz);color:var(--verde);border-color:var(--verde-luz)}
 /* no celular a linha não cabe numa faixa só: o nome ocupa a primeira e os
    números, a barra e o botão descem para a segunda */
 .topico{display:flex;flex-wrap:wrap;align-items:center;gap:7px 9px;padding:10px 0;
@@ -922,13 +935,21 @@ function materiasFora(materiasJaCarregadas){
    porque é chamada duas vezes (foco, depois o resto) para compor o banco aos
    poucos. Repetir uma matéria já carregada é seguro (concat de novo), mas o
    chamador nunca faz isso: materiasFora() já exclui o que materiasDoFoco()
-   trouxe. */
-async function carregarBancoParcial(lista){
+   trouxe.
+
+   `aoCadaUma`, se vier, dispara depois de CADA matéria da lista chegar —
+   não só quando a lista inteira termina. Antes disto, quem segue um
+   concurso com 3 matérias esperava as 3 juntas (Promise.all sem mais nada)
+   para "Estudar agora" liberar: se Português demorasse, dava pra estudar
+   nem SUS, que já tinha chegado minutos antes. Cada fetch já mistura a
+   matéria em BANCO/porId assim que resolve, sem esperar as outras. */
+async function carregarBancoParcial(lista, aoCadaUma){
   if(!lista.length) return;
-  const partes = await Promise.all(lista.map(m=>pega("banco/"+m+".json")));
-  const novas = partes.reduce((tudo,p)=>tudo.concat(p), []);
-  BANCO = BANCO.concat(novas);
-  novas.forEach(q=>{ porId[q.id] = q; });
+  await Promise.all(lista.map(m => pega("banco/"+m+".json").then(qs=>{
+    BANCO = BANCO.concat(qs);
+    qs.forEach(q=>{ porId[q.id] = q; });
+    if(aoCadaUma) aoCadaUma(m);
+  })));
 }
 
 /* Dispara o carregamento em duas fases e cuida de repintar quem tentou
@@ -936,12 +957,21 @@ async function carregarBancoParcial(lista){
    conta própria enquanto a tela já está de pé (ver o final da cadeia de
    boot). */
 async function carregarBancoEmFases(){
-  await carregarBancoParcial(materiasDoFoco());
-  BANCO_FOCO_PRONTO = true;
-  if(document.getElementById("tela-inicio").classList.contains("ativa")){ pintarInicio(); rodape("inicio"); }
-  if(document.getElementById("tela-simulado-inicio").classList.contains("ativa")){ pintarSimuladoInicio(); rodape("simulado-inicio"); }
+  const doFoco = materiasDoFoco();
+  /* dispara a cada matéria do foco que chega — a primeira já libera
+     "Estudar agora" (grauAberto/fila só precisam do que já está em BANCO),
+     e as seguintes só repintam pra atualizar contagem/meta na tela */
+  const aoChegarDoFoco = ()=>{
+    BANCO_FOCO_PRONTO = true;
+    if(document.getElementById("tela-inicio").classList.contains("ativa")){ pintarInicio(); rodape("inicio"); }
+    if(document.getElementById("tela-simulado-inicio").classList.contains("ativa")){ pintarSimuladoInicio(); rodape("simulado-inicio"); }
+  };
+  // foco vazio (ninguém pra carregar) não dispara aoCadaUma nenhuma vez —
+  // sem isto BANCO_FOCO_PRONTO nunca viraria true nesse caso
+  if(!doFoco.length) aoChegarDoFoco();
+  await carregarBancoParcial(doFoco, aoChegarDoFoco);
 
-  await carregarBancoParcial(materiasFora(materiasDoFoco()));
+  await carregarBancoParcial(materiasFora(doFoco));
   BANCO_PRONTO = true;
   /* só agora, com o banco INTEIRO carregado (porId cobre todas as matérias
      inscritas): migrarParaIds() decide "perdido" comparando com porId, e
@@ -1155,7 +1185,13 @@ const padrao = {
      como 0% (têm total, não têm "certas") em vez de simplesmente não entrar
      na conta. Como as somas nunca decrescem, dias sem estes dois campos
      contribuem 0/0 pra janela e não distorcem nada. */
-  diasTotal: {}, diasCertas: {}};
+  diasTotal: {}, diasCertas: {},
+  /* ISO da última vez que sincronizar() terminou COM SUCESSO (empurrou a
+     fila inteira e puxou eventos/simulados sem erro) — não a última
+     tentativa. Mostrado em Ajustes pra distinguir "sincronizado agora
+     mesmo" de "a última tentativa falhou, mas a fila local continua
+     intacta". null enquanto nunca sincronizou. */
+  ultimaSincronizacao: null};
 let E = Object.assign({}, padrao, ler()||{});
 
 /* =======================================================================
@@ -1340,6 +1376,12 @@ let FILA_SIM = lerLista(chaveFilaSim);     // simulados ainda não confirmados
 let CURSOR_EV = lerCursor(chaveCursorEv);
 let CURSOR_SIM = lerCursor(chaveCursorSim);
 let sincronizando = false;
+/* mensagem da ÚLTIMA tentativa que falhou (rede caiu, servidor recusou...) —
+   só em memória, de propósito: é "a tentativa mais recente deu erro", não um
+   histórico, e falha de uma sessão passada não deve assombrar a próxima
+   abertura do app. null enquanto a tentativa mais recente deu certo (ou
+   nenhuma tentativa ainda rodou). Ver sincronizar() e pintarStatusSync(). */
+let ULTIMA_FALHA_SYNC = null;
 
 async function chamarRest(caminho, opcoes){
   opcoes = opcoes || {};
@@ -1445,8 +1487,13 @@ async function sincronizar(){
     }
     await puxarEventos();
     await puxarSimulados();
+    ULTIMA_FALHA_SYNC = null;
+    E.ultimaSincronizacao = new Date().toISOString();
     salvar();
   }catch(e){
+    // string curta e sem jargão técnico: quem lê é a pessoa estudando, não
+    // um log — "o servidor respondeu 500" vira só "não sincronizou agora"
+    ULTIMA_FALHA_SYNC = navigator.onLine === false ? "sem internet" : "não foi possível agora";
     console.warn("sincronização não completou: "+e.message);   // tenta de novo na próxima chamada
   }finally{
     sincronizando = false;
@@ -1454,13 +1501,33 @@ async function sincronizar(){
   }
 }
 /* atualiza só o texto de status, sem repintar a tela inteira de Ajustes —
-   sincronizar() pode terminar enquanto a pessoa está estudando, não em Ajustes */
+   sincronizar() pode terminar enquanto a pessoa está estudando, não em Ajustes.
+
+   Antes disto, "sincronizado" só olhava pendentes === 0 — e como puxar
+   eventos/simulados não enfileira nada, uma tentativa que falhou de ponta a
+   ponta (sem internet, por exemplo) deixava FILA vazia do mesmo jeito e a
+   tela dizia "sincronizado" mesmo sem ter sincronizado nada. Agora o status
+   de falha vem de ULTIMA_FALHA_SYNC, gravado no catch() de sincronizar(), e
+   não da ausência de pendência. */
+function fmtHoraSync(iso){
+  if(!iso) return "nunca";
+  const d = new Date(iso);
+  const dia = fmtDiaBrasilia.format(d);   // "AAAA-MM-DD" em Brasília, mesmo formato de hoje()
+  const hora = new Intl.DateTimeFormat("pt-BR", {timeZone:FUSO_BRASILIA, hour:"2-digit", minute:"2-digit"}).format(d);
+  return (dia === hoje() ? "hoje" : dia.split("-").reverse().join("/"))+" às "+hora;
+}
 function pintarStatusSync(){
   const el = document.getElementById("conta-status");
   if(!el) return;
   if(sincronizando){ el.textContent = "sincronizando…"; return; }
+  const ultima = "última sincronização: "+fmtHoraSync(E.ultimaSincronizacao);
+  if(ULTIMA_FALHA_SYNC){
+    el.textContent = "⚠ Falha ao sincronizar ("+ULTIMA_FALHA_SYNC+") · "+ultima;
+    return;
+  }
+  if(!E.ultimaSincronizacao){ el.textContent = "Ainda não sincronizou nesta conta · "+ultima; return; }
   const pendentes = FILA.length + FILA_SIM.length;
-  el.textContent = pendentes ? pendentes+" resposta(s) aguardando envio" : "sincronizado";
+  el.textContent = (pendentes ? pendentes+" resposta(s) aguardando envio · " : "Sincronizado · ")+ultima;
 }
 window.addEventListener("online", ()=>sincronizar());
 
@@ -2001,7 +2068,7 @@ function pintarGraficos(){
    Esta tela mostra a divisão inteira, inclusive o que ainda não foi visto,
    e deixa estudar qualquer um dos três níveis isoladamente.
    ======================================================================= */
-const vazio = () => ({total:0, vistas:0, ac:0, resp:0});
+const vazio = () => ({total:0, vistas:0, ac:0, resp:0, dominados:0});
 
 function resumoDoBanco(){
   const dados = {};
@@ -2013,7 +2080,12 @@ function resumoDoBanco(){
     [d, dt, ds].forEach(n=>{
       if(!n) return;
       n.total++;
-      if(c){ n.vistas++; n.ac += c.acertos; n.resp += c.acertos + c.erros; }
+      if(c){
+        n.vistas++; n.ac += c.acertos; n.resp += c.acertos + c.erros;
+        // "dominado" é o mesmo critério que grauLiberado usa pra destravar
+        // degrau: caixa 2+ quer dizer "acertou sem chutar na última vez"
+        if(c.caixa >= 2) n.dominados++;
+      }
     });
     /* quanto do tópico está atrás do degrau fechado, e quanto falta acertar
        para abrir o próximo — a tela precisa dos dois para explicar a trava */
@@ -2062,10 +2134,44 @@ function miniBarra(d){
 /* o que está expandido, só enquanto a aba vive; a chave do tópico é
    "matéria|tópico" para não confundir tópicos homônimos de matérias diferentes */
 const abertas = {};
+/* qual sub-aba está em foco dentro de cada matéria: "abertos" (padrão) ou
+   "bloqueados" — chave é só o id da matéria, não precisa de tópico */
+const abaTopicos = {};
 
 /* ordena do maior para o menor, desempatando pelo nome */
 const porTamanho = mapa => Object.keys(mapa)
   .sort((x,y)=> mapa[y].total - mapa[x].total || x.localeCompare(y,"pt"));
+
+/* Profundidade de um tópico no grafo de requisitos.json: 0 para quem não
+   exige nada, e 1 + a maior profundidade entre o que ele exige, senão.
+   É a mesma leitura de "quantos elos da corrente até a raiz" — quanto
+   maior, mais tarde a escada libera aquele tópico. memo evita recalcular
+   o mesmo tópico váras vezes (grafo é uma árvore/DAG, não uma lista). */
+function profundidadeTopico(mid, t, memo){
+  const chave = mid+"|"+t;
+  if(chave in memo) return memo[chave];
+  memo[chave] = 0;   // guarda de recursão: requisitos.json circular já é barrado pelo validar
+  const deps = REQUISITOS[chave] || [];
+  const prof = deps.reduce((max, dep)=>{
+    const tdep = typeof dep === "string" ? dep : dep.t;
+    return Math.max(max, 1 + profundidadeTopico(mid, tdep, memo));
+  }, 0);
+  memo[chave] = prof;
+  return prof;
+}
+
+/* ordena tópicos pela ordem em que a escada de pré-requisitos os libera —
+   quem não depende de nada vem primeiro, cada um só depois de tudo que
+   exige. Matéria sem requisitos.json cai toda na profundidade 0 e a ordem
+   volta a ser só por tamanho, como já era antes desta função existir. */
+function porDesbloqueio(mid, mapa){
+  const memo = {};
+  return Object.keys(mapa).sort((x,y)=>
+    profundidadeTopico(mid, x, memo) - profundidadeTopico(mid, y, memo)
+    || mapa[y].total - mapa[x].total
+    || x.localeCompare(y,"pt")
+  );
+}
 
 /* Estado da escada de um tópico, para a tela explicar a trava em vez de só
    esconder o botão. Devolve null quando o tópico não tem escada (um degrau
@@ -2099,7 +2205,8 @@ function linhaNivel(cls, rotulo, d, aoEstudar, trava){
   if(vazia) linha.classList.add("sem-cartao");
   const nome = document.createElement("span"); nome.className = "nome"; nome.textContent = rotulo;
   linha.appendChild(nome);
-  const barra = miniBarra(d);
+  // % dominado (caixa 2+ sobre o total), não taxa de acerto — ver resumoDoBanco()
+  const barra = miniBarra({ac: d.dominados, resp: d.total});
   if(barra) linha.appendChild(barra);
   const num = document.createElement("span"); num.className = "num";
   num.textContent = vazia ? "sem cartão" : d.vistas+"/"+d.total;
@@ -2165,7 +2272,8 @@ function pintarMaterias(){
     const nome = document.createElement("span"); nome.className="nome";
     nome.textContent = (MATERIAS[mid]||{}).nome || mid;
     cab.appendChild(seta); cab.appendChild(nome);
-    const barra = miniBarra(d);
+    // % dominado (caixa 2+ sobre o total), não taxa de acerto — ver resumoDoBanco()
+    const barra = miniBarra({ac: d.dominados, resp: d.total});
     if(barra) cab.appendChild(barra);
     const num = document.createElement("span"); num.className="num";
     num.textContent = d.vistas+"/"+d.total;
@@ -2173,7 +2281,11 @@ function pintarMaterias(){
     cx.appendChild(cab);
 
     const corpo = document.createElement("div"); corpo.className="corpoM";
-    porTamanho(d.topicos).forEach(t=>{
+
+    /* desenha um tópico (com subtópicos, se tiver) dentro de `corpo` —
+       função à parte porque agora dois lugares chamam isto: a lista de
+       disponíveis e a aba Bloqueados */
+    const renderTopico = t=>{
       const dt = d.topicos[t];
       const temSub = Object.keys(dt.subs).length > 0;
       const chave = mid+"|"+t;
@@ -2204,7 +2316,36 @@ function pintarMaterias(){
       });
       grupo.appendChild(dentro);
       corpo.appendChild(grupo);
-    });
+    };
+
+    /* Disponíveis × Bloqueados: separa pelo mesmo topicoAberto() que já
+       decide o botão Estudar, e ordena os disponíveis pela profundidade no
+       grafo de requisitos.json — a ordem em que a escada realmente libera
+       cada um, não por tamanho. Bloqueados usa a mesma ordem (quem está
+       mais perto da raiz tende a abrir primeiro) só pra não ficar solto. */
+    const nomesTopicos = Object.keys(d.topicos);
+    const abertosIds = nomesTopicos.filter(t=>topicoAberto(mid, t));
+    const bloqueadosIds = nomesTopicos.filter(t=>!topicoAberto(mid, t));
+
+    if(bloqueadosIds.length){
+      const aba = abaTopicos[mid] || "abertos";
+      const subabas = document.createElement("div"); subabas.className = "subabas";
+      const btAbertos = document.createElement("button");
+      btAbertos.textContent = "Disponíveis ("+abertosIds.length+")";
+      btAbertos.className = aba === "abertos" ? "on" : "";
+      btAbertos.onclick = ev=>{ ev.stopPropagation(); abaTopicos[mid] = "abertos"; pintarMaterias(); };
+      const btBloqueados = document.createElement("button");
+      btBloqueados.textContent = "Bloqueados ("+bloqueadosIds.length+")";
+      btBloqueados.className = aba === "bloqueados" ? "on" : "";
+      btBloqueados.onclick = ev=>{ ev.stopPropagation(); abaTopicos[mid] = "bloqueados"; pintarMaterias(); };
+      subabas.appendChild(btAbertos); subabas.appendChild(btBloqueados);
+      corpo.appendChild(subabas);
+      (aba === "bloqueados" ? porDesbloqueio(mid, d.topicos).filter(t=>bloqueadosIds.indexOf(t)>=0)
+                             : porDesbloqueio(mid, d.topicos).filter(t=>abertosIds.indexOf(t)>=0)
+      ).forEach(renderTopico);
+    } else {
+      porDesbloqueio(mid, d.topicos).forEach(renderTopico);
+    }
 
     /* matéria que só tem tópico de edital (nenhum cartão escrito) não oferece
        estudo — iniciarSessao cairia no alert de "nada na fila" */
@@ -3400,12 +3541,80 @@ function zerar(){
   }
 }
 
-/* guarda o app no aparelho para funcionar sem internet */
+/* Guarda o app no aparelho para funcionar sem internet — e se atualiza
+   sozinho quando uma versão nova é publicada. Sem isto, um PWA instalado
+   (ícone na tela inicial, modo standalone) nunca "navega" de verdade: ele
+   só volta de segundo plano, e o service worker novo assume (skipWaiting +
+   clients.claim, já em sw.js) mas o JS antigo continua rodando na memória
+   até alguém forçar um recarregamento de verdade. Era por isso que a única
+   saída conhecida virou apagar o ícone e recolocar. */
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){
   window.addEventListener("load", ()=>{
-    navigator.serviceWorker.register("sw.js").catch(()=>{});
+    navigator.serviceWorker.register("sw.js").then(reg=>{
+      /* controllerchange dispara quando o SW novo termina de assumir.
+         Recarrega a página pra trocar o JS antigo em memória pelo novo —
+         mas nunca no meio de um simulado em andamento, cujas respostas só
+         são gravadas no fim (finalizarSimulado): um reload ali perderia a
+         prova inteira, o mesmo risco que sairDoSimulado() já avisa antes
+         de sair. Espera o simulado acabar, checando a cada poucos
+         segundos, antes de recarregar. */
+      let jaRecarregou = false;
+      const recarregarQuandoSeguro = ()=>{
+        if(jaRecarregou) return;
+        if(SIM){ setTimeout(recarregarQuandoSeguro, 4000); return; }
+        jaRecarregou = true;
+        location.reload();
+      };
+      navigator.serviceWorker.addEventListener("controllerchange", recarregarQuandoSeguro);
+
+      /* Um PWA standalone raramente "recarrega a página" sozinho — reabrir
+         só reativa a mesma aba/processo, sem passar pelo fluxo normal de
+         checagem de atualização do navegador. Forçar reg.update() toda vez
+         que o app volta ao primeiro plano é o que faz essa checagem
+         acontecer sem depender de fechar e abrir de verdade. */
+      document.addEventListener("visibilitychange", ()=>{
+        if(document.visibilityState === "visible") reg.update().catch(()=>{});
+      });
+    }).catch(()=>{});
   });
 }
+
+/* Puxar a tela pra baixo, no topo da página, recarrega o app — o gesto que
+   qualquer app de lista já tem, e que aqui dobra como "atualizar agora" sem
+   precisar ir em Ajustes. Só dispara com a página já no topo (senão
+   atrapalharia rolar uma lista comprida) e nunca durante um simulado em
+   andamento, pelo mesmo motivo do controllerchange logo acima: as respostas
+   só são gravadas no fim, e um reload no meio perderia a prova inteira. */
+(function(){
+  const LIMIAR = 70;
+  const barra = document.createElement("div");
+  barra.id = "puxa-atualizar";
+  document.body.prepend(barra);
+  let inicioY = null, distancia = 0;
+  const podeAtualizar = ()=> window.scrollY <= 0 && !SIM;
+
+  document.addEventListener("touchstart", e=>{
+    inicioY = (podeAtualizar() && e.touches.length === 1) ? e.touches[0].clientY : null;
+  }, {passive:true});
+
+  document.addEventListener("touchmove", e=>{
+    if(inicioY == null) return;
+    distancia = e.touches[0].clientY - inicioY;
+    if(distancia <= 0){ barra.style.height = "0"; return; }
+    barra.style.height = Math.min(distancia, LIMIAR + 20) + "px";
+    barra.textContent = distancia > LIMIAR ? "Solte para atualizar" : "Puxe para atualizar";
+  }, {passive:true});
+
+  document.addEventListener("touchend", ()=>{
+    if(inicioY != null && distancia > LIMIAR){
+      barra.textContent = "Atualizando…";
+      location.reload();
+    } else {
+      barra.style.height = "0";
+    }
+    inicioY = null; distancia = 0;
+  }, {passive:true});
+})();
 
 /* =======================================================================
    BOOT
