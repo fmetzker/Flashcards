@@ -4,9 +4,9 @@
 {"id":"ingles","nome":"Língua Inglesa"},
 {"id":"sus","nome":"Legislação do SUS"},
 {"id":"enfermagem","nome":"Enfermagem"},
-{"id":"enfermagem-trabalho","nome":"Enfermagem do Trabalho"},
-{"id":"psicologia","nome":"Psicologia"},
-{"id":"maritimo-maquinas","nome":"Máquinas e Prática Marítima"},
+{"id":"enfermagem-trabalho","nome":"Enfermagem do Trabalho","avulsa":true},
+{"id":"psicologia","nome":"Psicologia","avulsa":true},
+{"id":"maritimo-maquinas","nome":"Máquinas e Prática Marítima","avulsa":true},
 {"id":"manutencao-mecanica","nome":"Manutenção Mecânica"},
 {"id":"biologia-celular","nome":"Biologia Celular","avulsa":true}
 ]

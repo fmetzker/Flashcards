@@ -23,9 +23,12 @@ Moço de Máquinas e Enfermagem do Trabalho, ambos da Transpetro, saíram de
 bancos de questões (`banco/maritimo-maquinas.json` e
 `banco/enfermagem-trabalho.json`) continuam no repositório, intactos, para
 o caso de precisarem voltar. Matéria sem concurso ativo é situação normal
-no app (Psicologia já vivia assim antes de ganhar um concurso próprio): a
-matéria só não aparece pra ninguém estudar até algum concurso voltar a
-referenciá-la em `blocos[].materias`.
+no app: a matéria só não aparece pra ninguém estudar até algum concurso
+voltar a referenciá-la em `blocos[].materias`, **ou** até ser marcada
+`"avulsa": true` em `banco/materias.json` — o segundo caminho, hoje usado
+por Enfermagem do Trabalho, Psicologia e Máquinas e Prática Marítima (nenhuma
+delas referenciada por concurso algum no momento) além de Biologia Celular
+(nunca teve concurso, avulsa desde que nasceu). Ver regra 12.
 
 ## Estrutura
 
@@ -124,12 +127,15 @@ no Safari do iPhone sem nenhuma etapa de compilação.
     edital, prova adiada) ou se outro concurso vier a usar a mesma matéria.
     Foi o caso de Moço de Máquinas e Enfermagem do Trabalho, ambos da
     Transpetro: saíram de `concursos.json`, e `banco/maritimo-maquinas.json`
-    e `banco/enfermagem-trabalho.json` continuam intactos. Matéria sem
-    concurso ativo não é estudada automaticamente por ninguém — só entra na
-    sessão de quem, na tela de seleção, marcá-la à mão como matéria avulsa
-    (ver "Matéria, tópico e subtópico"). Isso não é erro nem lixo — é
-    exatamente a mesma situação que `psicologia` viveu antes de ganhar
-    concurso próprio.
+    e `banco/enfermagem-trabalho.json` continuam intactos. As duas matérias
+    — mais `psicologia`, que nunca teve bloco de concurso próprio apesar de
+    o concurso "Psicologia/Transpetro" existir em `concursos.json` — foram
+    depois marcadas `"avulsa": true` em `banco/materias.json`: continuam sem
+    concurso atrás, mas passaram a ser conteúdo avulso de propósito, à
+    disposição de quem quiser seguir sem prova nenhuma. Matéria sem concurso
+    ativo **e** sem avulsa declarada não é estudada automaticamente por
+    ninguém — só entra na sessão de quem, na tela de seleção, marcá-la à mão
+    como matéria avulsa (ver "Matéria, tópico e subtópico").
 
     **Guardar é uma coisa, escrever é outra: cartão novo só entra em matéria
     ativa.** O que já existe fica intacto — corrigir alternativa, explicação,
