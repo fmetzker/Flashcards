@@ -64,6 +64,41 @@ $REESCRITAS = @{
   '1a9f7bfcd0' = @{
     q = 'Como funciona o acesso da população ao SAMU 192, quanto a custo e abrangência?'
   }
+
+  # Lote da auditoria de dificuldade do nível 1 (pedida pelo usuário): estes 6
+  # cartões definiam um termo técnico de forma abstrata, sem nenhum exemplo
+  # concreto na pergunta -- viraram "exemplo primeiro, nome depois", como o
+  # resto do banco já faz para conceitos igualmente abstratos.
+  'de6199e16a' = @{
+    q = "Em 'Vossa Excelência está preocupado', o verbo concorda com a ideia de quem é tratado (masculino), e não com a forma gramatical de 'Vossa Excelência' (expressão feminina). Esse tipo de concordância, feita pelo sentido e não pela forma, chama-se:"
+    o = @('concordância ideológica (silepse)', 'concordância verbal regular, pela forma gramatical do sujeito', 'concordância nominal regular, pela forma gramatical do substantivo', 'concordância atrativa, pela proximidade com a palavra mais próxima', 'concordância facultativa, que pode ou não ser feita, a critério de quem escreve')
+    c = 0
+  }
+  '45cd0d2fe6' = @{
+    q = "Em 'fazer', 'faço' e 'fiz', o radical do verbo muda ligeiramente de forma (faz-/faç-/fiz-), mantendo o mesmo sentido básico nas três palavras. Esse fenômeno é chamado de:"
+    o = @('radical variante (ou alomorfe)', 'derivação regressiva', 'flexão verbal irregular', 'vogal temática', 'desinência verbal')
+    c = 0
+  }
+  '70f459328f' = @{
+    q = "Na frase 'Ele parou de fumar', fica implícito, sem ser dito diretamente, que ele fumava antes -- uma informação dada como certa, embutida no sentido da própria palavra 'parou'. Esse tipo de informação implícita é chamado de:"
+    o = @('pressuposto', 'subentendido', 'argumento', 'tese', 'fato')
+    c = 0
+  }
+  '72353909e0' = @{
+    q = "Se alguém diz 'Está frio aqui' numa sala com a janela aberta, sugere indiretamente um pedido para fechá-la, sem afirmar isso -- e pode negar essa intenção se for questionado. Esse tipo de informação sugerida, mas não afirmada, é chamado de:"
+    o = @('subentendido', 'pressuposto', 'argumento', 'tese', 'ponto de vista do autor')
+    c = 0
+  }
+  '57327a5acb' = @{
+    q = "Ao longo de um texto, 'o paciente', 'ele' e 'o idoso' podem retomar repetidamente a mesma pessoa. Essa sequência de expressões que retomam um mesmo referente ao longo do texto chama-se:"
+    o = @('cadeia referencial', 'coesão lexical', 'reiteração lexical', 'coesão sequencial', 'elipse')
+    c = 0
+  }
+  'd6decb1c16' = @{
+    q = "Um relato que descreve, em sequência, 'a equipe chegou, examinou, prescreveu' mantém a mesma estrutura verbal ao longo das três ações. Esse tipo de coesão, que preserva a mesma estrutura sintática ou o mesmo tempo verbal em passagens equivalentes, chama-se coesão sequencial por:"
+    o = @('continuidade (ou paralelismo)', 'conexão, por meio de conectivos', 'reiteração, pela repetição da mesma palavra', 'substituição, por sinônimo ou hiperônimo', 'elipse, pela omissão de um termo')
+    c = 0
+  }
 }
 
 # ---- aplica ------------------------------------------------------------------
