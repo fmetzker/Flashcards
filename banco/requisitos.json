@@ -107,6 +107,20 @@
         "Saúde do Homem": ["Anatomia e Fisiologia"],
         "Saúde Mental": ["Anatomia e Fisiologia"]
       }
+    },
+    "biologia-celular": {
+      "criterio": "10 tópicos, sem subtópico, cada um cobrindo um recorte fechado do currículo de biologia celular (Alberts, Fundamentos da biologia celular). Teoria celular é a base histórica — quem descobriu a célula e como — e não pressupõe nada. Microscopia e classificação celular (procarionte×eucarionte, técnicas de observação) exige Teoria celular porque classificar célula pressupõe já saber o que é uma célula. Daqui o grafo se ramifica em três frentes que não dependem uma da outra, todas exigindo só Microscopia e classificação celular como base comum: (1) Célula animal, vegetal e vírus — comparação de tipos celulares e a posição do vírus como parasita intracelular obrigatório, síntese que só faz sentido depois de já saber classificar célula; (2) a membrana — Composição da membrana e mosaico fluido é o primeiro passo, Especializações da membrana e transporte passivo exige o modelo de mosaico fluido pra explicar como a especialização e o transporte passivo atravessam essa estrutura, e Transporte ativo e endo/exocitose exige o transporte passivo por ser o próximo degrau (ativo é o que passivo não explica: contra gradiente, com gasto de ATP); a sinalização celular também parte da membrana — Moléculas e tipos de sinalização celular exige Composição da membrana porque sinalização parácrina/endócrina/autócrina se liga a receptores DA membrana, e Receptores celulares e proteína G exige Moléculas e tipos de sinalização porque o receptor é o mecanismo, não faz sentido sem já saber que tipos de sinal existem; (3) o citoesqueleto — Citosol e microtúbulos exige só Microscopia e classificação celular (microtúbulo é uma estrutura da célula eucarionte), e Actina e filamentos intermediários exige Citosol e microtúbulos por ser a continuação do mesmo assunto (as três famílias de filamento do citoesqueleto, na ordem que o próprio banco já usa). Fica sem requisito, e portanto aberta desde o primeiro dia, só Teoria celular — a base de tudo o que vem depois.",
+      "requisitos": {
+        "Microscopia e classificação celular": ["Teoria celular"],
+        "Célula animal, vegetal e vírus": ["Microscopia e classificação celular"],
+        "Composição da membrana e mosaico fluido": ["Microscopia e classificação celular"],
+        "Especializações da membrana e transporte passivo": ["Composição da membrana e mosaico fluido"],
+        "Transporte ativo e endo/exocitose": ["Especializações da membrana e transporte passivo"],
+        "Moléculas e tipos de sinalização celular": ["Composição da membrana e mosaico fluido"],
+        "Receptores celulares e proteína G": ["Moléculas e tipos de sinalização celular"],
+        "Citosol e microtúbulos": ["Microscopia e classificação celular"],
+        "Actina e filamentos intermediários": ["Citosol e microtúbulos"]
+      }
     }
   }
 }
