@@ -144,6 +144,47 @@
         "Citosol e microtúbulos": ["Microscopia e classificação celular"],
         "Actina e filamentos intermediários": ["Citosol e microtúbulos"]
       }
+    },
+    "enfermagem-trabalho": {
+      "criterio": "17 tópicos, todos fatos paralelos dentro de si (mesmo caso de manutencao-mecanica: nenhum ganhou escada interna, campo n). Matéria ficou sem nenhuma entrada aqui até virar avulsa — os 17 abriam juntos, sem ordem nenhuma. Cadeia de ORDEM DE ENSINO (não dependência de conceito — ver '_cadeia_entre_raizes' no topo do arquivo), seguindo a lógica de um currículo de saúde do trabalhador: Sistema de Saúde Brasileiro abre primeiro por situar onde a saúde do trabalhador entra dentro do SUS, a base institucional de tudo; Legislação de Segurança e Medicina do Trabalho em seguida, o arcabouço legal (NRs) que sustenta os programas que vêm depois; Elementos de Higiene Ocupacional introduz os agentes de risco (físico, químico, biológico) que Toxicologia da Indústria de Petróleo, Gás e Derivados especializa para o setor, e que Biossegurança e Saúde complementa do lado da proteção; Epidemiologia e Vigilância da Saúde do Trabalhador dá o instrumental de medição que Doenças Profissionais e Doenças Relacionadas ao Trabalho aplica; PCMSO segue por ser o programa que rastreia justamente essas doenças, e Administração de Serviços de Saúde e dos SESMT vem depois por ser a estrutura organizacional que roda o PCMSO; Gestão de Segurança e Saúde do Trabalho generaliza essa gestão; Ergonomia Aplicada ao Trabalho e Bem-Estar, Saúde e Qualidade de Vida no Trabalho tratam do lado humano/postural, o segundo generalizando o primeiro; Níveis de Atenção à Saúde situa onde a assistência acontece; Sistematização da Assistência de Enfermagem é o método de cuidado que Assistência de Enfermagem em Urgências e Emergências aplica a um contexto agudo; Ética e Deontologia de Enfermagem, base profissional que atravessa tudo, mas sem travar nada abaixo dela; Bioestatística, ferramenta de análise que não trava nem depende de nenhum outro tópico da lista, fecha a fila.",
+      "requisitos": {
+        "Legislação de Segurança e Medicina do Trabalho": ["Sistema de Saúde Brasileiro"],
+        "Elementos de Higiene Ocupacional": ["Legislação de Segurança e Medicina do Trabalho"],
+        "Toxicologia da Indústria de Petróleo, Gás e Derivados": ["Elementos de Higiene Ocupacional"],
+        "Biossegurança e Saúde": ["Toxicologia da Indústria de Petróleo, Gás e Derivados"],
+        "Epidemiologia e Vigilância da Saúde do Trabalhador": ["Biossegurança e Saúde"],
+        "Doenças Profissionais e Doenças Relacionadas ao Trabalho": ["Epidemiologia e Vigilância da Saúde do Trabalhador"],
+        "Programa de Controle Médico de Saúde Ocupacional (PCMSO)": ["Doenças Profissionais e Doenças Relacionadas ao Trabalho"],
+        "Administração de Serviços de Saúde e dos SESMT": ["Programa de Controle Médico de Saúde Ocupacional (PCMSO)"],
+        "Gestão de Segurança e Saúde do Trabalho": ["Administração de Serviços de Saúde e dos SESMT"],
+        "Ergonomia Aplicada ao Trabalho": ["Gestão de Segurança e Saúde do Trabalho"],
+        "Bem-Estar, Saúde e Qualidade de Vida no Trabalho": ["Ergonomia Aplicada ao Trabalho"],
+        "Níveis de Atenção à Saúde": ["Bem-Estar, Saúde e Qualidade de Vida no Trabalho"],
+        "Sistematização da Assistência de Enfermagem": ["Níveis de Atenção à Saúde"],
+        "Assistência de Enfermagem em Urgências e Emergências": ["Sistematização da Assistência de Enfermagem"],
+        "Ética e Deontologia de Enfermagem": ["Assistência de Enfermagem em Urgências e Emergências"],
+        "Bioestatística": ["Ética e Deontologia de Enfermagem"]
+      }
+    },
+    "maritimo-maquinas": {
+      "criterio": "16 tópicos, também todos fatos paralelos dentro de si, sem escada interna (mesmo caso de manutencao-mecanica). Sem nenhuma entrada até virar avulsa. Cadeia de ORDEM DE ENSINO (ver '_cadeia_entre_raizes' no topo do arquivo), seguindo a sequência real de um curso de praticagem/máquinas: os quatro treinamentos básicos de segurança do STCW abrem a fila — Segurança no Trabalho primeiro (a base de qualquer atividade a bordo), Conhecimentos Elementares de Primeiros Socorros, Técnicas de Sobrevivência Pessoal e Prevenção e Combate a Incêndio na sequência —, dos quais Procedimentos de Emergências deriva (aplica os quatro numa situação real de emergência a bordo); Conscientização sobre proteção de navio e Relações Interpessoais e Responsabilidades Sociais são os outros dois módulos STCW de base (segurança patrimonial e fator humano), e vêm em seguida; Legislação Marítima e Ambiental dá a base legal de que Prevenção e Controle da Poluição do Meio Ambiente Aquaviário precisa; Arquitetura Naval Aplicada introduz a estrutura do navio, pré-requisito de bom senso pra falar de Máquinas e Sistemas Auxiliares, que por sua vez introduz o que Motores Diesel e Sistemas de Propulsão detalha (o motor é o principal sistema entre os auxiliares); Ferramentaria dá o instrumental prático que Manutenção de Máquinas e Equipamentos Auxiliares usa; Serviço de Quarto de Máquinas de Apoio aplica esse conhecimento todo à rotina real de vigília na praça de máquinas, por isso vem depois de Manutenção; Pintura e Conservação de Embarcação, tarefa de manutenção mais isolada e que não trava nada abaixo, fecha a fila.",
+      "requisitos": {
+        "Conhecimentos Elementares de Primeiros Socorros": ["Segurança no Trabalho"],
+        "Técnicas de Sobrevivência Pessoal": ["Conhecimentos Elementares de Primeiros Socorros"],
+        "Prevenção e Combate a Incêndio": ["Técnicas de Sobrevivência Pessoal"],
+        "Procedimentos de Emergências": ["Prevenção e Combate a Incêndio"],
+        "Conscientização sobre proteção de navio": ["Procedimentos de Emergências"],
+        "Relações Interpessoais e Responsabilidades Sociais": ["Conscientização sobre proteção de navio"],
+        "Legislação Marítima e Ambiental": ["Relações Interpessoais e Responsabilidades Sociais"],
+        "Prevenção e Controle da Poluição do Meio Ambiente Aquaviário": ["Legislação Marítima e Ambiental"],
+        "Arquitetura Naval Aplicada": ["Prevenção e Controle da Poluição do Meio Ambiente Aquaviário"],
+        "Máquinas e Sistemas Auxiliares": ["Arquitetura Naval Aplicada"],
+        "Motores Diesel e Sistemas de Propulsão": ["Máquinas e Sistemas Auxiliares"],
+        "Ferramentaria": ["Motores Diesel e Sistemas de Propulsão"],
+        "Manutenção de Máquinas e Equipamentos Auxiliares": ["Ferramentaria"],
+        "Serviço de Quarto de Máquinas de Apoio": ["Manutenção de Máquinas e Equipamentos Auxiliares"],
+        "Pintura e Conservação de Embarcação": ["Serviço de Quarto de Máquinas de Apoio"]
+      }
     }
   }
 }

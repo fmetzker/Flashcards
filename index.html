@@ -3579,12 +3579,22 @@ if("serviceWorker" in navigator && location.protocol.startsWith("http")){
   });
 }
 
-/* Puxar a tela pra baixo, no topo da página, recarrega o app — o gesto que
-   qualquer app de lista já tem, e que aqui dobra como "atualizar agora" sem
-   precisar ir em Ajustes. Só dispara com a página já no topo (senão
-   atrapalharia rolar uma lista comprida) e nunca durante um simulado em
-   andamento, pelo mesmo motivo do controllerchange logo acima: as respostas
-   só são gravadas no fim, e um reload no meio perderia a prova inteira. */
+/* Puxar a tela pra baixo, no topo da página, dispara uma checagem de
+   atualização — o gesto que qualquer app de lista já tem. Só dispara com a
+   página já no topo (senão atrapalharia rolar uma lista comprida) e nunca
+   durante um simulado em andamento, mesmo motivo do controllerchange
+   logo acima: as respostas só são gravadas no fim, e um reload no meio
+   perderia a prova inteira.
+
+   NÃO recarrega direto. A pessoa não deveria ver tela de carregamento
+   nenhuma só porque uma matéria ganhou cartão novo — isso o service worker
+   já serve fresco sozinho (rede-primeiro), sem precisar de reload nenhum.
+   A tela de carregamento (o reload em si) só se justifica quando o CÓDIGO
+   do app mudou, e só o controllerchange sabe disso de verdade. Por isso o
+   gesto só chama reg.update() (que dispara controllerchange se houver
+   versão nova — o mesmo listener de cima cuida do reload) e sincronizar()
+   (que troca dado, não estrutura, e nunca pede reload). Se nenhum dos dois
+   encontrar nada, a barra só some — sem recarregar, sem tela de carregamento. */
 (function(){
   const LIMIAR = 70;
   const barra = document.createElement("div");
@@ -3607,8 +3617,20 @@ if("serviceWorker" in navigator && location.protocol.startsWith("http")){
 
   document.addEventListener("touchend", ()=>{
     if(inicioY != null && distancia > LIMIAR){
-      barra.textContent = "Atualizando…";
-      location.reload();
+      barra.textContent = "Verificando atualizações…";
+      // dado (progresso) e estrutura (código) checam em paralelo, os dois em
+      // segundo plano — nenhum dos dois trava a tela nem mostra "carregando"
+      // por conta própria; só reg.update() pode, indiretamente, acionar o
+      // controllerchange lá em cima, que aí sim recarrega de verdade
+      sincronizar();
+      (navigator.serviceWorker
+        ? navigator.serviceWorker.getRegistration().then(reg => reg && reg.update())
+        : Promise.resolve()
+      ).catch(()=>{}).finally(()=>{
+        // chegou até aqui sem o controllerchange ter disparado um reload:
+        // não havia versão nova do app, só some a barra
+        setTimeout(()=>{ barra.style.height = "0"; }, 350);
+      });
     } else {
       barra.style.height = "0";
     }
