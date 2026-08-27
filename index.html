@@ -902,11 +902,24 @@ function limparCacheGrau(){ for(const k in _cacheGrau) delete _cacheGrau[k]; }
    garante que a trava nunca deixe a pessoa sem nada para estudar.
 
    'dep' é string (tópico inteiro) ou {t, s} (só um subtópico daquele
-   tópico) — banco/requisitos.json documenta a forma em '_forma_do_item'. */
+   tópico) — banco/requisitos.json documenta a forma em '_forma_do_item'.
+
+   TRANSITIVO de propósito: a base só conta como dominada se o próprio
+   tópico exigido também estiver topicoAberto() — não basta a caixa dele
+   estar em dia. Sem isso, quem tem histórico de antes desta cadeia existir
+   (ou espalhado por vários tópicos, de quando dava pra estudar em qualquer
+   ordem) podia ter as caixas de um tópico do MEIO da fila em dia por
+   coincidência, sem nunca ter passado pelos tópicos anteriores — e o
+   próximo da cadeia abria pulando etapa. Exigir topicoAberto() aqui faz a
+   checagem recursiva subir a cadeia inteira até a raiz: só abre quem
+   realmente percorreu (ou já dominava, na ordem certa) tudo antes dele.
+   requisitosPendentes() sempre teve o corte cíclico do validar.py contra
+   pré-requisito circular, então esta recursão sempre termina. */
 function baseDominada(m, dep){
-  return typeof dep === "string"
-    ? grauLiberado(m, dep) > 1
-    : grauLiberado(m, dep.t, dep.s) > 1;
+  const t = typeof dep === "string" ? dep : dep.t;
+  const s = typeof dep === "string" ? undefined : dep.s;
+  if(!topicoAberto(m, t)) return false;
+  return grauLiberado(m, t, s) > 1;
 }
 
 /* Requisitos que ainda faltam para este tópico abrir; vazio = aberto. */
