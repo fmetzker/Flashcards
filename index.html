@@ -2509,7 +2509,8 @@ function iniciarSessao(modo, filtro){
 
        Cada bloco entra com o que ainda falta para fechar a cota dele, na
        mesma ordem de sempre (vencido primeiro, depois nunca visto). */
-    const porBloco = progressoPorBloco(hoje());
+    const h = hoje();
+    const porBloco = progressoPorBloco(h);
     lista = [];
     BLOCOS_META.forEach((bl,i)=>{
       const falta = Math.max(0, bl.questoes - Math.min(porBloco[i].feitas, bl.questoes));
@@ -2524,7 +2525,27 @@ function iniciarSessao(modo, filtro){
       // metade revisão, metade nova — mesma proporção que valia antes;
       // intercalar() só muda a ORDEM em que as duas metades aparecem
       const parte = rev.slice(0, Math.ceil(falta*0.5));
-      lista = lista.concat(intercalar(parte, nov.slice(0, falta - parte.length)));
+      let bloco = intercalar(parte, nov.slice(0, falta - parte.length));
+      /* Trava de degrau (ou banco pequeno) pode deixar a área com menos
+         cartão do que a cota pede — sobretudo logo que um tópico abre, com
+         só 1-2 cartões no degrau 1. Sem completar, a sessão vira só esses
+         poucos cartões pendentes, repetindo sessão após sessão do mesmo
+         dia: quem estuda decora a posição/resposta em vez de aprender, e é
+         exatamente o caso de errar o cartão que trava o degrau sem ter
+         outro disponível. Completa com REVISÃO ADIANTADA da mesma área —
+         cartão que a pessoa já respondeu antes e ainda não venceu — para
+         intercalar com o que está travado. Cartão nunca visto continua de
+         fora: isto não é atalho para pular a trava (regra do `n`/degrau),
+         é só encher a sessão com o que a pessoa já tem base para responder.
+         Ordena por vencimento mais próximo — antecipa o que ia vencer
+         primeiro de qualquer jeito, não sorteia. */
+      if(bloco.length < falta){
+        const vistos = Object.keys(E.cartoes)
+          .filter(id => E.cartoes[id].prox > h && daArea(id))
+          .sort((a,b)=> E.cartoes[a].prox.localeCompare(E.cartoes[b].prox));
+        bloco = intercalar(bloco, vistos.slice(0, falta - bloco.length));
+      }
+      lista = lista.concat(bloco);
     });
     /* nenhuma cota aberta (meta do dia já fechada), ou nada nas matérias da
        prova: cai no comportamento antigo em vez de deixar a pessoa sem nada
