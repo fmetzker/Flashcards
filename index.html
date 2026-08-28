@@ -620,6 +620,11 @@ let INSCRITOS = [];          // os que ESTE perfil segue (objetos, não ids)
    repintar sozinhas quando o banco completo chegar. */
 let BANCO_FOCO_PRONTO = false, BANCO_PRONTO = false;
 let AGUARDANDO_BANCO_PRONTO = [];
+/* matérias que atualizarUniaoDeMaterias() está buscando AGORA, fora do boot
+   inicial — ex.: acabou de marcar um concurso novo em Ajustes. pintarMaterias()
+   usa isto pra mostrar "carregando…" só na linha daquela matéria, sem repetir
+   o bloqueio de tela inteira que BANCO_PRONTO=false faz no primeiro boot. */
+let MATERIAS_CARREGANDO = new Set();
 const porId = {}, MATERIAS = {}, blocoDaMateria = {};
 
 /* fetch() sozinho não tem timeout: numa conexão ruim (não caída, só muito
@@ -1194,6 +1199,59 @@ async function carregarBancoEmFases(){
   if(document.getElementById("tela-inicio").classList.contains("ativa")) pintarInicio();
   const pendentes = AGUARDANDO_BANCO_PRONTO.splice(0);
   pendentes.forEach(fn=>fn());
+}
+
+/* Repinta só as telas que dependem do BANCO/META e estão de pé agora — usada
+   depois de carregarBancoEmFases() e de atualizarUniaoDeMaterias(), as duas
+   vezes em que o conteúdo de BANCO muda sem navegação nenhuma. */
+function repintarTelasQueDependemDoBanco(){
+  if(document.getElementById("tela-materias").classList.contains("ativa")) pintarMaterias();
+  if(document.getElementById("tela-inicio").classList.contains("ativa")){ pintarInicio(); rodape("inicio"); }
+  if(document.getElementById("tela-simulado-inicio").classList.contains("ativa")) pintarSimuladoInicio();
+}
+
+/* Troca a união de matérias SEM location.reload() — usada ao escolher
+   concurso/avulsa pela primeira vez (tela-escolher-concurso) e ao mudar a
+   lista em Ajustes. Antes, as duas ações recarregavam a página inteira:
+   funcionava, mas travava o app atrás da tela de carregamento branded só
+   pra buscar uma matéria a mais — inclusive quando a mudança era só
+   REMOVER algo, sem nada novo pra buscar. O app inteiro (navegação,
+   matérias já carregadas, sessão em andamento) continua usável enquanto
+   isto roda em segundo plano; só a matéria nova aparece como "carregando…"
+   na aba Matérias (ver pintarMaterias) até chegar.
+
+   Aditivo por natureza — só busca o que ainda NÃO está em BANCO — e PODA o
+   que saiu da união: desmarcar um concurso/avulsa não pode deixar cartão
+   dela na fila de estudo. migrarParaIds()/migrarReescritas() são seguras de
+   rodar de novo aqui (a primeira já se guarda por E.versaoEstado; a segunda
+   é feita pra rodar a cada boot, documentado nela mesma). */
+async function atualizarUniaoDeMaterias(){
+  INSCRITOS = CONCURSOS.filter(c=>E.concursos.indexOf(c.id) >= 0);
+  // escopo que apontava pra um concurso que saiu da lista volta pra "todos"
+  if(INSCRITOS.map(c=>c.id).indexOf(E.escopoEstudo) < 0) E.escopoEstudo = null;
+
+  const uniao = new Set(materiasInscritas());
+  if(BANCO.some(q=>!uniao.has(q.m))){
+    BANCO = BANCO.filter(q=>uniao.has(q.m));
+    Object.keys(porId).forEach(id=>{ if(!uniao.has(porId[id].m)) delete porId[id]; });
+  }
+  const jaCarregadas = new Set(BANCO.map(q=>q.m));
+  const faltando = [...uniao].filter(m=>!jaCarregadas.has(m));
+
+  faltando.forEach(m=>MATERIAS_CARREGANDO.add(m));
+  repintarTelasQueDependemDoBanco();
+
+  await carregarBancoParcial(faltando, m=>{
+    MATERIAS_CARREGANDO.delete(m);
+    repintarTelasQueDependemDoBanco();
+  });
+
+  await migrarParaIds();
+  await migrarReescritas();
+  salvar();
+  limparCacheGrau();
+  aplicarFoco(E.escopoEstudo);
+  repintarTelasQueDependemDoBanco();
 }
 
 const blocoDe = q => blocoDaMateria[q.m];
@@ -2486,6 +2544,13 @@ function pintarMaterias(){
   const dados = resumoDoBanco();
   c.innerHTML = "";
   const mats = ORDEM_MATERIAS.filter(m=>dados[m]);
+  /* matéria recém-marcada (concurso novo, ou avulsa nova em Ajustes) cujo
+     banco.json ainda está a caminho — ver atualizarUniaoDeMaterias(). Ela
+     ainda não tem entrada em `dados` (resumoDoBanco só enxerga o que já
+     chegou em BANCO), então ganha uma linha à parte, só com o nome e
+     "carregando…", sem travar a aba inteira feito o BANCO_PRONTO acima:
+     o resto das matérias já carregadas continua navegável normalmente. */
+  const carregando = ORDEM_MATERIAS.filter(m=>MATERIAS_CARREGANDO.has(m) && !dados[m]);
   let nTopicos = 0, nSubs = 0;
   mats.forEach(m=>{
     const ts = dados[m].topicos;
@@ -2493,7 +2558,20 @@ function pintarMaterias(){
     Object.keys(ts).forEach(t=>{ nSubs += Object.keys(ts[t].subs).length; });
   });
   document.getElementById("materias-sub").textContent =
-    mats.length+" matérias · "+nTopicos+" tópicos · "+nSubs+" subtópicos · "+BANCO.length+" questões";
+    mats.length+" matérias · "+nTopicos+" tópicos · "+nSubs+" subtópicos · "+BANCO.length+" questões"
+    + (carregando.length ? " · "+carregando.length+" chegando…" : "");
+
+  carregando.forEach(mid=>{
+    const cx = document.createElement("div"); cx.className = "materia";
+    const cab = document.createElement("div"); cab.className = "cabM";
+    const nome = document.createElement("span"); nome.className = "nome";
+    nome.textContent = (MATERIAS[mid]||{}).nome || mid;
+    const status = document.createElement("span"); status.className = "num";
+    status.textContent = "carregando…";
+    cab.appendChild(nome); cab.appendChild(status);
+    cx.appendChild(cab);
+    c.appendChild(cx);
+  });
 
   mats.forEach(mid=>{
     const d = dados[mid];
@@ -3692,14 +3770,15 @@ function pintarEscolherConcurso(){
     cx=>{ if(cx.checked) avulsasMarcadas.add(mid); else avulsasMarcadas.delete(mid); atualizaBotao(); }
   )));
 
-  // recarrega em vez de repintar, igual a alternarConcurso() em Ajustes: a
-  // lista de inscritos mudou, e com ela o banco inteiro (união de matérias)
+  // sem reload — atualizarUniaoDeMaterias() busca o banco das matérias
+  // recém-marcadas em segundo plano; a pessoa já entra na tela inicial
   bt.onclick = ()=>{
     if(!concursosMarcados.size && !avulsasMarcadas.size) return;
     E.concursos = [...concursosMarcados];
     E.materiasAvulsas = [...avulsasMarcadas];
     salvar();
-    location.reload();
+    ir("inicio");
+    atualizarUniaoDeMaterias();
   };
 }
 
@@ -3749,8 +3828,9 @@ function alternarConcurso(id, checkbox){
      — manter o escopo apontando para fora da lista travaria a meta em zero */
   if(E.concursos.indexOf(E.escopoEstudo) < 0) E.escopoEstudo = null;
   salvar();
-  // recarrega: a união de matérias mudou, e com ela o banco inteiro
-  reiniciarEm("ajustes");
+  // sem reload: a união de matérias mudou, atualizarUniaoDeMaterias() busca
+  // (ou poda) o banco em segundo plano — a pessoa continua em Ajustes
+  atualizarUniaoDeMaterias();
 }
 
 /* mesma ideia de alternarConcurso(), pro lado das matérias avulsas — mudar
@@ -3767,18 +3847,8 @@ function alternarMateriaAvulsa(id, checkbox){
   }
   E.materiasAvulsas = marcada ? E.materiasAvulsas.filter(x=>x!==id) : E.materiasAvulsas.concat([id]);
   salvar();
-  reiniciarEm("ajustes");
-}
-
-/* recarrega a página (precisa, pra reler o banco do zero) mas sem jogar a
-   pessoa pra tela inicial no meio da tarefa — o boot lê essa marca e pousa
-   na tela pedida em vez do padrão. sessionStorage porque é só uma dica de
-   navegação de uma recarga que a própria página disparou: não é progresso
-   nem sessão, não entra nas chaves da regra 1, e some sozinho se a aba
-   fechar antes do boot ler. */
-function reiniciarEm(tela){
-  try{ sessionStorage.setItem("vr:pos-reload", tela); }catch(e){}
-  location.reload();
+  // sem reload — ver atualizarUniaoDeMaterias()
+  atualizarUniaoDeMaterias();
 }
 
 function pintarAjustes(){
@@ -4047,15 +4117,13 @@ carregarConfig()
     else if(exigeAprovacao()) ir("espera");
     else if(exigeEscolherConcurso()) ir("escolher-concurso");
     else {
-      // ver reiniciarEm(): recarga disparada pela própria página pousa onde ela pediu, não sempre no início
-      let tela = "inicio";
-      try{
-        const pedida = sessionStorage.getItem("vr:pos-reload");
-        if(pedida){ sessionStorage.removeItem("vr:pos-reload"); tela = pedida; }
-      }catch(e){}
-      ir(tela);                  // pinta já, com BANCO ainda vazio — telas que precisam dele mostram "carregando"
-      carregarBancoEmFases();    // não é await: continua em segundo plano
-      sincronizar();             // puxa em segundo plano, não bloqueia a tela
+      /* Trocar concurso/avulsa não recarrega mais a página (ver
+         atualizarUniaoDeMaterias()) — o único jeito de chegar aqui de novo
+         é um boot de verdade (abrir o app, F5), que sempre pousa em
+         "inicio". */
+      ir("inicio");               // pinta já, com BANCO ainda vazio — telas que precisam dele mostram "carregando"
+      carregarBancoEmFases();     // não é await: continua em segundo plano
+      sincronizar();               // puxa em segundo plano, não bloqueia a tela
     }
   })
   .catch(err=>{

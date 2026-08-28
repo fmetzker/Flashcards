@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v277-id-do-cartao-na-tela";
+const VERSAO = "v278-trocar-concurso-sem-reload";
 const CACHE = "prova-enf-" + VERSAO;
 
 const ARQUIVOS = [
