@@ -431,9 +431,12 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
     <div class="stat"><span>Já vistas</span><span class="n" id="n-vistas">0</span></div>
     <div class="stat"><span>Acurácia geral</span><span class="n" id="n-acuracia">–</span></div>
     <div class="stat"><span>Acurácia hoje</span><span class="n" id="n-acuracia-dia">–</span></div>
-    <div class="stat"><span>Acurácia — 7 dias</span><span class="n" id="n-acuracia-semana">–</span></div>
-    <div class="stat"><span>Acurácia — 30 dias</span><span class="n" id="n-acuracia-mes">–</span></div>
     <div class="stat"><span>No caderno de erros</span><span class="n" id="n-erros">0</span></div>
+  </div>
+
+  <div class="card">
+    <div class="rotulo">Revisões pendentes</div>
+    <div id="stats-revisoes"></div>
   </div>
 
   <div class="rotulo" style="margin-top:24px">Acurácia por bloco do edital</div>
@@ -684,6 +687,24 @@ const META_MATERIA_AVULSA = 20;
    subconjunto do outro, então escolher "o maior" perderia conteúdo que cai
    numa das provas. Bloco sem `topicos` declarado significa matéria inteira,
    e nesse caso a união também é a matéria inteira. */
+/* Quantos cartões da matéria (dentro do escopo de tópicos, quando existe)
+   já estão vencidos agora — blocosDaMeta() soma isto à cota de novos do
+   dia. Não filtra por trava de degrau/pré-requisito: revisão vencida nunca
+   é travada (ver grauAberto), e a mesma regra vale aqui — cartão que a
+   pessoa já viu conta na cota mesmo que o tópico dele tenha fechado depois
+   por algum motivo. */
+function revisaoPendenteDaMateria(m, topicos){
+  const h = hoje();
+  let n = 0;
+  for(const id in E.cartoes){
+    const x = porId[id];
+    if(!x || x.m !== m) continue;
+    if(topicos && topicos.indexOf(x.t) < 0) continue;
+    if(E.cartoes[id].prox <= h) n++;
+  }
+  return n;
+}
+
 function blocosDaMeta(lista){
   const porMateria = {};                       // matéria -> bloco vencedor
   const escopo = {};                           // matéria -> Set de tópicos, ou null = tudo
@@ -736,13 +757,24 @@ function blocosDaMeta(lista){
   });
   return ordenadas.map(m=>{
     const bl = porMateria[m];
+    const topicos = escopo[m] ? Array.from(escopo[m]) : null;
+    /* cota do dia = novos (a cota do edital, como sempre foi) + revisão
+       pendente daquela matéria — teto de 2x os novos, pra um backlog
+       grande (dias sem estudar) não inflar a sessão de um dia só. O
+       excedente do teto continua vencido, só sai do NÚMERO da meta: ele
+       aparece antes de qualquer cartão novo assim que a pessoa bate a meta
+       e continua estudando (ver o fallback em iniciarSessao). `novos` e
+       `revisao` ficam expostos à parte porque iniciarSessao() precisa dos
+       dois separados pra intercalar de verdade, não só de `questoes`
+       (a soma) — ver comentário lá. */
+    const novos = bl.questoes;
+    const revisao = Math.min(revisaoPendenteDaMateria(m, topicos), novos * 2);
     /* nome da MATÉRIA, não do bloco: "Conhecimentos específicos" é o nome de
        três blocos diferentes (um por concurso), cada um cobrindo uma matéria
        diferente — usar bl.nome fazia a meta do dia mostrar três linhas
        idênticas e impossíveis de distinguir. MATERIAS[m].nome é sempre único. */
     return {id: bl.id+"@"+m, nome: (MATERIAS[m] && MATERIAS[m].nome) || bl.nome,
-            questoes: bl.questoes, materias: [m],
-            topicos: escopo[m] ? Array.from(escopo[m]) : null};
+            questoes: novos + revisao, novos, revisao, materias: [m], topicos};
   });
 }
 
@@ -1056,6 +1088,15 @@ async function carregarBancoEmFases(){
   await migrarParaIds();
   await migrarReescritas();
   salvar();
+  /* aplicarFoco() rodou lá no boot (carregarConfig) com o banco ainda
+     vazio — blocosDaMeta() soma revisão pendente olhando porId, e porId
+     não cobria nada ainda, então a cota de revisão de cada bloco saiu 0.
+     Só agora, com o banco inteiro carregado, dá pra calcular direito. Refaz
+     a MESMA escolha de foco de sempre (não muda CONCURSO nem escopo, só
+     recalcula BLOCOS_META/E.meta com os dados completos) antes de liberar
+     quem estava esperando o banco. */
+  aplicarFoco(E.escopoEstudo);
+  if(document.getElementById("tela-inicio").classList.contains("ativa")) pintarInicio();
   const pendentes = AGUARDANDO_BANCO_PRONTO.splice(0);
   pendentes.forEach(fn=>fn());
 }
@@ -1814,8 +1855,9 @@ function intercalar(a, b){
    do concurso de Enfermeiro estudando só Matemática — que nem cai nele.
 
    1. Matéria que não pertence a nenhum bloco do foco não conta.
-   2. Cada bloco tem teto próprio: a cota dele na prova (bl.questoes). Fazer
-      50 de Português numa prova que só pede 10 conta 10, não 50 — é isso que
+   2. Cada bloco tem teto próprio: a cota dele (bl.questoes — novos do
+      edital mais revisão pendente daquela matéria, ver blocosDaMeta()).
+      Fazer 50 de Português numa cota de 10 conta 10, não 50 — é isso que
       faz a meta só fechar quando todas as áreas foram estudadas.
 
    Dias anteriores a esta versão não têm diasMateria e caem no `dias` bruto,
@@ -2508,7 +2550,8 @@ function iniciarSessao(modo, filtro){
        declarado, a matéria entra inteira.
 
        Cada bloco entra com o que ainda falta para fechar a cota dele, na
-       mesma ordem de sempre (vencido primeiro, depois nunca visto). */
+       mesma ordem de sempre (vencido primeiro, depois nunca visto). A cota
+       (`bl.questoes`) já é novos + revisão pendente — ver blocosDaMeta(). */
     const h = hoje();
     const porBloco = progressoPorBloco(h);
     lista = [];
@@ -2522,9 +2565,15 @@ function iniciarSessao(modo, filtro){
       };
       const rev = q.revisar.filter(daArea);
       const nov = q.novas.filter(daArea);
-      // metade revisão, metade nova — mesma proporção que valia antes;
-      // intercalar() só muda a ORDEM em que as duas metades aparecem
-      const parte = rev.slice(0, Math.ceil(falta*0.5));
+      /* revisão entra até a cota do dia (bl.revisao, calculada em
+         blocosDaMeta — já é o real, não mais um corte fixo de metade), novo
+         completa o resto de `falta`. rev.length já reflete só o que ainda
+         está pendente NESTA chamada (responder um cartão hoje tira ele
+         daqui), então limitar por bl.revisao aqui é o bastante — não
+         precisa saber quanto de `falta` já foi revisão antes. Os dois
+         entram intercalados, não bloco de revisão seguido de bloco de
+         novo — é o que evita a sessão ficar maçante. */
+      const parte = rev.slice(0, Math.min(bl.revisao, falta));
       let bloco = intercalar(parte, nov.slice(0, falta - parte.length));
       /* Trava de degrau (ou banco pequeno) pode deixar a área com menos
          cartão do que a cota pede — sobretudo logo que um tópico abre, com
@@ -2547,14 +2596,18 @@ function iniciarSessao(modo, filtro){
       }
       lista = lista.concat(bloco);
     });
-    /* nenhuma cota aberta (meta do dia já fechada), ou nada nas matérias da
-       prova: cai no comportamento antigo em vez de deixar a pessoa sem nada
-       para estudar */
+    /* nenhuma cota aberta (meta do dia já fechada) ou nada nas matérias da
+       prova: cai num modo "continuar estudando" — e aqui a ordem muda de
+       propósito. Revisão vencida entra INTEIRA primeiro (inclusive o
+       excedente que passou do teto de 2x em blocosDaMeta e por isso não
+       coube na meta), sem intercalar com novo: quem chegou até aqui já
+       bateu a meta do dia e está adiantando revisão de verdade, não
+       fazendo a sessão normal — só depois de esvaziar o atrasado é que
+       cartão novo volta a aparecer. */
     if(lista.length===0){
       const restam = Math.max(0, E.meta - feitasHoje()) || E.meta;
-      const parte = q.revisar.slice(0, Math.ceil(restam*0.5));
-      lista = intercalar(parte, q.novas.slice(0, restam - parte.length));
-      if(lista.length===0) lista = intercalar(q.revisar, q.novas).slice(0, E.meta);
+      lista = q.revisar.slice(0, restam);
+      if(lista.length < restam) lista = lista.concat(q.novas.slice(0, restam - lista.length));
     }
   }
   if(lista.length===0){ alert("Nada na fila. Adicione mais questões ao banco."); return; }
@@ -2829,6 +2882,32 @@ function finalizarSimulado(){
 /* =======================================================================
    ESTATÍSTICAS
    ======================================================================= */
+/* Quantos cartões já respondidos vencem em cada um dos próximos dias, mais
+   o que já está atrasado agora — só das matérias inscritas (mesmo escopo
+   que o resto da tela usa). Não é a fila em si (que ainda respeita a trava
+   de degrau para cartão NOVO): aqui a pergunta é só "quando isso vence",
+   então nenhuma trava entra — revisão vencida nunca é travada (ver
+   grauAberto), o forecast segue a mesma regra. */
+function revisoesPorDia(){
+  const inscritas = materiasInscritas();
+  const h = hoje();
+  const porDia = {};
+  let atrasadas = 0;
+  Object.keys(E.cartoes).forEach(id=>{
+    const x = porId[id];
+    if(!x || inscritas.indexOf(x.m) < 0) return;
+    const prox = E.cartoes[id].prox;
+    if(prox < h) atrasadas++; else porDia[prox] = (porDia[prox]||0) + 1;
+  });
+  const dias = [];
+  if(atrasadas) dias.push({rotulo:"Atrasadas", n:atrasadas});
+  for(let i=0;i<7;i++){
+    const k = somarDias(h, i);
+    dias.push({rotulo: i===0 ? "Hoje" : i===1 ? "Amanhã" : "Em "+i+" dias", n: porDia[k]||0});
+  }
+  return dias;
+}
+
 /* A divisão completa em matérias e tópicos vive na tela Matérias. Aqui o
    trabalho é outro: ranquear o que está mais fraco, do pior para o melhor,
    considerando só o que já foi respondido. */
@@ -2852,9 +2931,13 @@ function pintarStats(){
   document.getElementById("n-acuracia").textContent = tot? Math.round(ac/tot*100)+"%" : "–";
   document.getElementById("n-erros").textContent = erros;
 
-  /* acurácia por período: soma diasCertas/diasTotal na janela de dias
-     corridos terminando hoje. Dias sem os dois campos (de antes desta
-     métrica) somam 0/0 e não entram na conta — ver comentário em `padrao`. */
+  /* acurácia do dia: soma diasCertas/diasTotal de hoje. Dias sem os dois
+     campos (de antes desta métrica) somam 0/0 e não entram na conta — ver
+     comentário em `padrao`. Existiu também em janela de 7 e 30 dias;
+     removida porque dilui rápido demais para servir de sinal (um mês de
+     acerto quase não move com um erro isolado) e porque quem quer saber
+     "o que vem por aí" tem resposta melhor em revisoesPorDia() — contagem
+     de verdade por dia, não média histórica. */
   const acuraciaJanela = n => {
     let certas=0, total=0, k=hoje();
     for(let i=0;i<n;i++){
@@ -2865,8 +2948,13 @@ function pintarStats(){
     return total ? Math.round(certas/total*100)+"%" : "–";
   };
   document.getElementById("n-acuracia-dia").textContent = acuraciaJanela(1);
-  document.getElementById("n-acuracia-semana").textContent = acuraciaJanela(7);
-  document.getElementById("n-acuracia-mes").textContent = acuraciaJanela(30);
+
+  const revBox = document.getElementById("stats-revisoes"); revBox.innerHTML = "";
+  revisoesPorDia().forEach(d=>{
+    const linha = document.createElement("div"); linha.className = "stat";
+    linha.innerHTML = "<span>"+d.rotulo+"</span><span class=\"n\">"+d.n+"</span>";
+    revBox.appendChild(linha);
+  });
 
   /* ranqueia pelo nível mais fino que a questão tem: o subtópico quando
      existe, senão o tópico. É onde dá para agir. */

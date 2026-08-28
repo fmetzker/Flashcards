@@ -366,6 +366,18 @@ matéria avulsa entra **sempre**, não depende do escopo (ver
   Estudar 10 de Português serve para as quatro provas ao mesmo tempo. A mesma
   regra vale entre bloco de concurso e matéria avulsa: se a mesma matéria
   aparece nos dois, fica a maior cota, nunca a soma.
+- **A cota de cada bloco é novos + revisão pendente, não só o número do
+  edital.** `blocosDaMeta()` soma à cota de novos (a do edital, como sempre
+  foi) quantos cartões daquela matéria já estão vencidos agora — capado em
+  **2× a cota de novos**, pra um backlog grande (dias sem estudar) não
+  inflar a sessão de um dia só. O excedente do teto continua vencido, só
+  sai do número da meta: `iniciarSessao("normal")` intercala revisão e
+  cartão novo dentro da cota (proporção real, não mais um corte fixo de
+  metade), e quem bate a meta e continua estudando recebe esse excedente
+  **inteiro, antes de qualquer cartão novo** — só volta a oferecer novo
+  depois de esvaziar o atrasado. A cota fica congelada no mesmo momento em
+  que `BLOCOS_META` já era recalculado (boot, troca de dia, troca de foco),
+  não a cada resposta — vira alvo móvel senão.
 - **`BLOCOS` ≠ `BLOCOS_META`.** `BLOCOS` é da prova (`CONCURSO`) e manda no
   simulado, na contagem regressiva, na regra de aprovação e em
   `blocoDaMateria` (peso usado por `prioridade()`). `BLOCOS_META` manda só na
@@ -540,9 +552,15 @@ errado dependendo de onde o aparelho está. `aplicarEventoRemoto()` usa a
 mesma formatação de fuso ao decidir em qual dia contar a resposta de outro
 aparelho.
 
-Acurácia por período (hoje/7 dias/30 dias) soma `E.diasCertas`/`E.diasTotal`
-numa janela — campos paralelos a `E.dias` (que só conta quantidade), para
-não fazer dias antigos aparecerem como 0%.
+Acurácia de hoje soma `E.diasCertas`/`E.diasTotal` do dia — campos paralelos
+a `E.dias` (que só conta quantidade), para não fazer dia antigo aparecer
+como 0%. Existiu também em janela de 7 e 30 dias; removida da tela
+Estatísticas por diluir rápido demais para servir de sinal (um mês de
+acerto quase não move com um erro isolado). No lugar, a tela mostra
+**revisões pendentes por dia** (`revisoesPorDia()`) — quantos cartões já
+respondidos vencem hoje e em cada um dos próximos 7 dias, mais o que já
+está atrasado — contagem de verdade do que vem por aí, não média
+histórica.
 
 ## Viés de comprimento e de posição
 
