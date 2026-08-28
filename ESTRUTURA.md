@@ -43,8 +43,9 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 
 | Eixo | Onde | Efeito |
 |---|---|---|
-| `t` / `s` | no cartão | agrupa por assunto; `s` também pode ser alvo de `requisitos` |
+| `t` / `s` | no cartão | agrupa por assunto; `s` também pode ser alvo de `requisitos`/`requisitos_subtopicos` |
 | `requisitos` | `banco/requisitos.json` | **trava** tópico até a base do exigido (tópico inteiro ou só um `{t,s}`) estar dominada |
+| `requisitos_subtopicos` | `banco/requisitos.json` | **trava** subtópico até a base do exigido (sempre `{t,s}`) estar dominada — um nível mais fundo que `requisitos`, dentro de um tópico grande |
 | `n` | no cartão | **trava** degrau dentro do tópico |
 
 ---
@@ -58,7 +59,7 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 | `banco/materias.json` | Lista de matérias, na ordem de exibição |
 | `banco/<matéria>.json` | Questões daquela matéria, uma por linha |
 | `banco/topicos.json` | Árvore oficial do edital — mostra tópico que a prova cobra e o banco não cobre |
-| `banco/requisitos.json` | Pré-requisitos entre tópicos — **travam** cartão novo até a base do exigido |
+| `banco/requisitos.json` | Pré-requisitos entre tópicos e entre subtópicos — **travam** cartão novo até a base do exigido |
 | `banco/indice-legado.json` | Ids na ordem antiga do array — migra progresso pré-id estável |
 | `banco/reescritas.json` | Mapa id antigo→novo de enunciados corrigidos — preserva progresso |
 | `sw.js` | Service worker, rede-primeiro. `VERSAO` sobe a cada mudança no app |
@@ -102,7 +103,7 @@ Um arquivo, ~3.300 linhas: CSS, HTML e JS. Ordem real do arquivo.
 |---|---|
 | `pega` | lê JSON; em `offline.html` lê de `window.DADOS` |
 | `carregarConfig` | concursos, matérias, `topicos.json`, `requisitos.json` |
-| `indexarRequisitos` | achata `requisitos.json` em `REQUISITOS` |
+| `indexarRequisitos` | achata `requisitos.json` em `REQUISITOS` (tópico) e `REQUISITOS_SUB` (subtópico) |
 | `carregarBanco` | carrega só as matérias inscritas |
 | `blocosDaMeta` / `aplicarFoco` | monta `BLOCOS_META` e a meta do dia |
 | `provaMaisProxima` | define `CONCURSO` quando não há escopo |
@@ -131,7 +132,8 @@ Migrações que rodam no boot: `migrarSessaoDoPerfil`, `migrarEstadoDoPerfil`,
 | `grauDe` | nível do cartão; ausente = 1 |
 | `grauLiberado` | até que degrau o tópico abriu (caixa ≥ 2 em todos do degrau) |
 | `requisitosPendentes` / `topicoAberto` | pré-requisitos entre tópicos |
-| `grauAberto` | tópico aberto **e** degrau alcançado |
+| `requisitosPendentesSub` / `subtopicoAberto` | pré-requisitos entre subtópicos — exige `topicoAberto` primeiro |
+| `grauAberto` | tópico aberto **e** subtópico aberto (se houver requisito) **e** degrau alcançado |
 | `fila` | separa `revisar` (por `prioridade`) de `novas` (filtradas por `grauAberto`; sem reordenação) |
 | `intercalar` | entrelaça revisão e novas na sessão, proporcional ao tamanho de cada lista |
 | `iniciarSessao` | modos `normal`, `filtro`, `erros` |

@@ -456,27 +456,45 @@ primeiro.
 ## Ordem de aprendizado
 
 **Entender o conceito antes de exercitar.** É o único princípio, e ele se
-realiza por dois mecanismos, os dois de bloqueio — não existe mais nenhum
+realiza por três mecanismos, os três de bloqueio — não existe nenhum
 mecanismo que apenas *ordene*:
 
 | | onde vive | o que trava |
 |---|---|---|
-| **pré-requisito** entre tópicos | `banco/requisitos.json` | o tópico, até a base do exigido estar dominada |
+| **pré-requisito** entre tópicos | `banco/requisitos.json` → `requisitos` | o tópico, até a base do exigido estar dominada |
+| **pré-requisito** entre subtópicos | `banco/requisitos.json` → `requisitos_subtopicos` | o subtópico, até a base do exigido estar dominada |
 | **nível do cartão** dentro do tópico | campo `n` | o degrau, até o anterior estar acertado |
 
-Os dois são opcionais: sem eles, nada trava. Formato e mecânica em
+Os três são opcionais: sem eles, nada trava. Formato e mecânica em
 `ESTRUTURA.md`.
 
-**Pré-requisito pode apontar para um subtópico, não só para o tópico
-inteiro.** Uma entrada de `requisitos.json` é uma lista onde cada item é uma
-string (tópico inteiro, como sempre foi) ou um objeto `{"t":"Tópico",
-"s":"Subtópico"}` (só aquele subtópico). Existe para o caso em que só uma
-fatia do tópico exigido é base de verdade — ex.: para abrir "Flexão verbal"
-não é preciso dominar Classes de palavras inteira, só o subtópico Verbo dela.
-Isso **não** cria uma segunda escada: o subtópico aqui é só o alvo do
-pré-requisito, e a trava continua sendo do tópico inteiro que o declara — o
-que muda é a granularidade do que precisa estar pronto do lado exigido, não
-como o lado exigente é travado.
+**Pré-requisito de tópico pode apontar para um subtópico do exigido, não só
+para o tópico inteiro.** Uma entrada de `requisitos` é uma lista onde cada
+item é uma string (tópico inteiro, como sempre foi) ou um objeto
+`{"t":"Tópico", "s":"Subtópico"}` (só aquele subtópico). Existe para o caso
+em que só uma fatia do tópico exigido é base de verdade — ex.: para abrir
+"Flexão verbal" não é preciso dominar Classes de palavras inteira, só o
+subtópico Verbo dela. Isso **não** cria uma segunda escada: o subtópico aqui
+é só o alvo do pré-requisito, e a trava continua sendo do tópico inteiro que
+o declara — o que muda é a granularidade do que precisa estar pronto do lado
+exigido, não como o lado exigente é travado.
+
+**Pré-requisito entre subtópicos afina o lado que TRAVA, não só o exigido —
+para tópico grande e heterogêneo o suficiente pra merecer ordem interna.**
+Aritmética (16 subtópicos que não têm nada a ver entre si — Frações,
+Progressões, Sistema de unidades de medida...) é o primeiro caso: abrir
+tudo de uma vez, no dia em que a matéria libera, não ensina em ordem
+nenhuma, e o campo `n` não resolve isso porque gradua definição→exercício
+DENTRO do mesmo fato, não sequencia subtópicos irmãos entre si. Chave
+`requisitos_subtopicos` em `banco/requisitos.json`, formato `"Tópico|Subtópico":
+[{"t":..,"s":..}, ...]` — cada dependência é **sempre** `{t,s}`, nunca string
+solta (dentro de uma chave de subtópico, string ambiguaria entre "o tópico X
+inteiro" e "o subtópico X deste mesmo tópico"). Um subtópico só abre se o
+TÓPICO dele já estiver aberto — a trava de subtópico é uma camada A MAIS,
+nunca um atalho que pule a de tópico — e tópico sem nenhuma entrada aqui
+continua com todos os subtópicos abertos assim que ele mesmo abrir: é
+opcional em cima de opcional. Exige `criterio_subtopicos` pela mesma razão
+de `criterio` — é julgamento pedagógico nosso, não transcrição de edital.
 
 **Não existe nível ENTRE tópicos.** Existiu — camadas que agrupavam os
 tópicos em "a palavra / a relação entre palavras / o texto" — e foi removido
@@ -488,29 +506,42 @@ dentro do tópico.**
 
 Os invariantes, que não podem ser afrouxados:
 
-- **Trava só cartão NOVO.** Revisão vencida entra sempre, venha do degrau ou
-  do tópico que vier. Travar revisão viraria um jeito de esconder justamente
-  o que a pessoa já errou.
+- **Trava só cartão NOVO.** Revisão vencida entra sempre, venha do degrau, do
+  tópico ou do subtópico que vier. Travar revisão viraria um jeito de
+  esconder justamente o que a pessoa já errou.
 - **Cartão sem `n` vale 1, e o degrau 1 nunca trava.** Enquanto o banco não
   estiver todo classificado, ligar o recurso não pode trancar o que ninguém
   classificou.
 - **Sempre existe tópico sem pré-requisito** — o validador reprova se não
-  houver nenhum. A trava não pode deixar a pessoa sem nada para estudar.
-- **O simulado ignora os dois eixos.** Ele imita a prova, e a prova não
+  houver nenhum. A trava não pode deixar a pessoa sem nada para estudar. Vale
+  também por subtópico: todo tópico que declara `requisitos_subtopicos` para
+  algum dos seus subtópicos precisa deixar pelo menos um subtópico dele sem
+  requisito — senão o tópico abre e nenhum subtópico dele nunca abriria.
+- **Subtópico só abre com o tópico já aberto — transitivo, como topicoAberto().**
+  `baseDominada()` verifica `subtopicoAberto()` (não só a caixa em dia) antes
+  de considerar uma dependência `{t,s}` cumprida, pelo mesmo motivo que já
+  valia para tópico: histórico espalhado (de antes da cadeia existir, ou de
+  quando cabia estudar em qualquer ordem) não pode destravar o que vem depois
+  sem ter passado pela base de verdade.
+- **O simulado ignora os três eixos.** Ele imita a prova, e a prova não
   respeita escada nenhuma.
-- **A trava não tem escape.** Tópico fechado por pré-requisito não ganha
-  botão Estudar; degrau fechado não é alcançável nem pelo atalho de "revisar
-  adiantado".
-- **`criterio`, não `fonte`.** `topicos.json` transcreve edital e exige
-  `fonte`; ordem de estudo é julgamento nosso, e nenhum edital diz de que
-  tópico depende qual. Chamar de "fonte" fingiria autoridade que não existe —
-  mesmo cuidado da regra 11.
+- **A trava não tem escape.** Tópico ou subtópico fechado por pré-requisito
+  não ganha botão Estudar; degrau fechado não é alcançável nem pelo atalho de
+  "revisar adiantado".
+- **`criterio`/`criterio_subtopicos`, não `fonte`.** `topicos.json` transcreve
+  edital e exige `fonte`; ordem de estudo é julgamento nosso, e nenhum edital
+  diz de que tópico (ou subtópico) depende qual. Chamar de "fonte" fingiria
+  autoridade que não existe — mesmo cuidado da regra 11.
 
 `validar.py` barra grafia que não existe no banco, pré-requisito circular,
 tópico que exige a si mesmo, matéria em que nenhum tópico abriria, e nível
 fora de 1–9. E **avisa** qual tópico tem cartão de nível 2+ sem nenhum de
 nível 1: ali a escada não segura nada, e esse aviso é a lista de trabalho de
-quais definições ainda faltam escrever.
+quais definições ainda faltam escrever. As mesmas checagens de pré-requisito
+valem por subtópico em `requisitos_subtopicos` (dependência que não existe
+no banco, ciclo — combinando o grafo de tópico com o de subtópico, já que um
+subtópico depende implicitamente do próprio tópico —, subtópico que exige a
+si mesmo, tópico em que nenhum subtópico abriria).
 
 O campo `n` é gravado pelos caminhos de sempre — `incorporar-rascunho.ps1` e
 `explicar-alternativas.ps1`. Nenhum script novo: a regra 9 segue com três.

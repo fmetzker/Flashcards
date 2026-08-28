@@ -599,7 +599,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
    e  = explicação   f = fonte
    ======================================================================= */
 let BANCO = [], CONCURSO = null, BLOCOS = [], BLOCOS_META = [], ORDEM_MATERIAS = [], TOPICOS_EDITAL = {};
-let REQ_MATERIA = {}, REQUISITOS = {};
+let REQ_MATERIA = {}, REQUISITOS = {}, REQUISITOS_SUB = {};
 let CONCURSOS = [];          // todos os que existem em concursos.json
 let INSCRITOS = [];          // os que ESTE perfil segue (objetos, não ids)
 /* Carregamento em duas fases (ver carregarBancoParcial): a tela pinta antes
@@ -889,11 +889,18 @@ async function carregarConfig(){
    a cada cartão seria desperdício.
 
    REQUISITOS["portugues|Crase"] = ["Classes de palavras", "Regência"]   */
+/* REQUISITOS_SUB["matematica|Aritmética|Juros"] = [{"t":"Aritmética","s":"Porcentagem"}]
+   — mesma ideia de REQUISITOS, um nível mais fundo: pré-requisito ENTRE
+   SUBTÓPICOS do mesmo tópico (ou de outro), não mais só entre tópicos. Ver
+   subtopicoAberto() logo abaixo e "Ordem de aprendizado" no CLAUDE.md. */
 function indexarRequisitos(){
   REQUISITOS = {};
+  REQUISITOS_SUB = {};
   Object.keys(REQ_MATERIA).forEach(mid=>{
     const req = REQ_MATERIA[mid].requisitos || {};
     Object.keys(req).forEach(t=>{ REQUISITOS[mid + "|" + t] = req[t] || []; });
+    const reqSub = REQ_MATERIA[mid].requisitos_subtopicos || {};
+    Object.keys(reqSub).forEach(chave=>{ REQUISITOS_SUB[mid + "|" + chave] = reqSub[chave] || []; });
   });
 }
 
@@ -925,7 +932,20 @@ const _cacheGrau = {};
 /* 's' é opcional: sem ele, mede o tópico inteiro (comportamento de sempre).
    Com 's', mede só os cartões daquele subtópico — usado por baseDominada()
    quando um pré-requisito aponta para {t, s} em vez de para o tópico
-   inteiro (ver "Pré-requisito pode apontar para um subtópico" no CLAUDE.md). */
+   inteiro (ver "Pré-requisito pode apontar para um subtópico" no CLAUDE.md).
+
+   Anda pelos graus que EXISTEM de verdade nesse escopo (m/t/s), não pelos
+   inteiros 1,2,3... Descoberto na auditoria de requisitos_subtopicos de
+   agosto/2026: vários subtópicos (ex. Aritmética|Fatoração em números
+   primos) só têm cartão de nível 2+, sem nenhum de nível 1 — a versão
+   antiga travava g=1 pra sempre nesse caso (checava porGrau[1], achava
+   undefined, e nunca chegava a olhar o nível 2 mesmo 100% dominado), o que
+   deixava esses subtópicos (e, no caso pré-existente de
+   Geometria|Geometria analítica, o TÓPICO Vetores inteiro, que exige esse
+   subtópico) permanentemente travados. Andar pelos graus presentes em vez
+   de incrementar 1 por 1 corrige isso e também sobrevive a um buraco no
+   meio (nível 1 e 3 sem nível 2) — no caso comum, sem buraco nenhum, o
+   resultado é idêntico ao de sempre. */
 function grauLiberado(m, t, s){
   const chave = m + "|" + t + "|" + (s || "");
   if(chave in _cacheGrau) return _cacheGrau[chave];
@@ -935,16 +955,23 @@ function grauLiberado(m, t, s){
     if(s && q.s !== s) return;
     (porGrau[grauDe(q)] = porGrau[grauDe(q)] || []).push(q.id);
   });
-  let g = 1;
-  while(porGrau[g] && porGrau[g].every(id=>{
+  const graus = Object.keys(porGrau).map(Number).sort((a,b)=>a-b);
+  let i = 0;
+  while(i < graus.length && porGrau[graus[i]].every(id=>{
     const c = E.cartoes[id];
     return c && c.caixa >= 2;
-  })) g++;
+  })) i++;
+  // tudo dominado: sentinela "um grau além do último" (mesmo espírito do
+  // g++ incondicional de sempre — nenhum cartão real tem esse nível)
+  const g = i < graus.length ? graus[i] : (graus[graus.length-1] || 0) + 1;
   return _cacheGrau[chave] = g;
 }
 /* o cache vale por montagem de fila: responder um cartão muda o que está
    liberado, e a fila é remontada a cada sessão */
-function limparCacheGrau(){ for(const k in _cacheGrau) delete _cacheGrau[k]; }
+function limparCacheGrau(){
+  for(const k in _cacheGrau) delete _cacheGrau[k];
+  for(const k in _cacheMenorGrau) delete _cacheMenorGrau[k];
+}
 
 /* ===== pré-requisito ENTRE tópicos ==========================================
 
@@ -976,11 +1003,40 @@ function limparCacheGrau(){ for(const k in _cacheGrau) delete _cacheGrau[k]; }
    realmente percorreu (ou já dominava, na ordem certa) tudo antes dele.
    requisitosPendentes() sempre teve o corte cíclico do validar.py contra
    pré-requisito circular, então esta recursão sempre termina. */
+/* Menor grau que EXISTE de verdade no escopo m/t/s — quase sempre 1 (cartão
+   sem 'n' vale 1), mas alguns subtópicos só têm cartão de nível 2+ (ver o
+   comentário de grauLiberado() acima). "Base dominada" tem que comparar
+   contra o piso REAL desse escopo, não contra o literal 1: senão, um
+   subtópico sem nível 1 passaria a barra sem ninguém ter estudado nada
+   (grauLiberado começa nesse piso mesmo com zero progresso), ou — se o
+   comparador ficasse hardcoded alto demais — nunca passaria (o bug que
+   motivou esta auditoria: Vetores, que exige Geometria|Geometria analítica,
+   um subtópico só com nível 2 e 3, ficava travado para sempre). */
+const _cacheMenorGrau = {};
+function menorGrauExistente(m, t, s){
+  const chave = m + "|" + t + "|" + (s || "");
+  if(chave in _cacheMenorGrau) return _cacheMenorGrau[chave];
+  let menor = null;
+  BANCO.forEach(q=>{
+    if(q.m !== m || q.t !== t) return;
+    if(s && q.s !== s) return;
+    const g = grauDe(q);
+    if(menor === null || g < menor) menor = g;
+  });
+  return _cacheMenorGrau[chave] = (menor === null ? 1 : menor);
+}
+
 function baseDominada(m, dep){
   const t = typeof dep === "string" ? dep : dep.t;
   const s = typeof dep === "string" ? undefined : dep.s;
-  if(!topicoAberto(m, t)) return false;
-  return grauLiberado(m, t, s) > 1;
+  /* {t,s}: a barra a vencer é a do SUBTÓPICO exigido (que já inclui, por
+     baixo, o tópico dele estar aberto — ver subtopicoAberto()), não só o
+     tópico inteiro. Mesma razão transitiva de sempre: sem isto, quem tem a
+     caixa de um subtópico em dia por coincidência (histórico de antes da
+     escada existir) abriria o que depende dele sem ter passado pela cadeia. */
+  if(s){ if(!subtopicoAberto(m, t, s)) return false; }
+  else{ if(!topicoAberto(m, t)) return false; }
+  return grauLiberado(m, t, s) > menorGrauExistente(m, t, s);
 }
 
 /* Requisitos que ainda faltam para este tópico abrir; vazio = aberto. */
@@ -991,18 +1047,48 @@ function requisitosPendentes(m, t){
 }
 function topicoAberto(m, t){ return requisitosPendentes(m, t).length === 0; }
 
+/* ===== pré-requisito ENTRE SUBTÓPICOS do mesmo tópico (ou de outro) =========
+
+   Um degrau mais fundo que topicoAberto(): dentro de um tópico grande e
+   heterogêneo (Aritmética, com 16 subtópicos que não têm nada a ver entre
+   si), abrir tudo de uma vez não ensina em ordem nenhuma — é o problema que
+   `n` (definição→exercício) não resolve, porque `n` graduamos DENTRO do
+   mesmo fato, não SEQUENCIA subtópicos irmãos. banco/requisitos.json ganhou
+   uma seção irmã, `requisitos_subtopicos`, chave "Tópico|Subtópico" →
+   lista de dependências, cada uma OBRIGATORIAMENTE {"t":..,"s":..} (nunca
+   string solta — sem essa forma, "Tópico|Subtópico exige X" seria ambíguo
+   entre "o tópico X inteiro" e "o subtópico X deste mesmo tópico").
+
+   Não travar o tópico inteiro: um tópico sem NENHUM requisito de subtópico
+   continua com todos os subtópicos abertos assim que ele mesmo abrir — só
+   quem tem entrada própria no mapa fica sujeito a mais essa checagem.
+   Opcional em cima de opcional: sem requisitos_subtopicos, nada muda aqui. */
+function requisitosPendentesSub(m, t, s){
+  const req = REQUISITOS_SUB[m + "|" + t + "|" + s];
+  if(!req || !req.length) return [];
+  return req.filter(dep=> !baseDominada(m, dep));
+}
+/* subtópico só abre se o TÓPICO dele já estiver aberto — a trava por
+   subtópico é uma camada A MAIS, nunca um atalho que pule a de tópico. */
+function subtopicoAberto(m, t, s){
+  return topicoAberto(m, t) && requisitosPendentesSub(m, t, s).length === 0;
+}
+
 /* Rótulo de exibição de uma dependência pendente — string (tópico) sai como
    está; {t, s} vira "Subtópico (em Tópico)", senão a tela mostraria
    "[object Object]". */
 function rotuloDep(d){ return typeof d === "string" ? d : d.s + " (em " + d.t + ")"; }
 
-/* Cartão NOVO só entra se o tópico dele estiver aberto E o degrau dele já
-   tiver sido alcançado dentro do tópico. Vale só para cartão novo: revisão
-   vencida nunca é travada, nem por degrau nem por pré-requisito, porque
-   travar revisão transformaria a escada num jeito de esconder o que a pessoa
-   já errou. */
+/* Cartão NOVO só entra se o tópico dele estiver aberto, o SUBTÓPICO dele
+   (se tiver `s` e ele estiver em requisitos_subtopicos) também estiver
+   aberto, E o degrau dele já tiver sido alcançado dentro do tópico. Vale só
+   para cartão novo: revisão vencida nunca é travada, nem por degrau nem por
+   pré-requisito (de tópico ou de subtópico), porque travar revisão
+   transformaria a escada num jeito de esconder o que a pessoa já errou. */
 function grauAberto(q){
-  return topicoAberto(q.m, q.t) && grauDe(q) <= grauLiberado(q.m, q.t);
+  if(!topicoAberto(q.m, q.t)) return false;
+  if(q.s && !subtopicoAberto(q.m, q.t, q.s)) return false;
+  return grauDe(q) <= grauLiberado(q.m, q.t);
 }
 
 /* união das matérias de TODOS os concursos inscritos, MAIS as matérias
@@ -2322,6 +2408,16 @@ function travaDoTopico(mid, t, dt){
   return {tipo:"grau", aberto, faltam: Math.max(0, dg.total - dg.dominados), presos};
 }
 
+/* mesma ideia de travaDoTopico(), um nível mais fundo: se o subtópico tem
+   requisito PRÓPRIO (requisitos_subtopicos) pendente, a linha explica o quê
+   falta em vez de só sumir com o botão. O tópico já foi conferido aberto
+   antes de chamar renderTopico() nesse subtópico, então aqui só sobra a
+   checagem de subtópico mesmo. */
+function travaDoSubtopico(mid, t, s){
+  const pend = requisitosPendentesSub(mid, t, s);
+  return pend.length ? {tipo:"requisito", faltam:pend} : null;
+}
+
 /* uma linha com nome, barra de acerto, contagem e botão de estudar.
    Tópico que veio só do edital (total 0) não ganha botão: não há o que
    estudar ainda. Fica apagado, como dívida de cobertura visível.
@@ -2347,7 +2443,7 @@ function linhaNivel(cls, rotulo, d, aoEstudar, trava){
     const tv = document.createElement("span"); tv.className = "trava";
     if(fechado){
       tv.textContent = "🔒 estude antes: " + trava.faltam.map(rotuloDep).join(", ");
-      tv.title = "Este tópico abre quando a base do que falta estiver dominada";
+      tv.title = "Isto abre quando a base do que falta estiver dominada";
     } else {
       tv.textContent = "🔒 nível " + (trava.aberto+1) + " travado · faltam "
                      + trava.faltam + " do nível " + trava.aberto;
@@ -2442,7 +2538,7 @@ function pintarMaterias(){
         dentro.appendChild(linhaNivel("subtopico", s, dt.subs[s], ev=>{
           ev.stopPropagation();
           iniciarSessao("filtro", {m:mid, t:t, s:s});
-        }));
+        }, travaDoSubtopico(mid, t, s)));
       });
       grupo.appendChild(dentro);
       corpo.appendChild(grupo);

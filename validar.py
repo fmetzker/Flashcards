@@ -305,6 +305,82 @@ def valida_requisitos(B, materias):
         if do_banco and not raizes:
             erros.append(f"requisitos.json: matéria '{mid}': todo tópico tem pré-requisito — "
                          "nenhum abriria no primeiro dia")
+
+        # ---- requisitos_subtopicos: mesma ideia, um nível mais fundo ----
+        # chave "Tópico|Subtópico" -> lista de deps, cada uma OBRIGATORIAMENTE
+        # {"t":..,"s":..} (nunca string solta — ver _forma_do_item no arquivo
+        # e o comentário de requisitosPendentesSub() no index.html).
+        req_sub = dado.get('requisitos_subtopicos') or {}
+        if req_sub and not dado.get('criterio_subtopicos'):
+            erros.append(f"requisitos.json: matéria '{mid}' tem 'requisitos_subtopicos' mas "
+                         "sem 'criterio_subtopicos' — por que esta ordem, e não outra?")
+        chaves_validas = {}   # "Tópico|Subtópico" -> (t, s), só as que existem de verdade
+        for (t_b, s_b) in pares_banco:
+            chaves_validas[f"{t_b}|{s_b}"] = (t_b, s_b)
+        for chave, deps in req_sub.items():
+            if chave not in chaves_validas:
+                erros.append(f"requisitos.json: matéria '{mid}': requisitos_subtopicos declarado "
+                             f"para '{chave}', que não existe como par tópico/subtópico no banco")
+                continue
+            t_chave, s_chave = chaves_validas[chave]
+            for d in deps:
+                if not isinstance(d, dict):
+                    erros.append(f"requisitos.json: matéria '{mid}', '{chave}': dependência de "
+                                 "subtópico precisa ser {\"t\":..,\"s\":..} — string solta é ambígua aqui")
+                    continue
+                if (d.get('t'), d.get('s')) not in pares_banco:
+                    erros.append(f"requisitos.json: matéria '{mid}', '{chave}': pré-requisito "
+                                 f"'{d.get('t')}/{d.get('s')}' não existe no banco desta matéria")
+                if d.get('t') == t_chave and d.get('s') == s_chave:
+                    erros.append(f"requisitos.json: matéria '{mid}': '{chave}' é pré-requisito de "
+                                 "si mesmo")
+        # ciclo combinado: nó de tópico ("T:x") e nó de subtópico ("S:x|y"),
+        # com a aresta implícita S:t|s -> T:t (subtópico nunca abre antes do
+        # próprio tópico) somada às arestas explícitas dos dois arquivos.
+        if req_sub:
+            estado2 = {}
+            def no_topico(t): return "T:" + t
+            def no_sub(t, s): return "S:" + t + "|" + s
+            def vizinhos(no):
+                if no.startswith("T:"):
+                    t = no[2:]
+                    return [no_topico(d) if isinstance(d, str) else no_sub(d['t'], d['s'])
+                            for d in req.get(t, [])]
+                t, s = no[2:].split("|", 1)
+                viz = [no_topico(t)]
+                for d in req_sub.get(f"{t}|{s}", []):
+                    if isinstance(d, dict) and d.get('t') and d.get('s'):
+                        viz.append(no_sub(d['t'], d['s']))
+                return viz
+            def ciclo2(no, caminho_atual):
+                if estado2.get(no) == 'ok':
+                    return None
+                if estado2.get(no) == 'visitando':
+                    return caminho_atual[caminho_atual.index(no):] + [no]
+                estado2[no] = 'visitando'
+                for viz in vizinhos(no):
+                    achado = ciclo2(viz, caminho_atual + [no])
+                    if achado:
+                        return achado
+                estado2[no] = 'ok'
+                return None
+            for chave in list(req_sub):
+                t_chave, s_chave = chave.split("|", 1)
+                c = ciclo2(no_sub(t_chave, s_chave), [])
+                if c:
+                    erros.append(f"requisitos.json: matéria '{mid}': ciclo de pré-requisitos entre "
+                                 f"subtópicos ({' -> '.join(c)}) — nunca destravariam")
+                    break
+            # por tópico que declara requisito de subtópico: ao menos um
+            # subtópico DELE precisa ficar sem requisito (senão, mesmo com o
+            # tópico aberto, nenhum subtópico jamais abriria)
+            topicos_com_req_sub = {chave.split("|", 1)[0] for chave in req_sub}
+            for t_pai in topicos_com_req_sub:
+                subs_do_topico = {s_b for (t_b, s_b) in pares_banco if t_b == t_pai}
+                raizes_sub = [s_b for s_b in subs_do_topico if not req_sub.get(f"{t_pai}|{s_b}")]
+                if subs_do_topico and not raizes_sub:
+                    erros.append(f"requisitos.json: matéria '{mid}', tópico '{t_pai}': todo "
+                                 "subtópico tem pré-requisito — nenhum abriria")
     # matéria ativa sem requisitos declarados: nenhum tópico dela trava
     declaradas = set(reg)
     ativas = materias_ativas()
