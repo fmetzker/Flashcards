@@ -253,17 +253,30 @@ que não podem ser confundidas:
 
 **`E.materiasAvulsas`** é um terceiro jeito de expandir o banco carregado,
 sem concurso nenhum por trás: matéria avulsa entra em `materiasInscritas()`
-do mesmo jeito que a de um concurso inscrito, mas **não** tem bloco, então
-não conta pra `BLOCOS_META` nem pra meta, e não entra no simulado (inventar
-data de prova e regra de aprovação pra ela violaria a regra 11). Dá pra
-seguir só matéria avulsa, sem concurso nenhum — nesse caso `CONCURSO` fica
-`null`, `BLOCOS`/`BLOCOS_META` ficam `[]`, a tela inicial mostra "Estudo
-livre" em vez do cabeçalho de prova, o botão Simulado some, e `E.meta` cai
-no fallback `SESSAO_SEM_CONCURSO` (20) só para `iniciarSessao()` ter quanto
-estudar — não é meta de prova nenhuma, e o rótulo na tela inicial muda para
-"Sessão de hoje" para não fingir que é. `exigeEscolherConcurso()` também
-aceita matéria avulsa sozinha: só força a tela de portão se não houver
-concurso **nem** avulsa nenhuma.
+do mesmo jeito que a de um concurso inscrito. Diferente de concurso, ela não
+vem de um `bloco` de `concursos.json` — mas `blocosDaMeta()` cria um bloco
+sintético pra cada matéria avulsa, com cota fixa `META_MATERIA_AVULSA` (20
+por dia), então ela **entra** em `BLOCOS_META` e conta pra meta do dia,
+igual a qualquer bloco de concurso. Se a mesma matéria já tem bloco de algum
+concurso seguido, vale a **maior** cota entre os dois — a mesma regra de
+"matéria repetida não soma" que já valia entre concursos (ver acima), agora
+estendida à avulsa. O que ela não faz é entrar no simulado (inventar data de
+prova e regra de aprovação pra ela violaria a regra 11) — por isso o botão
+Simulado permanece ligado a `CONCURSO`, não a `BLOCOS_META`.
+
+Dá pra seguir só matéria avulsa, sem concurso nenhum — nesse caso `CONCURSO`
+fica `null`, `BLOCOS` (que é `CONCURSO.blocos`, usado pelo simulado e pela
+regra de aprovação) fica `[]`, mas `BLOCOS_META` **não** fica vazio: tem um
+bloco sintético por matéria avulsa seguida. A tela inicial mostra "Estudo
+livre" em vez do cabeçalho de prova, o botão Simulado some, e o rótulo da
+meta muda para "Sessão de hoje" — não porque o número deixou de ser uma meta
+de verdade (cada matéria avulsa tem cota própria, soma igual a qualquer
+outra), mas porque não existe **prova** nenhuma atrás dela. `E.meta` só cai
+no fallback `SESSAO_SEM_CONCURSO` (20) no caso residual de `BLOCOS_META`
+ficar mesmo vazio — nem concurso, nem avulsa — o que hoje só acontece em
+estado transitório do boot ou pra quem ainda não seguiu nada.
+`exigeEscolherConcurso()` também aceita matéria avulsa sozinha: só força a
+tela de portão se não houver concurso **nem** avulsa nenhuma.
 
 Concurso e processo seletivo (campo `tipo` em `concursos.json`, usado só
 para agrupar as telas de seleção em três divisórias — não muda nenhuma
@@ -342,13 +355,17 @@ mesmo tipo de trabalho.
 ## Meta e progresso do dia
 
 A meta diária **não é configurável** — é a soma das cotas dos concursos que
-o escopo alcança (`blocosDaMeta()` → `BLOCOS_META`, recalculado em
-`aplicarFoco()`): todos os inscritos por padrão, ou um só quando
-`E.escopoEstudo` aponta para um.
+o escopo alcança, mais a cota de cada matéria avulsa seguida
+(`blocosDaMeta()` → `BLOCOS_META`, recalculado em `aplicarFoco()`): todos os
+inscritos por padrão, ou um só quando `E.escopoEstudo` aponta para um —
+matéria avulsa entra **sempre**, não depende do escopo (ver
+`E.materiasAvulsas` acima).
 
 - **Matéria repetida não soma, vale a maior cota.** Português cai nos quatro
   concursos cadastrados; somar daria 40 questões/dia da mesma matéria.
-  Estudar 10 de Português serve para as quatro provas ao mesmo tempo.
+  Estudar 10 de Português serve para as quatro provas ao mesmo tempo. A mesma
+  regra vale entre bloco de concurso e matéria avulsa: se a mesma matéria
+  aparece nos dois, fica a maior cota, nunca a soma.
 - **`BLOCOS` ≠ `BLOCOS_META`.** `BLOCOS` é da prova (`CONCURSO`) e manda no
   simulado, na contagem regressiva, na regra de aprovação e em
   `blocoDaMateria` (peso usado por `prioridade()`). `BLOCOS_META` manda só na

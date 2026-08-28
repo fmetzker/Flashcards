@@ -445,7 +445,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   <h1>Ajustes</h1>
 
   <div class="rotulo">Concursos e matérias</div>
-  <div class="aviso">Marque tudo que você estuda. O banco de questões passa a trazer as matérias de todos eles; a meta e o simulado usam o que estiver em foco na tela inicial. Matéria avulsa não tem prova atrás — não conta pra meta nem entra no simulado, é só pra estudar por conta própria.</div>
+  <div class="aviso">Marque tudo que você estuda. O banco de questões passa a trazer as matérias de todos eles; a meta e o simulado usam o que estiver em foco na tela inicial. Matéria avulsa não tem prova atrás — entra na meta do dia com cota própria (20 por dia), mas não entra no simulado.</div>
   <div id="concursos-corpo" style="margin-top:10px"></div>
 
   <div style="margin-top:24px" class="rotulo">Conta</div>
@@ -663,6 +663,10 @@ function metaDoConcurso(c){
   return (c.blocos||[]).reduce((soma,bl)=> soma + (bl.questoes||0), 0) || 35;
 }
 
+/* cota diária de cada matéria avulsa, tratada como bloco próprio dentro de
+   blocosDaMeta() — ver o bloco de mesclagem logo abaixo */
+const META_MATERIA_AVULSA = 20;
+
 /* Blocos que valem para a META DIÁRIA — a união de TODOS os concursos
    inscritos, não só o que está em foco. Quem segue dois concursos precisa
    estudar os dois todo dia; antes a meta só enxergava o foco, e a matéria
@@ -699,6 +703,26 @@ function blocosDaMeta(lista){
         bl.topicos.forEach(t=> escopo[m].add(t));
       });
     });
+  });
+  /* Matéria avulsa entra como se fosse o próprio bloco de um concurso: cota
+     fixa de META_MATERIA_AVULSA por matéria, contando na meta do dia e na
+     sessão normal como qualquer bloco — antes avulsa só aparecia como
+     contagem bruta, sem cota nenhuma ("sem contar pra meta"); virou bloco de
+     verdade porque a pessoa marcou aquilo para estudar TODO dia, não só como
+     sobra depois de fechar a cota do concurso.
+     Se a matéria já tem bloco de algum concurso seguido, fica valendo a
+     MAIOR cota entre o bloco do concurso e a cota fixa da avulsa — mesma
+     regra de "matéria repetida não soma" que já vale entre concursos, agora
+     estendida à avulsa. Escopo de tópicos sempre abre a matéria inteira:
+     avulsa não tem edital nenhum limitando o que cai, então não faz sentido
+     herdar o recorte de tópicos de um concurso que por acaso cobre a mesma
+     matéria. */
+  (E.materiasAvulsas||[]).forEach(m=>{
+    if(!porMateria[m] || META_MATERIA_AVULSA > porMateria[m].questoes){
+      porMateria[m] = {id: "avulsa", nome: (MATERIAS[m] && MATERIAS[m].nome) || m,
+                        questoes: META_MATERIA_AVULSA, materias: [m]};
+    }
+    escopo[m] = null;
   });
   /* ORDEM_MATERIAS só decide a ORDEM de exibição — nunca quais matérias
      entram. Antes esta linha era `ORDEM_MATERIAS.filter(...)`, e quando a
@@ -744,6 +768,11 @@ function provaMaisProxima(){
    CLAUDE.md. Simulado e a pergunta "quantos dias faltam" ficam indisponíveis
    nesse estado (ver pintarInicio); "Estudar agora" continua funcionando,
    porque fila() só depende do banco carregado, não de CONCURSO. */
+/* último recurso: só entra em uso quando BLOCOS_META fica vazio mesmo assim
+   (nem concurso, nem matéria avulsa — ver META_MATERIA_AVULSA, que agora dá
+   um bloco de verdade pra cada avulsa, então esse caso normalmente só
+   acontece em estado transitório do boot, não no dia a dia de quem já tem
+   alguma coisa seguida). */
 const SESSAO_SEM_CONCURSO = 20;   // tamanho de sessão quando não há meta de prova nenhuma atrás
 function aplicarFoco(id){
   const escolhido = id ? INSCRITOS.find(c=>c.id === id) : null;
@@ -1214,12 +1243,14 @@ const padrao = {
      conta no dia — por isso trocar o escopo repinta em vez de recarregar. */
   concurso:null, concursos:[], concursoAtivo:null, escopoEstudo:null,
   /* matérias avulsas: ids de matéria que a pessoa segue por conta própria,
-     sem concurso/processo seletivo nenhum atrás — carrega o banco delas e
-     libera pra estudo livre na tela Matérias, mas não vira meta de dia nem
-     entra no simulado (isso exigiria inventar data de prova e regra de
-     aprovação que não existem — regra 11 do CLAUDE.md). Pode conviver com
-     E.concursos (extra sobre o que já é seguido) ou existir sozinha (dá pra
-     usar o app sem seguir concurso nenhum, só estudando matéria solta). */
+     sem concurso/processo seletivo nenhum atrás — carrega o banco delas,
+     libera pra estudo livre na tela Matérias e entra na meta do dia com
+     cota própria (META_MATERIA_AVULSA, tratada como bloco dentro de
+     blocosDaMeta()), mas não entra no simulado (isso exigiria inventar data
+     de prova e regra de aprovação que não existem — regra 11 do
+     CLAUDE.md). Pode conviver com E.concursos (extra sobre o que já é
+     seguido) ou existir sozinha (dá pra usar o app sem seguir concurso
+     nenhum, só estudando matéria solta). */
   materiasAvulsas:[],
   /* ids de eventos gerados por ESTE perfil, para o pull não contar de novo o
      que este aparelho já somou em acertos/erros/dias na hora da resposta —
@@ -1790,10 +1821,12 @@ function intercalar(a, b){
    Dias anteriores a esta versão não têm diasMateria e caem no `dias` bruto,
    sem detalhamento: retroagir seria inventar de qual matéria eram.
 
-   BLOCOS_META vazio (nenhum concurso seguido, só matéria avulsa) cai no
-   mesmo bruto: não existe bloco/cota nenhum pra distribuir o progresso, mas
-   a pessoa ainda está estudando de verdade — contar tudo é melhor que travar
-   em 0 pra sempre. */
+   BLOCOS_META vazio cai no mesmo bruto: sem bloco/cota nenhum pra distribuir
+   o progresso, contar tudo é melhor que travar em 0 pra sempre. Isso hoje só
+   acontece em estado transitório do boot ou pra quem não segue absolutamente
+   nada — matéria avulsa também vira bloco (META_MATERIA_AVULSA, dentro de
+   blocosDaMeta()), então quem tem pelo menos uma avulsa marcada já cai no
+   `reduce` de baixo, com cota de verdade por matéria. */
 function progressoDoDia(k){
   const porMat = E.diasMateria[k];
   if(!porMat || !BLOCOS_META.length) return E.dias[k] || 0;
@@ -1805,14 +1838,18 @@ function progressoDoDia(k){
 function feitasHoje(){ return progressoDoDia(hoje()); }
 
 /* detalhamento por bloco do dia de hoje, para a tela inicial mostrar onde
-   ainda falta — devolve [{nome, feitas, cota}] na ordem dos blocos da meta
-   (união dos inscritos), não só do concurso em foco */
+   ainda falta — devolve [{nome, feitas, cota, avulsa}] na ordem dos blocos
+   da meta (união dos inscritos), não só do concurso em foco. `avulsa` marca
+   os blocos sintéticos que blocosDaMeta() cria a partir de E.materiasAvulsas
+   (id "avulsa"), só para o rótulo "· avulsa" na tela — a cota já é uma
+   cota de verdade, tratada igual à de qualquer bloco de concurso. */
 function progressoPorBloco(k){
   const porMat = E.diasMateria[k] || {};
   return BLOCOS_META.map(bl=>({
     nome: bl.nome,
     feitas: bl.materias.reduce((n,m)=> n + (porMat[m]||0), 0),
-    cota: bl.questoes
+    cota: bl.questoes,
+    avulsa: bl.id.indexOf("avulsa@") === 0
   }));
 }
 
@@ -1916,7 +1953,11 @@ function pintarFocoConcurso(){
   INSCRITOS.forEach(c=>{
     const op = document.createElement("option");
     op.value = c.id;
-    op.textContent = "Só "+c.cargo + " · " + metaDoConcurso(c) + " por dia";
+    /* blocosDaMeta([c]), não metaDoConcurso(c): este último só soma c.blocos,
+       sem a matéria avulsa que blocosDaMeta() sempre mescla — o número aqui
+       precisa bater com o que aplicarFoco(c.id) de fato vai produzir. */
+    const metaComEscopo = blocosDaMeta([c]).reduce((s,bl)=> s + bl.questoes, 0);
+    op.textContent = "Só "+c.cargo + " · " + metaComEscopo + " por dia";
     if(c.id === E.escopoEstudo) op.selected = true;
     sel.appendChild(op);
   });
@@ -1972,7 +2013,7 @@ function pintarInicio(){
     linha.style.cssText = "display:flex;align-items:center;gap:9px;font-size:12.5px;margin-top:6px;color:var(--tinta2)";
     const nome = document.createElement("span");
     nome.style.cssText = "flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
-    nome.textContent = b.nome;
+    nome.textContent = b.nome + (b.avulsa ? " · avulsa" : "");
     const mini = document.createElement("span");
     mini.style.cssText = "flex:0 0 54px;height:5px;background:#E7ECE8;border-radius:99px;overflow:hidden";
     const dentro = document.createElement("i");
@@ -1986,31 +2027,6 @@ function pintarInicio(){
     // mostra o excedente: fez 50 de Português numa prova que pede 10 vira "10/10 (+40)"
     num.textContent = cheio+"/"+b.cota + (b.feitas > b.cota ? " (+"+(b.feitas-b.cota)+")" : "");
     linha.appendChild(nome); linha.appendChild(mini); linha.appendChild(num);
-    mb.appendChild(linha);
-  });
-
-  /* Matéria avulsa não tem bloco (blocosDaMeta só lê os blocos dos concursos
-     seguidos), então nunca aparece no loop acima — de propósito, pra não
-     contar na meta de um concurso que ela não integra (ver E.materiasAvulsas
-     no CLAUDE.md). Mas isso deixava quem só segue avulsa sem NENHUMA linha
-     aqui: o número total ("Sessão de hoje") andava certo — progressoDoDia()
-     cai no bruto de E.dias quando BLOCOS_META está vazio — só a área de
-     detalhamento ficava muda sobre onde esse número foi estudado. Mostra a
-     contagem bruta do dia por matéria avulsa, sem barra de cota: inventar
-     uma cota pra ela fingiria uma meta que não existe. */
-  const porMatAvulsa = E.diasMateria[hoje()] || {};
-  E.materiasAvulsas.forEach(m=>{
-    const feitas = porMatAvulsa[m] || 0;
-    const linha = document.createElement("div");
-    linha.style.cssText = "display:flex;align-items:center;gap:9px;font-size:12.5px;margin-top:6px;color:var(--tinta2)";
-    const nome = document.createElement("span");
-    nome.style.cssText = "flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
-    nome.textContent = ((MATERIAS[m]||{}).nome || m) + " · avulsa";
-    const num = document.createElement("span");
-    num.className = "dado";
-    num.style.cssText = "flex:0 0 auto;font-size:12px";
-    num.textContent = feitas + (feitas===1 ? " cartão hoje" : " cartões hoje");
-    linha.appendChild(nome); linha.appendChild(num);
     mb.appendChild(linha);
   });
 
@@ -3454,7 +3470,7 @@ function pintarEscolherConcurso(){
   c.appendChild(tituloSecao("Matérias avulsas"));
   const aviso = document.createElement("div");
   aviso.style.cssText = "font-size:12px;color:var(--tinta2);margin:-4px 0 10px";
-  aviso.textContent = "Sem prova nenhuma atrás — só pra estudar por conta própria, sem contar pra meta nem entrar no simulado.";
+  aviso.textContent = "Sem prova nenhuma atrás — entra na meta do dia com cota própria (20 por dia), mas não entra no simulado.";
   c.appendChild(aviso);
   ORDEM_MATERIAS.forEach(mid=> c.appendChild(linhaSelecao(
     (MATERIAS[mid]||{}).nome || mid, null, false,
