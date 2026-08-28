@@ -177,7 +177,11 @@ regras que o esquema não expressa:
   pré-requisito.
 - **Reusar `t` e `s` que já existam** em vez de inventar rótulo novo: a
   árvore só é útil enquanto os níveis se mantêm poucos.
-- `eo` não é retroativo (regra 9): só cartão novo ou em reescrita.
+- `eo` é obrigatório DECIDIR em cartão novo (`validar --rascunho` reprova se
+  o campo faltar, mesmo que todo vazio — ver PADRAO-DOS-CARTOES.md §1.4.1).
+  Sobre o que já existe sem `eo`, não é retroação automática (regra 9): há
+  uma campanha em andamento, matéria por matéria, cartão revisado um a um
+  via `explicar-alternativas.ps1` — ver a mesma seção pra ordem e critério.
 
 Antes de escrever qualquer cartão, ler `PADRAO-DOS-CARTOES.md`.
 

@@ -12,7 +12,10 @@ Sai com código 1 se encontrar erro que impeça a publicação.
 gravar nada. É o que permite descobrir viés, formatação proibida, id duplicado
 ou fonte faltando antes de a questão existir — em vez de gravar, reprovar e
 desfazer à mão. Quem grava é o incorporar-rascunho.ps1, e só depois disto
-passar limpo.
+passar limpo. Exige também o campo 'eo' presente em toda questão (posição
+vazia é válida — nem todo distrator merece nota, ver PADRAO-DOS-CARTOES.md
+§1.4.1 — mas o campo em si precisa existir): não retroage sobre o banco já
+gravado, só sobre cartão NOVO passando por aqui.
 
 --patches aplica 'eo' (explicação por alternativa) em memória sobre cartão
 que JÁ EXISTE no banco, casando por id, sem gravar nada — mesma ideia do
@@ -464,17 +467,23 @@ def valida_questoes(B):
             erros.append(f"[{rot}] alternativas repetidas dentro da questão")
         if not q.get('f'):
             erros.append(f"[{rot}] sem fonte")
-        # 'eo' é opcional (explicação por alternativa, ver PADRAO-DOS-CARTOES.md
-        # seção 1.4.1) — quando existe, precisa cobrir toda alternativa em posição
-        # (vazio = "sem nota pra esta", não elemento faltando)
+        # 'eo' (explicação por alternativa, PADRAO-DOS-CARTOES.md §1.4.1) —
+        # quando existe, precisa cobrir toda alternativa em posição (vazio =
+        # "sem nota pra esta", não elemento faltando). Cartão NOVO (checado
+        # em carrega_rascunho, não aqui) é obrigado a trazer o campo — mas
+        # pode ser vazio em TODA posição de propósito (ex.: tabuada, onde
+        # nenhum distrator representa erro conceitual — ver §1.4.1): isso é
+        # a forma de registrar "decidi conscientemente que nenhuma merece
+        # nota", não um descuido, então só vira aviso, nunca erro.
         if 'eo' in q:
             eo = q.get('eo')
             if not isinstance(eo, list) or len(eo) != len(q.get('o', [])):
                 erros.append(f"[{rot}] 'eo' precisa ter o mesmo tamanho de 'o' — uma posição por "
                               "alternativa (string vazia pula, mas a posição tem que existir)")
             elif not any(isinstance(x, str) and x.strip() for x in eo):
-                erros.append(f"[{rot}] 'eo' está presente mas vazio em todas as alternativas — "
-                              "tire o campo se nenhuma vai ser preenchida")
+                avisos.append(f"[{rot}] 'eo' presente mas vazio em todas as alternativas — "
+                              "ok se foi decisão consciente (ex.: memorização pura, sem erro "
+                              "conceitual a explicar); revise se não foi")
         # 'n' é o nível do cartão DENTRO do tópico (definição → aplicação →
         # síntese), e é o que o app usa para travar o nível seguinte enquanto
         # o anterior não foi acertado. É a ÚNICA noção de nível do app: o
@@ -746,6 +755,17 @@ def carrega_rascunho(B, caminho):
                          "cartão novo só entra em matéria ativa (regra 12). Se o concurso vai "
                          "voltar, cadastre-o primeiro; se é conteúdo avulso de propósito, marque "
                          "\"avulsa\": true na matéria")
+        # 'eo' passou de sempre-que-possível pra passo obrigatório do processo
+        # de escrever cartão NOVO (PADRAO-DOS-CARTOES.md §1.4.1): não precisa
+        # ter nota em toda posição (posição vazia continua válida — nem todo
+        # distrator merece explicação), mas o campo precisa EXISTIR, provando
+        # que quem escreveu decidiu conscientemente, alternativa por
+        # alternativa, em vez de esquecer o passo inteiro. Não retroage — só
+        # roda em --rascunho, nunca contra o banco já gravado (regra 9).
+        if 'eo' not in q:
+            erros.append(f"rascunho: questão '{q.get('q','?')[:50]}...' sem 'eo' — decida por "
+                         "alternativa se vale nota (\"\" é válido pra quem não merece), mas o "
+                         "campo precisa existir. Ver PADRAO-DOS-CARTOES.md §1.4.1")
         B.append(q)
     print(f"Rascunho: {len(cands)} candidato(s) avaliados junto do banco (nada foi gravado)\n")
     return B

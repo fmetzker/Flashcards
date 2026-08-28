@@ -64,14 +64,24 @@ distrator mais tentador está errado.
   pessoas que estavam nela)."
 - ❌ "A alternativa correta é a letra B."
 
-### 1.4.1 Explicação por alternativa — campo `eo`, opcional
+### 1.4.1 Explicação por alternativa — campo `eo`, decisão obrigatória
 
 O campo `e` é a explicação da questão como um todo, sempre obrigatório. O
-app também aceita um campo opcional, `eo`, que é uma explicação **por
-alternativa**: um array com o mesmo tamanho de `o`, cada posição dizendo por
-que aquela alternativa específica está certa ou errada. Ao responder, o app
-mostra essa nota junto da própria alternativa, destacando uma a uma — não
-só embaixo da questão como o `e` já faz.
+app também aceita um campo, `eo`, que é uma explicação **por alternativa**:
+um array com o mesmo tamanho de `o`, cada posição dizendo por que aquela
+alternativa específica está certa ou errada. Ao responder, o app mostra essa
+nota junto da própria alternativa, destacando uma a uma — não só embaixo da
+questão como o `e` já faz.
+
+**O conteúdo de cada posição continua "sempre que possível" (ver critério
+abaixo) — o que passou a ser obrigatório é DECIDIR.** Todo cartão novo
+precisa trazer o campo `eo`, mesmo que seja um array de posições vazias
+(`["", "", "", "", ""]`) para o caso em que nenhum distrator merece nota —
+o que o `validar --rascunho` passou a exigir é a prova de que quem escreveu
+o cartão *considerou* cada alternativa, não que escreveu nota em todas. Um
+cartão sem o campo `eo` de jeito nenhum é reprovado; um cartão com `eo`
+todo vazio passa (a checagem de "vazio em todas as posições" continua
+existindo, mas é aviso, não erro — ver abaixo).
 
 ```json
 "o": ["Rifampicina", "Isoniazida", "Etambutol", "Pirazinamida", "Estreptomicina"],
@@ -86,11 +96,14 @@ só embaixo da questão como o `e` já faz.
 ```
 
 Posição vazia (`""`) é válida e significa "sem nota para esta alternativa"
-— não precisa justificar a que é obviamente absurda. O `validar` só reprova
-duas coisas: array de tamanho diferente de `o`, e array presente mas vazio
-em **todas** as posições (nesse caso é melhor tirar o campo).
+— não precisa justificar a que é obviamente absurda. O `validar` reprova
+array de tamanho diferente de `o` (falta posição pra alguma alternativa);
+array presente mas vazio em **todas** as posições só gera aviso (pode ser
+decisão consciente — nenhuma alternativa merece nota, caso da tabuada
+abaixo —, não precisa ser descuido).
 
-**"Sempre que possível", não obrigatório.** Vale o esforço quando o
+**O conteúdo de cada posição continua "sempre que possível", não
+obrigatório — só decidir é.** Vale o esforço quando o
 distrator representa um erro conceitual real (a pessoa que errou vai querer
 saber por que pensou certo e escolheu errado) — é o mesmo critério de
 plausibilidade da seção 1.3. Não vale a pena para "Apenas quando o paciente
@@ -140,12 +153,18 @@ cartão de juros compostos da calibração foi descartado por esse motivo),
 **não escreva a nota** — explicação plausível mas não confirmada é pior que
 nenhuma (mesmo princípio da regra 11 do `CLAUDE.md`).
 
-As 1244 questões já escritas não precisam ser retrofitadas — regra 9 do
-`CLAUDE.md` proíbe script de gravação em lote no banco, e preencher `eo`
-retroativamente é trabalho de conteúdo, revisado um cartão de cada vez,
-não de automação. `eo` é para cartão novo ou em reescrita. A produção segue
-em lotes por matéria — Enfermagem primeiro (maior peso e volume), depois
-Português/SUS, depois as menores.
+As questões já escritas sem `eo` não precisam ser retrofitadas de uma vez —
+regra 9 do `CLAUDE.md` proíbe script de gravação em lote no banco, e
+preencher `eo` retroativamente é trabalho de conteúdo, revisado um cartão
+de cada vez, não de automação. Mas existe uma campanha em andamento,
+matéria por matéria, priorizada pela cobertura mais baixa medida em
+agosto/2026 (`com eo / total`): Biologia Celular (0%, prioridade máxima —
+nenhum dos 134 cartões tinha `eo`), depois SUS (64%) e Inglês (70%),
+Enfermagem do Trabalho (74%), Português e Matemática (73-74%), até
+Manutenção Mecânica e Enfermagem (90%, já bem cobertas). `eo` retroativo
+segue o mesmo critério de "vale a pena" desta seção — não é preencher tudo
+às cegas, é revisar cartão por cartão se o distrator representa erro
+conceitual real.
 
 ### 1.5 Um fato, um cartão — e só um cartão
 
