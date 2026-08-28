@@ -1989,6 +1989,31 @@ function pintarInicio(){
     mb.appendChild(linha);
   });
 
+  /* Matéria avulsa não tem bloco (blocosDaMeta só lê os blocos dos concursos
+     seguidos), então nunca aparece no loop acima — de propósito, pra não
+     contar na meta de um concurso que ela não integra (ver E.materiasAvulsas
+     no CLAUDE.md). Mas isso deixava quem só segue avulsa sem NENHUMA linha
+     aqui: o número total ("Sessão de hoje") andava certo — progressoDoDia()
+     cai no bruto de E.dias quando BLOCOS_META está vazio — só a área de
+     detalhamento ficava muda sobre onde esse número foi estudado. Mostra a
+     contagem bruta do dia por matéria avulsa, sem barra de cota: inventar
+     uma cota pra ela fingiria uma meta que não existe. */
+  const porMatAvulsa = E.diasMateria[hoje()] || {};
+  E.materiasAvulsas.forEach(m=>{
+    const feitas = porMatAvulsa[m] || 0;
+    const linha = document.createElement("div");
+    linha.style.cssText = "display:flex;align-items:center;gap:9px;font-size:12.5px;margin-top:6px;color:var(--tinta2)";
+    const nome = document.createElement("span");
+    nome.style.cssText = "flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
+    nome.textContent = ((MATERIAS[m]||{}).nome || m) + " · avulsa";
+    const num = document.createElement("span");
+    num.className = "dado";
+    num.style.cssText = "flex:0 0 auto;font-size:12px";
+    num.textContent = feitas + (feitas===1 ? " cartão hoje" : " cartões hoje");
+    linha.appendChild(nome); linha.appendChild(num);
+    mb.appendChild(linha);
+  });
+
   /* fila() e o alerta de bloco fraco olham BANCO — só as matérias do foco
      bastam pros dois (revisão/novas do concurso em foco; bloco fraco também
      é só de BLOCOS, que é CONCURSO.blocos). Enquanto isso não chega, mostra
