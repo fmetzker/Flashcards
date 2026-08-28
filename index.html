@@ -162,6 +162,8 @@ button.fechar{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;
 
 /* questao */
 .cabQ{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;font-size:12px;color:var(--tinta2)}
+.cantoQ{display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex:0 0 auto}
+.cantoQ #q-id{font-size:9.5px;opacity:.55;letter-spacing:.2px}
 .tag{background:var(--verde-luz);color:var(--verde);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600}
 .enunciado{font-size:17.5px;line-height:1.5;margin-bottom:16px}
 .alt{display:flex;align-items:stretch;background:var(--card);border:1px solid var(--traco);
@@ -378,7 +380,14 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
       <span class="tag suave" id="q-materia">–</span>
       <span class="tag" id="q-tag">–</span>
     </span>
-    <span class="dado" id="q-contador">0/0</span>
+    <!-- contador da sessão + id do cartão no banco, empilhados discretos no
+         canto: o id é referência pra reportar/discutir um cartão específico
+         (ex.: "reportei o 7d3eda0f1d"), sem competir com o contador nem
+         com a pergunta -->
+    <span class="cantoQ">
+      <span class="dado" id="q-contador">0/0</span>
+      <span class="dado" id="q-id"></span>
+    </span>
   </div>
   <div class="enunciado" id="q-enunciado"></div>
   <div id="q-alts"></div>
@@ -2728,6 +2737,7 @@ function mostrarQuestao(){
   suave.style.display = q.s ? "" : "none";
   document.getElementById("q-tag").textContent = q.s || q.t;
   document.getElementById("q-contador").textContent = (S.pos+1)+"/"+S.lista.length;
+  document.getElementById("q-id").textContent = q.id;
   document.getElementById("q-enunciado").textContent = q.q;
   document.getElementById("q-expl").innerHTML = "";
   const box = document.getElementById("q-alts"); box.innerHTML="";
