@@ -1025,7 +1025,178 @@
         "Gestão da Manutenção": [
           "Equipamentos mecânicos"
         ]
-      }
+      },
+      "requisitos_subtopicos": {
+        "Ensaios metalúrgicos|Ensaios de dureza": [
+          {
+            "t": "Ensaios metalúrgicos",
+            "s": "Conceito geral (destrutivo × não destrutivo)"
+          }
+        ],
+        "Ensaios metalúrgicos|Exame metalográfico/estrutural": [
+          {
+            "t": "Ensaios metalúrgicos",
+            "s": "Conceito geral (destrutivo × não destrutivo)"
+          }
+        ],
+        "Ensaios metalúrgicos|Ensaios sob carga (tração/impacto/fadiga/torção)": [
+          {
+            "t": "Ensaios metalúrgicos",
+            "s": "Ensaios de dureza"
+          }
+        ],
+        "Medidas de pressão, nível, temperatura e vazão|Nível": [
+          {
+            "t": "Medidas de pressão, nível, temperatura e vazão",
+            "s": "Pressão"
+          }
+        ],
+        "Medidas de pressão, nível, temperatura e vazão|Vazão": [
+          {
+            "t": "Medidas de pressão, nível, temperatura e vazão",
+            "s": "Nível"
+          }
+        ],
+        "Noções de metrologia|Características do instrumento": [
+          {
+            "t": "Noções de metrologia",
+            "s": "Conceitos fundamentais"
+          }
+        ],
+        "Noções de metrologia|Calibração, rastreabilidade e padrões": [
+          {
+            "t": "Noções de metrologia",
+            "s": "Características do instrumento"
+          }
+        ],
+        "Sistema Internacional de Unidades|Conversões numéricas": [
+          {
+            "t": "Sistema Internacional de Unidades",
+            "s": "Definições e classificação de unidades"
+          }
+        ],
+        "Sistema Internacional de Unidades|Redefinição do SI (2019)": [
+          {
+            "t": "Sistema Internacional de Unidades",
+            "s": "Conversões numéricas"
+          }
+        ],
+        "Sistema de ajuste e tolerância|Tipos de ajuste e cálculo": [
+          {
+            "t": "Sistema de ajuste e tolerância",
+            "s": "Tolerância dimensional e qualidade IT"
+          }
+        ],
+        "Sistema de ajuste e tolerância|Sistemas de ajuste (furo-base × eixo-base)": [
+          {
+            "t": "Sistema de ajuste e tolerância",
+            "s": "Tipos de ajuste e cálculo"
+          }
+        ],
+        "Mecânica dos Fluidos|Fluidoestática": [
+          {
+            "t": "Mecânica dos Fluidos",
+            "s": "Propriedades do fluido"
+          }
+        ],
+        "Mecânica dos Fluidos|Fluidodinâmica": [
+          {
+            "t": "Mecânica dos Fluidos",
+            "s": "Fluidoestática"
+          }
+        ],
+        "Materiais de construção mecânica|Metais não-ferrosos": [
+          {
+            "t": "Materiais de construção mecânica",
+            "s": "Metais ferrosos"
+          }
+        ],
+        "Materiais de construção mecânica|Polímeros": [
+          {
+            "t": "Materiais de construção mecânica",
+            "s": "Metais não-ferrosos"
+          }
+        ],
+        "Processos de fabricação mecânica|Conformação mecânica": [
+          {
+            "t": "Processos de fabricação mecânica",
+            "s": "Fundição"
+          }
+        ],
+        "Processos de fabricação mecânica|Usinagem": [
+          {
+            "t": "Processos de fabricação mecânica",
+            "s": "Conformação mecânica"
+          }
+        ],
+        "Gestão da Manutenção|Metodologias e programas de gestão": [
+          {
+            "t": "Gestão da Manutenção",
+            "s": "Tipos/políticas de manutenção"
+          }
+        ],
+        "Gestão da Manutenção|Indicadores de manutenção": [
+          {
+            "t": "Gestão da Manutenção",
+            "s": "Metodologias e programas de gestão"
+          }
+        ],
+        "Sistemas hidráulicos e pneumáticos|Válvulas": [
+          {
+            "t": "Sistemas hidráulicos e pneumáticos",
+            "s": "Geração e condicionamento de energia do fluido"
+          }
+        ],
+        "Sistemas hidráulicos e pneumáticos|Atuadores": [
+          {
+            "t": "Sistemas hidráulicos e pneumáticos",
+            "s": "Válvulas"
+          }
+        ],
+        "Equipamentos mecânicos|Equipamentos estáticos e de transmissão": [
+          {
+            "t": "Equipamentos mecânicos",
+            "s": "Válvulas e acessórios de tubulação"
+          }
+        ],
+        "Equipamentos mecânicos|Máquinas de fluxo": [
+          {
+            "t": "Equipamentos mecânicos",
+            "s": "Equipamentos estáticos e de transmissão"
+          }
+        ],
+        "Noções de eletrotécnica|Corrente alternada e distribuição": [
+          {
+            "t": "Noções de eletrotécnica",
+            "s": "Circuitos e leis básicas de CC"
+          }
+        ],
+        "Noções de eletrotécnica|Segurança elétrica": [
+          {
+            "t": "Noções de eletrotécnica",
+            "s": "Corrente alternada e distribuição"
+          }
+        ],
+        "Resistência dos materiais|Modos de falha e projeto": [
+          {
+            "t": "Resistência dos materiais",
+            "s": "Tensão, deformação e propriedades elásticas"
+          }
+        ],
+        "Elementos de máquinas|Transmissão e suporte de movimento": [
+          {
+            "t": "Elementos de máquinas",
+            "s": "Fixação e posicionamento"
+          }
+        ],
+        "Metalografia e tratamentos térmicos|Tratamentos térmicos": [
+          {
+            "t": "Metalografia e tratamentos térmicos",
+            "s": "Metalografia (microestruturas)"
+          }
+        ]
+      },
+      "criterio_subtopicos": "Escada em ondas, mesmo espirito das outras materias -- do conceito basico pro caso aplicado/avancado. Como os 15 topicos aqui sao todos do mesmo tipo (glossario de fatos paralelos dentro de si, sem 'conceito geral' do qual os outros derivem -- mesma observacao ja feita no criterio de topico desta materia), a maioria das cadeias segue conceito basico -> aplicacao -> caso mais complexo/especifico, sem dependencia tecnica profunda entre os subtopicos (ordem pedagogica, nao conceito). Ensaios metalurgicos: Conceito geral (destrutivo x nao destrutivo) e a raiz -> Ensaios de dureza e Exame metalografico/estrutural (os dois tipos mais basicos de ensaio) -> Ensaios sob carga (tracao/impacto/fadiga/torcao), o mais elaborado. Medidas de pressao/nivel/temperatura/vazao: Pressao e Temperatura sao as duas raizes (as grandezas mais medidas na industria) -> Nivel -> Vazao, a mais derivada (depende de escoamento, nao so de uma leitura direta). Nocoes de metrologia: Conceitos fundamentais e a raiz -> Caracteristicas do instrumento -> Calibracao/rastreabilidade e padroes, o processo mais avancado (pressupoe entender o instrumento primeiro). Sistema Internacional de Unidades: Definicoes e classificacao de unidades e a raiz -> Conversoes numericas (aplica as definicoes) -> Redefinicao do SI (2019), o detalhe historico mais especifico. Sistema de ajuste e tolerancia: Tolerancia dimensional e qualidade IT e a raiz (o conceito basico) -> Tipos de ajuste e calculo -> Sistemas de ajuste (furo-base x eixo-base), a aplicacao mais especifica. Mecanica dos Fluidos: Propriedades do fluido e a raiz -> Fluidoestatica (fluido parado, mais simples) -> Fluidodinamica (fluido em movimento, mais avancado). Materiais de construcao mecanica: Metais ferrosos e a raiz (os mais comuns na industria) -> Metais nao-ferrosos -> Polimeros, a categoria mais distinta. Processos de fabricacao mecanica: Fundicao e a raiz (um dos processos mais antigos e basicos) -> Conformacao mecanica -> Usinagem, o processo de maior precisao. Gestao da Manutencao: Tipos/politicas de manutencao e a raiz (preventiva, corretiva, preditiva -- o vocabulario basico) -> Metodologias e programas de gestao -> Indicadores de manutencao, a camada analitica mais avancada. Sistemas hidraulicos e pneumaticos: Geracao e condicionamento de energia do fluido e a raiz (de onde vem a energia do sistema) -> Valvulas (controle) -> Atuadores, a saida final do sistema. Equipamentos mecanicos: Valvulas e acessorios de tubulacao e a raiz (os componentes mais basicos de uma linha) -> Equipamentos estaticos e de transmissao -> Maquinas de fluxo, os equipamentos dinamicos mais complexos. Nocoes de eletrotecnica: Circuitos e leis basicas de CC e a raiz (lei de Ohm, o ponto de partida) -> Corrente alternada e distribuicao -> Seguranca eletrica, a aplicacao pratica que pressupoe entender o circuito primeiro. Resistencia dos materiais: Tensao, deformacao e propriedades elasticas e a raiz -> Modos de falha e projeto, que aplica esses conceitos a um caso real de projeto. Elementos de maquinas: Fixacao e posicionamento e a raiz (parafuso, pino -- os elementos mais simples) -> Transmissao e suporte de movimento (engrenagem, rolamento -- elementos dinamicos mais complexos). Metalografia e tratamentos termicos: Metalografia (microestruturas) e a raiz -- entender a microestrutura vem antes de saber como ela e ALTERADA -> Tratamentos termicos, que modificam essa microestrutura."
     },
     "enfermagem": {
       "criterio": "18 tópicos, alguns com subtópico (Doenças Transmissíveis chega a 25). O grafo aqui travava só no nível do TÓPICO até esta leva — agora Doenças Transmissíveis é o primeiro caso em Enfermagem de requisito por SUBTÓPICO: em vez de exigir Vigilância em Saúde inteira, exige só o subtópico Vigilância epidemiológica dela, porque monitorar doença transmissível é especificamente vigilância epidemiológica, não vigilância sanitária (inspeção de estabelecimento) nem ambiental (água, ar, solo). Saúde do Trabalhador continua exigindo Vigilância em Saúde inteira, porque saúde do trabalhador usa os três tipos (epidemiológica, sanitária do ambiente de trabalho, ambiental). As demais arestas seguem a dependência clínica real: Fundamentos e Procedimentos de Enfermagem exige Anatomia e Fisiologia porque todo procedimento (punção, sondagem, ausculta) pressupõe saber a estrutura do corpo que está sendo manipulada; Controle de Infecção e Segurança do Paciente, Farmacologia e Medicamentos, Feridas/Estomias e Reabilitação, Imunização e Atenção Domiciliar exigem Fundamentos e Procedimentos porque aplicam a mesma base técnica (higienização, administração, curativo) a um contexto específico; Centro Cirúrgico e CME e Urgência/Emergência e Terapia Intensiva exigem também Controle de Infecção, por serem os dois ambientes de maior risco de infecção do hospital; os quatro tópicos por ciclo de vida — Saúde da Criança e do Adolescente, Saúde da Mulher, Saúde do Adulto e do Idoso, Saúde do Homem — e Saúde Mental exigem Anatomia e Fisiologia, a base biológica de qualquer um deles. Quatro tópicos não dependem de conceito nenhum outro (ver '_cadeia_entre_raizes' no topo do arquivo): Anatomia e Fisiologia (a base de tudo), Processo de Enfermagem e Registros (o método da profissão), Ética e Exercício Profissional (base legal/deontológica) e Vigilância em Saúde (sistemas de monitoramento, domínio próprio de saúde pública). Ganharam uma cadeia de ordem: Anatomia e Fisiologia primeiro, de longe o mais carregado de dependentes reais (Fundamentos e Procedimentos e os cinco tópicos que dependem dela); Vigilância em Saúde em seguida, por travar Doenças Transmissíveis e Saúde do Trabalhador; Processo de Enfermagem e Registros e Ética e Exercício Profissional, que não travam mais nada na árvore, fecham a fila. A escada INTERNA (campo n) foi feita depois, numa passada própria tópico por tópico, e cobre os 686 cartões: nível 1 é o que RECONHECER (a estrutura anatômica, o que a escala mede, como se classifica o achado, como a doença transmite) e nível 2 é o que FAZER com isso (a conduta, a técnica, a dose, o prazo, o ponto de corte). Em conteúdo clínico esse é o corte que importa: numa parada, reconhecer se o ritmo é chocável decide se choca — e vem antes de saber a carga do desfibrilador.",
