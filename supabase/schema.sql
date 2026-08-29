@@ -541,7 +541,7 @@ grant execute on function public.sou_revisor() to authenticated;
 create table if not exists public.propostas (
   id             uuid primary key,
   autor_id       uuid not null default auth.uid() references auth.users(id) on delete cascade,
-  materia        text not null check (materia in ('portugues','sus','enfermagem')),
+  materia        text not null,   -- conferida por formato na seção 8.2, não por lista fixa
   topico         text not null,
   subtopico      text,
   enunciado      text not null,
@@ -621,6 +621,34 @@ drop trigger if exists marcar_revisor on public.propostas;
 create trigger marcar_revisor
   before update on public.propostas
   for each row execute function public.marcar_revisor();
+
+
+-- ----------------------------------------------------------------------------
+-- 8.2 Matéria da proposta: formato, não lista fixa
+--
+-- Esta coluna nasceu com `check (materia in ('portugues','sus','enfermagem'))`,
+-- as três matérias que existiam na época. O app passou a ter dez, a tela
+-- Propor oferece TODAS elas (ORDEM_MATERIAS, lida de banco/materias.json), e
+-- o check silenciosamente recusava sete: propor questão de Matemática, Inglês,
+-- Manutenção Mecânica, Biologia Celular, Psicologia, Enfermagem do Trabalho ou
+-- Marítimo estourava com erro cru do Postgres na cara de quem propôs.
+--
+-- Lista fixa aqui é o desenho errado: matéria nova é uma linha em
+-- banco/materias.json (CLAUDE.md: "Novo concurso é editar concursos.json — não
+-- exige mexer no código"), e exigir migração de schema junto quebra isso. Quem
+-- confere a matéria de verdade é incorporar-propostas.ps1, que casa contra
+-- materias.json e recusa a inexistente ANTES de gravar no banco — a caixa de
+-- entrada não precisa saber a lista, só recusar lixo evidente.
+--
+-- Fica o formato de slug, que é o que todo id de matéria segue.
+--
+-- ALTER explícito porque `create table if not exists` não mexe em constraint
+-- de banco já publicado — mesma situação da seção 3.1, e roda de novo sem erro.
+-- ----------------------------------------------------------------------------
+alter table public.propostas
+  drop constraint if exists propostas_materia_check;
+alter table public.propostas
+  add constraint propostas_materia_check check (materia ~ '^[a-z][a-z0-9-]{1,40}$');
 
 
 -- ----------------------------------------------------------------------------

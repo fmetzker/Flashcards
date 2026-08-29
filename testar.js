@@ -46,6 +46,7 @@ const GLOBAIS_LET = [
 const GLOBAIS_CONST = [
   'porId', 'MATERIAS', 'blocoDaMateria', 'INTERVALOS', 'CAIXA_MAX',
   'META_MATERIA_AVULSA', 'SESSAO_SEM_CONCURSO', 'FUSO_BRASILIA',
+  'CHAVE', 'MAX_EVENTOS_PROPRIOS',
 ];
 /* As funções puras do motor — nenhuma toca DOM nem localStorage. */
 const FUNCOES = [
@@ -59,6 +60,8 @@ const FUNCOES = [
   'feitasHoje', 'montarLoteSessao', 'agendarRepeticao', 'resumoDoBanco',
   'materiasInscritas', 'provaMaisProxima', 'blocoDe', 'embaralhaOrdem',
   'revisoesPorDia', 'aplicarFoco', 'carregarConfig', 'carregarBancoParcial',
+  /* não são motor puro (tocam localStorage), mas o teste precisa alcançá-las */
+  'salvar', 'podarEventosProprios',
 ];
 
 function lerDados() {
@@ -92,7 +95,12 @@ function elementoFalso() {
   return el;
 }
 
-function carregarApp() {
+/* `sessao: true` pré-carrega uma sessão fingida no localStorage ANTES do
+   app subir. Muda o boot inteiro: CONTA_ID e CHAVE deixam de ser nulos, e
+   com isso o caminho de gravação de progresso passa a existir — sem isso
+   salvar() retorna cedo ("deslogado: nada a persistir") e não dá para
+   testar o que ele faz quando o localStorage recusa. */
+function carregarApp(opcoes = {}) {
   const html = fs.readFileSync(path.join(RAIZ, 'index.html'), 'utf8');
   const ini = html.lastIndexOf('<script>');
   const fim = html.lastIndexOf('</script>');
@@ -100,6 +108,12 @@ function carregarApp() {
   const script = html.slice(ini + '<script>'.length, fim);
 
   const armazem = {};
+  if (opcoes.sessao) {
+    const b64 = o => Buffer.from(JSON.stringify(o)).toString('base64')
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const token = 'x.' + b64({ sub: 'conta-de-teste', email: 'teste@exemplo.com' }) + '.y';
+    armazem['vr:sessao'] = JSON.stringify({ access_token: token, user_id: 'conta-de-teste' });
+  }
   const localStorageFalso = {
     getItem: k => (k in armazem ? armazem[k] : null),
     setItem: (k, v) => { armazem[k] = String(v); },
@@ -153,6 +167,13 @@ function carregarApp() {
   const ctx = vm.createContext(sandbox);
   vm.runInContext(script + exporta, ctx, { filename: 'index.html', timeout: 20000 });
   const APP = ctx.__APP;
+  /* o contexto do vm É o objeto global do script: declaração de função de
+     topo (mostrarToast, salvar...) vira propriedade dele, então trocar
+     ctx.mostrarToast substitui o que o app chama de verdade lá dentro —
+     coisa que atribuir em APP não faz, porque APP é só a vitrine. */
+  APP.__ctx = ctx;
+  APP.__armazem = armazem;
+  APP.__localStorage = localStorageFalso;
 
   /* Estado de partida para um teste: joga fora o progresso e o banco
      carregado, declara o que a conta segue e carrega as matérias pelo MESMO

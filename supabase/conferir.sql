@@ -288,6 +288,27 @@ begin
   if visto_ts is not null then raise notice 'OK — revisado_em foi preenchido pelo gatilho';
   else raise warning 'FALHOU — revisado_em ficou nulo'; end if;
 
+  -- matéria fora das três originais (schema.sql 8.2): tem que ser ACEITA.
+  -- O check antigo era uma lista fixa e recusava sete das dez matérias do
+  -- app — propor questão de Matemática estourava com erro cru do Postgres.
+  perform set_config('request.jwt.claims', json_build_object('sub', autor, 'role','authenticated')::text, true);
+  begin
+    insert into public.propostas (id, autor_id, materia, topico, enunciado, alternativas, correta, explicacao, fonte)
+    values (gen_random_uuid(), autor, 'manutencao-mecanica', 'T', 'enunciado de matéria nova', alt, 0, 'e', 'f');
+    raise notice 'OK — matéria fora da lista original é aceita';
+  exception when check_violation then
+    raise warning 'FALHOU — o check de materia voltou a ser lista fixa: matéria nova recusada';
+  end;
+
+  -- mas lixo evidente continua barrado pelo formato
+  begin
+    insert into public.propostas (id, autor_id, materia, topico, enunciado, alternativas, correta, explicacao, fonte)
+    values (gen_random_uuid(), autor, 'Não É Slug', 'T', 'enunciado invalido', alt, 0, 'e', 'f');
+    raise warning 'FALHOU — matéria fora do formato de slug foi aceita';
+  exception when check_violation then
+    raise notice 'OK — matéria fora do formato de slug é recusada';
+  end;
+
   reset role;
 end $$;
 

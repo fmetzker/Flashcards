@@ -1358,7 +1358,6 @@ async function sincronizarMateriasAtivas(){
 }
 
 const blocoDe = q => blocoDaMateria[q.m];
-const nomeBloco = id => (BLOCOS.find(b=>b.id===id)||{}).nome || id;
 
 /* =======================================================================
    SESSÃO E IDENTIDADE LOCAL
@@ -1508,10 +1507,33 @@ function ler(){
   try{ const t = localStorage.getItem(CHAVE); return t ? JSON.parse(t) : null; }
   catch(e){ return memoria; }
 }
+/* Falha de gravação NÃO pode ser silenciosa. O catch aqui existe para o
+   app não morrer no meio de uma resposta, mas cair para `memoria` significa
+   que o progresso deixou de ser persistido: fechou o app, perdeu tudo desde
+   o último salvamento que deu certo. A causa quase sempre é cota estourada
+   (localStorage tem ~5MB por origem) ou modo privado do navegador.
+
+   Avisa UMA vez por sessão, não a cada resposta — o alerta é para a pessoa
+   agir (sincronizar, liberar espaço), e repetir a cada cartão viraria ruído
+   que se aprende a ignorar. Quem estiver logado ainda tem a rede como rede
+   de segurança: sincronizar() já empurrou os eventos para o Postgres, e é
+   de lá que o progresso volta no próximo login. */
+let avisouFalhaAoSalvar = false;
 function salvar(){
   if(!CHAVE){ memoria = E; return; }     // deslogado: nada a persistir ainda
-  try{ localStorage.setItem(CHAVE, JSON.stringify(E)); }
-  catch(e){ memoria = E; }
+  try{
+    localStorage.setItem(CHAVE, JSON.stringify(E));
+    avisouFalhaAoSalvar = false;         // voltou a gravar: pode avisar de novo se falhar outra vez
+  }catch(e){
+    memoria = E;
+    console.warn("localStorage recusou a gravação: " + e.message);
+    if(!avisouFalhaAoSalvar){
+      avisouFalhaAoSalvar = true;
+      if(typeof mostrarToast === "function"){
+        mostrarToast("Sem espaço para gravar o progresso neste aparelho — ele só vale enquanto o app estiver aberto.");
+      }
+    }
+  }
 }
 const padrao = {
   /* meta não é mais configurável pela pessoa: aplicarFoco() sempre
@@ -1899,6 +1921,28 @@ async function puxarSimulados(){
   });
 }
 
+/* E.eventosProprios só cresce, e cada id é uma string de 36 caracteres.
+   O comentário original estimava "poucos milhares em anos" — estimativa
+   feita quando o banco era menor e a sessão terminava ao fim de um lote
+   fixo. Com a sessão contínua e a meta somando revisão pendente, 40
+   respostas por dia são ~570KB por ano só nesta lista; somada ao E.cartoes
+   (uma entrada por cartão já visto) e aos quatro mapas de dias, o teto de
+   ~5MB do localStorage deixa de ser teórico — e a falha de gravação é
+   justamente a que salvar() passou a avisar, acima.
+
+   Podar é seguro porque o id só serve numa janela curta: ele entra ao
+   EMPURRAR e é consumido pelo PUXAR logo em seguida, dentro da mesma
+   chamada de sincronizar(). Passado o cursor, o evento nunca mais volta e o
+   id vira peso morto. O teto de 5.000 cobre milhares de ciclos de folga
+   sobre essa janela de um; e só poda depois de um ciclo COMPLETO ter dado
+   certo, que é o que garante que o cursor de fato avançou. */
+const MAX_EVENTOS_PROPRIOS = 5000;
+function podarEventosProprios(){
+  const n = E.eventosProprios.length;
+  if(n <= MAX_EVENTOS_PROPRIOS) return;
+  E.eventosProprios = E.eventosProprios.slice(n - MAX_EVENTOS_PROPRIOS);
+}
+
 /* dispara em segundo plano — nunca lança erro pra fora, nunca trava a
    navegação. Chamar de novo enquanto uma sincronização está em andamento
    não faz nada; a fila persiste até a próxima chamada dar certo. */
@@ -1921,6 +1965,7 @@ async function sincronizar(){
        se falhasse — foi o que deixou perfis.materias_ativas desatualizado
        pra uma conta e o Painel mostrou "atrasadas" que não existiam mais. */
     await sincronizarMateriasAtivas();
+    podarEventosProprios();
     ULTIMA_FALHA_SYNC = null;
     E.ultimaSincronizacao = new Date().toISOString();
     salvar();
