@@ -3,8 +3,23 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v279-contagem-regressiva-e-avisos-de-prova";
+const VERSAO = "v280-cache-do-banco-separado-do-app";
 const CACHE = "prova-enf-" + VERSAO;
+
+/* Cache do BANCO (tudo debaixo de ./banco/) é separado do cache do APP, e
+   com nome ESTÁVEL — não leva VERSAO, não é apagado a cada deploy.
+
+   Antes, os dois viviam juntos em `CACHE` (nome com VERSAO): activate()
+   apagava o cache da versão anterior por completo a cada bump, e como
+   VERSAO muda a cada mudança de index.html (regra 2 do CLAUDE.md, ~3x/dia
+   neste repositório), o banco inteiro — hoje 3,6 MB em 10 matérias — era
+   rebaixado do zero a cada deploy de CÓDIGO, mesmo quando nenhuma questão
+   tinha mudado. Com o cache separado, só o app shell (pequeno) se refaz a
+   cada deploy; o banco só é rebaixado arquivo por arquivo quando aquela
+   matéria específica muda de verdade (o handler de fetch abaixo já
+   reescreve o cache certo a cada resposta de rede, então isso já acontece
+   sozinho em uso normal — nenhuma lógica nova precisou entrar ali). */
+const CACHE_BANCO = "prova-enf-banco";
 
 const ARQUIVOS = [
   "./",
@@ -13,43 +28,44 @@ const ARQUIVOS = [
   "./icone-192.png",
   "./icone-512.png",
   "./apple-touch-icon.png",
-  /* o banco saiu de dentro do index.html na Fase 0 — sem estes arquivos
-     no cache, o app não abre offline */
+  /* o banco (banco/*.json) saiu daqui — cacheado à parte, em CACHE_BANCO,
+     abaixo */
   "./concursos.json",
-  "./supabase.json",
-  "./banco/materias.json",
-  "./banco/indice-legado.json",
-  /* mapa de questões reescritas — sem ele no cache, abrir offline depois de
-     uma correção de enunciado perderia o histórico daqueles cartões */
-  "./banco/reescritas.json",
-  /* árvore oficial do conteúdo programático — sem ele, a tela Matérias offline
-     deixa de mostrar os tópicos do edital que ainda não têm cartão */
-  "./banco/topicos.json",
-  /* pré-requisitos entre tópicos — sem ele, o app offline deixa de travar
-     tópico por dependência; só a escada interna do cartão continua valendo */
-  "./banco/requisitos.json"
+  "./supabase.json"
 ];
 
-/* Instalação: baixa tudo e guarda.
+/* Instalação: baixa e guarda os dois caches em paralelo.
    Os arquivos de matéria não são listados à mão: são lidos de materias.json,
-   para que acrescentar uma matéria nova não exija lembrar de editar aqui. */
+   para que acrescentar uma matéria nova não exija lembrar de editar aqui.
+   materias.json, indice-legado.json, reescritas.json, topicos.json e
+   requisitos.json vão todos para CACHE_BANCO — são dado do banco, não
+   código do app, e sem eles o app offline perde peça (matérias, migração de
+   progresso, histórico de questão reescrita, árvore do edital, travas de
+   pré-requisito, respectivamente). */
 self.addEventListener("install", evento => {
   evento.waitUntil(
-    caches.open(CACHE)
-      .then(cache => cache.addAll(ARQUIVOS)
-        .then(() => fetch("./banco/materias.json"))
+    Promise.all([
+      caches.open(CACHE).then(cache => cache.addAll(ARQUIVOS)),
+      caches.open(CACHE_BANCO).then(cache => cache.addAll([
+        "./banco/materias.json",
+        "./banco/indice-legado.json",
+        "./banco/reescritas.json",
+        "./banco/topicos.json",
+        "./banco/requisitos.json"
+      ]).then(() => fetch("./banco/materias.json"))
         .then(r => r.json())
         .then(materias => cache.addAll(materias.map(m => "./banco/" + m.id + ".json"))))
-      .then(() => self.skipWaiting())
+    ]).then(() => self.skipWaiting())
   );
 });
 
-/* Ativação: apaga caches de versões anteriores */
+/* Ativação: apaga caches de versões anteriores do APP — nunca CACHE_BANCO,
+   que não tem versão e não deve ser apagado por deploy de código nenhum. */
 self.addEventListener("activate", evento => {
   evento.waitUntil(
     caches.keys()
       .then(nomes => Promise.all(
-        nomes.filter(n => n.startsWith("prova-enf-") && n !== CACHE)
+        nomes.filter(n => n.startsWith("prova-enf-") && n !== CACHE && n !== CACHE_BANCO)
              .map(n => caches.delete(n))
       ))
       .then(() => self.clients.claim())
@@ -97,16 +113,22 @@ function comPrazo(promessa, ms){
 self.addEventListener("fetch", evento => {
   if (evento.request.method !== "GET") return;
 
+  // grava no cache do BANCO ou do APP conforme a URL — é isso que mantém
+  // CACHE_BANCO sempre fresco sozinho, sem precisar de lógica de "matéria
+  // mudou" nenhuma: toda resposta de rede boa já atualiza o cache certo.
+  const alvo = evento.request.url.indexOf("/banco/") !== -1 ? CACHE_BANCO : CACHE;
   const buscaNaRede = fetch(evento.request, { cache: "no-store" }).then(resposta => {
     if (resposta && resposta.status === 200 && resposta.type === "basic") {
       const copia = resposta.clone();
-      caches.open(CACHE).then(cache => cache.put(evento.request, copia));
+      caches.open(alvo).then(cache => cache.put(evento.request, copia));
     }
     return resposta;
   });
 
   evento.respondWith(
     comPrazo(buscaNaRede, PRAZO_FETCH_MS).catch(() =>
+      // sem cache específico: caches.match() varre todos os caches abertos,
+      // então funciona igual estivesse em CACHE ou em CACHE_BANCO
       caches.match(evento.request).then(cacheado => cacheado || buscaNaRede)
     )
   );

@@ -68,6 +68,15 @@ no Safari do iPhone sem nenhuma etapa de compilação.
    worker é **rede-primeiro**, com o cache só como reserva para quando não
    há internet. Não voltar para cache-primeiro: o aparelho continua servindo
    a versão antiga mesmo depois de publicar.
+
+   **`CACHE` (com `VERSAO`) e `CACHE_BANCO` (nome fixo) são caches
+   separados.** `CACHE_BANCO` guarda tudo debaixo de `banco/` e **não** é
+   apagado quando `VERSAO` sobe — só o app shell (`CACHE`) é recriado a cada
+   deploy. Antes de existir essa separação, um bump de `VERSAO` (regra 2,
+   qualquer mudança em `index.html`) derrubava o cache do banco inteiro
+   junto — 3,6 MB em 10 matérias, refeitos do zero a cada deploy de código,
+   mesmo sem questão nenhuma ter mudado. Nunca incluir `CACHE_BANCO` no
+   filtro de limpeza do `activate()`.
 3. **Rodar `validar.py` (ou `validar.ps1`) antes de qualquer commit.** Falha
    se houver questão malformada, duplicada, sem fonte ou com viés
    estatístico piorando (ver seção de viés, abaixo).

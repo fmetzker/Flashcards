@@ -112,8 +112,9 @@ Um arquivo, ~3.300 linhas: CSS, HTML e JS. Ordem real do arquivo.
 
 `lerSessao`, `capturarSessaoDoHash`, `idDoToken`, `entrar`, `criarConta`,
 `sair`, `renovarSessao`, `verificarSituacao`, `verificarRevisor`,
-`verificarAprovador` · fila de saída: `empurrarUm`, `puxarEventos`,
-`puxarSimulados`, `sincronizar`, `aplicarEventoRemoto`.
+`verificarAprovador` · fila de saída: `empurrarFila`/`empurrarLote`
+(em lote, não item a item), `puxarPaginado` (genérico, usado por
+`puxarEventos`/`puxarSimulados`), `sincronizar`, `aplicarEventoRemoto`.
 
 Migrações que rodam no boot: `migrarSessaoDoPerfil`, `migrarEstadoDoPerfil`,
 `migrarParaIds`, `migrarReescritas`.
@@ -170,7 +171,7 @@ matéria órfã.
 
 | Onde | O quê |
 |---|---|
-| `sw.js` → `ARQUIVOS` | cache do PWA |
+| `sw.js` → lista dentro de `install()` (cache `CACHE_BANCO`) | cache do PWA |
 | `gerar-offline.ps1` → `$arquivos` | embutir no `offline.html` |
 | `validar.py` → lista em `carrega_banco` | exceção de "matéria órfã" |
 | `validar.ps1` → mesma lista | idem |

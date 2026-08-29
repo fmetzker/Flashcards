@@ -1647,8 +1647,11 @@ function salvarCursor(chaveFn, v){ if(!CONTA_ID) return; try{ localStorage.setIt
 
 let FILA = lerLista(chaveFila);            // eventos de resposta ainda não confirmados no servidor
 let FILA_SIM = lerLista(chaveFilaSim);     // simulados ainda não confirmados
-let CURSOR_EV = lerCursor(chaveCursorEv);
-let CURSOR_SIM = lerCursor(chaveCursorSim);
+/* cursor de cada pull, empacotado com a própria chave de localStorage —
+   puxarPaginado() só recebe isto e um `aplicar`, sem saber qual pull é
+   qual. */
+const CURSOR_EV = {valor: lerCursor(chaveCursorEv), chave: chaveCursorEv};
+const CURSOR_SIM = {valor: lerCursor(chaveCursorSim), chave: chaveCursorSim};
 let sincronizando = false;
 /* mensagem da ÚLTIMA tentativa que falhou (rede caiu, servidor recusou...) —
    só em memória, de propósito: é "a tentativa mais recente deu erro", não um
@@ -1678,17 +1681,50 @@ async function chamarRest(caminho, opcoes){
   return r;
 }
 
-async function empurrarUm(tabela, obj){
-  const r = await chamarRest(tabela, {method:"POST", headers:{"Prefer":"return=minimal"}, body: JSON.stringify(obj)});
-  if(r.status === 201 || r.status === 409) return;   // 409 = já estava lá — idempotente, não é erro
-  throw new Error(tabela+": o servidor respondeu "+r.status);
+/* tamanho de página do pull E de lote do push — sem motivo pra ser
+   diferente nos dois sentidos. */
+const TAMANHO_PAGINA = 500;
+
+/* envia um LOTE de uma vez (array no corpo), não um POST por item — sem
+   isso, quem acumula fila offline (viagem, sem sinal por uns dias) paga uma
+   rodada de rede por evento pendente. `resolution=ignore-duplicates` faz o
+   Postgres pular, sem erro, qualquer linha cujo id (PK) já exista — mesma
+   idempotência que o 409 tratava por item antes, só que agora um lote com
+   ALGUM evento repetido (reenvio depois de falha parcial) não falha
+   inteiro por causa dele. */
+async function empurrarLote(tabela, itens){
+  const r = await chamarRest(tabela, {
+    method: "POST",
+    headers: {"Prefer": "resolution=ignore-duplicates,return=minimal"},
+    body: JSON.stringify(itens)
+  });
+  if(r.status !== 201) throw new Error(tabela+": o servidor respondeu "+r.status);
+}
+/* esvazia uma fila em blocos de TAMANHO_PAGINA, salvando o restante uma vez
+   por bloco — não uma vez por item (reescrever a fila inteira no
+   localStorage a cada item removido é O(n²) pra fila grande). `aoEnviar`,
+   se vier, roda pra cada item do bloco depois do POST ter dado certo (ex.:
+   marcar como "meu" em eventosProprios, pra não contar de novo quando
+   vier de volta no pull). */
+async function empurrarFila(tabela, fila, chave, aoEnviar){
+  while(fila.length){
+    const lote = fila.slice(0, TAMANHO_PAGINA);
+    await empurrarLote(tabela, lote);
+    if(aoEnviar) lote.forEach(aoEnviar);
+    fila.splice(0, lote.length);
+    salvarLista(chave, fila);
+  }
 }
 
 /* aplica por cima do estado local um evento vindo de outro lugar (pode ser
-   deste mesmo aparelho, revisitado no pull — ver eventosProprios acima) */
-function aplicarEventoRemoto(ev){
+   deste mesmo aparelho, revisitado no pull — ver eventosProprios acima).
+   `proprios` é um Set, montado UMA VEZ por puxarEventos() — não
+   E.eventosProprios.indexOf() direto aqui dentro: a lista só cresce (nunca
+   é podada), e indexOf() a cada evento puxado é O(n) por evento, O(n×m) na
+   sincronização inteira pra quem tem meses de uso. */
+function aplicarEventoRemoto(ev, proprios){
   const c = E.cartoes[ev.questao_id] || {caixa:1, acertos:0, erros:0, prox:hoje(), ts:null};
-  if(E.eventosProprios.indexOf(ev.id) < 0){
+  if(!proprios.has(ev.id)){
     if(ev.resultado === "sabia") c.acertos++; else c.erros++;
     // fmtDiaBrasilia, não ev.ts.slice(0,10): o timestamp é UTC, e uma resposta
     // dada às 21h em Brasília já é "amanhã" em UTC — cortar a string juntaria
@@ -1712,32 +1748,33 @@ function aplicarEventoRemoto(ev){
   E.cartoes[ev.questao_id] = c;
 }
 
-async function puxarEventos(){
+/* pull genérico, paginado por cursor (criado_em, sempre crescente do lado
+   do servidor) — puxarEventos()/puxarSimulados() eram cópias quase
+   idênticas uma da outra; a única diferença real é o que `aplicar` faz com
+   cada linha. `cursor` é {valor, chave} (ver CURSOR_EV/CURSOR_SIM). */
+async function puxarPaginado(tabela, campos, cursor, aplicar){
   let pagina;
   do{
-    const filtro = CURSOR_EV ? "&criado_em=gt."+encodeURIComponent(CURSOR_EV) : "";
-    const r = await chamarRest("eventos_resposta?select=id,questao_id,ts,resultado,caixa_depois,prox,criado_em&order=criado_em.asc&limit=500"+filtro);
-    if(!r.ok) throw new Error("puxar eventos: o servidor respondeu "+r.status);
+    const filtro = cursor.valor ? "&criado_em=gt."+encodeURIComponent(cursor.valor) : "";
+    const r = await chamarRest(tabela+"?select="+campos+"&order=criado_em.asc&limit="+TAMANHO_PAGINA+filtro);
+    if(!r.ok) throw new Error("puxar "+tabela+": o servidor respondeu "+r.status);
     pagina = await r.json();
-    pagina.forEach(ev=>{ aplicarEventoRemoto(ev); CURSOR_EV = ev.criado_em; });
-    if(pagina.length){ salvarCursor(chaveCursorEv, CURSOR_EV); }
-  }while(pagina.length === 500);
+    pagina.forEach(item=>{ aplicar(item); cursor.valor = item.criado_em; });
+    if(pagina.length){ salvarCursor(cursor.chave, cursor.valor); }
+  }while(pagina.length === TAMANHO_PAGINA);
+}
+async function puxarEventos(){
+  // Set montado uma vez aqui, não a cada evento — ver aplicarEventoRemoto()
+  const proprios = new Set(E.eventosProprios);
+  await puxarPaginado("eventos_resposta", "id,questao_id,ts,resultado,caixa_depois,prox,criado_em", CURSOR_EV,
+    ev => aplicarEventoRemoto(ev, proprios));
 }
 async function puxarSimulados(){
-  let pagina;
-  do{
-    const filtro = CURSOR_SIM ? "&criado_em=gt."+encodeURIComponent(CURSOR_SIM) : "";
-    const r = await chamarRest("simulados?select=id,data,acertos,total,concurso,criado_em&order=criado_em.asc&limit=500"+filtro);
-    if(!r.ok) throw new Error("puxar simulados: o servidor respondeu "+r.status);
-    pagina = await r.json();
-    pagina.forEach(s=>{
-      if(!E.simulados.some(x=>x.id===s.id)){
-        E.simulados.push({id:s.id, data:s.data, acertos:s.acertos, total:s.total, concurso:s.concurso});
-      }
-      CURSOR_SIM = s.criado_em;
-    });
-    if(pagina.length){ salvarCursor(chaveCursorSim, CURSOR_SIM); }
-  }while(pagina.length === 500);
+  await puxarPaginado("simulados", "id,data,acertos,total,concurso,criado_em", CURSOR_SIM, s=>{
+    if(!E.simulados.some(x=>x.id===s.id)){
+      E.simulados.push({id:s.id, data:s.data, acertos:s.acertos, total:s.total, concurso:s.concurso});
+    }
+  });
 }
 
 /* dispara em segundo plano — nunca lança erro pra fora, nunca trava a
@@ -1748,17 +1785,8 @@ async function sincronizar(){
   sincronizando = true;
   pintarStatusSync();
   try{
-    while(FILA.length){
-      await empurrarUm("eventos_resposta", FILA[0]);
-      E.eventosProprios.push(FILA[0].id);
-      FILA.shift();
-      salvarLista(chaveFila, FILA);
-    }
-    while(FILA_SIM.length){
-      await empurrarUm("simulados", FILA_SIM[0]);
-      FILA_SIM.shift();
-      salvarLista(chaveFilaSim, FILA_SIM);
-    }
+    await empurrarFila("eventos_resposta", FILA, chaveFila, ev=>E.eventosProprios.push(ev.id));
+    await empurrarFila("simulados", FILA_SIM, chaveFilaSim);
     await puxarEventos();
     await puxarSimulados();
     ULTIMA_FALHA_SYNC = null;
@@ -4159,13 +4187,14 @@ carregarConfig()
      A tela pinta com isso, e o banco chega depois, sozinho, começando pela
      matéria do concurso em foco (é o que a pessoa vai estudar agora). */
   .then(carregarSupabase)   // arquivo ausente não é erro fatal, mas sem ele ninguém consegue logar
-  .then(verificarSessao)    // desloga em silêncio se a sessão salva não presta mais
-  .then(verificarSituacao)  // pendente/aprovado/rejeitado — decide entre tela de espera e app
-  // revisor e aprovador são independentes um do outro (cada um só seta sua
-  // própria flag) — rodar em paralelo em vez de em série corta essa parte do
-  // boot pela metade. Os dois precisam terminar antes do menu pintar, senão
-  // o botão de revisor/aprovador pisca (aparece e some).
-  .then(()=>Promise.all([verificarRevisor(), verificarAprovador()]))
+  .then(verificarSessao)    // desloga em silêncio se a sessão salva não presta mais — precisa vir ANTES
+  // das três abaixo: são chamadas REST/RPC que dependem do token já renovado.
+  // situação/revisor/aprovador são independentes uma da outra (cada uma só
+  // seta sua própria flag) — rodar em paralelo em vez de em série corta essa
+  // parte do boot em um terço. Todas precisam terminar antes do menu pintar,
+  // senão pendente vê a tela errada por um instante e o botão de
+  // revisor/aprovador pisca (aparece e some).
+  .then(()=>Promise.all([verificarSituacao(), verificarRevisor(), verificarAprovador()]))
   .then(()=>{
     salvar();
     if(exigeLogin()) ir("login");
