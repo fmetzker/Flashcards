@@ -287,6 +287,28 @@ alter table public.perfis add column if not exists materias_ativas jsonb not nul
 
 
 -- ----------------------------------------------------------------------------
+-- 2.3 Marco de reset de progresso — Painel de desempenho
+--
+-- Instante do último zerar() da conta (null = nunca zerou). eventos_resposta
+-- é append-only: o reset limpa o `E` do aparelho, mas NÃO tem como apagar o
+-- log aqui (sem policy de update/delete, seção 3 — e um delete apagaria o
+-- histórico de todos os aparelhos da conta, não só de quem clicou).
+--
+-- Este marco é o que faz "zerei meu progresso" valer para a conta inteira, e
+-- não só para a tela do aparelho que zerou: o painel e resumo_desempenho
+-- (abaixo) ignoram todo evento anterior a ele. Sem isso, uma conta que zerou
+-- via 0 atrasadas na própria tela Estatísticas (lê o `E` local, zerado) e 74
+-- no painel (lê o servidor, intacto) — dois números certos respondendo a
+-- perguntas diferentes, sem nada dizendo qual valia.
+--
+-- Escrita cai na policy "perfil próprio: atualizar" (seção 2) — não precisa
+-- de policy nova. Sincronizado por sincronizarMateriasAtivas() (index.html),
+-- junto de materias_ativas.
+-- ----------------------------------------------------------------------------
+alter table public.perfis add column if not exists progresso_zerado_em timestamptz;
+
+
+-- ----------------------------------------------------------------------------
 -- 3. Eventos de resposta — o log append-only
 --
 -- Cada resposta vira um evento. Duas decisões que valem explicação:
@@ -433,16 +455,24 @@ order by usuario_id, questao_id, ts desc, id desc;
 -- security_invoker = true, mesmo motivo de estado_cartao: herda a RLS de
 -- eventos_resposta sem repetir a regra de quem pode ver o quê — aprovador
 -- lê a linha de qualquer conta, conta comum só a própria.
+--
+-- O join com perfis aplica o corte de progresso_zerado_em (seção 2.3): o
+-- agregado ignora tudo que veio antes do último zerar() daquela conta. É o
+-- único lugar onde esse corte PRECISA ser feito em SQL — o painel filtra os
+-- outros números no cliente (tem o `ts` de cada linha em mãos), mas uma
+-- soma agregada já chega pronta, sem como descontar depois.
 -- ----------------------------------------------------------------------------
 create or replace view public.resumo_desempenho
 with (security_invoker = true) as
 select
-  usuario_id,
+  e.usuario_id,
   count(*) as respostas_total,
-  count(*) filter (where resultado = 'sabia') as acertos_total,
-  max(criado_em) as ultima_atividade
-from public.eventos_resposta
-group by usuario_id;
+  count(*) filter (where e.resultado = 'sabia') as acertos_total,
+  max(e.criado_em) as ultima_atividade
+from public.eventos_resposta e
+join public.perfis p on p.id = e.usuario_id
+where p.progresso_zerado_em is null or e.ts > p.progresso_zerado_em
+group by e.usuario_id;
 
 
 -- ----------------------------------------------------------------------------

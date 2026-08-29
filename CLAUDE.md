@@ -445,19 +445,28 @@ mesmo `materiasInscritas()` (no cliente) já não contando com ele.
   `migrarReescritas()`) antes de agrupar por cartão; entre linhas que
   colidem no mesmo id resolvido, fica a de `ts` mais recente — mesmo
   desempate que `migrarReescritas()` já usa localmente.
-- **Órfão de verdade — id que não existe em NENHUMA matéria do banco
-  atual, mesmo depois de resolver `reescritas.json` — não entra em nada**
-  (nem "estudados", nem "atrasadas"). Descoberto com uma consulta SQL
-  direta numa conta de teste: **95 de 95** questões vencidas não batiam
-  com id nenhum do banco publicado. Não é violação da regra 5 (enunciado
-  editado à mão) — a causa era mais simples: `zerar()` zera o `E` local,
-  mas não alcança `eventos_resposta` no servidor (não tem como; a tabela
-  não tem policy de update/delete, ver seção 3), e o cursor de
-  sincronização não volta atrás. Quem reseta o progresso enquanto ainda
-  está testando um cartão que depois é reescrito/substituído (auditoria de
-  conteúdo, tópico reorganizado) deixa pra trás eventos com `questao_id`
-  que pode nem existir mais — ficam no servidor pra sempre, órfãos do `E`
-  local. Ver comentário em `zerar()` (index.html).
+- **Órfão — id que não existe em NENHUMA matéria do banco atual, mesmo
+  depois de resolver `reescritas.json` — não entra em nada** (nem
+  "estudados", nem "atrasadas"). Defesa barata e correta, mas **não** era a
+  causa do bug que a motivou: um script de diagnóstico quebrado (leu
+  `banco/*.json` linha a linha com `json.loads`, quando os arquivos são
+  ARRAY JSON, e engoliu o erro num `except: continue`) reportou "95 de 95
+  ids ausentes" quando na verdade **os 95 existiam todos**. Lição que vale
+  além deste caso: script de diagnóstico com `except: continue` mente com
+  cara de dado — conferir o total encontrado contra o esperado antes de
+  concluir qualquer coisa.
+- **`zerar()` marca `progresso_zerado_em`, e o painel corta por ele.** Esta
+  era a causa real do bug acima. `eventos_resposta` é *append-only* e o
+  reset não tem como apagar nada lá (sem policy de update/delete, seção 3),
+  então a conta que zerava via **0** atrasadas na própria tela Estatísticas
+  (lê o `E` local, zerado) e **74** no painel (lê o servidor, intacto) —
+  dois números certos respondendo a perguntas diferentes, sem nada dizendo
+  qual valia. Agora `zerar()` grava o instante em `E.progressoZeradoEm`,
+  `sincronizarMateriasAtivas()` manda pra `perfis.progresso_zerado_em`
+  (seção 2.3), e tudo que veio antes desse marco deixa de contar: o painel
+  filtra no cliente (tem o `ts` de cada linha) e `resumo_desempenho`
+  filtra em SQL (é agregado — chega pronto, sem como descontar depois).
+  Continua sendo MARCO, não delete: o log fica inteiro no servidor.
 - **Toda consulta do painel usa `buscarTudo()` (index.html), não
   `chamarRest()` direto.** O PostgREST corta a resposta num teto de linhas
   por padrão (não erra, só devolve menos do que existe) — perigoso

@@ -1323,18 +1323,29 @@ async function atualizarUniaoDeMaterias(){
    tentar uma vez só e desistir em silêncio — foi exatamente essa
    diferença que deixou uma conta com materias_ativas desatualizado.
    "perfil próprio: atualizar" (schema.sql) já cobre a escrita — não
-   precisou de policy nova. */
+   precisou de policy nova.
+
+   Manda junto `progresso_zerado_em` (E.progressoZeradoEm): o instante do
+   último zerar(). eventos_resposta é append-only — o reset não tem como
+   apagar nada no servidor — então esse marco é o que diz "o que veio
+   antes disto não conta mais". Sem ele, o Painel de desempenho seguia
+   contando o histórico de antes do reset: uma conta que zerou o progresso
+   e via 0 atrasadas na própria tela aparecia com 74 no painel, porque o
+   servidor ainda tinha os eventos de antes. */
 async function sincronizarMateriasAtivas(){
   if(!supaConfigurado() || !SESSAO || !CONTA_ID) return;
   try{
     const r = await chamarRest("perfis?id=eq."+CONTA_ID, {
       method: "PATCH",
       headers: {"Prefer": "return=minimal"},
-      body: JSON.stringify({materias_ativas: materiasInscritas()})
+      body: JSON.stringify({
+        materias_ativas: materiasInscritas(),
+        progresso_zerado_em: E.progressoZeradoEm || null
+      })
     });
     if(!r.ok) throw new Error("o servidor respondeu "+r.status);
   }catch(e){
-    console.warn("materias_ativas não sincronizou: "+e.message);
+    console.warn("perfil (materias_ativas/progresso_zerado_em) não sincronizou: "+e.message);
   }
 }
 
@@ -1547,7 +1558,14 @@ const padrao = {
      tentativa. Mostrado em Ajustes pra distinguir "sincronizado agora
      mesmo" de "a última tentativa falhou, mas a fila local continua
      intacta". null enquanto nunca sincronizou. */
-  ultimaSincronizacao: null};
+  ultimaSincronizacao: null,
+  /* ISO do último zerar(), ou null se a conta nunca zerou o progresso.
+     eventos_resposta é append-only: o reset limpa o `E` daqui, mas o log
+     no servidor continua inteiro — este marco é o que diz "o que veio
+     antes disto não conta mais" pro Painel de desempenho e pra acurácia
+     agregada (resumo_desempenho). Sincronizado pra perfis.progresso_zerado_em
+     junto de materias_ativas (ver sincronizarMateriasAtivas). */
+  progressoZeradoEm: null};
 let E = Object.assign({}, padrao, ler()||{});
 
 /* =======================================================================
@@ -4156,7 +4174,7 @@ async function pintarPainel(){
        linha podia sumir (caiu entre duas páginas) ou vir duas vezes. */
     const janela = new Date(Date.now() - 8*86400000).toISOString();
     const [p, r, e, ec, indice, mapa] = await Promise.all([
-      buscarTudo("perfis?status=eq.aprovado&select=id,nome,email,materias_ativas&order=nome.asc,id.asc"),
+      buscarTudo("perfis?status=eq.aprovado&select=id,nome,email,materias_ativas,progresso_zerado_em&order=nome.asc,id.asc"),
       buscarTudo("resumo_desempenho?select=usuario_id,respostas_total,acertos_total,ultima_atividade&order=usuario_id.asc"),
       buscarTudo("eventos_resposta?select=usuario_id,ts&ts=gte."+encodeURIComponent(janela)+"&order=usuario_id.asc,criado_em.asc"),
       buscarTudo("estado_cartao?select=usuario_id,questao_id,prox,ts&order=usuario_id.asc,questao_id.asc"),
@@ -4176,9 +4194,18 @@ async function pintarPainel(){
 
   const porResumo = {}; resumos.forEach(r=>{ porResumo[r.usuario_id] = r; });
 
+  /* corte por conta: instante do último zerar() daquela pessoa (ISO, ou
+     null se nunca zerou). eventos_resposta é append-only e o reset não
+     apaga nada lá — este marco é o que faz "zerei meu progresso" valer
+     também aqui, e não só na tela pessoal de quem zerou. Ver zerar(). */
+  const zeradoEm = {};
+  perfis.forEach(p=>{ if(p.progresso_zerado_em) zeradoEm[p.id] = p.progresso_zerado_em; });
+  const antesDoReset = (uid, ts) => zeradoEm[uid] && (ts||"") <= zeradoEm[uid];
+
   const h = hoje(), seteDiasAtras = somarDias(h, -6);
   const hojeCont = {}, seteDiasCont = {};
   eventosRecentes.forEach(ev=>{
+    if(antesDoReset(ev.usuario_id, ev.ts)) return;
     const dia = fmtDiaBrasilia.format(new Date(ev.ts));
     if(dia === h) hojeCont[ev.usuario_id] = (hojeCont[ev.usuario_id]||0) + 1;
     if(dia >= seteDiasAtras) seteDiasCont[ev.usuario_id] = (seteDiasCont[ev.usuario_id]||0) + 1;
@@ -4215,6 +4242,8 @@ async function pintarPainel(){
      números com fantasma. */
   const porCartaoPorAluno = {};
   estados.forEach(e2=>{
+    // resposta anterior ao último zerar() daquela conta não conta mais
+    if(antesDoReset(e2.usuario_id, e2.ts)) return;
     const qid = resolverReescrita(mapaReesc, e2.questao_id);
     if(!indiceBanco[qid]) return;
     const porCartao = porCartaoPorAluno[e2.usuario_id] = porCartaoPorAluno[e2.usuario_id] || {};
@@ -4569,26 +4598,31 @@ function importar(input){
                    catch(e){ alert("Arquivo inválido."); } };
   r.readAsText(f);
 }
-/* "Não tem volta" no confirm() é sobre o LOCAL: isto zera o `E` deste
-   aparelho, mas não alcança o servidor — não tem como. eventos_resposta
-   não tem policy de update nem delete, de propósito (é a AUSÊNCIA delas
-   que torna o log append-only de verdade, ver schema.sql seção 3); um
-   DELETE aqui, se existisse, apagaria histórico de sincronização de
-   TODOS os aparelhos da conta, não só deste. E o cursor de sincronização
-   (CURSOR_EV) também não volta: o próximo puxarEventos() só busca o que é
-   mais novo que ele, então os eventos de antes do zerar() nunca voltam a
-   aparecer sozinhos — ficam no servidor pra sempre, órfãos do `E` local.
+/* Zerar não APAGA nada no servidor — MARCA um corte no tempo.
+   eventos_resposta não tem policy de update nem delete, de propósito (é a
+   AUSÊNCIA delas que torna o log append-only de verdade, ver schema.sql
+   seção 3), então o log fica inteiro lá mesmo depois do reset. O que
+   `progressoZeradoEm` faz é dizer "o que veio antes disto não conta mais":
+   o Painel de desempenho e a view resumo_desempenho (acurácia) passam a
+   ignorar todo evento anterior a esse instante.
 
-   Isso é esperado, não bug: quem reseta o progresso enquanto o banco
-   ainda está mudando (cartão sendo reescrito, tópico reorganizado) deixa
-   pra trás eventos com `questao_id` que pode nem existir mais no banco
-   atual. O Painel de desempenho já sabe ignorar esses órfãos (indiceBanco
-   não reconhece o id, então nem conta como estudado nem como atrasado) —
-   foi assim que uma conta de teste chegou a mostrar "95 atrasadas" que na
-   verdade eram puro histórico órfão de antes de um zerar(). */
+   Sem esse marco, o reset valia só pra este aparelho: a conta via 0
+   atrasadas na própria tela Estatísticas (que lê o `E` local, zerado) e
+   74 no painel (que lê o servidor, intacto) — dois números certos, cada
+   um respondendo a uma pergunta diferente, sem nada dizendo qual valia.
+
+   Continua sendo só um MARCO, não um delete: o histórico segue no
+   servidor e é o que permite auditar/recuperar depois se precisar. E o
+   cursor de sincronização (CURSOR_EV) não volta atrás, então os eventos
+   antigos também não voltam a aparecer sozinhos no `E` deste aparelho. */
 function zerar(){
   if(confirm("Apagar todo o progresso de "+((SESSAO && SESSAO.email) || "esta conta")+"? Não tem volta.")){
-    E = JSON.parse(JSON.stringify(padrao)); salvar(); ir("inicio");
+    E = JSON.parse(JSON.stringify(padrao));
+    // depois do reset, não junto de `padrao`: é o que sobrevive ao zerar
+    E.progressoZeradoEm = new Date().toISOString();
+    salvar();
+    sincronizar();   // manda o marco pro servidor (com retentativa — ver sincronizarMateriasAtivas)
+    ir("inicio");
   }
 }
 
