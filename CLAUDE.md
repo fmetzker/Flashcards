@@ -620,10 +620,14 @@ a `E.dias` (que só conta quantidade), para não fazer dia antigo aparecer
 como 0%. Existiu também em janela de 7 e 30 dias; removida da tela
 Estatísticas por diluir rápido demais para servir de sinal (um mês de
 acerto quase não move com um erro isolado). No lugar, a tela mostra
-**revisões pendentes por dia** (`revisoesPorDia()`) — quantos cartões já
-respondidos vencem hoje e em cada um dos próximos 7 dias, mais o que já
-está atrasado — contagem de verdade do que vem por aí, não média
-histórica.
+**revisões pendentes** (`revisoesPorDia()`) — contagem de verdade do que
+vem por aí, não média histórica. Os baldes (Atrasadas, Hoje, Amanhã, 2 a 7
+dias, 8 a 30, 31 a 120) não são cortes redondos escolhidos à toa: são os
+próprios intervalos do Leitner (`INTERVALOS`) — cada fronteira é onde uma
+caixa nova passa a vencer. Exclusivos, não cumulativos, e contam a data
+**real** de vencimento (`prox`), não a caixa nominal — perto da prova o
+teto dinâmico comprime intervalos que seriam maiores, e os baldes devem
+refletir essa pressão de verdade, não a promessa que o teto vai quebrar.
 
 ## Viés de comprimento e de posição
 

@@ -3141,29 +3141,48 @@ function finalizarSimulado(){
 /* =======================================================================
    ESTATÍSTICAS
    ======================================================================= */
-/* Quantos cartões já respondidos vencem em cada um dos próximos dias, mais
-   o que já está atrasado agora — só das matérias inscritas (mesmo escopo
-   que o resto da tela usa). Não é a fila em si (que ainda respeita a trava
-   de degrau para cartão NOVO): aqui a pergunta é só "quando isso vence",
-   então nenhuma trava entra — revisão vencida nunca é travada (ver
-   grauAberto), o forecast segue a mesma regra. */
+/* Quantos cartões já respondidos vencem em cada balde de tempo, mais o que
+   já está atrasado agora — só das matérias inscritas (mesmo escopo que o
+   resto da tela usa). Não é a fila em si (que ainda respeita a trava de
+   degrau para cartão NOVO): aqui a pergunta é só "quando isso vence", então
+   nenhuma trava entra — revisão vencida nunca é travada (ver grauAberto),
+   o forecast segue a mesma regra.
+
+   As fronteiras (1, 7, 30, 120) não são números redondos escolhidos à toa:
+   são os próprios intervalos do Leitner (INTERVALOS) — cada balde é onde
+   uma caixa nova passa a vencer (caixa 3-4 → até 7 dias, caixa 5-6 → até
+   30, caixa 7-8 → até 120). "Hoje"/"Amanhã" ficam isolados de propósito:
+   são caixa 1 e caixa 2, a pressão mais imediata. Baldes são EXCLUSIVOS
+   (cada cartão entra em um só), não cumulativos — um "em 8 a 30 dias"
+   somado ao "hoje" daria a falsa impressão de que um inclui o outro.
+
+   Perto da prova, o teto dinâmico (proximaData()) comprime intervalos que
+   nominalmente seriam maiores — um cartão de caixa 7 (60 dias) pode vencer
+   em 10 dias se a prova está logo ali. Isso é o comportamento CERTO: os
+   baldes contam a data real (`prox`), não a caixa nominal, então mostram a
+   pressão de verdade, não uma promessa que o teto vai quebrar depois. */
 function revisoesPorDia(){
   const inscritas = materiasInscritas();
-  const h = hoje();
-  const porDia = {};
-  let atrasadas = 0;
+  const h = diaUTC(hoje());
+  const b = {atrasadas:0, hoje:0, amanha:0, semana:0, mes:0, resto:0};
   Object.keys(E.cartoes).forEach(id=>{
     const x = porId[id];
     if(!x || inscritas.indexOf(x.m) < 0) return;
-    const prox = E.cartoes[id].prox;
-    if(prox < h) atrasadas++; else porDia[prox] = (porDia[prox]||0) + 1;
+    const diff = Math.round((diaUTC(E.cartoes[id].prox) - h) / 86400000);
+    if(diff < 0) b.atrasadas++;
+    else if(diff === 0) b.hoje++;
+    else if(diff === 1) b.amanha++;
+    else if(diff <= 7) b.semana++;
+    else if(diff <= 30) b.mes++;
+    else b.resto++;   // 31 a 120 dias — INTERVALOS nunca passa de 120
   });
   const dias = [];
-  if(atrasadas) dias.push({rotulo:"Atrasadas", n:atrasadas});
-  for(let i=0;i<7;i++){
-    const k = somarDias(h, i);
-    dias.push({rotulo: i===0 ? "Hoje" : i===1 ? "Amanhã" : "Em "+i+" dias", n: porDia[k]||0});
-  }
+  if(b.atrasadas) dias.push({rotulo:"Atrasadas", n:b.atrasadas});
+  dias.push({rotulo:"Hoje", n:b.hoje});
+  dias.push({rotulo:"Amanhã", n:b.amanha});
+  dias.push({rotulo:"Em 2 a 7 dias", n:b.semana});
+  dias.push({rotulo:"Em 8 a 30 dias", n:b.mes});
+  dias.push({rotulo:"Em 31 a 120 dias", n:b.resto});
   return dias;
 }
 
