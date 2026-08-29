@@ -614,13 +614,9 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
    sem service worker, ou primeira visita ainda sem nada guardado) fica em
    branco de propósito — não é erro, é "ainda não tem o que mostrar".
 
-   Exclui "prova-enf-banco" explicitamente: desde que o cache do banco
-   virou separado do cache do app (CACHE_BANCO, nome fixo — ver sw.js),
-   os dois começam com "prova-enf-", e sem essa exclusão o find() abaixo
-   podia pegar CACHE_BANCO por acaso e mostrar "banco" no lugar da versão
-   de verdade. Foi exatamente esse bug — versão errada na tela — que
-   ajudou a esconder por mais tempo do que devia um aparelho rodando JS
-   antigo enquanto o painel de desempenho já tinha sido corrigido. */
+   Exclui "prova-enf-banco" explicitamente: os dois caches começam com
+   "prova-enf-", e sem isso o find() abaixo pode pegar o do banco por acaso
+   e mostrar "banco" no lugar da versão. Já aconteceu (HISTORICO.md). */
 (function mostraVersaoCarregando(){
   if(window.DADOS || !("caches" in window)) return;
   caches.keys().then(nomes=>{
@@ -1104,20 +1100,18 @@ function topicoAberto(m, t){ return requisitosPendentes(m, t).length === 0; }
 
 /* ===== pré-requisito ENTRE SUBTÓPICOS do mesmo tópico (ou de outro) =========
 
-   Um degrau mais fundo que topicoAberto(): dentro de um tópico grande e
-   heterogêneo (Aritmética, com 16 subtópicos que não têm nada a ver entre
-   si), abrir tudo de uma vez não ensina em ordem nenhuma — é o problema que
-   `n` (definição→exercício) não resolve, porque `n` graduamos DENTRO do
-   mesmo fato, não SEQUENCIA subtópicos irmãos. banco/requisitos.json ganhou
-   uma seção irmã, `requisitos_subtopicos`, chave "Tópico|Subtópico" →
-   lista de dependências, cada uma OBRIGATORIAMENTE {"t":..,"s":..} (nunca
-   string solta — sem essa forma, "Tópico|Subtópico exige X" seria ambíguo
-   entre "o tópico X inteiro" e "o subtópico X deste mesmo tópico").
+   Um degrau mais fundo que topicoAberto(), para tópico grande e heterogêneo
+   (Aritmética tem 17 subtópicos sem relação entre si): abrir tudo de uma vez
+   não ensina em ordem nenhuma, e `n` não resolve isso — ele gradua
+   definição→exercício DENTRO do mesmo fato, não sequencia subtópicos irmãos.
 
-   Não travar o tópico inteiro: um tópico sem NENHUM requisito de subtópico
-   continua com todos os subtópicos abertos assim que ele mesmo abrir — só
-   quem tem entrada própria no mapa fica sujeito a mais essa checagem.
-   Opcional em cima de opcional: sem requisitos_subtopicos, nada muda aqui. */
+   Chave "Tópico|Subtópico" em requisitos_subtopicos, e cada dependência é
+   OBRIGATORIAMENTE {t,s}, nunca string solta: dentro de uma chave de
+   subtópico, "exige X" seria ambíguo entre o tópico X inteiro e o subtópico
+   X deste mesmo tópico.
+
+   Opcional em cima de opcional: tópico sem entrada aqui continua com todos
+   os subtópicos abertos assim que ele mesmo abrir. */
 function requisitosPendentesSub(m, t, s){
   const req = REQUISITOS_SUB[m + "|" + t + "|" + s];
   if(!req || !req.length) return [];
@@ -1134,22 +1128,14 @@ function subtopicoAberto(m, t, s){
    "[object Object]". */
 function rotuloDep(d){ return typeof d === "string" ? d : d.s + " (em " + d.t + ")"; }
 
-/* Cartão NOVO só entra se o tópico dele estiver aberto, o SUBTÓPICO dele
-   (se tiver `s` e ele estiver em requisitos_subtopicos) também estiver
-   aberto, E o degrau dele já tiver sido alcançado — DENTRO DO SUBTÓPICO
-   quando o cartão tem um, dentro do tópico inteiro quando não tem.
+/* Cartão NOVO só entra com o tópico aberto, o subtópico aberto (quando tem
+   `s` e há requisito para ele) E o degrau alcançado.
 
-   Antes disto, grauLiberado(q.m, q.t) sempre olhava o TÓPICO inteiro,
-   somando cartão de nível 1 de TODO subtópico — inclusive os ainda
-   travados pela escada de subtópico. Isso empacava a escada: o nível 1 do
-   tópico só "vencia" quando o último subtópico da cadeia abrisse e fosse
-   dominado, então nível 2 de QUALQUER subtópico ficava inatingível até a
-   escada de subtópico inteira terminar — o oposto de liberação gradual.
-   Passar q.s aqui faz cada subtópico ter sua própria escada de nível,
-   casada com a escada de desbloqueio que já existe (grauLiberado ignora
-   cartão de outro subtópico quando `s` é passado). Tópico sem subtópico
-   (q.s undefined) continua idêntico a sempre: grauLiberado trata `s`
-   ausente como "olha o tópico inteiro". */
+   O degrau é medido NO RECORTE MAIS FINO que o cartão tem: passar q.s aqui
+   dá a cada subtópico a própria escada de nível, casada com a escada de
+   desbloqueio. Medir pelo tópico inteiro empaca a escada e nunca destrava —
+   é um bug real, ver HISTORICO.md. Cartão sem `s` cai no tópico inteiro
+   automaticamente, que é o comportamento de sempre. */
 function grauAberto(q){
   if(!topicoAberto(q.m, q.t)) return false;
   if(q.s && !subtopicoAberto(q.m, q.t, q.s)) return false;
@@ -1261,21 +1247,16 @@ function repintarTelasQueDependemDoBanco(){
   if(document.getElementById("tela-simulado-inicio").classList.contains("ativa")) pintarSimuladoInicio();
 }
 
-/* Troca a união de matérias SEM location.reload() — usada ao escolher
-   concurso/avulsa pela primeira vez (tela-escolher-concurso) e ao mudar a
-   lista em Ajustes. Antes, as duas ações recarregavam a página inteira:
-   funcionava, mas travava o app atrás da tela de carregamento branded só
-   pra buscar uma matéria a mais — inclusive quando a mudança era só
-   REMOVER algo, sem nada novo pra buscar. O app inteiro (navegação,
-   matérias já carregadas, sessão em andamento) continua usável enquanto
-   isto roda em segundo plano; só a matéria nova aparece como "carregando…"
-   na aba Matérias (ver pintarMaterias) até chegar.
+/* Troca a união de matérias SEM location.reload() — ao escolher
+   concurso/avulsa e ao mudar a lista em Ajustes. O app inteiro continua
+   usável enquanto isto roda em segundo plano; só a matéria nova aparece
+   como "carregando…" na aba Matérias até chegar.
 
-   Aditivo por natureza — só busca o que ainda NÃO está em BANCO — e PODA o
-   que saiu da união: desmarcar um concurso/avulsa não pode deixar cartão
-   dela na fila de estudo. migrarParaIds()/migrarReescritas() são seguras de
-   rodar de novo aqui (a primeira já se guarda por E.versaoEstado; a segunda
-   é feita pra rodar a cada boot, documentado nela mesma). */
+   Aditivo — só busca o que ainda NÃO está em BANCO — e PODA o que saiu da
+   união: desmarcar um concurso não pode deixar cartão dele na fila.
+   migrarParaIds()/migrarReescritas() são seguras de rodar de novo aqui (a
+   primeira se guarda por E.versaoEstado; a segunda é feita para rodar a
+   cada boot). */
 async function atualizarUniaoDeMaterias(){
   INSCRITOS = CONCURSOS.filter(c=>E.concursos.indexOf(c.id) >= 0);
   // escopo que apontava pra um concurso que saiu da lista volta pra "todos"
@@ -1306,41 +1287,26 @@ async function atualizarUniaoDeMaterias(){
   sincronizar();   // materias_ativas mudou; sincronizar() manda em seguida (ver comentário nela)
 }
 
-/* Sincroniza quais matérias esta conta segue AGORA (materiasInscritas())
-   para perfis.materias_ativas — é o que permite o Painel de desempenho
-   (Fase 2) filtrar "revisões atrasadas" pelas matérias que cada aluno
-   realmente estuda, em vez do histórico inteiro. eventos_resposta é
-   append-only e nunca esquece uma matéria abandonada: sem isto, um
-   cartão de uma matéria que a conta seguiu há meses e não segue mais
-   infla "atrasadas" pra sempre, mesmo a tela Estatísticas dela mostrando
-   zero (que já filtra por materiasInscritas() hoje).
+/* Manda para o servidor os dois campos de que o Painel de desempenho
+   depende: quais matérias a conta segue agora (materias_ativas) e o
+   instante do último zerar() (progresso_zerado_em). Os dois existem pelo
+   mesmo motivo — eventos_resposta é append-only e não esquece nada, então
+   sem eles o painel conta matéria abandonada e progresso já zerado.
 
-   Nunca lança erro pra fora (try/catch interno) — é o que permite
-   sincronizar() chamar isto dentro do próprio try dela sem que uma falha
-   aqui marque a sincronização inteira como falha. Chamada de dentro de
-   sincronizar(), não à parte: reaproveita a malha de retentativa dela
-   (evento 'online', cada resposta, puxar-pra-atualizar, boot) em vez de
-   tentar uma vez só e desistir em silêncio — foi exatamente essa
-   diferença que deixou uma conta com materias_ativas desatualizado.
-   "perfil próprio: atualizar" (schema.sql) já cobre a escrita — não
-   precisou de policy nova.
+   Três detalhes que não podem mudar:
 
-   Manda junto `progresso_zerado_em` (E.progressoZeradoEm): o instante do
-   último zerar(). eventos_resposta é append-only — o reset não tem como
-   apagar nada no servidor — então esse marco é o que diz "o que veio
-   antes disto não conta mais". Sem ele, o Painel de desempenho seguia
-   contando o histórico de antes do reset: uma conta que zerou o progresso
-   e via 0 atrasadas na própria tela aparecia com 74 no painel, porque o
-   servidor ainda tinha os eventos de antes.
+   - **Roda DENTRO de sincronizar()**, não à parte, para reaproveitar a
+     malha de retentativa dela (evento 'online', cada resposta,
+     puxar-pra-atualizar, boot). Tentar uma vez e desistir já deixou uma
+     conta com materias_ativas velho (HISTORICO.md).
+   - **Nunca lança erro pra fora** (try/catch interno): uma falha aqui não
+     pode marcar a sincronização inteira como falha.
+   - **NUNCA manda progresso_zerado_em quando o valor local é vazio.** Num
+     PATCH, `null` não é "não mexe", é "APAGA" — e isso derrubava o marco
+     do servidor a cada sincronização. Só entra no corpo quando há instante
+     de verdade para gravar. Quem lê de volta é verificarSituacao(), no boot.
 
-   NUNCA manda o campo quando o valor local é vazio — só quando tem um
-   instante de verdade pra gravar. Um `progresso_zerado_em: null` no PATCH
-   não é "não mexe nisso", é "APAGA o que está lá": quem zerou o progresso
-   ANTES desta versão existir (ou num aparelho, e abriu o app noutro) tem
-   E.progressoZeradoEm vazio, e mandar null apagaria o marco do servidor a
-   cada sincronização — inclusive um marco posto à mão por SQL, segundos
-   depois de ele ser criado. Quem lê o valor de volta pro cliente é
-   verificarSituacao(), no boot. */
+   A escrita cai na policy "perfil próprio: atualizar", que já existia. */
 async function sincronizarMateriasAtivas(){
   if(!supaConfigurado() || !SESSAO || !CONTA_ID) return;
   try{
@@ -1362,15 +1328,10 @@ const blocoDe = q => blocoDaMateria[q.m];
 /* =======================================================================
    SESSÃO E IDENTIDADE LOCAL
 
-   Não existe mais "perfil": a conta É a identidade. Antes havia um id local
-   escolhido na tela (p1, p2...) e o progresso morava sob ele; com login
-   obrigatório isso virou redundante, e pior, mentiroso — o mesmo p1 podia
-   guardar o progresso de duas pessoas diferentes em momentos diferentes.
-
-   Agora a chave do progresso é o id DE VERDADE da conta, tirado do `sub` do
-   próprio token. Consequência que é o ponto de tudo isto: se outra pessoa
-   logar neste mesmo aparelho, ela lê e escreve sob outra chave, e nada se
-   mistura — nem antes de a sincronização rodar.
+   Não existe "perfil": a conta É a identidade, e a chave do progresso é o id
+   de verdade dela, tirado do `sub` do token. É isso que garante que duas
+   pessoas no mesmo aparelho leiam e escrevam sob chaves diferentes, sem nada
+   se misturar — nem antes de a sincronização rodar.
 
    vr:sessao            -> sessão (chave única: um logado por vez no aparelho)
    vr:conta:<userId>    -> o estado (mesmo JSON de sempre)
@@ -1748,7 +1709,7 @@ async function verificarSituacao(){
 }
 
 /* =======================================================================
-   SINCRONIZAÇÃO — Fase 3c
+   SINCRONIZAÇÃO
    Fila local de eventos → empurra pro Postgres → puxa o que outro aparelho
    da mesma conta gravou → aplica por cima do estado local.
 
@@ -1760,9 +1721,8 @@ async function verificarSituacao(){
    igual a view estado_cartao faz no banco. Mas acertos/erros são contagem
    acumulada; se cada pull incrementasse de novo, os eventos que este mesmo
    aparelho empurrou voltariam no pull seguinte e seriam contados duas vezes.
-   Por isso só incrementa quando o id do evento não está na lista do que já
-   foi contado aqui. Cresce ao longo do tempo, mas devagar — poucos milhares
-   de ids curtos em anos de uso, para um grupo de 5 a 10 pessoas.
+   Por isso só incrementa quando o id do evento não está na lista. Ela é
+   podada (podarEventosProprios): o id só serve até o cursor passar por ele.
 
    CAIXA/PROX SÓ TROCAM SE O EVENTO FOR MAIS NOVO (por `ts`, não por
    `criado_em`): sem isso, um evento atrasado de outro aparelho — que chegou
@@ -2208,27 +2168,19 @@ function intercalar(a, b){
   return out;
 }
 
-/* Quanto do dia conta para a meta do concurso EM FOCO.
+/* Quanto do dia conta para a meta. Duas regras:
 
-   Duas regras, e as duas vêm do mesmo problema: antes, a meta enchia com
-   qualquer questão respondida, então quem segue dois concursos batia a meta
-   do concurso de Enfermeiro estudando só Matemática — que nem cai nele.
+   1. Matéria fora de todos os blocos da meta não conta — senão quem segue
+      dois concursos bateria a meta de um estudando só matéria do outro.
+   2. Cada bloco tem teto próprio, a cota dele. Fazer 50 de Português numa
+      cota de 10 conta 10, não 50: é o que faz a meta só fechar quando todas
+      as áreas foram estudadas.
 
-   1. Matéria que não pertence a nenhum bloco do foco não conta.
-   2. Cada bloco tem teto próprio: a cota dele (bl.questoes — novos do
-      edital mais revisão pendente daquela matéria, ver blocosDaMeta()).
-      Fazer 50 de Português numa cota de 10 conta 10, não 50 — é isso que
-      faz a meta só fechar quando todas as áreas foram estudadas.
-
-   Dias anteriores a esta versão não têm diasMateria e caem no `dias` bruto,
-   sem detalhamento: retroagir seria inventar de qual matéria eram.
-
-   BLOCOS_META vazio cai no mesmo bruto: sem bloco/cota nenhum pra distribuir
-   o progresso, contar tudo é melhor que travar em 0 pra sempre. Isso hoje só
-   acontece em estado transitório do boot ou pra quem não segue absolutamente
-   nada — matéria avulsa também vira bloco (META_MATERIA_AVULSA, dentro de
-   blocosDaMeta()), então quem tem pelo menos uma avulsa marcada já cai no
-   `reduce` de baixo, com cota de verdade por matéria. */
+   Dois casos caem no `dias` bruto, sem detalhamento por matéria: dia
+   anterior a diasMateria existir (retroagir seria inventar de qual matéria
+   eram) e BLOCOS_META vazio (sem cota nenhuma para distribuir, contar tudo é
+   melhor que travar em 0). O segundo hoje só acontece em estado transitório
+   do boot ou para quem não segue nada — avulsa também vira bloco. */
 function progressoDoDia(k){
   const porMat = E.diasMateria[k];
   if(!porMat || !BLOCOS_META.length) return E.dias[k] || 0;
@@ -4173,53 +4125,28 @@ async function buscarTudo(caminho){
 /* =======================================================================
    PAINEL DE DESEMPENHO — visão geral
 
-   Só existe pra quem é aprovador — a policy "...: aprovador lê tudo" em
-   eventos_resposta/simulados (supabase/schema.sql, seção 3/4) é o que torna
-   isto possível; sem ela, os fetches abaixo devolveriam só a própria linha,
-   igual a qualquer conta comum.
+   Só para aprovador: quem torna isto possível é a policy "...: aprovador lê
+   tudo" em eventos_resposta/simulados (schema.sql, seções 3 e 4). Sem ela os
+   fetches abaixo devolveriam só a própria linha.
 
-   NÃO reproduz "meta batida hoje" nem "sequência de estudo" — de propósito.
-   Os dois dependem de quais concursos/matérias avulsas cada conta segue,
-   e a União (materiasInscritas()) só descreve "o que estudo AGORA" — não
-   dá pra reconstruir a meta/cota do edital sem reimplementar blocosDaMeta()
-   pra cada aluno aqui. Inventar uma meta genérica seria fabricar um número
-   que parece autoritativo e não é — mesmo espírito da regra 11 do
-   CLAUDE.md.
+   NÃO reproduz "meta batida hoje" nem "sequência de estudo", de propósito:
+   as duas dependem de quais concursos e matérias avulsas cada conta segue, e
+   isso nunca sai do localStorage do aparelho. Inventar uma meta genérica
+   aqui fabricaria um número com cara de autoritativo — regra 11.
 
-   REVISÕES ATRASADAS filtra por perfis.materias_ativas (sincronizado pelo
-   cliente dentro de sincronizar() — ver comentário lá e em
-   sincronizarMateriasAtivas()): a mesma pergunta que a tela Estatísticas
-   pessoal responde, só que vista de fora. Existe por causa de um bug
-   real — eventos_resposta é append-only e nunca esquece uma matéria
-   abandonada, então sem o filtro um cartão de matéria que a conta seguiu
-   há meses e não segue mais aparecia "atrasado" pra sempre (o painel
-   chegou a mostrar 95 atrasadas pra uma conta cuja Estatísticas mostrava
-   0). Conta que ainda não sincronizou materias_ativas nem uma vez (perfil
-   antigo, ou nunca abriu o app depois desta versão) mostra "–" em vez de
-   0 — 0 diria "está em dia" quando na verdade é "não sei".
+   Três distinções que o painel precisa manter — confundir cada uma já
+   produziu um número errado (ver HISTORICO.md):
+   - "cartões estudados" é estado_cartao (DISTINCT ON por questão), NÃO
+     respostas_total, que conta revisão repetida e só serve para a acurácia;
+   - "revisões atrasadas" filtra por perfis.materias_ativas, senão matéria
+     abandonada conta para sempre. Conta que nunca sincronizou mostra "–",
+     não 0 — 0 diria "em dia" quando a verdade é "não sei";
+   - o corte de progresso_zerado_em vale aqui e em resumo_desempenho.
 
-   "Cartões estudados" conta linhas de estado_cartao por aluno — a view já
-   é DISTINCT ON (usuario_id, questao_id) (schema.sql, seção 5), então cada
-   linha é um cartão DIFERENTE, nunca uma revisão repetida do mesmo. É o
-   mesmo número que "Já vistas" mede na tela Estatísticas pessoal
-   (Object.keys(E.cartoes).length). NÃO é respostas_total de
-   resumo_desempenho — esse é o total de RESPOSTAS (conta toda revisão
-   repetida do mesmo cartão), usado só na acurácia geral. Primeira versão
-   deste painel confundiu os dois e mostrou 336 "estudados" pra uma conta
-   com 69 cartões diferentes.
-
-   Fontes de dado:
-   - resumo_desempenho (view no servidor): agrega TODO o histórico
-     (acurácia geral, última atividade) sem puxar cada evento pro
-     navegador — histórico de meses/anos por conta seria pesado de somar
-     aqui.
-   - eventos_resposta (janela de ~8 dias) e estado_cartao (um cartão por
-     linha) são pequenos o bastante pra buscar direto e agregar no
-     cliente — não compensa criar view nova só pra isso.
-   - indiceBancoCompleto() (acima): banco inteiro, só pra saber a matéria
-     de cada questao_id.
-   - mapaReescritas() (acima): banco/reescritas.json, pra resolver id
-     antigo→novo antes de contar/agrupar por cartão. */
+   Fontes: resumo_desempenho agrega o histórico inteiro no servidor;
+   eventos_resposta (~8 dias) e estado_cartao são pequenos e agregam no
+   cliente; indiceBancoCompleto() dá a matéria de cada questão;
+   mapaReescritas() resolve id antigo→novo antes de agrupar. */
 async function pintarPainel(){
   const c = document.getElementById("painel-corpo");
   c.innerHTML = "";
@@ -4666,22 +4593,17 @@ function importar(input){
   r.readAsText(f);
 }
 /* Zerar não APAGA nada no servidor — MARCA um corte no tempo.
-   eventos_resposta não tem policy de update nem delete, de propósito (é a
-   AUSÊNCIA delas que torna o log append-only de verdade, ver schema.sql
-   seção 3), então o log fica inteiro lá mesmo depois do reset. O que
-   `progressoZeradoEm` faz é dizer "o que veio antes disto não conta mais":
-   o Painel de desempenho e a view resumo_desempenho (acurácia) passam a
-   ignorar todo evento anterior a esse instante.
 
-   Sem esse marco, o reset valia só pra este aparelho: a conta via 0
-   atrasadas na própria tela Estatísticas (que lê o `E` local, zerado) e
-   74 no painel (que lê o servidor, intacto) — dois números certos, cada
-   um respondendo a uma pergunta diferente, sem nada dizendo qual valia.
+   eventos_resposta não tem policy de update nem delete (é a AUSÊNCIA delas
+   que torna o log append-only de verdade, schema.sql seção 3), então o log
+   fica inteiro lá depois do reset. `progressoZeradoEm` é o que diz "o que
+   veio antes disto não conta mais": o painel e a view resumo_desempenho
+   passam a ignorar todo evento anterior a esse instante. Sem o marco, o
+   reset valeria só para este aparelho (HISTORICO.md).
 
-   Continua sendo só um MARCO, não um delete: o histórico segue no
-   servidor e é o que permite auditar/recuperar depois se precisar. E o
-   cursor de sincronização (CURSOR_EV) não volta atrás, então os eventos
-   antigos também não voltam a aparecer sozinhos no `E` deste aparelho. */
+   MARCO, não delete: o histórico segue no servidor e é o que permite
+   auditar depois. O cursor de sincronização não volta atrás, então os
+   eventos antigos também não reaparecem sozinhos no `E` daqui. */
 function zerar(){
   if(confirm("Apagar todo o progresso de "+((SESSAO && SESSAO.email) || "esta conta")+"? Não tem volta.")){
     E = JSON.parse(JSON.stringify(padrao));

@@ -77,6 +77,7 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 | `supabase/limpar-colunas-mortas.sql` | Remove colunas de `perfis` que o app não usa. **Manual, irreversível** — separado do schema de propósito |
 | `supabase.json` | URL e chave pública |
 | `CLAUDE.md` | Regras invioláveis e os porquês |
+| `HISTORICO.md` | Bug que custou caro, decisão revista, coisa removida. Memória, não regra |
 | `PADRAO-DOS-CARTOES.md` | Como escrever cartão |
 | `TUTORIAL.md` | Publicar e instalar |
 
@@ -267,5 +268,6 @@ o nome dizendo qual; os casos vivem em `testes/*.js`, um arquivo por assunto
 | Como escrever um bom cartão? | `PADRAO-DOS-CARTOES.md` |
 | Onde fica a função X? | este arquivo |
 | O motor pode se comportar assim? | `testes/*.js` — a regra em forma executável |
+| Por que ficou assim? Que bug motivou? | `HISTORICO.md` |
 | O que fazer agora? | `.claude/commands/decidir.md` |
 | Como publicar? | `TUTORIAL.md` |

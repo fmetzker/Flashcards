@@ -1,13 +1,21 @@
 # App de estudo — Concursos públicos
 
-> **Onde procurar o quê.** Este arquivo tem as **regras e os porquês** — o
-> que não pode ser quebrado e a razão de ser assim. O **mapa** (onde mora
-> cada função do `index.html`, o esquema completo do cartão, os fluxos de
-> gravação, as listas que precisam andar juntas) está em `ESTRUTURA.md`, e é
-> o que evita grepar o app de 3.300 linhas. O padrão de escrita dos cartões
-> está em `PADRAO-DOS-CARTOES.md`. Os três não se repetem de propósito:
-> fato duplicado é fato que vai envelhecer errado em um dos lados — **em
-> caso de conflito, este arquivo manda.**
+> **Onde procurar o quê.** Quatro arquivos, e cada um responde a uma
+> pergunta diferente:
+>
+> | Pergunta | Arquivo |
+> |---|---|
+> | O que não pode ser quebrado, e por quê? | **este** |
+> | Onde mora a função X? Qual o esquema do cartão? | `ESTRUTURA.md` |
+> | Como escrever um bom cartão? | `PADRAO-DOS-CARTOES.md` |
+> | Por que ficou assim? Que bug motivou isso? | `HISTORICO.md` |
+>
+> **Não se repetem de propósito:** fato duplicado é fato que vai envelhecer
+> errado em um dos lados — **em caso de conflito, este arquivo manda.**
+>
+> A regra do `HISTORICO.md` vale também para os comentários do código: aqui
+> e lá fica o que explica o **presente**; a narrativa do que já foi ("antes
+> era assim", "descoberto em setembro") vai para o histórico.
 
 Aplicativo web de questões com repetição espaçada, contas e banco
 colaborativo. Hoje atende quatro concursos: Enfermeiro/Volta Redonda (edital
@@ -238,10 +246,10 @@ pra quando algum concurso voltar a referenciá-la (é o caso de
 `maritimo-maquinas` e `enfermagem-trabalho` hoje, e já foi o caso de
 `psicologia` antes dela ganhar um concurso próprio):
 
-**Não há tabela de contagem aqui de propósito.** Ela existiu, era atualizada
-à mão a cada lote e chegou a ter três números errados ao mesmo tempo —
-contagem mantida por humano num arquivo que ninguém relê é pior que
-contagem nenhuma, porque parece verdade. O número real sai de:
+**Não há tabela de contagem aqui de propósito:** contagem mantida à mão num
+arquivo que ninguém relê é pior que contagem nenhuma, porque parece verdade.
+Já teve, e já esteve errada em três números ao mesmo tempo. O número real
+sai de:
 
 ```bash
 python - <<'PY'
@@ -401,118 +409,66 @@ aprovador liberar:
 
 Tela só para `aprovador` (`SOU_APROVADOR`, mesmo gate de "Aprovar contas"),
 com o desempenho de todo mundo — `pintarPainel()`. Reaproveita o papel
-`aprovador` que já existe; não criou papel novo. Duas policies a mais
-tornam isso possível: `eventos_resposta`/`simulados` ganharam
-`"...: aprovador lê tudo"` (mesmo molde de `"aprovador: ver todos"` em
-`perfis`) — sem elas, um aprovador só enxergaria o próprio log, igual
-qualquer conta.
+`aprovador`; quem torna possível é a policy `"...: aprovador lê tudo"` em
+`eventos_resposta`/`simulados`, sem a qual um aprovador só veria o próprio log.
 
-**Não mostra "meta batida hoje" nem "sequência de estudo".** Os dois
-dependem de quais concursos/matérias avulsas cada conta segue
-(`E.concursos`, `E.materiasAvulsas`), e isso nunca sai do `localStorage`
-de cada aparelho — `sincronizar()` só manda pro servidor o LOG de resposta
-(`eventos_resposta`/`simulados`), nunca o `E` inteiro. Inventar uma meta
-genérica pro painel seria fabricar um número com cara de autoritativo que
-não é — mesmo espírito da regra 11 (não inventar o que não se sabe de
-verdade). Os números do painel são todos contagem bruta do log: cartões
-hoje/7 dias/estudados no total, acurácia geral, revisões atrasadas, última
-atividade.
+**Não mostra "meta batida hoje" nem "sequência de estudo".** Os dois dependem
+de quais concursos e matérias avulsas cada conta segue (`E.concursos`,
+`E.materiasAvulsas`), e isso nunca sai do `localStorage` do aparelho —
+`sincronizar()` manda o LOG de respostas, nunca o `E`. Inventar uma meta
+genérica fabricaria um número com cara de autoritativo (regra 11). Tudo aqui
+é contagem bruta do log.
 
-`resumo_desempenho` (view, `security_invoker`) agrega o histórico INTEIRO
-(cartões estudados, acurácia geral, última atividade) no servidor — evita
-puxar meses/anos de eventos pro navegador só pra somar um total. `hoje`/
-`últimos 7 dias` não têm view própria: a janela é pequena, então
-`pintarPainel()` busca os eventos recentes direto e agrupa no cliente, com
-`fmtDiaBrasilia` — a mesma conversão de fuso que `aplicarEventoRemoto()` já
-usa, e pelo mesmo motivo (`ts` é UTC; cortar sem converter erra o dia perto
-da virada).
+As regras que o painel não pode quebrar — cada uma existe porque confundir
+duas perguntas parecidas já produziu um número errado (ver `HISTORICO.md`):
 
-**"Revisões atrasadas" filtra por matéria ativa** — descoberto por um bug
-real: o painel chegou a mostrar 95 atrasadas pra uma conta cuja tela
-Estatísticas mostrava 0. `eventos_resposta` é *append-only* e nunca
-esquece uma matéria abandonada: um cartão de matéria que a conta seguiu no
-passado e não segue mais fica "atrasado" em `estado_cartao` pra sempre,
-mesmo `materiasInscritas()` (no cliente) já não contando com ele.
-- `perfis.materias_ativas` (jsonb, seção 2.2 do `schema.sql`) guarda
-  `materiasInscritas()` de cada conta. Escrita cai na policy "perfil
-  próprio: atualizar" que já existia — não precisou de policy nova.
-- `sincronizarMateriasAtivas()` roda **dentro de `sincronizar()`** (não à
-  parte): reaproveita a mesma malha de retentativa dela (evento `online`,
-  cada resposta, puxar-pra-atualizar, boot) em vez de tentar uma vez só e
-  desistir em silêncio — foi exatamente essa diferença (uma versão
-  anterior chamava só à parte, sem retentativa) que deixou uma conta com
-  `materias_ativas` desatualizado e causou o bug dos 95.
-- **"Revisões atrasadas"** cruza `estado_cartao` com `materias_ativas` via
-  `indiceBancoCompleto()` (todo `questao_id → matéria` do banco, não só das
-  matérias que o aprovador logado carregou pra si) — é o número que bate
-  com o que a tela Estatísticas daquele aluno mostraria.
-- Conta que nunca sincronizou `materias_ativas` (perfil de antes desta
-  versão, ou que não abriu o app depois dela) mostra **"–"**, não **0**,
-  em vez de fingir que está em dia.
-- **"Cartões estudados"** conta linhas de `estado_cartao` por aluno — a
-  view já é `DISTINCT ON (usuario_id, questao_id)` (seção 5), então é
-  direto "quantos cartões DIFERENTES", igual a "Já vistas" na tela
-  Estatísticas pessoal (`Object.keys(E.cartoes).length`). **Não** é
-  `respostas_total` de `resumo_desempenho` — esse conta toda REVISÃO
-  repetida do mesmo cartão e serve só pra acurácia
-  (`acertos_total/respostas_total`). A primeira versão do painel usou
-  `respostas_total` aqui por engano e mostrou 336 "estudados" pra uma
-  conta com 69 cartões diferentes.
-- **Enunciado reescrito (regra 5) também precisa ser resolvido no painel.**
-  `reescrever-questoes.ps1` muda o `id` (SHA-1 do enunciado);
-  `migrarReescritas()` move o progresso LOCAL pro id novo e apaga o antigo,
-  mas o evento antigo no servidor é *append-only* — nunca migra, nunca
-  some. Sem resolver, id antigo e novo contavam como dois cartões
-  diferentes ("Cartões estudados" inflado) e um id antigo órfão com `prox`
-  velho podia contar como atrasado mesmo a pessoa tendo voltado a revisar
-  aquele conteúdo pelo id novo. `resolverReescrita()` (index.html) segue
-  `banco/reescritas.json` (mesma cadeia e mesmo limite de 10 saltos de
-  `migrarReescritas()`) antes de agrupar por cartão; entre linhas que
-  colidem no mesmo id resolvido, fica a de `ts` mais recente — mesmo
-  desempate que `migrarReescritas()` já usa localmente.
-- **Órfão — id que não existe em NENHUMA matéria do banco atual, mesmo
-  depois de resolver `reescritas.json` — não entra em nada** (nem
-  "estudados", nem "atrasadas"). Defesa barata e correta, mas **não** era a
-  causa do bug que a motivou: um script de diagnóstico quebrado (leu
-  `banco/*.json` linha a linha com `json.loads`, quando os arquivos são
-  ARRAY JSON, e engoliu o erro num `except: continue`) reportou "95 de 95
-  ids ausentes" quando na verdade **os 95 existiam todos**. Lição que vale
-  além deste caso: script de diagnóstico com `except: continue` mente com
-  cara de dado — conferir o total encontrado contra o esperado antes de
-  concluir qualquer coisa.
-- **`zerar()` marca `progresso_zerado_em`, e o painel corta por ele.** Esta
-  era a causa real do bug acima. `eventos_resposta` é *append-only* e o
-  reset não tem como apagar nada lá (sem policy de update/delete, seção 3),
-  então a conta que zerava via **0** atrasadas na própria tela Estatísticas
-  (lê o `E` local, zerado) e **74** no painel (lê o servidor, intacto) —
-  dois números certos respondendo a perguntas diferentes, sem nada dizendo
-  qual valia. Agora `zerar()` grava o instante em `E.progressoZeradoEm`,
-  `sincronizarMateriasAtivas()` manda pra `perfis.progresso_zerado_em`
-  (seção 2.3), e tudo que veio antes desse marco deixa de contar: o painel
-  filtra no cliente (tem o `ts` de cada linha) e `resumo_desempenho`
-  filtra em SQL (é agregado — chega pronto, sem como descontar depois).
-  Continua sendo MARCO, não delete: o log fica inteiro no servidor.
-  - **O PATCH nunca manda `progresso_zerado_em: null`** — só inclui o campo
-    quando há instante de verdade pra gravar. `null` num PATCH não é "não
-    mexe", é **apaga**: quem zerou antes desta versão existir (ou zerou
-    num aparelho e abriu o app noutro) tem `E.progressoZeradoEm` vazio, e
-    mandar `null` derrubava o marco do servidor a cada sincronização —
-    inclusive um marco posto à mão por SQL, segundos depois de criado. Foi
-    esse detalhe que fez a correção parecer não ter funcionado.
-  - **`verificarSituacao()` (boot) lê o marco de volta** e adota o do
-    servidor quando é mais novo que o local. É o que faz `zerar()` num
-    aparelho valer nos outros, e o que permite marcar o corte à mão por
-    SQL numa conta antiga. Só avança, nunca retrocede.
-- **Toda consulta do painel usa `buscarTudo()` (index.html), não
-  `chamarRest()` direto.** O PostgREST corta a resposta num teto de linhas
-  por padrão (não erra, só devolve menos do que existe) — perigoso
-  especialmente em `estado_cartao`/`eventos_resposta` sem filtro de
-  `usuario_id` (é o log de TODAS as contas aprovadas somado, e cresce
-  sozinho: o log é *append-only*). `buscarTudo()` pagina por
-  `limit`/`offset` até a página vir menor que o tamanho pedido — cada
-  consulta paginada leva `order=` explícito, porque sem ele o Postgres não
-  garante a mesma ordem entre duas chamadas com offset diferente, e uma
-  linha podia sumir entre páginas.
+- **"Revisões atrasadas" filtra por matéria ativa.** `eventos_resposta` é
+  *append-only* e nunca esquece matéria abandonada, então sem o filtro um
+  cartão que a conta não estuda mais fica atrasado para sempre.
+  `perfis.materias_ativas` (seção 2.2 do `schema.sql`) guarda
+  `materiasInscritas()`; o cruzamento usa `indiceBancoCompleto()` — todo
+  `questao_id → matéria` do banco, não só do que o aprovador carregou.
+- **Conta que nunca sincronizou `materias_ativas` mostra "–", não 0.** Zero
+  diria "está em dia"; a verdade é "não sei".
+- **`sincronizarMateriasAtivas()` roda dentro de `sincronizar()`**, para
+  herdar a malha de retentativa dela. Chamar à parte e desistir em silêncio
+  já deixou uma conta com o campo velho.
+- **"Cartões estudados" é `estado_cartao`, não `respostas_total`.** A view já
+  é `DISTINCT ON (usuario_id, questao_id)`, então cada linha é um cartão
+  DIFERENTE — o mesmo número que "Já vistas" mostra na tela pessoal.
+  `respostas_total` conta toda revisão repetida e serve só para a acurácia.
+- **Enunciado reescrito (regra 5) precisa ser resolvido aqui.** O `id` muda,
+  `migrarReescritas()` move o progresso LOCAL, mas o evento antigo no
+  servidor nunca migra. `resolverReescrita()` segue `banco/reescritas.json`
+  (mesma cadeia e mesmo limite de 10 saltos) antes de agrupar; entre linhas
+  que colidem no mesmo id resolvido fica a de `ts` mais recente.
+- **Id órfão não entra em nada** — nem "estudados", nem "atrasadas". Órfão é
+  o id que não existe em nenhuma matéria do banco atual, já resolvidas as
+  reescritas.
+- **`zerar()` marca `progresso_zerado_em`, e o painel corta por ele.** O
+  reset não tem como apagar o log (sem policy de update/delete, seção 3),
+  então o marco é o que faz "zerei" valer para a conta inteira, e não só para
+  o aparelho que zerou. O painel filtra no cliente (tem o `ts` de cada linha)
+  e `resumo_desempenho` filtra em SQL (é agregado — chega pronto, sem como
+  descontar depois). MARCO, não delete: o log fica inteiro.
+  - **O PATCH nunca manda `progresso_zerado_em: null`.** Num PATCH, `null`
+    não é "não mexe", é **apaga** — e isso derrubava o marco do servidor a
+    cada sincronização. Só entra no corpo quando há instante de verdade.
+  - **`verificarSituacao()` lê o marco de volta no boot** e adota o do
+    servidor quando é mais novo. Só avança, nunca retrocede — é o que faz
+    `zerar()` num aparelho valer nos outros.
+- **Toda consulta usa `buscarTudo()`, nunca `chamarRest()` direto.** O
+  PostgREST corta a resposta num teto de linhas sem errar — só devolve menos
+  do que existe. Perigoso em `estado_cartao`/`eventos_resposta` sem filtro de
+  conta, que somam o log de todo mundo e crescem sozinhos. `buscarTudo()`
+  pagina até a página vir menor que a pedida, sempre com `order=` explícito:
+  sem ordem declarada o Postgres não garante a mesma sequência entre páginas
+  e uma linha some no meio.
+
+`resumo_desempenho` (view, `security_invoker`) agrega o histórico inteiro no
+servidor. `hoje`/`7 dias` não têm view: a janela é pequena e `pintarPainel()`
+agrega no cliente com `fmtDiaBrasilia` — `ts` é UTC, e cortar sem converter
+erra o dia perto da virada.
 
 ## Banco colaborativo
 
@@ -558,11 +514,7 @@ matéria avulsa entra **sempre**, não depende do escopo (ver
   a meta do dia foi batida — mede constância da conta, não de uma prova
   específica. Não conta a partir de `CONCURSO.inicio`: trocar de concurso
   não redesenha nada, e a contagem continua fazendo sentido depois da
-  prova. Existiu antes uma cartela visual de 100 dias (janela fixa,
-  10×10, colorida por meta batida) que fazia esse mesmo papel de forma
-  mais elaborada; foi removida por ser cara de carregar/pintar sem
-  acrescentar informação que a contagem simples de dias seguidos já não
-  desse.
+  prova.
 - **Escopo de tópicos por bloco** (`blocos[].topicos`, opcional): a mesma
   matéria pode ter conteúdo programático diferente por cargo — um cargo de
   nível fundamental/médio, por exemplo, cobre menos itens de Português que
@@ -666,26 +618,21 @@ continua com todos os subtópicos abertos assim que ele mesmo abrir: é
 opcional em cima de opcional. Exige `criterio_subtopicos` pela mesma razão
 de `criterio` — é julgamento pedagógico nosso, não transcrição de edital.
 
-**Não existe nível ENTRE tópicos.** Existiu — camadas que agrupavam os
-tópicos em "a palavra / a relação entre palavras / o texto" — e foi removido
-porque era rótulo decorativo que contradizia o motor: ao dominar Classes de
-palavras abriam ao mesmo tempo um tópico rotulado camada 1 e outro rotulado
-camada 3, porque quem decide o que abre é o grafo de pré-requisitos. A tela
-anunciava uma hierarquia que não existia. **Nível é uma noção só.**
+**Não existe nível ENTRE tópicos. Nível é uma noção só.** Quem decide o que
+abre é o grafo de pré-requisitos; qualquer camada por cima dele é rótulo
+decorativo que a tela anuncia e o motor contradiz. Já existiu uma, e foi
+removida (`HISTORICO.md`).
 
 **Nível (`n`) de cartão com subtópico é avaliado DENTRO DO SUBTÓPICO, nunca
 do tópico inteiro.** `grauLiberado`/`grauAberto` escalam pelo recorte mais
-fino que o cartão tem: `{m,t,s}` quando existe subtópico, `{m,t}` quando
-não. Existe desde agosto/2026, quando a escada de subtópico (audite acima)
-expôs um impasse que a escada de tópico nunca tinha: medir o nível 1 pelo
-TÓPICO inteiro soma cartão de todo subtópico, inclusive os ainda fechados
-pela escada de desbloqueio — e cartão fechado é inacessível, nunca dá pra
-dominar. O nível 1 do tópico inteiro nunca "vencia", e nível 2 de NENHUM
-subtópico jamais abria, até a cadeia de subtópico inteira ser percorrida.
-Escalar por subtópico resolve: cada um tem a própria escada de
-definição→exercício, independente dos outros — exatamente como a escada de
-desbloqueio já pressupunha. Tópico sem subtópico continua idêntico a
-sempre (o cartão não tem `s`, cai no recorte de tópico automaticamente).
+fino que o cartão tem: `{m,t,s}` quando há subtópico, `{m,t}` quando não.
+
+O motivo é mecânico: medir pelo tópico inteiro soma cartão de todo subtópico,
+inclusive os ainda FECHADOS — e cartão fechado é inacessível, logo impossível
+de dominar. O degrau nunca sobe e a escada trava inteira (foi um bug real,
+`HISTORICO.md`). Por subtópico, cada um tem a própria escada
+definição→exercício, como a escada de desbloqueio já pressupunha. Tópico sem
+subtópico cai no recorte de tópico automaticamente.
 
 Os invariantes, que não podem ser afrouxados:
 
@@ -727,21 +674,14 @@ Os invariantes, que não podem ser afrouxados:
   regra não exige escada nova em lugar nenhum, só manda a exibição seguir a
   que já existe.
 - **Dependência de um tópico sobre `{t,s}` de OUTRO tópico não pode pular
-  mais de 2 ondas restantes da escada interna do exigido.** Achado em
-  setembro/2026: Análise combinatória abria só com Multiplicação dominada —
-  a RAIZ de uma escada de 8 ondas em Aritmética, então o tópico liberava
-  tendo visto 1 dos 17 subtópicos da matéria. "Ondas restantes" é a maior
-  profundidade entre os subtópicos do exigido, menos a profundidade do alvo
-  escolhido; passou de 2, a dependência tem que virar o TÓPICO INTEIRO (sem
-  `s`) em vez do subtópico — foi o que aconteceu com Análise combinatória e
-  Estatística (matemática), que passaram a exigir `"Aritmética"` inteira. O
-  limite 2 não é arbitrário: é o maior valor que já existia entre os casos
-  considerados corretos (Trigonometria→Geometria/Triângulos, Matrizes→
-  Álgebra/Sistemas de equações, Flexão verbal/nominal→Classes de palavras/
-  Verbo|Substantivo) — não se aplica a `requisitos_subtopicos` (dependência
-  DENTRO do mesmo tópico), só entre tópicos diferentes, e só quando o alvo é
-  `{t,s}` (dependência de tópico inteiro não tem o que pular). `validar.py`
-  reprova automaticamente quem violar isso.
+  mais de 2 ondas restantes da escada interna do exigido.** "Ondas
+  restantes" é a maior profundidade entre os subtópicos do exigido menos a
+  profundidade do alvo escolhido; passou de 2, a dependência tem que virar o
+  TÓPICO INTEIRO. Vale só entre tópicos diferentes e só quando o alvo é
+  `{t,s}` — dependência de tópico inteiro não tem o que pular, e
+  `requisitos_subtopicos` é dentro do mesmo tópico. O limite 2 não é
+  arbitrário: é o maior valor que já existia entre os casos considerados
+  corretos. `validar.py` reprova automaticamente quem violar.
 
 `validar.py` barra grafia que não existe no banco, pré-requisito circular,
 tópico que exige a si mesmo, matéria em que nenhum tópico abriria, e nível
@@ -809,11 +749,10 @@ aparelho.
 
 Acurácia de hoje soma `E.diasCertas`/`E.diasTotal` do dia — campos paralelos
 a `E.dias` (que só conta quantidade), para não fazer dia antigo aparecer
-como 0%. Existiu também em janela de 7 e 30 dias; removida da tela
-Estatísticas por diluir rápido demais para servir de sinal (um mês de
-acerto quase não move com um erro isolado). No lugar, a tela mostra
-**revisões pendentes** (`revisoesPorDia()`) — contagem de verdade do que
-vem por aí, não média histórica. Os baldes (Atrasadas, Hoje, Amanhã, 2 a 7
+como 0%. Não há janela de 7 nem de 30 dias: dilui rápido demais para servir
+de sinal — um mês de acerto quase não se move com um erro isolado. A tela
+mostra **revisões pendentes** (`revisoesPorDia()`), que é contagem do que vem
+por aí, não média do que passou. Os baldes (Atrasadas, Hoje, Amanhã, 2 a 7
 dias, 8 a 30, 31 a 120) não são cortes redondos escolhidos à toa: são os
 próprios intervalos do Leitner (`INTERVALOS`) — cada fronteira é onde uma
 caixa nova passa a vencer. Exclusivos, não cumulativos, e contam a data
