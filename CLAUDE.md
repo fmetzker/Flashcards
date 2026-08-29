@@ -380,37 +380,43 @@ de cada aparelho — `sincronizar()` só manda pro servidor o LOG de resposta
 genérica pro painel seria fabricar um número com cara de autoritativo que
 não é — mesmo espírito da regra 11 (não inventar o que não se sabe de
 verdade). Os números do painel são todos contagem bruta do log: cartões
-hoje/7 dias, acurácia geral, revisões atrasadas, última atividade.
+hoje/7 dias/estudados no total, acurácia geral, revisões atrasadas, última
+atividade.
 
 `resumo_desempenho` (view, `security_invoker`) agrega o histórico INTEIRO
-(acurácia geral, última atividade) no servidor — evita puxar meses/anos de
-eventos pro navegador só pra somar um total. `hoje`/`últimos 7 dias` não
-têm view própria: a janela é pequena, então `pintarPainel()` busca os
-eventos recentes direto e agrupa no cliente, com `fmtDiaBrasilia` — a
-mesma conversão de fuso que `aplicarEventoRemoto()` já usa, e pelo mesmo
-motivo (`ts` é UTC; cortar sem converter erra o dia perto da virada).
+(cartões estudados, acurácia geral, última atividade) no servidor — evita
+puxar meses/anos de eventos pro navegador só pra somar um total. `hoje`/
+`últimos 7 dias` não têm view própria: a janela é pequena, então
+`pintarPainel()` busca os eventos recentes direto e agrupa no cliente, com
+`fmtDiaBrasilia` — a mesma conversão de fuso que `aplicarEventoRemoto()` já
+usa, e pelo mesmo motivo (`ts` é UTC; cortar sem converter erra o dia perto
+da virada).
 
-**"Revisões atrasadas" tem DOIS números, de propósito** — descoberto por um
-bug real: o painel mostrava 95 atrasadas pra uma conta cuja tela
+**"Revisões atrasadas" filtra por matéria ativa** — descoberto por um bug
+real: o painel chegou a mostrar 95 atrasadas pra uma conta cuja tela
 Estatísticas mostrava 0. `eventos_resposta` é *append-only* e nunca
 esquece uma matéria abandonada: um cartão de matéria que a conta seguiu no
 passado e não segue mais fica "atrasado" em `estado_cartao` pra sempre,
 mesmo `materiasInscritas()` (no cliente) já não contando com ele.
 - `perfis.materias_ativas` (jsonb, seção 2.2 do `schema.sql`) guarda
-  `materiasInscritas()` de cada conta, sincronizado por
-  `sincronizarMateriasAtivas()` no boot e sempre que
-  `atualizarUniaoDeMaterias()` roda. Escrita cai na policy "perfil
+  `materiasInscritas()` de cada conta. Escrita cai na policy "perfil
   próprio: atualizar" que já existia — não precisou de policy nova.
+- `sincronizarMateriasAtivas()` roda **dentro de `sincronizar()`** (não à
+  parte): reaproveita a mesma malha de retentativa dela (evento `online`,
+  cada resposta, puxar-pra-atualizar, boot) em vez de tentar uma vez só e
+  desistir em silêncio — foi exatamente essa diferença (uma versão
+  anterior chamava só à parte, sem retentativa) que deixou uma conta com
+  `materias_ativas` desatualizado e causou o bug dos 95.
 - **"Revisões atrasadas"** cruza `estado_cartao` com `materias_ativas` via
   `indiceBancoCompleto()` (todo `questao_id → matéria` do banco, não só das
   matérias que o aprovador logado carregou pra si) — é o número que bate
   com o que a tela Estatísticas daquele aluno mostraria.
-- **"Cartões vencidos (histórico completo)"** é o número cru, sem filtro —
-  mantido ao lado do corrigido, não substituído por ele.
 - Conta que nunca sincronizou `materias_ativas` (perfil de antes desta
   versão, ou que não abriu o app depois dela) mostra **"–"**, não **0**,
-  nas atrasadas filtradas: 0 diria "está em dia" quando na verdade é "não
-  sei ainda".
+  em vez de fingir que está em dia.
+- **"Cartões estudados"** é `respostas_total` de `resumo_desempenho` — total
+  de respostas já dadas, sem filtro nenhum (não é sobre atraso, é sobre
+  volume de estudo).
 
 ## Banco colaborativo
 

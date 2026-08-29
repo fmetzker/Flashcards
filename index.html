@@ -1278,7 +1278,7 @@ async function atualizarUniaoDeMaterias(){
   limparCacheGrau();
   aplicarFoco(E.escopoEstudo);
   repintarTelasQueDependemDoBanco();
-  sincronizarMateriasAtivas();   // ver comentário na função
+  sincronizar();   // materias_ativas mudou; sincronizar() manda em seguida (ver comentário nela)
 }
 
 /* Sincroniza quais matérias esta conta segue AGORA (materiasInscritas())
@@ -1290,12 +1290,15 @@ async function atualizarUniaoDeMaterias(){
    infla "atrasadas" pra sempre, mesmo a tela Estatísticas dela mostrando
    zero (que já filtra por materiasInscritas() hoje).
 
-   Silenciosa e best-effort, como sincronizar(): falhar aqui não pode
-   travar a navegação nem gerar alerta — o painel só fica desatualizado
-   até a próxima chamada dar certo. Chamada no boot e sempre que
-   atualizarUniaoDeMaterias() rodar (a lista mudou). "perfil próprio:
-   atualizar" (schema.sql) já cobre a escrita — não precisou de policy
-   nova. */
+   Nunca lança erro pra fora (try/catch interno) — é o que permite
+   sincronizar() chamar isto dentro do próprio try dela sem que uma falha
+   aqui marque a sincronização inteira como falha. Chamada de dentro de
+   sincronizar(), não à parte: reaproveita a malha de retentativa dela
+   (evento 'online', cada resposta, puxar-pra-atualizar, boot) em vez de
+   tentar uma vez só e desistir em silêncio — foi exatamente essa
+   diferença que deixou uma conta com materias_ativas desatualizado.
+   "perfil próprio: atualizar" (schema.sql) já cobre a escrita — não
+   precisou de policy nova. */
 async function sincronizarMateriasAtivas(){
   if(!supaConfigurado() || !SESSAO || !CONTA_ID) return;
   try{
@@ -1843,6 +1846,16 @@ async function sincronizar(){
     await empurrarFila("simulados", FILA_SIM, chaveFilaSim);
     await puxarEventos();
     await puxarSimulados();
+    /* materias_ativas (Painel de desempenho) reaproveita esta malha de
+       retentativa em vez de ter a própria: sincronizarMateriasAtivas()
+       nunca lança erro (try/catch interno), então uma falha dela aqui não
+       marca ULTIMA_FALHA_SYNC nem esconde que o resto sincronizou — só
+       tenta de novo na próxima chamada, que é frequente (todo evento
+       'online', toda resposta, todo puxar-pra-atualizar, todo boot). Antes
+       ela só era chamada à parte, tentava uma vez e desistia em silêncio
+       se falhasse — foi o que deixou perfis.materias_ativas desatualizado
+       pra uma conta e o Painel mostrou "atrasadas" que não existiam mais. */
+    await sincronizarMateriasAtivas();
     ULTIMA_FALHA_SYNC = null;
     E.ultimaSincronizacao = new Date().toISOString();
     salvar();
@@ -3945,20 +3958,20 @@ async function indiceBancoCompleto(){
    que parece autoritativo e não é — mesmo espírito da regra 11 do
    CLAUDE.md.
 
-   REVISÕES ATRASADAS tem DOIS números, de propósito (pedido depois de um
-   bug real: o painel mostrava 95 atrasadas pra uma conta cuja tela
-   Estatísticas mostrava 0). eventos_resposta é append-only e nunca esquece
-   uma matéria abandonada — um cartão de matéria que a conta seguiu há
-   meses e não segue mais fica "atrasado" pra sempre em estado_cartao.
-   - "Revisões atrasadas" filtra por perfis.materias_ativas (sincronizado
-     pelo cliente — ver sincronizarMateriasAtivas()): a mesma pergunta que
-     a tela Estatísticas pessoal responde, só que vista de fora.
-   - "Cartões vencidos (histórico completo)" é o número cru, sem filtro —
-     o que você pediu manter junto do número corrigido.
-   Conta que ainda não sincronizou materias_ativas nem uma vez (perfil
+   REVISÕES ATRASADAS filtra por perfis.materias_ativas (sincronizado pelo
+   cliente dentro de sincronizar() — ver comentário lá e em
+   sincronizarMateriasAtivas()): a mesma pergunta que a tela Estatísticas
+   pessoal responde, só que vista de fora. Existe por causa de um bug
+   real — eventos_resposta é append-only e nunca esquece uma matéria
+   abandonada, então sem o filtro um cartão de matéria que a conta seguiu
+   há meses e não segue mais aparecia "atrasado" pra sempre (o painel
+   chegou a mostrar 95 atrasadas pra uma conta cuja Estatísticas mostrava
+   0). Conta que ainda não sincronizou materias_ativas nem uma vez (perfil
    antigo, ou nunca abriu o app depois desta versão) mostra "–" em vez de
-   0 nas atrasadas filtradas — 0 diria "está em dia" quando na verdade é
-   "não sei".
+   0 — 0 diria "está em dia" quando na verdade é "não sei".
+
+   "Cartões estudados" é `respostas_total` de resumo_desempenho — total de
+   respostas já dadas, sem filtro nenhum (não é sobre atraso).
 
    Fontes de dado:
    - resumo_desempenho (view no servidor): agrega TODO o histórico
@@ -4044,7 +4057,7 @@ async function pintarPainel(){
       seteDias: seteDiasCont[p.id] || 0,
       acuracia: r.respostas_total ? Math.round(r.acertos_total/r.respostas_total*100) : null,
       atrasadas: semSincronizar ? null : atrasadasAtivas,
-      atrasadasTotal: vencidos.length,
+      estudados: r.respostas_total,
       ultimaAtividade: r.ultima_atividade
     };
   });
@@ -4091,9 +4104,9 @@ async function pintarPainel(){
       };
       linha("Cartões hoje", l.hoje);
       linha("Últimos 7 dias", l.seteDias);
+      linha("Cartões estudados", l.estudados);
       linha("Acurácia geral", l.acuracia==null ? "–" : l.acuracia+"%");
       linha("Revisões atrasadas", l.atrasadas==null ? "– (aguardando sincronizar)" : l.atrasadas, l.atrasadas > 0);
-      linha("Cartões vencidos (histórico completo)", l.atrasadasTotal, false);
       linha("Última atividade", fmtHoraSync(l.ultimaAtividade));
 
       card.appendChild(document.createElement("div"));
@@ -4535,8 +4548,7 @@ carregarConfig()
          "inicio". */
       ir("inicio");               // pinta já, com BANCO ainda vazio — telas que precisam dele mostram "carregando"
       carregarBancoEmFases();     // não é await: continua em segundo plano
-      sincronizar();               // puxa em segundo plano, não bloqueia a tela
-      sincronizarMateriasAtivas(); // idem — ver comentário na função
+      sincronizar();               // puxa em segundo plano; materias_ativas vai junto (ver comentário nela)
     }
   })
   .catch(err=>{
