@@ -316,6 +316,18 @@ create policy "eventos próprios: criar"
 -- Sem policy de update nem de delete, de propósito: é a AUSÊNCIA delas que
 -- torna o log append-only de verdade, no banco, e não só por convenção do app.
 
+-- Painel de desempenho dos alunos: aprovador lê o log de QUALQUER conta, não
+-- só o próprio — é o que permite reconstruir o estado de cada aluno (replay
+-- do log, mesma lógica de aplicarEventoRemoto() no cliente) sem um blob de
+-- estado por conta no servidor. Mesmo molde de "aprovador: ver todos" em
+-- perfis (seção 2.1): papel já existente, RLS de policy extra, sem tabela
+-- nova. RLS é permissiva por padrão dentro do mesmo comando (select) — esta
+-- policy só ACRESCENTA quem mais pode ler, nunca tira o que "eventos
+-- próprios: ler" já garante para o dono da conta.
+drop policy if exists "eventos: aprovador lê tudo" on public.eventos_resposta;
+create policy "eventos: aprovador lê tudo"
+  on public.eventos_resposta for select using (public.sou_aprovador());
+
 -- 3.1 Leitner de 8 caixas (eram 5) — index.html:CAIXA_MAX é a outra metade
 -- desta constante; os dois lados têm de concordar, e nada os liga automa-
 -- ticamente. `create table if not exists`, acima, não altera uma constraint
@@ -357,6 +369,12 @@ create policy "simulados próprios: ler"
 create policy "simulados próprios: criar"
   on public.simulados for insert with check (usuario_id = auth.uid() and public.conta_aprovada());
 
+-- Painel de desempenho — mesmo motivo e mesmo molde da policy equivalente em
+-- eventos_resposta (seção 3), logo acima.
+drop policy if exists "simulados: aprovador lê tudo" on public.simulados;
+create policy "simulados: aprovador lê tudo"
+  on public.simulados for select using (public.sou_aprovador());
+
 
 -- ----------------------------------------------------------------------------
 -- 5. Estado derivado
@@ -367,7 +385,10 @@ create policy "simulados próprios: criar"
 -- ATENÇÃO ao `security_invoker = true`: sem isso, uma view roda com as
 -- permissões de quem a criou (postgres) e IGNORA a RLS da tabela de baixo —
 -- ou seja, vazaria o progresso de todo mundo para qualquer pessoa logada.
--- Não remover.
+-- Não remover. Com ele, esta view respeita a RLS de eventos_resposta (seção
+-- 3) automaticamente — inclusive a policy "eventos: aprovador lê tudo": um
+-- aprovador que consultar estado_cartao já recebe o de qualquer conta, sem
+-- a view precisar saber nada sobre papel nenhum.
 -- ----------------------------------------------------------------------------
 create or replace view public.estado_cartao
 with (security_invoker = true) as

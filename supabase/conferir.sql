@@ -152,6 +152,67 @@ end $$;
 
 
 -- ----------------------------------------------------------------------------
+-- 5.1 Painel de desempenho — aprovador lê o log de QUALQUER conta
+--
+-- eventos_resposta e simulados ganharam uma policy extra ("... : aprovador
+-- lê tudo"), no mesmo molde de perfis. Confirma que ela faz exatamente o
+-- que deve: aprovador enxerga o log de duas contas diferentes, e uma conta
+-- comum (aprovada, mas NÃO aprovadora) continua barrada do log alheio
+-- mesmo com a policy nova existindo — ela só ACRESCENTA quem lê, nunca
+-- afrouxa o isolamento de quem não é aprovador.
+-- ----------------------------------------------------------------------------
+do $$
+declare
+  aluno1    uuid := 'a0a0a0a0-a0a0-a0a0-a0a0-a0a0a0a0a0a0';
+  aluno2    uuid := 'b0b0b0b0-b0b0-b0b0-b0b0-b0b0b0b0b0b0';
+  aprovador uuid := 'c0c0c0c0-c0c0-c0c0-c0c0-c0c0c0c0c0c0';
+  comum     uuid := 'd0d0d0d0-d0d0-d0d0-d0d0-d0d0d0d0d0d0';
+  visto int;
+begin
+  insert into public.perfis (id, nome, email, status) values
+    (aluno1,    'Aluno Um',    'aluno1@exemplo.com',    'aprovado'),
+    (aluno2,    'Aluno Dois',  'aluno2@exemplo.com',    'aprovado'),
+    (aprovador, 'Aprovador',   'aprovador2@exemplo.com','aprovado'),
+    (comum,     'Conta Comum', 'comum@exemplo.com',     'aprovado');
+  insert into public.aprovadores (user_id) values (aprovador);
+
+  insert into public.eventos_resposta (id, usuario_id, questao_id, ts, resultado, caixa_depois, prox)
+  values
+    (gen_random_uuid(), aluno1, '1111111111', now(), 'sabia', 2, current_date),
+    (gen_random_uuid(), aluno2, '2222222222', now(), 'errei', 1, current_date);
+  insert into public.simulados (id, usuario_id, data, acertos, total, concurso)
+  values
+    (gen_random_uuid(), aluno1, current_date, 30, 40, 'teste'),
+    (gen_random_uuid(), aluno2, current_date, 20, 40, 'teste');
+
+  -- como aprovador: vê o log das DUAS contas
+  set local role authenticated;
+  perform set_config('request.jwt.claims', json_build_object('sub', aprovador, 'role','authenticated')::text, true);
+
+  select count(*) into visto from public.eventos_resposta where usuario_id in (aluno1, aluno2);
+  if visto = 2 then raise notice 'OK — aprovador vê o log das duas contas em eventos_resposta';
+  else raise warning 'FALHOU — aprovador vê % evento(s) de aluno1/aluno2; deveria ver 2', visto; end if;
+
+  select count(*) into visto from public.simulados where usuario_id in (aluno1, aluno2);
+  if visto = 2 then raise notice 'OK — aprovador vê o log das duas contas em simulados';
+  else raise warning 'FALHOU — aprovador vê % simulado(s) de aluno1/aluno2; deveria ver 2', visto; end if;
+
+  select count(*) into visto from public.estado_cartao where usuario_id in (aluno1, aluno2);
+  if visto = 2 then raise notice 'OK — estado_cartao também abre pro aprovador (herda a RLS de baixo)';
+  else raise warning 'FALHOU — estado_cartao devolve % linha(s) pro aprovador; deveria ver 2', visto; end if;
+
+  -- como conta comum (aprovada, mas NÃO aprovadora): continua vendo só o
+  -- próprio log — a policy nova não pode ter afrouxado isto
+  perform set_config('request.jwt.claims', json_build_object('sub', comum, 'role','authenticated')::text, true);
+  select count(*) into visto from public.eventos_resposta where usuario_id in (aluno1, aluno2);
+  if visto = 0 then raise notice 'OK — conta comum continua sem alcançar o log de outra conta';
+  else raise warning 'FALHOU — conta comum (não aprovadora) lê % evento(s) alheio(s) — a policy nova vazou', visto; end if;
+
+  reset role;
+end $$;
+
+
+-- ----------------------------------------------------------------------------
 -- 6. Propostas de questão — Fase 4
 --
 -- Autor vê e propõe só o que é seu; revisor vê tudo e decide; autor NÃO pode
