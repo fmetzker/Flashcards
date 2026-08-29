@@ -439,11 +439,15 @@ mesmo `materiasInscritas()` (no cliente) já não contando com ele.
   atual, mesmo depois de resolver `reescritas.json` — não entra em nada**
   (nem "estudados", nem "atrasadas"). Descoberto com uma consulta SQL
   direta numa conta de teste: **95 de 95** questões vencidas não batiam
-  com id nenhum do banco publicado. `reescritas.json` só registra troca
-  de id feita por `reescrever-questoes.ps1` (regra 5) — enunciado editado
-  à mão por fora do script muda o id sem deixar rastro no mapa, e a
-  questão também pode ter sido removida de vez; o painel não distingue os
-  dois casos, só sabe que não é cartão que a pessoa possa revisar hoje.
+  com id nenhum do banco publicado. Não é violação da regra 5 (enunciado
+  editado à mão) — a causa era mais simples: `zerar()` zera o `E` local,
+  mas não alcança `eventos_resposta` no servidor (não tem como; a tabela
+  não tem policy de update/delete, ver seção 3), e o cursor de
+  sincronização não volta atrás. Quem reseta o progresso enquanto ainda
+  está testando um cartão que depois é reescrito/substituído (auditoria de
+  conteúdo, tópico reorganizado) deixa pra trás eventos com `questao_id`
+  que pode nem existir mais — ficam no servidor pra sempre, órfãos do `E`
+  local. Ver comentário em `zerar()` (index.html).
 
 ## Banco colaborativo
 

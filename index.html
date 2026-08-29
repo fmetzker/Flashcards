@@ -4535,6 +4535,23 @@ function importar(input){
                    catch(e){ alert("Arquivo inválido."); } };
   r.readAsText(f);
 }
+/* "Não tem volta" no confirm() é sobre o LOCAL: isto zera o `E` deste
+   aparelho, mas não alcança o servidor — não tem como. eventos_resposta
+   não tem policy de update nem delete, de propósito (é a AUSÊNCIA delas
+   que torna o log append-only de verdade, ver schema.sql seção 3); um
+   DELETE aqui, se existisse, apagaria histórico de sincronização de
+   TODOS os aparelhos da conta, não só deste. E o cursor de sincronização
+   (CURSOR_EV) também não volta: o próximo puxarEventos() só busca o que é
+   mais novo que ele, então os eventos de antes do zerar() nunca voltam a
+   aparecer sozinhos — ficam no servidor pra sempre, órfãos do `E` local.
+
+   Isso é esperado, não bug: quem reseta o progresso enquanto o banco
+   ainda está mudando (cartão sendo reescrito, tópico reorganizado) deixa
+   pra trás eventos com `questao_id` que pode nem existir mais no banco
+   atual. O Painel de desempenho já sabe ignorar esses órfãos (indiceBanco
+   não reconhece o id, então nem conta como estudado nem como atrasado) —
+   foi assim que uma conta de teste chegou a mostrar "95 atrasadas" que na
+   verdade eram puro histórico órfão de antes de um zerar(). */
 function zerar(){
   if(confirm("Apagar todo o progresso de "+((SESSAO && SESSAO.email) || "esta conta")+"? Não tem volta.")){
     E = JSON.parse(JSON.stringify(padrao)); salvar(); ir("inicio");
