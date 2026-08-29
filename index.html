@@ -4060,6 +4060,31 @@ function resolverReescrita(mapa, id){
   return atual;
 }
 
+/* Busca TODAS as linhas de uma consulta REST, paginando — sem isto, o
+   PostgREST corta a resposta num teto de linhas por padrão (geralmente
+   1000) sem devolver erro nenhum: o pedido "funciona", só que com menos
+   dado do que existe de verdade. Pro painel isso é perigoso justamente
+   pelas consultas mais largas (estado_cartao/eventos_resposta, sem
+   usuario_id no filtro — é o log de TODAS as contas aprovadas somado),
+   que crescem sozinhas com o tempo (log é append-only) sem ninguém
+   perceber que passaram do teto. Mesmo espírito de TAMANHO_PAGINA na
+   sincronização pessoal (empurrarFila/puxarPaginado), só que por
+   limit/offset em vez de cursor — aqui não há uma coluna óbvia pra
+   cursorear por conta somada de várias pessoas. */
+const TAMANHO_PAGINA_PAINEL = 1000;
+async function buscarTudo(caminho){
+  let tudo = [], pagina, offset = 0;
+  do{
+    const sep = caminho.indexOf("?") >= 0 ? "&" : "?";
+    const r = await chamarRest(caminho + sep + "limit=" + TAMANHO_PAGINA_PAINEL + "&offset=" + offset);
+    if(!r.ok) throw new Error("o servidor respondeu " + r.status);
+    pagina = await r.json();
+    tudo = tudo.concat(pagina);
+    offset += TAMANHO_PAGINA_PAINEL;
+  }while(pagina.length === TAMANHO_PAGINA_PAINEL);
+  return tudo;
+}
+
 /* =======================================================================
    PAINEL DE DESEMPENHO — visão geral
 
@@ -4124,22 +4149,21 @@ async function pintarPainel(){
        fmtDiaBrasilia — a mesma função que aplicarEventoRemoto() já usa,
        pelo mesmo motivo (ts é UTC; cortar sem converter erra o dia perto
        da virada). */
+    /* order= em toda consulta paginada, mesmo quando o cálculo em si não
+       liga pra ordem — sem ORDER BY explícito o Postgres não garante a
+       MESMA ordem entre duas chamadas com LIMIT/OFFSET diferentes, e
+       buscarTudo() pagina fazendo exatamente isso. Sem ordem estável, uma
+       linha podia sumir (caiu entre duas páginas) ou vir duas vezes. */
     const janela = new Date(Date.now() - 8*86400000).toISOString();
-    const [rPerfis, rResumo, rEventos, rEstado, indice, mapa] = await Promise.all([
-      chamarRest("perfis?status=eq.aprovado&select=id,nome,email,materias_ativas&order=nome.asc"),
-      chamarRest("resumo_desempenho?select=usuario_id,respostas_total,acertos_total,ultima_atividade"),
-      chamarRest("eventos_resposta?select=usuario_id,ts&ts=gte."+encodeURIComponent(janela)),
-      chamarRest("estado_cartao?select=usuario_id,questao_id,prox,ts"),
+    const [p, r, e, ec, indice, mapa] = await Promise.all([
+      buscarTudo("perfis?status=eq.aprovado&select=id,nome,email,materias_ativas&order=nome.asc,id.asc"),
+      buscarTudo("resumo_desempenho?select=usuario_id,respostas_total,acertos_total,ultima_atividade&order=usuario_id.asc"),
+      buscarTudo("eventos_resposta?select=usuario_id,ts&ts=gte."+encodeURIComponent(janela)+"&order=usuario_id.asc,criado_em.asc"),
+      buscarTudo("estado_cartao?select=usuario_id,questao_id,prox,ts&order=usuario_id.asc,questao_id.asc"),
       indiceBancoCompleto(),
       mapaReescritas()
     ]);
-    if(!rPerfis.ok || !rResumo.ok || !rEventos.ok || !rEstado.ok){
-      throw new Error("o servidor respondeu com erro");
-    }
-    perfis = await rPerfis.json();
-    resumos = await rResumo.json();
-    eventosRecentes = await rEventos.json();
-    estados = await rEstado.json();
+    perfis = p; resumos = r; eventosRecentes = e; estados = ec;
     indiceBanco = indice;
     mapaReesc = mapa;
   }catch(e){

@@ -458,6 +458,16 @@ mesmo `materiasInscritas()` (no cliente) já não contando com ele.
   conteúdo, tópico reorganizado) deixa pra trás eventos com `questao_id`
   que pode nem existir mais — ficam no servidor pra sempre, órfãos do `E`
   local. Ver comentário em `zerar()` (index.html).
+- **Toda consulta do painel usa `buscarTudo()` (index.html), não
+  `chamarRest()` direto.** O PostgREST corta a resposta num teto de linhas
+  por padrão (não erra, só devolve menos do que existe) — perigoso
+  especialmente em `estado_cartao`/`eventos_resposta` sem filtro de
+  `usuario_id` (é o log de TODAS as contas aprovadas somado, e cresce
+  sozinho: o log é *append-only*). `buscarTudo()` pagina por
+  `limit`/`offset` até a página vir menor que o tamanho pedido — cada
+  consulta paginada leva `order=` explícito, porque sem ele o Postgres não
+  garante a mesma ordem entre duas chamadas com offset diferente, e uma
+  linha podia sumir entre páginas.
 
 ## Banco colaborativo
 
