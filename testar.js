@@ -42,6 +42,7 @@ const RAIZ = __dirname;
 const GLOBAIS_LET = [
   'BANCO', 'CONCURSO', 'BLOCOS', 'BLOCOS_META', 'ORDEM_MATERIAS', 'TOPICOS_EDITAL',
   'REQ_MATERIA', 'REQUISITOS', 'REQUISITOS_SUB', 'CONCURSOS', 'INSCRITOS', 'E', 'S',
+  'SESSAO', 'SUPA',
 ];
 const GLOBAIS_CONST = [
   'porId', 'MATERIAS', 'blocoDaMateria', 'INTERVALOS', 'CAIXA_MAX',
@@ -61,7 +62,7 @@ const FUNCOES = [
   'materiasInscritas', 'provaMaisProxima', 'blocoDe', 'embaralhaOrdem',
   'revisoesPorDia', 'aplicarFoco', 'carregarConfig', 'carregarBancoParcial',
   /* não são motor puro (tocam localStorage), mas o teste precisa alcançá-las */
-  'salvar', 'podarEventosProprios',
+  'salvar', 'podarEventosProprios', 'renovarSessao', 'chamarAuth',
 ];
 
 function lerDados() {
@@ -144,6 +145,9 @@ function carregarApp(opcoes = {}) {
        aí o teste tem que saber, não engolir em silêncio. */
     fetch: () => Promise.reject(new Error('fetch inesperado no teste')),
     setTimeout, clearTimeout, setInterval, clearInterval,
+    /* fetchComPrazo() usa AbortController; sem ele no sandbox a chamada
+       estoura antes de chegar na rede e o teste passa por engano */
+    AbortController, TypeError, Error,
     requestAnimationFrame: fn => setTimeout(fn, 0),
     localStorage: localStorageFalso,
     document: documentoFalso,

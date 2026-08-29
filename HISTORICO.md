@@ -183,6 +183,14 @@ abre página do Supabase: ele confere o token e redireciona de volta para o app
 com a sessão pronta no fragmento da URL. O app ignorava o fragmento inteiro e
 mostrava a tela de login comum.
 
+**Ficar sem internet deslogava a conta.** `renovarSessao()` tratava
+QUALQUER erro como "a credencial não presta" e apagava a sessão do aparelho —
+inclusive falha de rede. Num PWA feito para funcionar offline, abrir o app sem
+internet a menos de 5 minutos do token vencer bastava: a pessoa voltava à tela
+de login sem entender por quê, e o papel de aprovador sumia junto. Descoberto
+em agosto/2026 numa conta real, ao testar justamente o modo offline. Hoje só
+4xx do GoTrue desloga; rede e 5xx mantêm a sessão e tentam de novo depois.
+
 **"Sincronizado" mentindo.** O status olhava só se a fila de saída estava
 vazia — e puxar eventos não enfileira nada, então uma tentativa que falhou de
 ponta a ponta (sem internet) deixava a fila vazia do mesmo jeito e a tela

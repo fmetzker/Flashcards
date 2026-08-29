@@ -1298,7 +1298,15 @@ async function chamarAuth(caminho, corpo){
     body: JSON.stringify(corpo)
   });
   const dado = await r.json().catch(()=>({}));
-  if(!r.ok) throw new Error(dado.error_description || dado.msg || dado.error || ("o servidor respondeu "+r.status));
+  if(!r.ok){
+    /* `status` no erro é o que permite a quem chama separar "o servidor
+       RECUSOU" de "não consegui falar com o servidor" — sem isso, uma queda
+       de rede (que rejeita antes daqui, sem status) fica indistinguível de
+       uma credencial inválida. Ver renovarSessao(). */
+    const erro = new Error(dado.error_description || dado.msg || dado.error || ("o servidor respondeu "+r.status));
+    erro.status = r.status;
+    throw erro;
+  }
   return dado;
 }
 function salvarSessaoDe(dado){
@@ -1339,10 +1347,29 @@ async function sair(){
 }
 /* renova sem interromper o boot: se o refresh_token também expirou ou foi
    revogado, desloga silenciosamente em vez de travar a abertura do app */
+/* Renova o token. SÓ apaga a sessão quando o SERVIDOR recusa (4xx do
+   GoTrue: refresh token expirado, revogado, conta apagada). Falha de rede
+   NÃO desloga.
+
+   Isto já foi `catch(e){ SESSAO = null; apagarSessaoSalva(); }`, tratando
+   qualquer erro como credencial ruim — e num app que existe para funcionar
+   offline isso é perda de dado: abrir sem internet a menos de 5 minutos do
+   token vencer apagava a sessão do aparelho, e a pessoa voltava a ver a tela
+   de login sem entender por quê (o progresso continua no servidor, mas o
+   acesso e o papel de aprovador somem até logar de novo). Sem rede a resposta
+   certa é NÃO FAZER NADA e tentar de novo depois: a sessão local segue
+   valendo, e o app já funciona offline com ela. */
 async function renovarSessao(){
   if(!SESSAO || !SESSAO.refresh_token) return;
-  try{ salvarSessaoDe(await chamarAuth("token?grant_type=refresh_token", {refresh_token: SESSAO.refresh_token})); }
-  catch(e){ SESSAO = null; apagarSessaoSalva(); }
+  try{
+    salvarSessaoDe(await chamarAuth("token?grant_type=refresh_token", {refresh_token: SESSAO.refresh_token}));
+  }catch(e){
+    if(e && e.status >= 400 && e.status < 500){
+      SESSAO = null; apagarSessaoSalva();          // o servidor recusou de verdade
+    }else{
+      console.warn("não deu para renovar a sessão agora: " + e.message);   // rede: mantém e tenta depois
+    }
+  }
 }
 async function verificarSessao(){
   if(!supaConfigurado() || !SESSAO) return;
