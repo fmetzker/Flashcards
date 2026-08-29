@@ -105,7 +105,12 @@ function carregarApp(opcoes = {}) {
   const ini = html.lastIndexOf('<script>');
   const fim = html.lastIndexOf('</script>');
   if (ini < 0 || fim < 0) throw new Error('não achei o bloco <script> do index.html');
-  const script = html.slice(ini + '<script>'.length, fim);
+  /* Na MESMA ordem das tags do HTML: motor.js primeiro (só define), depois o
+     bloco inline (que declara os globais e roda o boot). Ler os dois daqui,
+     em vez de manter uma lista, é o que garante que o teste veja exatamente
+     o que o navegador vê. */
+  const motor = fs.readFileSync(path.join(RAIZ, 'motor.js'), 'utf8');
+  const script = motor + String.fromCharCode(10) + html.slice(ini + '<script>'.length, fim);
 
   const armazem = {};
   if (opcoes.sessao) {

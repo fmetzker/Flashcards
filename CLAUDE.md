@@ -72,9 +72,9 @@ no Safari do iPhone sem nenhuma etapa de compilação.
    Esquemas antigos de chave são lidos para migrar e nunca apagados — custam
    alguns KB e são rede de segurança. Não introduzir outra chave sem
    migração.
-2. **Ao alterar `index.html`, incrementar `VERSAO` em `sw.js`.** O service
-   worker é **rede-primeiro**, com o cache só como reserva para quando não
-   há internet. Não voltar para cache-primeiro: o aparelho continua servindo
+2. **Ao alterar `index.html` ou `motor.js`, incrementar `VERSAO` em
+   `sw.js`.** O service worker é **rede-primeiro**, com o cache só como
+   reserva para quando não há internet. Não voltar para cache-primeiro: o aparelho continua servindo
    a versão antiga mesmo depois de publicar.
 
    **`CACHE` (com `VERSAO`) e `CACHE_BANCO` (nome fixo) são caches
@@ -208,6 +208,24 @@ no Safari do iPhone sem nenhuma etapa de compilação.
     que a conta usa o app pra revisar". Se o concurso vai voltar, o caminho é
     cadastrá-lo em `concursos.json`; se é avulso de propósito, marcar o flag
     — os dois caminhos tornam a matéria ativa e a escrita legítima.
+
+13. **`motor.js` não toca DOM, `localStorage`, rede nem `window`.** Ele
+    decide o que estudar; quem pinta tela e fala com o servidor é o
+    `index.html`. É o que permite testar o motor inteiro fora do navegador,
+    e `testar.js` reprova quem quebrar — não é convenção, é checado.
+
+    Os globais que o motor lê (`E`, `BANCO`, `porId`, `BLOCOS_META`,
+    `REQUISITOS`...) continuam declarados no `index.html`: `let`/`const` de
+    topo vivem no ambiente léxico **global**, compartilhado entre `<script>`
+    clássicos, e a resolução acontece na CHAMADA, não na definição — por
+    isso a ordem das tags (motor primeiro) não cria problema de
+    inicialização.
+
+    **Arquivo novo carregado por `<script src>` precisa entrar em três
+    lugares**, e `testar.js` confere os três: a tag no `index.html`,
+    `ARQUIVOS` no `sw.js` (senão o app quebra offline — e só no aparelho de
+    quem já instalou) e `gerar-offline.ps1` (senão o arquivo único sai sem
+    ele).
 
 ## Formato do banco de questões
 

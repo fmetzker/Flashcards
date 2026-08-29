@@ -54,7 +54,8 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 
 | Arquivo | Papel |
 |---|---|
-| `index.html` | App inteiro: HTML, CSS e JS. O banco **não** vive aqui |
+| `index.html` | Telas: HTML, CSS, e o JS de tela/conta/sincronismo. O banco **não** vive aqui |
+| `motor.js` | Motor de estudo: Leitner, pré-requisito, nível, meta, sessão, datas. **Não toca DOM nem rede** (regra 13) |
 | `concursos.json` | Receitas de prova: data, composição, regra de aprovação |
 | `banco/materias.json` | Lista de matérias, na ordem de exibição |
 | `banco/<matéria>.json` | Questões daquela matéria, uma por linha |
@@ -97,9 +98,17 @@ Campo ausente no patch é **preservado**: mandar só `n` não apaga o `eo`.
 
 ---
 
-## 4. Anatomia do `index.html`
+## 4. Anatomia do app
 
-Um arquivo, ~3.300 linhas: CSS, HTML e JS. Ordem real do arquivo.
+Dois arquivos de JS, carregados nesta ordem:
+
+- **`motor.js`** (~790 linhas) — a lógica pura: §4.3 e §4.4 abaixo.
+- **`index.html`** (~4.040 linhas) — CSS, HTML, e o resto do JS: carga,
+  conta/sincronismo, navegação e as telas.
+
+Os globais (`E`, `BANCO`, `porId`, `BLOCOS_META`, `REQUISITOS`...) são
+declarados no `index.html` e enxergados pelo motor: `let`/`const` de topo
+vivem no ambiente léxico global, compartilhado entre `<script>` clássicos.
 
 ### 4.1 Carga e configuração
 

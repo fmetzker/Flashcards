@@ -26,6 +26,7 @@ import json, re, subprocess, sys, tempfile, os, collections, hashlib
 
 RAIZ = os.path.dirname(os.path.abspath(__file__))
 HTML = os.path.join(RAIZ, 'index.html')
+MOTOR = os.path.join(RAIZ, 'motor.js')
 SW = os.path.join(RAIZ, 'sw.js')
 BANCO_DIR = os.path.join(RAIZ, 'banco')
 CONCURSOS = os.path.join(RAIZ, 'concursos.json')
@@ -460,13 +461,20 @@ def valida_escadas(B):
 
 
 def valida_js(fonte):
-    """Confere a sintaxe de todo o JavaScript do app."""
+    """Confere a sintaxe de todo o JavaScript do app — inline e motor.js."""
     scripts = re.findall(r'<script>(.*?)</script>', fonte, re.S)
     if not scripts:
         erros.append("nenhum bloco <script> encontrado")
         return
+    codigo = scripts[-1]
+    # motor.js entra junto: é carregado por <script src> e é metade do app
+    if os.path.exists(MOTOR):
+        with open(MOTOR, encoding='utf-8') as f:
+            codigo = f.read() + chr(10) + codigo
+    else:
+        erros.append("motor.js ausente — o index.html o carrega por <script src>")
     with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False, encoding='utf-8') as f:
-        f.write(scripts[-1])
+        f.write(codigo)
         tmp = f.name
     try:
         r = subprocess.run(['node', '--check', tmp], capture_output=True, text=True)

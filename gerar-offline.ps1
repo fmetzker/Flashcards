@@ -45,6 +45,18 @@ $dados = "window.DADOS={`n" + ($partes -join ",`n") + "`n};"
 
 $fonte = [System.IO.File]::ReadAllText($html, [System.Text.Encoding]::UTF8)
 
+# O motor vive em motor.js, carregado por <script src> no app publicado. Num
+# arquivo unico isso nao funciona (seria um segundo arquivo, que e justamente
+# o que o offline.html existe para evitar), entao a tag e trocada pelo
+# conteudo. Tem que vir ANTES do bloco inline, igual no index.html: o motor so
+# define funcoes, e o inline declara os globais e dispara o boot.
+$motorArq = Join-Path $raiz 'motor.js'
+if (-not (Test-Path $motorArq)) { throw "motor.js nao encontrado" }
+$motor = [System.IO.File]::ReadAllText($motorArq, [System.Text.Encoding]::UTF8)
+$tagMotor = '<script src="motor.js"></script>'
+if ($fonte -notlike "*$tagMotor*") { throw "tag do motor.js nao encontrada no index.html" }
+$fonte = $fonte.Replace($tagMotor, "<script>`n$motor`n</script>")
+
 # `</script>` dentro de uma string quebraria a tag; nenhum dado do banco tem
 # isso hoje, mas a conferência é barata e a falha seria silenciosa
 if ($dados -match '(?i)</script') { throw "os dados contêm '</script' e quebrariam o HTML" }

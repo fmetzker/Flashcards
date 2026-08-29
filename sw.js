@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v298-comentarios-enxutos-historico-a-parte";
+const VERSAO = "v299-motor-em-arquivo-proprio";
 const CACHE = "prova-enf-" + VERSAO;
 
 /* Cache do BANCO (tudo debaixo de ./banco/) é separado do cache do APP, e
@@ -24,6 +24,7 @@ const CACHE_BANCO = "prova-enf-banco";
 const ARQUIVOS = [
   "./",
   "./index.html",
+  "./motor.js",          // motor de estudo, carregado por <script src> pelo index.html
   "./manifest.json",
   "./icone-192.png",
   "./icone-512.png",
