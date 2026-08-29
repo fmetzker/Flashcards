@@ -46,6 +46,15 @@ vazio, e a sincronização derrubava o marco do servidor a cada chamada —
 inclusive um marco posto à mão por SQL, segundos depois de criado. O campo
 passou a só entrar no corpo quando há instante de verdade para gravar.
 
+**Lista de matérias apagada por um PATCH com `[]`.** Mesma armadilha do
+`progresso_zerado_em: null`, um campo ao lado: `materias_ativas: []` num PATCH
+não é "não mexe", é **apaga**. Estado local vazio acontece de verdade — conta
+recém-logada ainda na tela de escolher concurso, ou aparelho novo — e o
+listener de `online` chama `sincronizar()` de qualquer tela, então bastava a
+rede voltar naquele instante para a lista boa do servidor cair. O painel
+passava a mostrar "–" em revisões atrasadas, que é como ele diz "não sei o que
+essa conta estuda". Hoje lista vazia não é enviada.
+
 **Um script de diagnóstico que mentiu com cara de dado.** Enquanto se
 investigava as 95 atrasadas, um script leu `banco/*.json` linha a linha com
 `json.loads` — mas os arquivos são ARRAY JSON — e engoliu o erro num

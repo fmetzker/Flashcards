@@ -1011,8 +1011,23 @@ async function atualizarUniaoDeMaterias(){
 async function sincronizarMateriasAtivas(){
   if(!supaConfigurado() || !SESSAO || !CONTA_ID) return;
   try{
-    const corpo = {materias_ativas: materiasInscritas()};
+    /* Lista VAZIA não é mandada, pela mesma razão do progresso_zerado_em
+       logo abaixo: um PATCH com [] não é "não mexe", é APAGA. Estado local
+       vazio acontece de verdade — conta que acabou de entrar e ainda está na
+       tela de escolher concurso, ou aparelho novo antes de escolher — e
+       basta a rede voltar nesse momento (o listener de 'online' chama
+       sincronizar() de qualquer tela) pra derrubar a lista boa do servidor.
+       O painel então mostra "–" em revisões atrasadas, porque lista vazia
+       ali significa "não sei o que essa conta estuda".
+
+       Ninguém perde nada por não mandar: quem de fato parou de seguir tudo
+       não tem o que estudar, e a lista volta a ser mandada assim que
+       escolher alguma coisa. */
+    const ativas = materiasInscritas();
+    const corpo = {};
+    if(ativas.length) corpo.materias_ativas = ativas;
     if(E.progressoZeradoEm) corpo.progresso_zerado_em = E.progressoZeradoEm;
+    if(!Object.keys(corpo).length) return;   // nada de verdade pra gravar
     const r = await chamarRest("perfis?id=eq."+CONTA_ID, {
       method: "PATCH",
       headers: {"Prefer": "return=minimal"},
@@ -1424,8 +1439,15 @@ async function verificarSituacao(){
            Só avança, nunca retrocede: o marco mais recente é sempre o que
            vale, então um aparelho que ficou offline desde antes do reset
            não desfaz o corte ao voltar. */
+        /* Compara por INSTANTE, não por string: os dois lados chegam em
+           formatos diferentes — o PostgREST devolve "…+00:00" e o cliente
+           grava com toISOString() ("…Z"). Como texto, "…123456+00:00" e
+           "…123Z" divergem já no caractere depois dos milissegundos, e o
+           mesmo instante pode parecer mais antigo de um lado. */
         const remoto = linhas[0].progresso_zerado_em;
-        if(remoto && (!E.progressoZeradoEm || remoto > E.progressoZeradoEm)){
+        const instante = v => { const d = Date.parse(v); return isNaN(d) ? null : d; };
+        const tRemoto = instante(remoto), tLocal = instante(E.progressoZeradoEm);
+        if(remoto && tRemoto !== null && (tLocal === null || tRemoto > tLocal)){
           E.progressoZeradoEm = remoto;
           salvar();
         }
