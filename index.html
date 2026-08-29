@@ -210,6 +210,18 @@ button.fechar{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;
 .alerta{background:var(--coral-luz);border:1px solid #F0C9C6;color:#8A2C26;border-radius:12px;padding:12px;font-size:14.5px;margin-bottom:12px}
 .ok{background:var(--verde-luz);border-color:#BEDDD4;color:#0B5A4A}
 
+/* toast: aviso de meta batida, sem bloquear o cartão — some sozinho.
+   position:fixed e fora de .tela de propósito (ver a div no topo do body):
+   se vivesse dentro de #tela-estudo, uma reabastecida de sessão que troca
+   o conteúdo por baixo não deveria nunca levar o aviso junto. */
+.toast-area{position:fixed;top:14px;left:0;right:0;z-index:999;display:flex;
+  flex-direction:column;align-items:center;gap:8px;padding:0 18px;pointer-events:none}
+.toast{background:var(--verde-luz);border:1px solid #BEDDD4;color:#0B5A4A;
+  border-radius:12px;padding:10px 16px;font-size:13.5px;font-weight:600;
+  box-shadow:0 6px 18px rgba(0,0,0,.14);max-width:420px;text-align:center;
+  opacity:0;transform:translateY(-10px);transition:opacity .25s,transform .25s}
+.toast.mostrar{opacity:1;transform:translateY(0)}
+
 /* materias e topicos */
 .materia{background:var(--card);border:1px solid var(--traco);border-radius:14px;margin-bottom:9px;overflow:hidden}
 .cabM{display:flex;flex-wrap:wrap;align-items:center;gap:6px 9px;width:100%;padding:13px 14px;background:none;
@@ -301,6 +313,11 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
 </style>
 </head>
 <body>
+
+<!-- avisos passageiros (meta batida, sessão contínua) — fixo, fora de
+     qualquer .tela, pra não sumir quando a tela troca nem interromper o
+     cartão -->
+<div class="toast-area" id="toast-area" aria-live="polite"></div>
 
 <!-- ============ CARREGANDO ============
      Nasce ativa no HTML estático, antes de qualquer JS rodar: cobre o
@@ -2889,11 +2906,22 @@ let S = null;
    salva normalmente (registrar() já gravou), só a sessão em si é abandonada */
 function sairDoEstudo(){ S = null; ir("inicio"); }
 
-function iniciarSessao(modo, filtro){
+/* Monta um LOTE de ids para a sessão — usada tanto para abrir a sessão
+   quanto para reabastecê-la sem fechar (ver responder()/registrar() mais
+   abaixo). `excluir` é o Set de ids já usados NESTA sessão, pra nunca
+   repetir cartão no mesmo dia por reabastecimento (a repetição proposital
+   de cartão errado usa outro caminho — ver agendarRepeticao()).
+
+   Sem adiantamento de revisão em lugar nenhum aqui (removido a pedido: com
+   a sessão contínua, "faltou pra fechar a cota" deixou de ser problema —
+   quem reabastece pega mais de outra matéria/tópico ainda aberto, e a
+   sessão só termina quando isso também vier vazio; estudar cartão antes da
+   hora só enfraquecia o espaçamento sem essa necessidade). */
+function montarLoteSessao(modo, filtro, excluir){
   const q = fila();
   let lista = [];
   if(modo==="erros"){
-    lista = Object.keys(E.cartoes).filter(id=>porId[id] && E.cartoes[id].caixa<=2 && E.cartoes[id].erros>0);
+    lista = Object.keys(E.cartoes).filter(id=>porId[id] && E.cartoes[id].caixa<=2 && E.cartoes[id].erros>0 && !excluir.has(id));
   } else if(modo==="filtro"){
     /* uma matéria ou um tópico isolado: vale a mesma ordem do estudo normal —
        o que está vencido primeiro, depois o que nunca foi visto */
@@ -2904,6 +2932,7 @@ function iniciarSessao(modo, filtro){
     const h = hoje(), rev = [], nov = [];
     limparCacheGrau();
     alvo.forEach(x=>{
+      if(excluir.has(x.id)) return;
       const c = E.cartoes[x.id];
       /* mesma escada do estudo normal: estudar um tópico pela tela Matérias
          não pode ser um atalho para pular o degrau de baixo */
@@ -2912,14 +2941,6 @@ function iniciarSessao(modo, filtro){
     });
     rev.sort((a,b)=> prioridade(a) - prioridade(b));   // mesma ordem do estudo normal
     lista = intercalar(rev, nov).slice(0, E.meta);
-    /* nada vencido e nada novo: revisa adiantado em vez de não fazer nada —
-       mas só o que a pessoa JÁ VIU. Cartão de degrau fechado continua fora,
-       senão este atalho desfaria a escada justamente no tópico em que ela
-       ainda não foi vencida. */
-    if(lista.length===0){
-      lista = alvo.filter(x => E.cartoes[x.id] || grauAberto(x))
-                  .map(x=>x.id).slice(0, E.meta);
-    }
   } else {
     /* Monta a sessão RESPEITANDO A COTA DE CADA BLOCO DA META — a união dos
        concursos inscritos, não só o que está em foco. Antes isto seguia o
@@ -2942,7 +2963,7 @@ function iniciarSessao(modo, filtro){
       if(!falta) return;
       const daArea = id => {
         const x = porId[id];
-        if(!x || bl.materias.indexOf(x.m) < 0) return false;
+        if(!x || excluir.has(id) || bl.materias.indexOf(x.m) < 0) return false;
         return !bl.topicos || bl.topicos.indexOf(x.t) >= 0;
       };
       const rev = q.revisar.filter(daArea);
@@ -2954,47 +2975,85 @@ function iniciarSessao(modo, filtro){
          daqui), então limitar por bl.revisao aqui é o bastante — não
          precisa saber quanto de `falta` já foi revisão antes. Os dois
          entram intercalados, não bloco de revisão seguido de bloco de
-         novo — é o que evita a sessão ficar maçante. */
+         novo — é o que evita a sessão ficar maçante.
+
+         Se isso ainda ficar abaixo de `falta` (trava de degrau, tópico
+         recém-aberto com pouco cartão), o bloco simplesmente entra com
+         menos que a cota — não completa com nada que ainda não venceu. A
+         sessão contínua reabastece de outra matéria/tópico depois; não
+         precisa fingir que esta cota fechou hoje. */
       const parte = rev.slice(0, Math.min(bl.revisao, falta));
-      let bloco = intercalar(parte, nov.slice(0, falta - parte.length));
-      /* Trava de degrau (ou banco pequeno) pode deixar a área com menos
-         cartão do que a cota pede — sobretudo logo que um tópico abre, com
-         só 1-2 cartões no degrau 1. Sem completar, a sessão vira só esses
-         poucos cartões pendentes, repetindo sessão após sessão do mesmo
-         dia: quem estuda decora a posição/resposta em vez de aprender, e é
-         exatamente o caso de errar o cartão que trava o degrau sem ter
-         outro disponível. Completa com REVISÃO ADIANTADA da mesma área —
-         cartão que a pessoa já respondeu antes e ainda não venceu — para
-         intercalar com o que está travado. Cartão nunca visto continua de
-         fora: isto não é atalho para pular a trava (regra do `n`/degrau),
-         é só encher a sessão com o que a pessoa já tem base para responder.
-         Ordena por vencimento mais próximo — antecipa o que ia vencer
-         primeiro de qualquer jeito, não sorteia. */
-      if(bloco.length < falta){
-        const vistos = Object.keys(E.cartoes)
-          .filter(id => E.cartoes[id].prox > h && daArea(id))
-          .sort((a,b)=> E.cartoes[a].prox.localeCompare(E.cartoes[b].prox));
-        bloco = intercalar(bloco, vistos.slice(0, falta - bloco.length));
-      }
+      const bloco = intercalar(parte, nov.slice(0, falta - parte.length));
       lista = lista.concat(bloco);
     });
     /* nenhuma cota aberta (meta do dia já fechada) ou nada nas matérias da
-       prova: cai num modo "continuar estudando" — e aqui a ordem muda de
-       propósito. Revisão vencida entra INTEIRA primeiro (inclusive o
-       excedente que passou do teto de 2x em blocosDaMeta e por isso não
-       coube na meta), sem intercalar com novo: quem chegou até aqui já
-       bateu a meta do dia e está adiantando revisão de verdade, não
-       fazendo a sessão normal — só depois de esvaziar o atrasado é que
-       cartão novo volta a aparecer. */
+       prova: sobra tudo que a pessoa segue e ainda está vencido ou liberado,
+       sem respeitar cota de bloco nenhuma — é o "continuar estudando depois
+       de bater a meta", real, não adiantado. Termina de vez só quando isto
+       também vier vazio. */
     if(lista.length===0){
-      const restam = Math.max(0, E.meta - feitasHoje()) || E.meta;
-      lista = q.revisar.slice(0, restam);
-      if(lista.length < restam) lista = lista.concat(q.novas.slice(0, restam - lista.length));
+      lista = q.revisar.filter(id=>!excluir.has(id)).concat(q.novas.filter(id=>!excluir.has(id)));
     }
   }
+  return lista;
+}
+
+function iniciarSessao(modo, filtro){
+  const lista = montarLoteSessao(modo, filtro, new Set());
   if(lista.length===0){ alert("Nada na fila. Adicione mais questões ao banco."); return; }
-  S = {lista, pos:0, respondida:false};
+  S = {lista, pos:0, respondida:false, modo, filtro, metasAnunciadas:new Set(), todasAnunciada:false, pendentes:[]};
   ir("estudo"); mostrarQuestao();
+}
+
+/* Toast: avisa sem fechar o cartão. Fica de fora de qualquer .tela (ver a
+   div fixa logo no início do <body>) e some sozinho — não é alert(), não
+   bloqueia clique nem interrompe a sessão. */
+function mostrarToast(msg){
+  const area = document.getElementById("toast-area");
+  if(!area) return;
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.textContent = msg;
+  area.appendChild(el);
+  requestAnimationFrame(()=> el.classList.add("mostrar"));
+  setTimeout(()=>{
+    el.classList.remove("mostrar");
+    setTimeout(()=> el.remove(), 300);
+  }, 3200);
+}
+
+/* Um aviso por matéria por sessão (S.metasAnunciadas) e um "todas as
+   metas" (S.todasAnunciada) — não é gate de nada, só notícia: a sessão
+   continua do mesmo jeito antes e depois de qualquer um dos dois. */
+function checarMetasBatidas(){
+  if(!S || !BLOCOS_META.length) return;
+  const porBloco = progressoPorBloco(hoje());
+  let todasBatidas = true;
+  BLOCOS_META.forEach((bl,i)=>{
+    const pb = porBloco[i];
+    const batida = pb.feitas >= pb.cota;
+    if(!batida) todasBatidas = false;
+    else if(!S.metasAnunciadas.has(bl.id)){
+      S.metasAnunciadas.add(bl.id);
+      mostrarToast("Meta diária de "+pb.nome+" batida!");
+    }
+  });
+  if(todasBatidas && !S.todasAnunciada){
+    S.todasAnunciada = true;
+    mostrarToast("Você bateu todas as metas do dia!");
+  }
+}
+
+/* Errou ou chutou (não demonstrou saber de verdade): volta pra caixa 1 do
+   Leitner como sempre (vale a partir de amanhã), E ganha uma repetição
+   dentro da MESMA sessão, 5 a 10 cartões à frente — reforço de curto prazo,
+   a pedido. Modo "erros" já É essa revisão, não duplica. Se errar de novo
+   na repetição, agenda outra do mesmo jeito (auto-limitante na prática: a
+   maioria acerta antes de virar um ciclo longo). */
+function agendarRepeticao(id, resultado){
+  if(resultado === "sabia" || !S || S.modo === "erros") return;
+  const daqui = 5 + Math.floor(Math.random()*6);   // 5 a 10
+  S.pendentes.push({id, apareceEm: S.pos + daqui});
 }
 
 function embaralhaOrdem(n){
@@ -3118,8 +3177,34 @@ function registrar(id, resultado){
     sincronizar();   // em segundo plano; se falhar, o evento fica na fila e tenta de novo depois
   }
   salvar();
+
+  agendarRepeticao(id, resultado);
+  checarMetasBatidas();
+
   S.pos++;
-  if(S.pos >= S.lista.length){ ir("inicio"); return; }
+  /* repetição de cartão errado/chutado (agendarRepeticao) chegando na vez:
+     entra como o PRÓXIMO cartão, empurrando o resto — checado a cada avanço
+     porque o reabastecimento (abaixo) pode crescer S.lista em qualquer
+     ritmo, e isto tem que valer não importa quando a vez chegar. */
+  const iPend = S.pendentes.findIndex(p => p.apareceEm <= S.pos);
+  if(iPend >= 0) S.lista.splice(S.pos, 0, S.pendentes.splice(iPend,1)[0].id);
+
+  if(S.pos < S.lista.length){ mostrarQuestao(); return; }
+
+  /* modo "erros" continua fechando ao fim, de propósito — já é uma lista
+     pequena e intencionalmente finita, revisar especificamente o que foi
+     errado; os outros dois modos (normal, filtro) não fecham mais: só
+     reabastecem, e só voltam pro Início quando isso vier vazio de verdade. */
+  if(S.modo === "erros"){ S = null; ir("inicio"); return; }
+
+  const mais = montarLoteSessao(S.modo, S.filtro, new Set(S.lista));
+  if(mais.length===0){
+    S = null;
+    alert("Você estudou tudo que havia disponível hoje!");
+    ir("inicio");
+    return;
+  }
+  S.lista = S.lista.concat(mais);
   mostrarQuestao();
 }
 
@@ -3943,6 +4028,30 @@ async function indiceBancoCompleto(){
   return indice;
 }
 
+/* banco/reescritas.json ({id_antigo: id_novo}) — o mesmo mapa que
+   migrarReescritas() usa pra mover PROGRESSO LOCAL de enunciado corrigido
+   (regra 5 do CLAUDE.md). eventos_resposta é append-only: o evento com o
+   id ANTIGO nunca é reescrito nem apagado no servidor, mesmo depois de
+   migrarReescritas() já ter movido (e apagado) o progresso local daquele
+   id. Sem resolver aqui, o painel conta o id antigo e o novo como dois
+   cartões diferentes — foi o que inflou "Cartões estudados" (e podia
+   inflar "Revisões atrasadas": um id antigo com prox velho, órfão desde
+   a reescrita, contando separado do id novo que a pessoa segue revisando
+   de verdade). Mesma lógica de saltos e mesmo limite de segurança de
+   migrarReescritas(). */
+let MAPA_REESCRITAS = null;
+async function mapaReescritas(){
+  if(MAPA_REESCRITAS) return MAPA_REESCRITAS;
+  try{ MAPA_REESCRITAS = await pega("banco/reescritas.json"); }
+  catch(e){ MAPA_REESCRITAS = {}; }
+  return MAPA_REESCRITAS;
+}
+function resolverReescrita(mapa, id){
+  let atual = id, saltos = 0;
+  while(mapa[atual] && saltos++ < 10) atual = mapa[atual];
+  return atual;
+}
+
 /* =======================================================================
    PAINEL DE DESEMPENHO — visão geral
 
@@ -3990,14 +4099,16 @@ async function indiceBancoCompleto(){
      linha) são pequenos o bastante pra buscar direto e agregar no
      cliente — não compensa criar view nova só pra isso.
    - indiceBancoCompleto() (acima): banco inteiro, só pra saber a matéria
-     de cada questao_id. */
+     de cada questao_id.
+   - mapaReescritas() (acima): banco/reescritas.json, pra resolver id
+     antigo→novo antes de contar/agrupar por cartão. */
 async function pintarPainel(){
   const c = document.getElementById("painel-corpo");
   c.innerHTML = "";
   const carregando = document.createElement("div"); carregando.className = "vazio"; carregando.textContent = "Carregando…";
   c.appendChild(carregando);
 
-  let perfis, resumos, eventosRecentes, estados, indiceBanco;
+  let perfis, resumos, eventosRecentes, estados, indiceBanco, mapaReesc;
   try{
     /* janela FROUXA de propósito (8 dias corridos em UTC, não 7 dias exatos
        em Brasília): é só pra limitar quanto dado vem da rede. O corte
@@ -4006,12 +4117,13 @@ async function pintarPainel(){
        pelo mesmo motivo (ts é UTC; cortar sem converter erra o dia perto
        da virada). */
     const janela = new Date(Date.now() - 8*86400000).toISOString();
-    const [rPerfis, rResumo, rEventos, rEstado, indice] = await Promise.all([
+    const [rPerfis, rResumo, rEventos, rEstado, indice, mapa] = await Promise.all([
       chamarRest("perfis?status=eq.aprovado&select=id,nome,email,materias_ativas&order=nome.asc"),
       chamarRest("resumo_desempenho?select=usuario_id,respostas_total,acertos_total,ultima_atividade"),
       chamarRest("eventos_resposta?select=usuario_id,ts&ts=gte."+encodeURIComponent(janela)),
-      chamarRest("estado_cartao?select=usuario_id,questao_id,prox"),
-      indiceBancoCompleto()
+      chamarRest("estado_cartao?select=usuario_id,questao_id,prox,ts"),
+      indiceBancoCompleto(),
+      mapaReescritas()
     ]);
     if(!rPerfis.ok || !rResumo.ok || !rEventos.ok || !rEstado.ok){
       throw new Error("o servidor respondeu com erro");
@@ -4021,6 +4133,7 @@ async function pintarPainel(){
     eventosRecentes = await rEventos.json();
     estados = await rEstado.json();
     indiceBanco = indice;
+    mapaReesc = mapa;
   }catch(e){
     c.innerHTML = "";
     const erro = document.createElement("div"); erro.className = "aviso";
@@ -4039,20 +4152,36 @@ async function pintarPainel(){
     if(dia >= seteDiasAtras) seteDiasCont[ev.usuario_id] = (seteDiasCont[ev.usuario_id]||0) + 1;
   });
 
-  /* agrupa por aluno o que estado_cartao já devolve DEDUPLICADO — uma
-     linha por (usuario_id, questao_id), nunca duas para o mesmo cartão
-     (é o próprio DISTINCT ON da view, ver schema.sql seção 5). Por isso
-     `vistos.length` é diretamente "quantos cartões DIFERENTES essa conta
-     já respondeu" — o mesmo que "Já vistas" mede na tela Estatísticas
-     pessoal (Object.keys(E.cartoes).length, também sem filtro de matéria).
-     `respostas_total` (resumo_desempenho) é outra coisa: TOTAL de
-     respostas, contando toda revisão repetida do mesmo cartão — é o que
-     entra na acurácia (acertos_total/respostas_total), não em "estudados". */
-  const vencidosPorAluno = {}, vistosPorAluno = {};
+  /* estado_cartao já é DISTINCT ON (usuario_id, questao_id) — uma linha
+     por cartão (schema.sql, seção 5). Mas "cartão" aqui é por ID, e um
+     enunciado reescrito (reescrever-questoes.ps1) MUDA o id — o servidor
+     nunca reescreve o evento antigo, só o cliente move o progresso local
+     (migrarReescritas()). Sem resolver, o id antigo e o novo contam como
+     dois cartões diferentes. resolverReescrita() traz os dois pro mesmo
+     id atual; entre as linhas que colidirem no mesmo id resolvido, fica a
+     de `ts` mais recente — mesmo desempate que migrarReescritas() já usa
+     localmente ("o mais recente vence"), então se a pessoa voltou a
+     revisar aquele conteúdo pelo id novo, é essa resposta (não a antiga,
+     órfã) que decide se está atrasado.
+
+     Por isso `Object.keys(porCartao).length` é "quantos cartões
+     DIFERENTES essa conta já respondeu" — o mesmo que "Já vistas" mede na
+     tela Estatísticas pessoal (Object.keys(E.cartoes).length, que já
+     passou por essa mesma migração). `respostas_total` (resumo_desempenho)
+     é outra coisa: TOTAL de respostas, contando toda revisão repetida do
+     mesmo cartão — é o que entra na acurácia, não em "estudados". */
+  const porCartaoPorAluno = {};
   estados.forEach(e2=>{
-    (vistosPorAluno[e2.usuario_id] = vistosPorAluno[e2.usuario_id] || []).push(e2.questao_id);
-    if(e2.prox >= h) return;
-    (vencidosPorAluno[e2.usuario_id] = vencidosPorAluno[e2.usuario_id] || []).push(e2.questao_id);
+    const qid = resolverReescrita(mapaReesc, e2.questao_id);
+    const porCartao = porCartaoPorAluno[e2.usuario_id] = porCartaoPorAluno[e2.usuario_id] || {};
+    const atual = porCartao[qid];
+    if(!atual || (e2.ts||"") > (atual.ts||"")) porCartao[qid] = {prox: e2.prox, ts: e2.ts};
+  });
+  const vencidosPorAluno = {}, vistosPorAluno = {};
+  Object.keys(porCartaoPorAluno).forEach(uid=>{
+    const porCartao = porCartaoPorAluno[uid];
+    vistosPorAluno[uid] = Object.keys(porCartao);
+    vencidosPorAluno[uid] = vistosPorAluno[uid].filter(qid => porCartao[qid].prox < h);
   });
 
   const linhas = perfis.map(p=>{

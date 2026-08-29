@@ -423,6 +423,18 @@ mesmo `materiasInscritas()` (no cliente) já não contando com ele.
   (`acertos_total/respostas_total`). A primeira versão do painel usou
   `respostas_total` aqui por engano e mostrou 336 "estudados" pra uma
   conta com 69 cartões diferentes.
+- **Enunciado reescrito (regra 5) também precisa ser resolvido no painel.**
+  `reescrever-questoes.ps1` muda o `id` (SHA-1 do enunciado);
+  `migrarReescritas()` move o progresso LOCAL pro id novo e apaga o antigo,
+  mas o evento antigo no servidor é *append-only* — nunca migra, nunca
+  some. Sem resolver, id antigo e novo contavam como dois cartões
+  diferentes ("Cartões estudados" inflado) e um id antigo órfão com `prox`
+  velho podia contar como atrasado mesmo a pessoa tendo voltado a revisar
+  aquele conteúdo pelo id novo. `resolverReescrita()` (index.html) segue
+  `banco/reescritas.json` (mesma cadeia e mesmo limite de 10 saltos de
+  `migrarReescritas()`) antes de agrupar por cartão; entre linhas que
+  colidem no mesmo id resolvido, fica a de `ts` mais recente — mesmo
+  desempate que `migrarReescritas()` já usa localmente.
 
 ## Banco colaborativo
 
