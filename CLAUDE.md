@@ -467,6 +467,17 @@ mesmo `materiasInscritas()` (no cliente) já não contando com ele.
   filtra no cliente (tem o `ts` de cada linha) e `resumo_desempenho`
   filtra em SQL (é agregado — chega pronto, sem como descontar depois).
   Continua sendo MARCO, não delete: o log fica inteiro no servidor.
+  - **O PATCH nunca manda `progresso_zerado_em: null`** — só inclui o campo
+    quando há instante de verdade pra gravar. `null` num PATCH não é "não
+    mexe", é **apaga**: quem zerou antes desta versão existir (ou zerou
+    num aparelho e abriu o app noutro) tem `E.progressoZeradoEm` vazio, e
+    mandar `null` derrubava o marco do servidor a cada sincronização —
+    inclusive um marco posto à mão por SQL, segundos depois de criado. Foi
+    esse detalhe que fez a correção parecer não ter funcionado.
+  - **`verificarSituacao()` (boot) lê o marco de volta** e adota o do
+    servidor quando é mais novo que o local. É o que faz `zerar()` num
+    aparelho valer nos outros, e o que permite marcar o corte à mão por
+    SQL numa conta antiga. Só avança, nunca retrocede.
 - **Toda consulta do painel usa `buscarTudo()` (index.html), não
   `chamarRest()` direto.** O PostgREST corta a resposta num teto de linhas
   por padrão (não erra, só devolve menos do que existe) — perigoso

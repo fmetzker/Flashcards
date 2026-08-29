@@ -1331,17 +1331,25 @@ async function atualizarUniaoDeMaterias(){
    antes disto não conta mais". Sem ele, o Painel de desempenho seguia
    contando o histórico de antes do reset: uma conta que zerou o progresso
    e via 0 atrasadas na própria tela aparecia com 74 no painel, porque o
-   servidor ainda tinha os eventos de antes. */
+   servidor ainda tinha os eventos de antes.
+
+   NUNCA manda o campo quando o valor local é vazio — só quando tem um
+   instante de verdade pra gravar. Um `progresso_zerado_em: null` no PATCH
+   não é "não mexe nisso", é "APAGA o que está lá": quem zerou o progresso
+   ANTES desta versão existir (ou num aparelho, e abriu o app noutro) tem
+   E.progressoZeradoEm vazio, e mandar null apagaria o marco do servidor a
+   cada sincronização — inclusive um marco posto à mão por SQL, segundos
+   depois de ele ser criado. Quem lê o valor de volta pro cliente é
+   verificarSituacao(), no boot. */
 async function sincronizarMateriasAtivas(){
   if(!supaConfigurado() || !SESSAO || !CONTA_ID) return;
   try{
+    const corpo = {materias_ativas: materiasInscritas()};
+    if(E.progressoZeradoEm) corpo.progresso_zerado_em = E.progressoZeradoEm;
     const r = await chamarRest("perfis?id=eq."+CONTA_ID, {
       method: "PATCH",
       headers: {"Prefer": "return=minimal"},
-      body: JSON.stringify({
-        materias_ativas: materiasInscritas(),
-        progresso_zerado_em: E.progressoZeradoEm || null
-      })
+      body: JSON.stringify(corpo)
     });
     if(!r.ok) throw new Error("o servidor respondeu "+r.status);
   }catch(e){
@@ -1695,10 +1703,24 @@ async function verificarSituacao(){
   SITUACAO = null;
   if(!supaConfigurado() || !SESSAO || !CONTA_ID) return;
   try{
-    const r = await chamarRest("perfis?select=status&id=eq."+encodeURIComponent(CONTA_ID));
+    const r = await chamarRest("perfis?select=status,progresso_zerado_em&id=eq."+encodeURIComponent(CONTA_ID));
     if(r.ok){
       const linhas = await r.json();
-      if(linhas && linhas.length) SITUACAO = linhas[0].status;
+      if(linhas && linhas.length){
+        SITUACAO = linhas[0].status;
+        /* Traz o marco de reset do servidor pra cá quando ele é mais novo
+           que o local (ou quando não há local nenhum). É o que faz zerar()
+           num aparelho valer nos outros, e o que permite marcar o corte à
+           mão por SQL numa conta que zerou antes desta versão existir.
+           Só avança, nunca retrocede: o marco mais recente é sempre o que
+           vale, então um aparelho que ficou offline desde antes do reset
+           não desfaz o corte ao voltar. */
+        const remoto = linhas[0].progresso_zerado_em;
+        if(remoto && (!E.progressoZeradoEm || remoto > E.progressoZeradoEm)){
+          E.progressoZeradoEm = remoto;
+          salvar();
+        }
+      }
     }
   }catch(e){ /* offline: segue com null, ver comentário acima */ }
 }
