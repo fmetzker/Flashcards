@@ -74,6 +74,7 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 | `gerar-offline.ps1` → `offline.html` | App inteiro num arquivo. **Gerado — não editar** |
 | `supabase/schema.sql` | Tabelas, RLS, triggers |
 | `supabase/conferir.sql` | Confere o que a RLS **nega**; rodar sempre depois do schema |
+| `supabase/limpar-colunas-mortas.sql` | Remove colunas de `perfis` que o app não usa. **Manual, irreversível** — separado do schema de propósito |
 | `supabase.json` | URL e chave pública |
 | `CLAUDE.md` | Regras invioláveis e os porquês |
 | `PADRAO-DOS-CARTOES.md` | Como escrever cartão |

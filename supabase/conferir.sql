@@ -475,7 +475,7 @@ where tgname = 'exigir_convite' and not tgisinternal;
 -- ----------------------------------------------------------------------------
 -- 10. Reportar problema em questão
 --
--- Mesmo padrão de propostas (seção 6): autor vê e cria só o que é seu,
+-- Mesmo padrão de propostas (schema.sql, seção 8): autor vê e cria só o que é seu,
 -- revisor vê e decide tudo, autor não pode se auto-resolver, resolvido_por
 -- não pode ser forjado pelo cliente.
 -- ----------------------------------------------------------------------------

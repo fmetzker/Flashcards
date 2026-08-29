@@ -66,17 +66,28 @@ drop trigger if exists exigir_convite on auth.users;
 -- ----------------------------------------------------------------------------
 -- 2. Perfis
 --
--- Uma linha por conta. Guarda nome, concurso escolhido e meta diária — as
--- mesmas preferências que hoje vivem no localStorage de cada perfil local.
--- Tabela única em vez de perfis + preferencias separadas: para 5 a 10 pessoas,
--- separar só multiplica policies para manter certas.
+-- Uma linha por conta. Tabela única em vez de perfis + preferencias separadas:
+-- para 5 a 10 pessoas, separar só multiplica policies para manter certas.
+--
+-- O que a conta ESTUDA não mora aqui, e isso é decisão, não esquecimento:
+-- quais concursos segue, quais matérias avulsas marcou e o progresso de cada
+-- cartão vivem no localStorage de cada aparelho (CLAUDE.md, regra 1), e o que
+-- chega ao servidor é o LOG de respostas (eventos_resposta), nunca o estado.
+-- As colunas daqui são só o que o SERVIDOR precisa saber: quem é a pessoa,
+-- se foi aprovada, e os dois campos que o Painel de desempenho depende
+-- (seções 2.2 e 2.3).
+--
+-- Nasceram aqui, e saíram em agosto/2026 por nunca terem sido lidas nem
+-- escritas pelo app (ver limpar-colunas-mortas.sql):
+--   concurso      — a conta passou a seguir VÁRIOS concursos (E.concursos),
+--                   e a escolha nunca foi sincronizada para cá.
+--   meta          — a meta deixou de ser configurável: hoje é a soma das
+--                   cotas dos blocos (CLAUDE.md, "Meta e progresso do dia").
+--   ultimo_backup — do tempo em que o backup era manual, por arquivo.
 -- ----------------------------------------------------------------------------
 create table if not exists public.perfis (
   id            uuid primary key references auth.users(id) on delete cascade,
   nome          text not null default '',
-  concurso      text,                       -- id de um concurso de concursos.json
-  meta          smallint not null default 35 check (meta between 5 and 200),
-  ultimo_backup date,
   atualizado_em timestamptz not null default now()
 );
 
@@ -784,12 +795,10 @@ end $$;
 
 
 -- ----------------------------------------------------------------------------
--- 9. Convidados — NÃO É MAIS USADO
+-- 9. Convidados — a lista, para o caso de voltar ao cadastro fechado
 --
--- O cadastro virou aberto (ver seção 1): qualquer pessoa cria conta, e o
--- controle acontece depois, na aprovação. Esta tabela fica de pé, vazia ou
--- não, caso você queira voltar ao modelo fechado — para isso, recrie o
--- gatilho exigir_convite e mantenha a lista em dia.
+-- Por que a tabela continua de pé, sem uso: ver seção 1. Aqui é só o
+-- template de como popular a lista, se um dia o gatilho voltar.
 -- ----------------------------------------------------------------------------
 -- insert into public.convidados (email, nome) values
 --   ('franciscometzker@gmail.com', 'Francisco'),
