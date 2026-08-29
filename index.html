@@ -1278,6 +1278,36 @@ async function atualizarUniaoDeMaterias(){
   limparCacheGrau();
   aplicarFoco(E.escopoEstudo);
   repintarTelasQueDependemDoBanco();
+  sincronizarMateriasAtivas();   // ver comentário na função
+}
+
+/* Sincroniza quais matérias esta conta segue AGORA (materiasInscritas())
+   para perfis.materias_ativas — é o que permite o Painel de desempenho
+   (Fase 2) filtrar "revisões atrasadas" pelas matérias que cada aluno
+   realmente estuda, em vez do histórico inteiro. eventos_resposta é
+   append-only e nunca esquece uma matéria abandonada: sem isto, um
+   cartão de uma matéria que a conta seguiu há meses e não segue mais
+   infla "atrasadas" pra sempre, mesmo a tela Estatísticas dela mostrando
+   zero (que já filtra por materiasInscritas() hoje).
+
+   Silenciosa e best-effort, como sincronizar(): falhar aqui não pode
+   travar a navegação nem gerar alerta — o painel só fica desatualizado
+   até a próxima chamada dar certo. Chamada no boot e sempre que
+   atualizarUniaoDeMaterias() rodar (a lista mudou). "perfil próprio:
+   atualizar" (schema.sql) já cobre a escrita — não precisou de policy
+   nova. */
+async function sincronizarMateriasAtivas(){
+  if(!supaConfigurado() || !SESSAO || !CONTA_ID) return;
+  try{
+    const r = await chamarRest("perfis?id=eq."+CONTA_ID, {
+      method: "PATCH",
+      headers: {"Prefer": "return=minimal"},
+      body: JSON.stringify({materias_ativas: materiasInscritas()})
+    });
+    if(!r.ok) throw new Error("o servidor respondeu "+r.status);
+  }catch(e){
+    console.warn("materias_ativas não sincronizou: "+e.message);
+  }
 }
 
 const blocoDe = q => blocoDaMateria[q.m];
@@ -3876,8 +3906,31 @@ async function decidirConta(id, status, email){
   }
 }
 
+/* Todo id de questão -> matéria, para TODO o banco — não só as matérias
+   que ESTA conta (o aprovador) carregou pra si. O painel precisa cruzar
+   estado_cartao.questao_id de QUALQUER aluno com a matéria certa, e o
+   aluno pode seguir um conjunto de matérias diferente do aprovador que
+   está olhando. À parte de BANCO/porId (que representam "o que EU
+   estudo") — não mistura os dois, e não polui o estado normal do app.
+
+   Memoizado: o banco não muda no meio de uma sessão (mesma premissa de
+   BANCO_PRONTO), então buscar uma vez só e reaproveitar entre aberturas
+   do painel evita rebaixar ~3,6MB toda vez — e como CACHE_BANCO (sw.js)
+   já mantém isso fresco sozinho, mesmo essa primeira busca tende a vir do
+   cache, não da rede. */
+let INDICE_BANCO_COMPLETO = null;
+async function indiceBancoCompleto(){
+  if(INDICE_BANCO_COMPLETO) return INDICE_BANCO_COMPLETO;
+  const indice = {};
+  await Promise.all(ORDEM_MATERIAS.map(m =>
+    pega("banco/"+m+".json").then(qs => qs.forEach(q => { indice[q.id] = q.m; }))
+  ));
+  INDICE_BANCO_COMPLETO = indice;
+  return indice;
+}
+
 /* =======================================================================
-   PAINEL DE DESEMPENHO — Fase 1 (visão geral)
+   PAINEL DE DESEMPENHO — visão geral
 
    Só existe pra quem é aprovador — a policy "...: aprovador lê tudo" em
    eventos_resposta/simulados (supabase/schema.sql, seção 3/4) é o que torna
@@ -3885,30 +3938,45 @@ async function decidirConta(id, status, email){
    igual a qualquer conta comum.
 
    NÃO reproduz "meta batida hoje" nem "sequência de estudo" — de propósito.
-   Os dois dependem de quais concursos/matérias avulsas cada conta segue
-   (E.concursos, E.materiasAvulsas), e isso nunca sai do localStorage de
-   cada aparelho: só o LOG de resposta (eventos_resposta/simulados) é
-   sincronizado. Inventar uma meta genérica pra mostrar aqui seria fabricar
-   um número que parece autoritativo e não é — mesmo espírito da regra 11
-   do CLAUDE.md (não inventar o que não se sabe de verdade). Em vez disso,
-   os números aqui são todos derivados direto do log: contagem bruta, não
-   contagem "contra uma meta".
+   Os dois dependem de quais concursos/matérias avulsas cada conta segue,
+   e a União (materiasInscritas()) só descreve "o que estudo AGORA" — não
+   dá pra reconstruir a meta/cota do edital sem reimplementar blocosDaMeta()
+   pra cada aluno aqui. Inventar uma meta genérica seria fabricar um número
+   que parece autoritativo e não é — mesmo espírito da regra 11 do
+   CLAUDE.md.
 
-   Duas fontes de dado:
-   - resumo_desempenho (view no servidor, supabase/schema.sql): agrega
-     TODO o histórico (acurácia geral, última atividade) sem puxar cada
-     evento pro navegador — histórico de meses/anos por conta seria pesado
-     de somar aqui.
+   REVISÕES ATRASADAS tem DOIS números, de propósito (pedido depois de um
+   bug real: o painel mostrava 95 atrasadas pra uma conta cuja tela
+   Estatísticas mostrava 0). eventos_resposta é append-only e nunca esquece
+   uma matéria abandonada — um cartão de matéria que a conta seguiu há
+   meses e não segue mais fica "atrasado" pra sempre em estado_cartao.
+   - "Revisões atrasadas" filtra por perfis.materias_ativas (sincronizado
+     pelo cliente — ver sincronizarMateriasAtivas()): a mesma pergunta que
+     a tela Estatísticas pessoal responde, só que vista de fora.
+   - "Cartões vencidos (histórico completo)" é o número cru, sem filtro —
+     o que você pediu manter junto do número corrigido.
+   Conta que ainda não sincronizou materias_ativas nem uma vez (perfil
+   antigo, ou nunca abriu o app depois desta versão) mostra "–" em vez de
+   0 nas atrasadas filtradas — 0 diria "está em dia" quando na verdade é
+   "não sei".
+
+   Fontes de dado:
+   - resumo_desempenho (view no servidor): agrega TODO o histórico
+     (acurácia geral, última atividade) sem puxar cada evento pro
+     navegador — histórico de meses/anos por conta seria pesado de somar
+     aqui.
    - eventos_resposta (janela de ~8 dias) e estado_cartao (um cartão por
      linha) são pequenos o bastante pra buscar direto e agregar no
-     cliente — não compensa criar view nova só pra isso. */
+     cliente — não compensa criar view nova só pra isso.
+   - indiceBancoCompleto() (acima): banco inteiro, só pra saber a matéria
+     de cada questao_id. */
 async function pintarPainel(){
   const c = document.getElementById("painel-corpo");
   c.innerHTML = "";
   const carregando = document.createElement("div"); carregando.className = "vazio"; carregando.textContent = "Carregando…";
   c.appendChild(carregando);
 
-  let perfis, resumos, eventosRecentes, estados;
+  let perfis, resumos, eventosRecentes, estados, indiceBanco;
   try{
     /* janela FROUXA de propósito (8 dias corridos em UTC, não 7 dias exatos
        em Brasília): é só pra limitar quanto dado vem da rede. O corte
@@ -3917,11 +3985,12 @@ async function pintarPainel(){
        pelo mesmo motivo (ts é UTC; cortar sem converter erra o dia perto
        da virada). */
     const janela = new Date(Date.now() - 8*86400000).toISOString();
-    const [rPerfis, rResumo, rEventos, rEstado] = await Promise.all([
-      chamarRest("perfis?status=eq.aprovado&select=id,nome,email&order=nome.asc"),
+    const [rPerfis, rResumo, rEventos, rEstado, indice] = await Promise.all([
+      chamarRest("perfis?status=eq.aprovado&select=id,nome,email,materias_ativas&order=nome.asc"),
       chamarRest("resumo_desempenho?select=usuario_id,respostas_total,acertos_total,ultima_atividade"),
       chamarRest("eventos_resposta?select=usuario_id,ts&ts=gte."+encodeURIComponent(janela)),
-      chamarRest("estado_cartao?select=usuario_id,prox")
+      chamarRest("estado_cartao?select=usuario_id,questao_id,prox"),
+      indiceBancoCompleto()
     ]);
     if(!rPerfis.ok || !rResumo.ok || !rEventos.ok || !rEstado.ok){
       throw new Error("o servidor respondeu com erro");
@@ -3930,6 +3999,7 @@ async function pintarPainel(){
     resumos = await rResumo.json();
     eventosRecentes = await rEventos.json();
     estados = await rEstado.json();
+    indiceBanco = indice;
   }catch(e){
     c.innerHTML = "";
     const erro = document.createElement("div"); erro.className = "aviso";
@@ -3948,13 +4018,24 @@ async function pintarPainel(){
     if(dia >= seteDiasAtras) seteDiasCont[ev.usuario_id] = (seteDiasCont[ev.usuario_id]||0) + 1;
   });
 
-  const atrasadasCont = {};
+  // agrupa os cartões VENCIDOS de cada aluno — o filtro por matéria ativa
+  // só acontece depois, já dentro do map de `linhas`, porque cada aluno
+  // tem seu próprio materias_ativas
+  const vencidosPorAluno = {};
   estados.forEach(e2=>{
-    if(e2.prox < h) atrasadasCont[e2.usuario_id] = (atrasadasCont[e2.usuario_id]||0) + 1;
+    if(e2.prox >= h) return;
+    (vencidosPorAluno[e2.usuario_id] = vencidosPorAluno[e2.usuario_id] || []).push(e2.questao_id);
   });
 
   const linhas = perfis.map(p=>{
     const r = porResumo[p.id] || {respostas_total:0, acertos_total:0, ultima_atividade:null};
+    const vencidos = vencidosPorAluno[p.id] || [];
+    const ativas = new Set(Array.isArray(p.materias_ativas) ? p.materias_ativas : []);
+    const atrasadasAtivas = vencidos.filter(qid => ativas.has(indiceBanco[qid])).length;
+    /* materias_ativas vazio + tem cartão vencido: essa conta ainda não
+       sincronizou (perfil antigo, ou não abriu o app depois desta
+       versão) — mostra "não sei" em vez de fingir que está em dia. */
+    const semSincronizar = ativas.size === 0 && vencidos.length > 0;
     return {
       id: p.id,
       nome: p.nome || p.email || "(sem nome)",
@@ -3962,7 +4043,8 @@ async function pintarPainel(){
       hoje: hojeCont[p.id] || 0,
       seteDias: seteDiasCont[p.id] || 0,
       acuracia: r.respostas_total ? Math.round(r.acertos_total/r.respostas_total*100) : null,
-      atrasadas: atrasadasCont[p.id] || 0,
+      atrasadas: semSincronizar ? null : atrasadasAtivas,
+      atrasadasTotal: vencidos.length,
       ultimaAtividade: r.ultima_atividade
     };
   });
@@ -3971,7 +4053,7 @@ async function pintarPainel(){
     linhas.length + (linhas.length===1 ? " aluno aprovado" : " alunos aprovados");
 
   const CRITERIOS = {
-    atrasadas: (a,b) => b.atrasadas - a.atrasadas,
+    atrasadas: (a,b) => (b.atrasadas==null?-1:b.atrasadas) - (a.atrasadas==null?-1:a.atrasadas),
     inativo:   (a,b) => (a.ultimaAtividade||"") < (b.ultimaAtividade||"") ? -1 : 1,
     acuracia:  (a,b) => (a.acuracia==null?-1:a.acuracia) - (b.acuracia==null?-1:b.acuracia),
     nome:      (a,b) => a.nome.localeCompare(b.nome)
@@ -4010,7 +4092,8 @@ async function pintarPainel(){
       linha("Cartões hoje", l.hoje);
       linha("Últimos 7 dias", l.seteDias);
       linha("Acurácia geral", l.acuracia==null ? "–" : l.acuracia+"%");
-      linha("Revisões atrasadas", l.atrasadas, l.atrasadas > 0);
+      linha("Revisões atrasadas", l.atrasadas==null ? "– (aguardando sincronizar)" : l.atrasadas, l.atrasadas > 0);
+      linha("Cartões vencidos (histórico completo)", l.atrasadasTotal, false);
       linha("Última atividade", fmtHoraSync(l.ultimaAtividade));
 
       card.appendChild(document.createElement("div"));
@@ -4453,6 +4536,7 @@ carregarConfig()
       ir("inicio");               // pinta já, com BANCO ainda vazio — telas que precisam dele mostram "carregando"
       carregarBancoEmFases();     // não é await: continua em segundo plano
       sincronizar();               // puxa em segundo plano, não bloqueia a tela
+      sincronizarMateriasAtivas(); // idem — ver comentário na função
     }
   })
   .catch(err=>{

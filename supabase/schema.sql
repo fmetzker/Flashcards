@@ -270,6 +270,23 @@ create policy "perfil próprio: criar"
 
 
 -- ----------------------------------------------------------------------------
+-- 2.2 Matérias ativas — Painel de desempenho
+--
+-- Quais matérias esta conta estuda AGORA: materiasInscritas() no cliente
+-- (união das matérias dos concursos inscritos + matérias avulsas marcadas),
+-- sincronizado sempre que muda (sincronizarMateriasAtivas() em index.html).
+--
+-- eventos_resposta é append-only e nunca esquece matéria abandonada: sem
+-- isto, o Painel de desempenho não tinha como distinguir "revisão atrasada
+-- de verdade" de "cartão de matéria que a conta nem estuda mais" — essa
+-- distinção só existia no localStorage de cada aparelho. Escrita já cai na
+-- policy "perfil próprio: atualizar" (seção 2) — não precisa de policy
+-- nova, só a coluna.
+-- ----------------------------------------------------------------------------
+alter table public.perfis add column if not exists materias_ativas jsonb not null default '[]'::jsonb;
+
+
+-- ----------------------------------------------------------------------------
 -- 3. Eventos de resposta — o log append-only
 --
 -- Cada resposta vira um evento. Duas decisões que valem explicação:
