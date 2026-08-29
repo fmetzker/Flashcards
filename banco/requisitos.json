@@ -112,7 +112,142 @@
             "s": "Verbo"
           }
         ]
-      }
+      },
+      "requisitos_subtopicos": {
+        "Classes de palavras|Artigo": [
+          {
+            "t": "Classes de palavras",
+            "s": "Substantivo"
+          }
+        ],
+        "Classes de palavras|Numeral": [
+          {
+            "t": "Classes de palavras",
+            "s": "Substantivo"
+          }
+        ],
+        "Classes de palavras|Adjetivo": [
+          {
+            "t": "Classes de palavras",
+            "s": "Substantivo"
+          }
+        ],
+        "Classes de palavras|Pronome": [
+          {
+            "t": "Classes de palavras",
+            "s": "Substantivo"
+          }
+        ],
+        "Classes de palavras|Advérbio": [
+          {
+            "t": "Classes de palavras",
+            "s": "Verbo"
+          }
+        ],
+        "Classes de palavras|Preposição": [
+          {
+            "t": "Classes de palavras",
+            "s": "Verbo"
+          }
+        ],
+        "Classes de palavras|Conjunção": [
+          {
+            "t": "Classes de palavras",
+            "s": "Advérbio"
+          }
+        ],
+        "Pronomes|Possessivo": [
+          {
+            "t": "Pronomes",
+            "s": "Pessoal"
+          }
+        ],
+        "Pronomes|Demonstrativo": [
+          {
+            "t": "Pronomes",
+            "s": "Pessoal"
+          }
+        ],
+        "Pronomes|Indefinido": [
+          {
+            "t": "Pronomes",
+            "s": "Demonstrativo"
+          }
+        ],
+        "Pronomes|Tratamento": [
+          {
+            "t": "Pronomes",
+            "s": "Demonstrativo"
+          }
+        ],
+        "Pronomes|Relativo": [
+          {
+            "t": "Pronomes",
+            "s": "Indefinido"
+          }
+        ],
+        "Figuras de linguagem|Figuras de pensamento": [
+          {
+            "t": "Figuras de linguagem",
+            "s": "Figuras de palavra"
+          }
+        ],
+        "Figuras de linguagem|Figuras de sintaxe": [
+          {
+            "t": "Figuras de linguagem",
+            "s": "Figuras de pensamento"
+          }
+        ],
+        "Flexão nominal|Grau": [
+          {
+            "t": "Flexão nominal",
+            "s": "Gênero"
+          }
+        ],
+        "Flexão verbal|Vozes verbais": [
+          {
+            "t": "Flexão verbal",
+            "s": "Tempo e modo"
+          }
+        ],
+        "Flexão verbal|Formas especiais": [
+          {
+            "t": "Flexão verbal",
+            "s": "Vozes verbais"
+          }
+        ],
+        "Variação linguística|Fatores de variação": [
+          {
+            "t": "Variação linguística",
+            "s": "Concepções de linguagem"
+          }
+        ],
+        "Variação linguística|Língua falada e escrita": [
+          {
+            "t": "Variação linguística",
+            "s": "Fatores de variação"
+          }
+        ],
+        "Gramática|Tipos de gramática": [
+          {
+            "t": "Gramática",
+            "s": "Divisões da gramática"
+          }
+        ],
+        "Ortografia|Crase em trechos": [
+          {
+            "t": "Ortografia",
+            "s": "Acentuação em trechos"
+          }
+        ],
+        "Semântica|Figuras de linguagem em trechos": [
+          {
+            "t": "Semântica",
+            "s": "Sinônimos e antônimos"
+          }
+        ]
+      },
+      "criterio_subtopicos": "Escada em ondas, mesmo espirito das outras materias. Classes de palavras (10, o hub da materia -- Substantivo e Verbo ja sao raiz de outros topicos via requisitos de topico, entao continuam raiz aqui tambem, sem empurra-los pra baixo na fila): Substantivo, Verbo e Interjeicao sao as tres raizes (Interjeicao e a classe mais autocontida, sem depender de nada). Onda 2 (apos Substantivo): Artigo, Numeral, Adjetivo e Pronome -- as quatro classes que giram em torno do substantivo (determinam, quantificam, qualificam ou substituem ele). Onda 3 (apos Verbo): Adverbio e Preposicao -- adverbio modifica principalmente o verbo; preposicao rege complementos verbais. Onda 4 (apos Adverbio): Conjuncao, a classe mais avancada, que prepara o terreno pra Coordenacao/Subordinacao mais adiante na materia. Pronomes (6): Pessoal e a raiz (eu, tu, ele -- o pronome mais basico) -> Possessivo e Demonstrativo (proximos e concretos) -> Indefinido e Tratamento (mais especificos) -> Relativo, o mais avancado (usado em oracoes subordinadas). Figuras de linguagem (3): Figuras de palavra (metafora, metonimia -- nivel da palavra, o caso classico) -> Figuras de pensamento (ironia, hiperbole -- nivel do sentido) -> Figuras de sintaxe (elipse, zeugma -- nivel da estrutura da frase, o mais abstrato). Flexao nominal (3): Genero e Numero sao as duas raizes (as duas flexoes mais basicas do substantivo/adjetivo) -> Grau (aumentativo/diminutivo), mais especifico. Flexao verbal (3): Tempo e modo e a raiz (o nucleo da conjugacao verbal) -> Vozes verbais (ativa/passiva) -> Formas especiais, os casos irregulares mais avancados. Variacao linguistica (3): Concepcoes de linguagem e a raiz (a base teorica) -> Fatores de variacao (regional, social) -> Lingua falada e escrita, uma aplicacao mais especifica dos fatores de variacao. Gramatica (2): Divisoes da gramatica (fonetica, morfologia, sintaxe...) e a raiz -> Tipos de gramatica (normativa, descritiva), mais conceitual. Ortografia (2): os dois subtopicos ja eram os cartoes de aplicacao em texto (exercicio) do proprio topico -- Acentuacao em trechos e a raiz (regra mais simples de aplicar) -> Crase em trechos, que ja exige saber regencia (mesma dependencia real que o topico Crase tem de Regencia). Semantica (2): Sinonimos e antonimos e a raiz (relacao de sentido mais direta) -> Figuras de linguagem em trechos, que exige reconhecer sentido figurado, mais avancado. Interpretacao de texto (1 subtopico): sem escada interna, nao ha o que ordenar."
     },
     "matematica": {
       "criterio": "Cada aresta segue a dependência matemática real: um tópico só exige outro quando suas contas pressupõem, de fato, a base do exigido. Álgebra exige Aritmética porque equação é conta com incógnita, não conta nova; Geometria exige Aritmética porque área e volume são produtos de medidas; Funções exige Álgebra porque função é a mesma manipulação simbólica aplicada a f(x); Probabilidade exige Análise combinatória (contar casos favoráveis e possíveis) e Aritmética (razão/porcentagem). Análise combinatória e Lógica usam requisito por SUBTÓPICO: Análise combinatória exige só o subtópico Multiplicação de Aritmética, porque o princípio multiplicativo generaliza a tabuada — não precisa do resto de Aritmética (frações, juros etc.) pra abrir. Lógica não depende de conceito nenhum outro (nem consta do Anexo IV), mas ganhou uma aresta de ORDEM (ver '_cadeia_entre_raizes' no topo do arquivo) para não abrir junto de Aritmética no primeiro dia: exige Aritmética (tópico inteiro), a raiz de fato da matéria. Trigonometria, Estatística, Matrizes e Vetores também usam requisito por SUBTÓPICO, cada um pedindo só a fatia de que depende de verdade: Trigonometria precisa só do subtópico Triângulos de Geometria (é dali que vêm Pitágoras e as razões no triângulo retângulo que a trigonometria usa) — não exige Funções: os cartões do banco são razão/ângulo/lei do triângulo, não gráfico ou domínio de função trigonométrica, então essa aresta foi removida na auditoria de agosto/2026 por falta de dependência real; Estatística precisa só do subtópico Médias de Aritmética (é literalmente soma e divisão) — Divisibilidade, Juros, MMC/MDC etc. ficam de fora; Matrizes precisa do subtópico Sistemas de equações de Álgebra (é a mesma conta — resolver sistema linear —, só que representada em tabela, e os cartões do banco são justamente sobre determinante e invertibilidade, que decidem se um sistema tem solução); Vetores precisa do subtópico Geometria analítica de Geometria (vetor em ℝ² /ℝ³ dado por coordenadas é geometria analítica pura — produto escalar, módulo, ponto inicial/final). Aritmética é a única raiz de verdade da matéria (sem pré-requisito nenhum, nem de tópico nem de subtópico) — Multiplicação (a tabuada), que travava Aritmética e Análise combinatória de fora até agosto/2026, virou subtópico DELA por pedido explícito, e a mesma trava foi refeita um nível mais fundo, dentro do próprio grafo de subtópicos de Aritmética (ver 'criterio_subtopicos').",
