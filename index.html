@@ -335,6 +335,8 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
     <div style="min-width:0">
       <h1 id="cabecalho-cargo">–</h1>
       <div class="sub" id="cabecalho-sub">–</div>
+      <!-- some quando não há concurso/processo seletivo seguido (só matéria avulsa) -->
+      <div class="dado" id="cabecalho-contagem" style="display:none;margin-top:2px;font-size:14px"></div>
       <!-- só aparece quando o perfil segue mais de um concurso -->
       <select id="foco-concurso" style="display:none;margin-top:8px;font-size:13px;padding:6px 9px;width:auto;max-width:100%"></select>
     </div>
@@ -448,7 +450,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
     <div id="stats-revisoes"></div>
   </div>
 
-  <div class="rotulo" style="margin-top:24px">Acurácia por bloco do edital</div>
+  <div class="rotulo" style="margin-top:24px">Domínio por assunto</div>
   <div id="stats-corpo" style="margin-top:10px"></div>
 </div>
 
@@ -2175,11 +2177,13 @@ function pintarInicio(){
   document.getElementById("menu-simulado").style.display = CONCURSO ? "" : "none";
 
   pintarFocoConcurso();
+  const contagem = document.getElementById("cabecalho-contagem");
   if(!CONCURSO){
     // só matéria avulsa, nenhum concurso/processo seletivo seguido: não há
     // "qual prova" pra responder, então o cabeçalho fala de estudo livre
     document.getElementById("cabecalho-cargo").textContent = "Estudo livre";
     document.getElementById("cabecalho-sub").textContent = "sem concurso ou processo seletivo seguido";
+    contagem.style.display = "none";
   } else {
     /* Sem escopo escolhido, o cabeçalho fala do conjunto, não de um concurso:
        CONCURSO aqui é apenas a prova mais próxima, e mostrá-la como se fosse
@@ -2191,6 +2195,15 @@ function pintarInicio(){
       ? "próxima: "+CONCURSO.cargo+" · "+CONCURSO.data.slice(8)+"/"+CONCURSO.data.slice(5,7)
       : [CONCURSO.orgao, CONCURSO.banca, "prova "+CONCURSO.data.slice(8)+"/"+CONCURSO.data.slice(5,7)]
           .filter(Boolean).join(" · ");
+    /* contagem regressiva: a data já aparecia embutida no subtítulo
+       ("prova DD/MM"), mas sem dizer quanto falta — mesma conta de
+       diaUTC/86400000 que diasAteMaisProxima() já usa, só que da prova
+       específica mostrada no cabeçalho (a mais próxima, quando não há
+       escopo — coincide com CONCURSO nesse caso). */
+    const dias = Math.max(0, Math.ceil((diaUTC(CONCURSO.data) - diaUTC(hoje()))/86400000));
+    contagem.style.display = "";
+    contagem.textContent = dias===0 ? "A prova é hoje!"
+      : dias===1 ? "Falta 1 dia para a prova" : "Faltam "+dias+" dias para a prova";
   }
   // sem concurso nenhum, E.meta é só o tamanho de sessão (SESSAO_SEM_CONCURSO),
   // não uma meta de prova de verdade — o rótulo muda pra não fingir que é
@@ -2265,6 +2278,40 @@ function pintarInicio(){
         box.appendChild(d3);
       }
     });
+
+    /* teto dinâmico do Leitner (proximaData()) comprime os intervalos perto
+       da prova, e isso é invisível: a pessoa vê os cartões voltando mais
+       rápido sem saber por quê. Mesmos limiares que o motor já usa —
+       dTeto<=10 é o ponto em que TUDO vira revisão diária (teto=1);
+       dTeto<90 já corta a caixa mais alta (120 dias) pra menos de um mês
+       (Math.floor(dTeto/3)<30), o que muda o ritmo de verdade. Acima disso
+       o teto não aperta nada que importe, e não há o que avisar. Pula o dia
+       da prova em si (dTeto===0): o cabeçalho já grita "a prova é hoje". */
+    const dTeto = diasAteMaisProxima();
+    if(dTeto >= 1 && dTeto !== Infinity){
+      const d4 = document.createElement("div"); d4.className = "alerta";
+      const rotuloD = dTeto===1 ? "Falta 1 dia" : "Faltam "+dTeto+" dias";
+      if(dTeto <= 10){
+        d4.textContent = rotuloD+" — toda revisão volta todo dia até a prova.";
+        box.appendChild(d4);
+      } else if(Math.floor(dTeto/3) < 30){
+        d4.textContent = rotuloD+" — os intervalos de revisão estão limitados a "+Math.floor(dTeto/3)+" dias por causa da prova.";
+        box.appendChild(d4);
+      }
+
+      /* backlog vs. tempo restante: cruza revisoesPorDia() (o "Atrasadas")
+         com dTeto. Limiar é matemático, não arbitrário — mesmo estudando a
+         meta inteira TODO dia até a prova, sem nunca folgar, não daria pra
+         zerar esse tanto de revisão vencida. */
+      const atrasadasInfo = revisoesPorDia().find(x=>x.rotulo==="Atrasadas");
+      const atrasadas = atrasadasInfo ? atrasadasInfo.n : 0;
+      if(atrasadas > 0 && E.meta > 0 && atrasadas > E.meta * dTeto){
+        const d5 = document.createElement("div"); d5.className = "alerta";
+        d5.textContent = "Você tem "+atrasadas+" revisões atrasadas e "+rotuloD.toLowerCase()+
+          " para a prova — no ritmo da meta de hoje ("+E.meta+"/dia), não dá tempo de zerar isso antes dela.";
+        box.appendChild(d5);
+      }
+    }
   }
 }
 
@@ -3093,8 +3140,8 @@ function revisoesPorDia(){
 }
 
 /* A divisão completa em matérias e tópicos vive na tela Matérias. Aqui o
-   trabalho é outro: ranquear o que está mais fraco, do pior para o melhor,
-   considerando só o que já foi respondido. */
+   trabalho é outro: ranquear o que está menos dominado, do pior para o
+   melhor, considerando só o que já foi respondido. */
 function pintarStats(){
   /* os cards de gráfico e de banco moravam na tela inicial e vieram para cá
      quando a navegação por abas entrou: a tela inicial ficou só com o que é
@@ -3141,20 +3188,28 @@ function pintarStats(){
   });
 
   /* ranqueia pelo nível mais fino que a questão tem: o subtópico quando
-     existe, senão o tópico. É onde dá para agir. */
+     existe, senão o tópico. É onde dá para agir.
+     Critério é CAIXA MÉDIA (Leitner), não acurácia: acurácia mistura
+     "acertei de sorte" com "já domino" — duas respostas certas dão 100% e
+     empurram pro fim da lista algo que nunca foi revisado de verdade.
+     Caixa alta só se ganha voltando a acertar depois do espaçamento
+     crescer (registrar()), então é sinal de retenção mais forte que o
+     motor já produz. Acurácia continua na mesma barra de sempre, só não
+     é mais quem ordena. */
   const itens = {};
   BANCO.forEach(q=>{
     const c = E.cartoes[q.id]; if(!c) return;
     const k = (q.s || q.t) + " " + q.m;
-    itens[k] = itens[k] || {a:0, t:0, rotulo:(q.s || q.t), acima:(q.s ? q.t : (MATERIAS[q.m]||{}).nome || q.m)};
+    itens[k] = itens[k] || {a:0, t:0, n:0, caixas:0, rotulo:(q.s || q.t), acima:(q.s ? q.t : (MATERIAS[q.m]||{}).nome || q.m)};
     itens[k].a += c.acertos; itens[k].t += c.acertos + c.erros;
+    itens[k].n++; itens[k].caixas += c.caixa;
   });
   const chaves = Object.keys(itens).filter(k=>itens[k].t>0)
-    .sort((x,y)=>(itens[x].a/itens[x].t)-(itens[y].a/itens[y].t));
+    .sort((x,y)=>(itens[x].caixas/itens[x].n)-(itens[y].caixas/itens[y].n));
   const c = document.getElementById("stats-corpo");
   c.innerHTML = "";
   if(chaves.length===0){
-    c.innerHTML = '<div class="vazio">Responda algumas questões e as estatísticas aparecem aqui, do assunto mais fraco para o mais forte. A divisão completa está em Matérias.</div>';
+    c.innerHTML = '<div class="vazio">Responda algumas questões e as estatísticas aparecem aqui, do assunto menos dominado para o mais dominado. A divisão completa está em Matérias.</div>';
     return;
   }
   const card = document.createElement("div"); card.className = "card";
@@ -3165,7 +3220,7 @@ function pintarStats(){
     const nome = document.createElement("div"); nome.textContent = d.rotulo;
     const acima = document.createElement("div");
     acima.style.cssText = "font-size:11.5px;color:var(--tinta2)";
-    acima.textContent = d.acima;
+    acima.textContent = d.acima + " · caixa média " + (d.caixas/d.n).toFixed(1);
     esq.appendChild(nome); esq.appendChild(acima);
     linha.appendChild(esq);
     linha.appendChild(miniBarra({ac:d.a, resp:d.t}));

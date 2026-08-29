@@ -308,9 +308,14 @@ saúde, continuam compartilháveis com qualquer cargo.
 
 A tela **Matérias** mostra a árvore inteira, inclusive o que ainda não foi
 visto, e permite estudar qualquer um dos três níveis isoladamente. A tela
-**Estatísticas** ranqueia do mais fraco para o mais forte, pelo nível mais
-fino de cada questão, considerando só o que já foi respondido. Não duplicar
-uma na outra.
+**Estatísticas** ranqueia do menos dominado para o mais dominado, pelo nível
+mais fino de cada questão, considerando só o que já foi respondido. O
+critério é **caixa média do Leitner**, não acurácia: acurácia mistura
+"acertei de sorte" com "já domino" (duas respostas certas dão 100% mesmo
+sem nunca ter sido revisado de verdade), enquanto caixa alta só se ganha
+voltando a acertar depois do espaçamento crescer — é o sinal de retenção
+mais forte que o motor já produz. A acurácia continua exibida (mini barra em
+cada linha), só não é mais quem ordena. Não duplicar uma tela na outra.
 
 ## Contas e aprovação
 
@@ -560,6 +565,20 @@ prova, e a partir de D-10 tudo vira revisão diária. Ver `proximaData()`.
 `eventos_resposta` em `supabase/schema.sql` precisam concordar — nada os
 liga automaticamente, e o Postgres rejeita o evento se `index.html` gravar
 caixa mais alta do que o banco aceita.
+
+**O teto dinâmico é invisível por padrão** — a pessoa vê os cartões
+voltando mais rápido perto da prova sem saber por quê. `pintarInicio()`
+torna isso visível com três coisas: contagem regressiva no cabeçalho
+(`#cabecalho-contagem`, `diaUTC(CONCURSO.data) - diaUTC(hoje())` — a mesma
+conta de `diasAteMaisProxima()`); e, em `#alerta-area`, um aviso quando o
+teto está de fato apertando (D-10, ou `Math.floor(dias/3) < 30` — os mesmos
+limiares que `proximaData()` já usa, não números novos) seguido de um
+aviso de **backlog vs. tempo restante**, cruzando `revisoesPorDia()` com
+`diasAteMaisProxima()` — só dispara quando o atrasado é matematicamente
+maior que `E.meta × dias restantes`, ou seja, quando nem estudando a meta
+inteira todo santo dia até a prova daria pra zerar. Limiar matemático de
+propósito, não estimativa arbitrária (mesmo espírito da regra 11: não
+inventar números como se fossem certeza).
 
 Três respostas possíveis: "Sabia" sobe uma caixa; "Chutei" e "Errei" voltam
 para a caixa 1. O botão "Chutei" é central — não removê-lo nem transformá-lo
