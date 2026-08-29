@@ -435,6 +435,15 @@ mesmo `materiasInscritas()` (no cliente) já não contando com ele.
   `migrarReescritas()`) antes de agrupar por cartão; entre linhas que
   colidem no mesmo id resolvido, fica a de `ts` mais recente — mesmo
   desempate que `migrarReescritas()` já usa localmente.
+- **Órfão de verdade — id que não existe em NENHUMA matéria do banco
+  atual, mesmo depois de resolver `reescritas.json` — não entra em nada**
+  (nem "estudados", nem "atrasadas"). Descoberto com uma consulta SQL
+  direta numa conta de teste: **95 de 95** questões vencidas não batiam
+  com id nenhum do banco publicado. `reescritas.json` só registra troca
+  de id feita por `reescrever-questoes.ps1` (regra 5) — enunciado editado
+  à mão por fora do script muda o id sem deixar rastro no mapa, e a
+  questão também pode ter sido removida de vez; o painel não distingue os
+  dois casos, só sabe que não é cartão que a pessoa possa revisar hoje.
 
 ## Banco colaborativo
 

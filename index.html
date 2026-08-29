@@ -4169,10 +4169,22 @@ async function pintarPainel(){
      tela Estatísticas pessoal (Object.keys(E.cartoes).length, que já
      passou por essa mesma migração). `respostas_total` (resumo_desempenho)
      é outra coisa: TOTAL de respostas, contando toda revisão repetida do
-     mesmo cartão — é o que entra na acurácia, não em "estudados". */
+     mesmo cartão — é o que entra na acurácia, não em "estudados".
+
+     ÓRFÃO DE VERDADE — id que não existe em NENHUMA matéria do banco
+     atual, mesmo depois de resolver reescritas.json — não entra em nada.
+     reescritas.json só registra troca de id feita por
+     reescrever-questoes.ps1 (regra 5); enunciado editado à mão por fora
+     do script muda o id sem deixar rastro nenhum no mapa, e a questão
+     pode também ter sido removida de vez. Não tem como saber qual dos
+     dois foi, e não importa pro painel: se o id não existe em nenhum
+     lugar do banco publicado hoje, não é cartão que a pessoa possa
+     revisar nem que conte como "estudado" — contá-lo só infla os dois
+     números com fantasma. */
   const porCartaoPorAluno = {};
   estados.forEach(e2=>{
     const qid = resolverReescrita(mapaReesc, e2.questao_id);
+    if(!indiceBanco[qid]) return;
     const porCartao = porCartaoPorAluno[e2.usuario_id] = porCartaoPorAluno[e2.usuario_id] || {};
     const atual = porCartao[qid];
     if(!atual || (e2.ts||"") > (atual.ts||"")) porCartao[qid] = {prox: e2.prox, ts: e2.ts};
