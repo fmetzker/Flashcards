@@ -1260,7 +1260,598 @@
         "Saúde Mental": [
           "Anatomia e Fisiologia"
         ]
-      }
+      },
+      "requisitos_subtopicos": {
+        "Doenças Transmissíveis|Tétano": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Sarampo"
+          }
+        ],
+        "Doenças Transmissíveis|Poliomielite": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Sarampo"
+          }
+        ],
+        "Doenças Transmissíveis|Meningite": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Sarampo"
+          }
+        ],
+        "Doenças Transmissíveis|Hepatites virais": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Sarampo"
+          }
+        ],
+        "Doenças Transmissíveis|Influenza": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Sarampo"
+          }
+        ],
+        "Doenças Transmissíveis|Tuberculose": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Tétano"
+          }
+        ],
+        "Doenças Transmissíveis|Hanseníase": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Tétano"
+          }
+        ],
+        "Doenças Transmissíveis|Covid-19": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Tétano"
+          }
+        ],
+        "Doenças Transmissíveis|Raiva": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Tétano"
+          }
+        ],
+        "Doenças Transmissíveis|Escabiose": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Tétano"
+          }
+        ],
+        "Doenças Transmissíveis|IST": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Tuberculose"
+          }
+        ],
+        "Doenças Transmissíveis|Sífilis": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Tuberculose"
+          }
+        ],
+        "Doenças Transmissíveis|Toxoplasmose": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Tuberculose"
+          }
+        ],
+        "Doenças Transmissíveis|Leptospirose": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Tuberculose"
+          }
+        ],
+        "Doenças Transmissíveis|Febre maculosa": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Tuberculose"
+          }
+        ],
+        "Doenças Transmissíveis|Arboviroses": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "IST"
+          }
+        ],
+        "Doenças Transmissíveis|Malária": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "IST"
+          }
+        ],
+        "Doenças Transmissíveis|Leishmaniose": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "IST"
+          }
+        ],
+        "Doenças Transmissíveis|Doença de Chagas": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "IST"
+          }
+        ],
+        "Doenças Transmissíveis|Esquistossomose": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "IST"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Emergências respiratórias e via aérea": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Acolhimento e classificação de risco"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Parada cardiorrespiratória e RCP": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Acolhimento e classificação de risco"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Choque, sepse e anafilaxia": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Emergências respiratórias e via aérea"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Emergências cardiovasculares": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Emergências respiratórias e via aérea"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Emergências neurológicas": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Choque, sepse e anafilaxia"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Emergências clínicas": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Choque, sepse e anafilaxia"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Trauma e atendimento pré-hospitalar": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Choque, sepse e anafilaxia"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Intoxicações e emergências ambientais": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Emergências neurológicas"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Cuidados ao paciente crítico": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Emergências neurológicas"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Procedimentos de enfermagem": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Sinais vitais e avaliação"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Coleta de exames": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Sinais vitais e avaliação"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Punção venosa e terapia intravenosa": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Procedimentos de enfermagem"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Sondagens e cateterismo": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Procedimentos de enfermagem"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Oxigenoterapia e aspiração": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Procedimentos de enfermagem"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Avaliação e classificação de feridas": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Punção venosa e terapia intravenosa"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Curativos e coberturas": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Punção venosa e terapia intravenosa"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Estomias": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Avaliação e classificação de feridas"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Hipertensão arterial": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Doenças crônicas — atenção básica"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Diabetes mellitus": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Doenças crônicas — atenção básica"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Obesidade e fatores de risco": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Hipertensão arterial"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Saúde do idoso": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Hipertensão arterial"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Avaliação funcional e fragilidade": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Obesidade e fatores de risco"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Saúde do homem": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Obesidade e fatores de risco"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Violência e proteção da pessoa idosa": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Obesidade e fatores de risco"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Câncer e cuidados paliativos": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Avaliação funcional e fragilidade"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Reabilitação": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Avaliação funcional e fragilidade"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|Controle de infecção": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "Higienização das mãos"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|Precauções e isolamento": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "Higienização das mãos"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|IRAS e vigilância de infecção": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "Controle de infecção"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|Limpeza, desinfecção e resíduos": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "Controle de infecção"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|Acidente com material biológico": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "Controle de infecção"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|Metas de segurança do paciente": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "IRAS e vigilância de infecção"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|Identificação e cirurgia segura": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "Metas de segurança do paciente"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|Prevenção de quedas e lesões": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "Metas de segurança do paciente"
+          }
+        ],
+        "Saúde da Mulher|Planejamento reprodutivo": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Saúde da mulher — atenção básica"
+          }
+        ],
+        "Saúde da Mulher|Rastreamento de câncer": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Saúde da mulher — atenção básica"
+          }
+        ],
+        "Saúde da Mulher|Pré-natal": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Planejamento reprodutivo"
+          }
+        ],
+        "Saúde da Mulher|Climatério e violência": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Planejamento reprodutivo"
+          }
+        ],
+        "Saúde da Mulher|Parto e nascimento": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Pré-natal"
+          }
+        ],
+        "Saúde da Mulher|Emergências obstétricas": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Pré-natal"
+          }
+        ],
+        "Saúde da Mulher|Puerpério": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Parto e nascimento"
+          }
+        ],
+        "Saúde da Mulher|Aleitamento materno": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Parto e nascimento"
+          }
+        ],
+        "Imunização|Normas e procedimentos de vacinação": [
+          {
+            "t": "Imunização",
+            "s": "Calendário vacinal"
+          }
+        ],
+        "Imunização|Rede de frio": [
+          {
+            "t": "Imunização",
+            "s": "Calendário vacinal"
+          }
+        ],
+        "Imunização|Técnica e vias de administração": [
+          {
+            "t": "Imunização",
+            "s": "Normas e procedimentos de vacinação"
+          }
+        ],
+        "Imunização|Situações especiais e contraindicações": [
+          {
+            "t": "Imunização",
+            "s": "Técnica e vias de administração"
+          }
+        ],
+        "Imunização|Eventos adversos pós-vacinação": [
+          {
+            "t": "Imunização",
+            "s": "Técnica e vias de administração"
+          }
+        ],
+        "Imunização|Imunobiológicos especiais e CRIE": [
+          {
+            "t": "Imunização",
+            "s": "Situações especiais e contraindicações"
+          }
+        ],
+        "Imunização|Profilaxia da raiva": [
+          {
+            "t": "Imunização",
+            "s": "Situações especiais e contraindicações"
+          }
+        ],
+        "Saúde da Criança e do Adolescente|Recém-nascido": [
+          {
+            "t": "Saúde da Criança e do Adolescente",
+            "s": "Saúde da criança — atenção básica"
+          }
+        ],
+        "Saúde da Criança e do Adolescente|Crescimento e desenvolvimento": [
+          {
+            "t": "Saúde da Criança e do Adolescente",
+            "s": "Saúde da criança — atenção básica"
+          }
+        ],
+        "Saúde da Criança e do Adolescente|Triagem neonatal": [
+          {
+            "t": "Saúde da Criança e do Adolescente",
+            "s": "Recém-nascido"
+          }
+        ],
+        "Saúde da Criança e do Adolescente|Alimentação e nutrição infantil": [
+          {
+            "t": "Saúde da Criança e do Adolescente",
+            "s": "Recém-nascido"
+          }
+        ],
+        "Saúde da Criança e do Adolescente|Doenças comuns da infância": [
+          {
+            "t": "Saúde da Criança e do Adolescente",
+            "s": "Triagem neonatal"
+          }
+        ],
+        "Saúde da Criança e do Adolescente|Saúde do adolescente": [
+          {
+            "t": "Saúde da Criança e do Adolescente",
+            "s": "Triagem neonatal"
+          }
+        ],
+        "Saúde da Criança e do Adolescente|Violência e proteção da criança": [
+          {
+            "t": "Saúde da Criança e do Adolescente",
+            "s": "Doenças comuns da infância"
+          }
+        ],
+        "Farmacologia e Medicamentos|Segurança na administração": [
+          {
+            "t": "Farmacologia e Medicamentos",
+            "s": "Vias de administração"
+          }
+        ],
+        "Farmacologia e Medicamentos|Cálculo de dose e gotejamento": [
+          {
+            "t": "Farmacologia e Medicamentos",
+            "s": "Segurança na administração"
+          }
+        ],
+        "Farmacologia e Medicamentos|Farmacologia aplicada": [
+          {
+            "t": "Farmacologia e Medicamentos",
+            "s": "Cálculo de dose e gotejamento"
+          }
+        ],
+        "Farmacologia e Medicamentos|Medicamentos controlados": [
+          {
+            "t": "Farmacologia e Medicamentos",
+            "s": "Cálculo de dose e gotejamento"
+          }
+        ],
+        "Saúde Mental|Transtornos e cuidado em crise": [
+          {
+            "t": "Saúde Mental",
+            "s": "RAPS e reforma psiquiátrica"
+          }
+        ],
+        "Saúde Mental|Prevenção do suicídio": [
+          {
+            "t": "Saúde Mental",
+            "s": "Transtornos e cuidado em crise"
+          }
+        ],
+        "Saúde Mental|Álcool e outras drogas": [
+          {
+            "t": "Saúde Mental",
+            "s": "Transtornos e cuidado em crise"
+          }
+        ],
+        "Saúde Mental|Psicofarmacologia": [
+          {
+            "t": "Saúde Mental",
+            "s": "Prevenção do suicídio"
+          }
+        ],
+        "Feridas, Estomias e Reabilitação|Classificação de lesão por pressão": [
+          {
+            "t": "Feridas, Estomias e Reabilitação",
+            "s": "Avaliação e tratamento de feridas"
+          }
+        ],
+        "Feridas, Estomias e Reabilitação|Estomias": [
+          {
+            "t": "Feridas, Estomias e Reabilitação",
+            "s": "Classificação de lesão por pressão"
+          }
+        ],
+        "Feridas, Estomias e Reabilitação|Reabilitação e atenção à pessoa com deficiência": [
+          {
+            "t": "Feridas, Estomias e Reabilitação",
+            "s": "Estomias"
+          }
+        ],
+        "Vigilância em Saúde|Vigilância sanitária": [
+          {
+            "t": "Vigilância em Saúde",
+            "s": "Vigilância epidemiológica"
+          }
+        ],
+        "Vigilância em Saúde|Vigilância ambiental": [
+          {
+            "t": "Vigilância em Saúde",
+            "s": "Vigilância epidemiológica"
+          }
+        ],
+        "Centro Cirúrgico e CME|Período perioperatório": [
+          {
+            "t": "Centro Cirúrgico e CME",
+            "s": "Centro cirúrgico"
+          }
+        ],
+        "Centro Cirúrgico e CME|CME e processamento de materiais": [
+          {
+            "t": "Centro Cirúrgico e CME",
+            "s": "Período perioperatório"
+          }
+        ],
+        "Ética e Exercício Profissional|Exercício profissional": [
+          {
+            "t": "Ética e Exercício Profissional",
+            "s": "Código de Ética"
+          }
+        ],
+        "Ética e Exercício Profissional|Educação permanente": [
+          {
+            "t": "Ética e Exercício Profissional",
+            "s": "Exercício profissional"
+          }
+        ],
+        "Anatomia e Fisiologia|Sistema cardiovascular e respiratório": [
+          {
+            "t": "Anatomia e Fisiologia",
+            "s": "Anatomia e fisiologia geral"
+          }
+        ],
+        "Anatomia e Fisiologia|Sistemas digestório, urinário e endócrino": [
+          {
+            "t": "Anatomia e Fisiologia",
+            "s": "Anatomia e fisiologia geral"
+          }
+        ],
+        "Saúde do Homem|Saúde sexual e reprodutiva masculina": [
+          {
+            "t": "Saúde do Homem",
+            "s": "PNAISH"
+          }
+        ],
+        "Saúde do Homem|Rastreamento e prevenção do câncer de próstata": [
+          {
+            "t": "Saúde do Homem",
+            "s": "Saúde sexual e reprodutiva masculina"
+          }
+        ],
+        "Processo de Enfermagem e Registros|Registros de enfermagem": [
+          {
+            "t": "Processo de Enfermagem e Registros",
+            "s": "Processo de enfermagem"
+          }
+        ]
+      },
+      "criterio_subtopicos": "Escada em ondas, mesmo espirito das outras materias -- poucos subtopicos abrem de cada vez, do mais basico/comum ao mais especifico/avancado. A maioria das cadeias e ordem pedagogica (fatos clinicos paralelos, sem dependencia real entre si), exceto onde ha dependencia real de fato (indicada abaixo). Doencas Transmissiveis (25, o maior de toda a materia): 5 ondas de 5, agrupadas por familia clinica -- onda 1, as doencas classicas do calendario vacinal infantil (Sarampo, Rubeola, Varicela, Difteria, Coqueluche); onda 2, mais imunopreviniveis e respiratorias comuns (Tetano, Poliomielite, Meningite, Hepatites virais, Influenza); onda 3, respiratorias/cronicas e de pele (Tuberculose, Hanseniase, Covid-19, Raiva, Escabiose); onda 4, IST e zoonoses de transmissao indireta (IST, Sifilis, Toxoplasmose, Leptospirose, Febre maculosa); onda 5, arboviroses e doencas tropicais vetoriais, as mais especializadas (Arboviroses, Malaria, Leishmaniose, Doenca de Chagas, Esquistossomose). Continua exigindo tambem o subtopico Vigilancia epidemiologica de Vigilancia em Saude (requisito de topico ja existente) -- por isso esse subtopico la continua raiz. Urgencia, Emergencia e UTI (10): Acolhimento e classificacao de risco e a raiz (o primeiro passo de qualquer atendimento) -> vias aereas e RCP (o ABC da emergencia) -> choque/sepse/anafilaxia e emergencias cardiovasculares -> neurologicas, clinicas e trauma -> intoxicacoes e cuidado critico continuo, o mais avancado. Fundamentos e Procedimentos (10): Sinais vitais e Higiene/conforto sao as raizes (a base de qualquer cuidado) -> procedimentos gerais e coleta de exames -> puncao venosa, sondagem e oxigenoterapia (tecnicas mais invasivas) -> avaliacao e curativo de ferida -> estomias, o caso mais especializado. Saude do Adulto e do Idoso (10): Doencas cronicas - atencao basica e a raiz -> hipertensao e diabetes, as duas doencas cronicas mais comuns -> obesidade e saude do idoso -> avaliacao funcional, saude do homem e violencia contra o idoso -> cancer/paliativos e reabilitacao, os mais avancados. Controle de Infeccao e Seguranca do Paciente (10): Higienizacao das maos e EPI sao as raizes (a base classica de qualquer prevencao) -> controle de infeccao e precaucoes/isolamento -> IRAS/vigilancia, limpeza e acidente biologico -> metas de seguranca do paciente, o arcabouco mais amplo -> identificacao/cirurgia segura e prevencao de quedas, metas especificas dentro desse arcabouco. Saude da Mulher (9): atencao basica e a raiz -> planejamento reprodutivo e rastreamento de cancer -> pre-natal e climaterio/violencia -> parto e emergencias obstetricas -> puerperio e aleitamento, a fase seguinte ao parto. Imunizacao (8): Calendario vacinal e a raiz -> normas de vacinacao e rede de frio -> tecnica e vias de administracao -> situacoes especiais e eventos adversos -> imunobiologicos especiais/CRIE e profilaxia da raiva, os casos mais especificos. Saude da Crianca e do Adolescente (8): atencao basica e a raiz -> recem-nascido e crescimento/desenvolvimento -> triagem neonatal e alimentacao infantil -> doencas comuns da infancia e saude do adolescente -> violencia contra a crianca, o topico mais avancado. Farmacologia e Medicamentos (5): vias de administracao -> seguranca na administracao -> calculo de dose/gotejamento -> farmacologia aplicada e medicamentos controlados, os mais avancados. Saude Mental (5): RAPS e reforma psiquiatrica, o arcabouco institucional, e a raiz -> transtornos e cuidado em crise -> prevencao do suicidio e alcool/drogas -> psicofarmacologia, o mais tecnico. Feridas, Estomias e Reabilitacao (4): avaliacao e tratamento de ferida -> classificacao de lesao por pressao -> estomias -> reabilitacao e pessoa com deficiencia, o mais amplo. Vigilancia em Saude (3): Vigilancia epidemiologica e a raiz -- de proposito, porque Doencas Transmissiveis ja depende dela via requisito de topico, e nao pode ficar presa atras de mais nada -> Vigilancia sanitaria e ambiental. Centro Cirurgico e CME (3): Centro cirurgico -> Periodo perioperatorio -> CME e processamento de materiais, o mais tecnico/especializado. Etica e Exercicio Profissional (3): Codigo de Etica -> Exercicio profissional -> Educacao permanente. Anatomia e Fisiologia (3): geral e a raiz -> sistema cardiovascular/respiratorio e sistemas digestorio/urinario/endocrino, os sistemas especificos. Saude do Homem (3): PNAISH, o arcabouco de politica -> saude sexual e reprodutiva -> rastreamento de cancer de prostata, o mais clinico/especifico. Processo de Enfermagem e Registros (2): o metodo -> o registro dele."
     },
     "biologia-celular": {
       "criterio": "10 tópicos, sem subtópico, cada um cobrindo um recorte fechado do currículo de biologia celular (Alberts, Fundamentos da biologia celular). Teoria celular é a base histórica — quem descobriu a célula e como — e não pressupõe nada. Microscopia e classificação celular (procarionte×eucarionte, técnicas de observação) exige Teoria celular porque classificar célula pressupõe já saber o que é uma célula. Daqui o grafo se ramifica em três frentes que não dependem uma da outra, todas exigindo só Microscopia e classificação celular como base comum: (1) Célula animal, vegetal e vírus — comparação de tipos celulares e a posição do vírus como parasita intracelular obrigatório, síntese que só faz sentido depois de já saber classificar célula; (2) a membrana — Composição da membrana e mosaico fluido é o primeiro passo, Especializações da membrana e transporte passivo exige o modelo de mosaico fluido pra explicar como a especialização e o transporte passivo atravessam essa estrutura, e Transporte ativo e endo/exocitose exige o transporte passivo por ser o próximo degrau (ativo é o que passivo não explica: contra gradiente, com gasto de ATP); a sinalização celular também parte da membrana — Moléculas e tipos de sinalização celular exige Composição da membrana porque sinalização parácrina/endócrina/autócrina se liga a receptores DA membrana, e Receptores celulares e proteína G exige Moléculas e tipos de sinalização porque o receptor é o mecanismo, não faz sentido sem já saber que tipos de sinal existem; (3) o citoesqueleto — Citosol e microtúbulos exige só Microscopia e classificação celular (microtúbulo é uma estrutura da célula eucarionte), e Actina e filamentos intermediários exige Citosol e microtúbulos por ser a continuação do mesmo assunto (as três famílias de filamento do citoesqueleto, na ordem que o próprio banco já usa). Fica sem requisito, e portanto aberta desde o primeiro dia, só Teoria celular — a base de tudo o que vem depois.",
