@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v292-comentario-zerar-e-log-permanente";
+const VERSAO = "v293-corrige-exibicao-da-versao-guardada";
 const CACHE = "prova-enf-" + VERSAO;
 
 /* Cache do BANCO (tudo debaixo de ./banco/) é separado do cache do APP, e

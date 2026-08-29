@@ -77,6 +77,16 @@ no Safari do iPhone sem nenhuma etapa de compilação.
    junto — 3,6 MB em 10 matérias, refeitos do zero a cada deploy de código,
    mesmo sem questão nenhuma ter mudado. Nunca incluir `CACHE_BANCO` no
    filtro de limpeza do `activate()`.
+
+   **Os dois nomes começam com `"prova-enf-"`.** Qualquer código no
+   `index.html` que procure "o cache do app" varrendo `caches.keys()` por
+   esse prefixo (`mostraVersaoCarregando()` na tela de carregamento,
+   `pintarAjustes()` em Ajustes) precisa excluir `"prova-enf-banco"`
+   explicitamente, senão pode pegar o cache errado e mostrar "banco" no
+   lugar da versão de verdade. Já aconteceu — os dois lugares quebraram em
+   silêncio quando `CACHE_BANCO` foi criado, e isso atrasou o diagnóstico
+   de um bug real no Painel de desempenho porque a versão exibida não
+   dizia se o aparelho já tinha o código novo.
 3. **Rodar `validar.py` (ou `validar.ps1`) antes de qualquer commit.** Falha
    se houver questão malformada, duplicada, sem fonte ou com viés
    estatístico piorando (ver seção de viés, abaixo).

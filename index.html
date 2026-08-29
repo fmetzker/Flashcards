@@ -612,11 +612,19 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
    mais abaixo): lê o nome do cache em vez de duplicar VERSAO aqui dentro,
    pra nunca ficar fora de sincronia com sw.js. Sem cache (offline.html,
    sem service worker, ou primeira visita ainda sem nada guardado) fica em
-   branco de propósito — não é erro, é "ainda não tem o que mostrar". */
+   branco de propósito — não é erro, é "ainda não tem o que mostrar".
+
+   Exclui "prova-enf-banco" explicitamente: desde que o cache do banco
+   virou separado do cache do app (CACHE_BANCO, nome fixo — ver sw.js),
+   os dois começam com "prova-enf-", e sem essa exclusão o find() abaixo
+   podia pegar CACHE_BANCO por acaso e mostrar "banco" no lugar da versão
+   de verdade. Foi exatamente esse bug — versão errada na tela — que
+   ajudou a esconder por mais tempo do que devia um aparelho rodando JS
+   antigo enquanto o painel de desempenho já tinha sido corrigido. */
 (function mostraVersaoCarregando(){
   if(window.DADOS || !("caches" in window)) return;
   caches.keys().then(nomes=>{
-    const atual = nomes.find(n=>n.startsWith("prova-enf-"));
+    const atual = nomes.find(n=>n.startsWith("prova-enf-") && n !== "prova-enf-banco");
     if(atual) document.getElementById("carregando-versao").textContent = atual.replace("prova-enf-","");
   }).catch(()=>{});
 })();
@@ -4468,7 +4476,9 @@ function pintarAjustes(){
     btChecar.style.display = "none";
   } else {
     caches.keys().then(nomes=>{
-      const atual = nomes.find(n=>n.startsWith("prova-enf-"));
+      // exclui "prova-enf-banco" — cache separado do banco (sw.js), mesmo
+      // motivo do comentário em mostraVersaoCarregando()
+      const atual = nomes.find(n=>n.startsWith("prova-enf-") && n !== "prova-enf-banco");
       versaoMsg.textContent = atual
         ? "Versão guardada neste aparelho: "+atual.replace("prova-enf-","")
         : "Ainda sem versão guardada.";
