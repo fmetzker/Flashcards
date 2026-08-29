@@ -148,7 +148,8 @@ Migrações que rodam no boot: `migrarSessaoDoPerfil`, `migrarEstadoDoPerfil`,
 `ir` roteia. `pintarInicio`, `pintarMaterias`, `pintarStats`, `pintarGraficos`,
 `pintarConta`, `pintarLogin`, `pintarEspera`, `pintarConcursos`,
 `pintarEscolherConcurso`, `pintarAjustes`, `pintarPropor`, `pintarRevisar`,
-`pintarReportes`, `pintarAprovar`.
+`pintarReportes`, `pintarAprovar`, `pintarPainel` (aprovador; desempenho de
+todo mundo, via `eventos_resposta`/`simulados`/`resumo_desempenho`).
 
 Auxiliares da tela Matérias: `resumoDoBanco` (agrega por matéria/tópico/
 subtópico **e por degrau**, este último dos dois: `dt.graus` por tópico,

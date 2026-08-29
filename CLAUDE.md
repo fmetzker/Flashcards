@@ -362,6 +362,34 @@ aprovador liberar:
   propósito — ficar offline não pode trancar quem já usava o app, e a RLS
   nega os dados de qualquer jeito.
 
+## Painel de desempenho
+
+Tela só para `aprovador` (`SOU_APROVADOR`, mesmo gate de "Aprovar contas"),
+com o desempenho de todo mundo — `pintarPainel()`. Reaproveita o papel
+`aprovador` que já existe; não criou papel novo. Duas policies a mais
+tornam isso possível: `eventos_resposta`/`simulados` ganharam
+`"...: aprovador lê tudo"` (mesmo molde de `"aprovador: ver todos"` em
+`perfis`) — sem elas, um aprovador só enxergaria o próprio log, igual
+qualquer conta.
+
+**Não mostra "meta batida hoje" nem "sequência de estudo".** Os dois
+dependem de quais concursos/matérias avulsas cada conta segue
+(`E.concursos`, `E.materiasAvulsas`), e isso nunca sai do `localStorage`
+de cada aparelho — `sincronizar()` só manda pro servidor o LOG de resposta
+(`eventos_resposta`/`simulados`), nunca o `E` inteiro. Inventar uma meta
+genérica pro painel seria fabricar um número com cara de autoritativo que
+não é — mesmo espírito da regra 11 (não inventar o que não se sabe de
+verdade). Os números do painel são todos contagem bruta do log: cartões
+hoje/7 dias, acurácia geral, revisões atrasadas, última atividade.
+
+`resumo_desempenho` (view, `security_invoker`) agrega o histórico INTEIRO
+(acurácia geral, última atividade) no servidor — evita puxar meses/anos de
+eventos pro navegador só pra somar um total. `hoje`/`últimos 7 dias` não
+têm view própria: a janela é pequena, então `pintarPainel()` busca os
+eventos recentes direto e agrupa no cliente, com `fmtDiaBrasilia` — a
+mesma conversão de fuso que `aplicarEventoRemoto()` já usa, e pelo mesmo
+motivo (`ts` é UTC; cortar sem converter erra o dia perto da virada).
+
 ## Banco colaborativo
 
 O banco continua estático (regra 9). `propostas` é a caixa de entrada de

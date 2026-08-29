@@ -364,6 +364,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
     <button id="menu-revisar" style="display:none" onclick="ir('revisar')">Revisar propostas</button>
     <button id="menu-reportes" style="display:none" onclick="ir('reportes')">Reportes de questões</button>
     <button id="menu-aprovar" style="display:none" onclick="ir('aprovar')">Aprovar contas</button>
+    <button id="menu-painel" style="display:none" onclick="ir('painel')">Painel de desempenho</button>
   </div>
 </div>
 
@@ -549,6 +550,19 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   <h1>Aprovar contas</h1>
   <div class="sub" id="aprovar-sub">–</div>
   <div id="aprovar-corpo" style="margin-top:16px"></div>
+</div>
+
+<!-- ============ PAINEL DE DESEMPENHO ============ -->
+<div class="tela" id="tela-painel">
+  <h1>Painel de desempenho</h1>
+  <div class="sub" id="painel-sub">–</div>
+  <select id="painel-ordem" style="margin-top:12px">
+    <option value="atrasadas">Mais atrasado primeiro</option>
+    <option value="inativo">Mais tempo sem estudar primeiro</option>
+    <option value="acuracia">Menor acurácia primeiro</option>
+    <option value="nome">Nome (A-Z)</option>
+  </select>
+  <div id="painel-corpo" style="margin-top:16px"></div>
 </div>
 
 <!-- ============ ESCOLHER CONCURSO ============ -->
@@ -2099,6 +2113,7 @@ function ir(nome){
   if(nome==="espera") pintarEspera();
   if(nome==="escolher-concurso") pintarEscolherConcurso();
   if(nome==="aprovar") pintarAprovar();
+  if(nome==="painel") pintarPainel();
   if(nome==="inicio") pintarInicio();
   if(nome==="materias") pintarMaterias();
   if(nome==="stats") pintarStats();
@@ -2210,6 +2225,7 @@ function pintarInicio(){
   document.getElementById("menu-revisar").style.display = (supaConfigurado() && SESSAO && SOU_REVISOR) ? "" : "none";
   document.getElementById("menu-reportes").style.display = (supaConfigurado() && SESSAO && SOU_REVISOR) ? "" : "none";
   document.getElementById("menu-aprovar").style.display = (supaConfigurado() && SESSAO && SOU_APROVADOR) ? "" : "none";
+  document.getElementById("menu-painel").style.display = (supaConfigurado() && SESSAO && SOU_APROVADOR) ? "" : "none";
   // simulado imita uma prova de verdade — sem concurso/processo seletivo
   // nenhum seguido não existe prova nenhuma pra imitar (só matéria avulsa)
   document.getElementById("menu-simulado").style.display = CONCURSO ? "" : "none";
@@ -3858,6 +3874,151 @@ async function decidirConta(id, status, email){
   }catch(e){
     alert("Não foi possível registrar a decisão: "+e.message);
   }
+}
+
+/* =======================================================================
+   PAINEL DE DESEMPENHO — Fase 1 (visão geral)
+
+   Só existe pra quem é aprovador — a policy "...: aprovador lê tudo" em
+   eventos_resposta/simulados (supabase/schema.sql, seção 3/4) é o que torna
+   isto possível; sem ela, os fetches abaixo devolveriam só a própria linha,
+   igual a qualquer conta comum.
+
+   NÃO reproduz "meta batida hoje" nem "sequência de estudo" — de propósito.
+   Os dois dependem de quais concursos/matérias avulsas cada conta segue
+   (E.concursos, E.materiasAvulsas), e isso nunca sai do localStorage de
+   cada aparelho: só o LOG de resposta (eventos_resposta/simulados) é
+   sincronizado. Inventar uma meta genérica pra mostrar aqui seria fabricar
+   um número que parece autoritativo e não é — mesmo espírito da regra 11
+   do CLAUDE.md (não inventar o que não se sabe de verdade). Em vez disso,
+   os números aqui são todos derivados direto do log: contagem bruta, não
+   contagem "contra uma meta".
+
+   Duas fontes de dado:
+   - resumo_desempenho (view no servidor, supabase/schema.sql): agrega
+     TODO o histórico (acurácia geral, última atividade) sem puxar cada
+     evento pro navegador — histórico de meses/anos por conta seria pesado
+     de somar aqui.
+   - eventos_resposta (janela de ~8 dias) e estado_cartao (um cartão por
+     linha) são pequenos o bastante pra buscar direto e agregar no
+     cliente — não compensa criar view nova só pra isso. */
+async function pintarPainel(){
+  const c = document.getElementById("painel-corpo");
+  c.innerHTML = "";
+  const carregando = document.createElement("div"); carregando.className = "vazio"; carregando.textContent = "Carregando…";
+  c.appendChild(carregando);
+
+  let perfis, resumos, eventosRecentes, estados;
+  try{
+    /* janela FROUXA de propósito (8 dias corridos em UTC, não 7 dias exatos
+       em Brasília): é só pra limitar quanto dado vem da rede. O corte
+       EXATO do dia (hoje/últimos 7 dias) acontece depois, no cliente, com
+       fmtDiaBrasilia — a mesma função que aplicarEventoRemoto() já usa,
+       pelo mesmo motivo (ts é UTC; cortar sem converter erra o dia perto
+       da virada). */
+    const janela = new Date(Date.now() - 8*86400000).toISOString();
+    const [rPerfis, rResumo, rEventos, rEstado] = await Promise.all([
+      chamarRest("perfis?status=eq.aprovado&select=id,nome,email&order=nome.asc"),
+      chamarRest("resumo_desempenho?select=usuario_id,respostas_total,acertos_total,ultima_atividade"),
+      chamarRest("eventos_resposta?select=usuario_id,ts&ts=gte."+encodeURIComponent(janela)),
+      chamarRest("estado_cartao?select=usuario_id,prox")
+    ]);
+    if(!rPerfis.ok || !rResumo.ok || !rEventos.ok || !rEstado.ok){
+      throw new Error("o servidor respondeu com erro");
+    }
+    perfis = await rPerfis.json();
+    resumos = await rResumo.json();
+    eventosRecentes = await rEventos.json();
+    estados = await rEstado.json();
+  }catch(e){
+    c.innerHTML = "";
+    const erro = document.createElement("div"); erro.className = "aviso";
+    erro.textContent = "Não foi possível carregar: "+e.message;
+    c.appendChild(erro);
+    return;
+  }
+
+  const porResumo = {}; resumos.forEach(r=>{ porResumo[r.usuario_id] = r; });
+
+  const h = hoje(), seteDiasAtras = somarDias(h, -6);
+  const hojeCont = {}, seteDiasCont = {};
+  eventosRecentes.forEach(ev=>{
+    const dia = fmtDiaBrasilia.format(new Date(ev.ts));
+    if(dia === h) hojeCont[ev.usuario_id] = (hojeCont[ev.usuario_id]||0) + 1;
+    if(dia >= seteDiasAtras) seteDiasCont[ev.usuario_id] = (seteDiasCont[ev.usuario_id]||0) + 1;
+  });
+
+  const atrasadasCont = {};
+  estados.forEach(e2=>{
+    if(e2.prox < h) atrasadasCont[e2.usuario_id] = (atrasadasCont[e2.usuario_id]||0) + 1;
+  });
+
+  const linhas = perfis.map(p=>{
+    const r = porResumo[p.id] || {respostas_total:0, acertos_total:0, ultima_atividade:null};
+    return {
+      id: p.id,
+      nome: p.nome || p.email || "(sem nome)",
+      email: p.email,
+      hoje: hojeCont[p.id] || 0,
+      seteDias: seteDiasCont[p.id] || 0,
+      acuracia: r.respostas_total ? Math.round(r.acertos_total/r.respostas_total*100) : null,
+      atrasadas: atrasadasCont[p.id] || 0,
+      ultimaAtividade: r.ultima_atividade
+    };
+  });
+
+  document.getElementById("painel-sub").textContent =
+    linhas.length + (linhas.length===1 ? " aluno aprovado" : " alunos aprovados");
+
+  const CRITERIOS = {
+    atrasadas: (a,b) => b.atrasadas - a.atrasadas,
+    inativo:   (a,b) => (a.ultimaAtividade||"") < (b.ultimaAtividade||"") ? -1 : 1,
+    acuracia:  (a,b) => (a.acuracia==null?-1:a.acuracia) - (b.acuracia==null?-1:b.acuracia),
+    nome:      (a,b) => a.nome.localeCompare(b.nome)
+  };
+  const sel = document.getElementById("painel-ordem");
+
+  const renderizar = ()=>{
+    c.innerHTML = "";
+    if(!linhas.length){
+      const vazio = document.createElement("div"); vazio.className = "vazio";
+      vazio.textContent = "Nenhum aluno aprovado ainda.";
+      c.appendChild(vazio);
+      return;
+    }
+    const ordenadas = linhas.slice().sort(CRITERIOS[sel.value] || CRITERIOS.atrasadas);
+    ordenadas.forEach(l=>{
+      const card = document.createElement("div"); card.className = "card"; card.style.marginBottom = "12px";
+
+      const nome = document.createElement("div");
+      nome.style.cssText = "font-size:15.5px;font-weight:600";
+      nome.textContent = l.nome;
+      card.appendChild(nome);
+
+      if(l.email && l.email !== l.nome){
+        const email = document.createElement("div");
+        email.className = "aviso"; email.style.marginTop = "2px"; email.style.wordBreak = "break-all";
+        email.textContent = l.email;
+        card.appendChild(email);
+      }
+
+      const linha = (rotulo, valor, destaque) => {
+        const el = document.createElement("div"); el.className = "stat";
+        el.innerHTML = "<span>"+rotulo+"</span><span class=\"n\""+(destaque?" style=\"color:var(--coral)\"":"")+">"+valor+"</span>";
+        card.appendChild(el);
+      };
+      linha("Cartões hoje", l.hoje);
+      linha("Últimos 7 dias", l.seteDias);
+      linha("Acurácia geral", l.acuracia==null ? "–" : l.acuracia+"%");
+      linha("Revisões atrasadas", l.atrasadas, l.atrasadas > 0);
+      linha("Última atividade", fmtHoraSync(l.ultimaAtividade));
+
+      card.appendChild(document.createElement("div"));
+      c.appendChild(card);
+    });
+  };
+  sel.onchange = renderizar;
+  renderizar();
 }
 
 /* =======================================================================

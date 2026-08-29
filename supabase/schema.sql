@@ -404,6 +404,31 @@ order by usuario_id, questao_id, ts desc, id desc;
 
 
 -- ----------------------------------------------------------------------------
+-- 5.1 Resumo agregado por conta — Painel de desempenho
+--
+-- Acurácia geral e última atividade dependem do histórico INTEIRO (meses ou
+-- anos de eventos), não só de uma janela recente — somar isso no cliente
+-- puxando cada evento pra sempre seria pesado à toa quando o Postgres já
+-- faz a soma na consulta. `hoje`/`últimos 7 dias`, ao contrário, são janela
+-- pequena e não entram aqui: pintarPainel() (index.html) busca eventos
+-- recentes direto e agrega no cliente, sem precisar de view pra isso.
+--
+-- security_invoker = true, mesmo motivo de estado_cartao: herda a RLS de
+-- eventos_resposta sem repetir a regra de quem pode ver o quê — aprovador
+-- lê a linha de qualquer conta, conta comum só a própria.
+-- ----------------------------------------------------------------------------
+create or replace view public.resumo_desempenho
+with (security_invoker = true) as
+select
+  usuario_id,
+  count(*) as respostas_total,
+  count(*) filter (where resultado = 'sabia') as acertos_total,
+  max(criado_em) as ultima_atividade
+from public.eventos_resposta
+group by usuario_id;
+
+
+-- ----------------------------------------------------------------------------
 -- 7. Revisores — Fase 4
 --
 -- Quem pode ver e aprovar propostas de questão de qualquer pessoa. Mesma

@@ -201,12 +201,20 @@ begin
   if visto = 2 then raise notice 'OK — estado_cartao também abre pro aprovador (herda a RLS de baixo)';
   else raise warning 'FALHOU — estado_cartao devolve % linha(s) pro aprovador; deveria ver 2', visto; end if;
 
+  select count(*) into visto from public.resumo_desempenho where usuario_id in (aluno1, aluno2);
+  if visto = 2 then raise notice 'OK — resumo_desempenho também abre pro aprovador (herda a RLS de baixo)';
+  else raise warning 'FALHOU — resumo_desempenho devolve % linha(s) pro aprovador; deveria ver 2', visto; end if;
+
   -- como conta comum (aprovada, mas NÃO aprovadora): continua vendo só o
   -- próprio log — a policy nova não pode ter afrouxado isto
   perform set_config('request.jwt.claims', json_build_object('sub', comum, 'role','authenticated')::text, true);
   select count(*) into visto from public.eventos_resposta where usuario_id in (aluno1, aluno2);
   if visto = 0 then raise notice 'OK — conta comum continua sem alcançar o log de outra conta';
   else raise warning 'FALHOU — conta comum (não aprovadora) lê % evento(s) alheio(s) — a policy nova vazou', visto; end if;
+
+  select count(*) into visto from public.resumo_desempenho where usuario_id in (aluno1, aluno2);
+  if visto = 0 then raise notice 'OK — conta comum também não alcança resumo_desempenho de outra conta';
+  else raise warning 'FALHOU — conta comum lê % linha(s) alheia(s) em resumo_desempenho', visto; end if;
 
   reset role;
 end $$;
