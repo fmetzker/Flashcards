@@ -7,9 +7,10 @@
 # questão nova, este só ACRESCENTA/ALTERA CAMPOS de uma que já existe.
 #
 # A disciplina é a mesma dos outros dois:
-#   1. NADA é gravado antes de `validar.ps1 -Patches` passar limpo. O script
-#      roda o validador de verdade, com o patch aplicado em memória contra
-#      o banco inteiro — não há cópia das regras aqui.
+#   1. NADA é gravado antes de `validar.ps1 -Patches` passar limpo, com o
+#      patch aplicado em memória contra o banco inteiro. `validar.ps1` é só
+#      o invólucro do `validar.py`, então o gate é o validador inteiro, não
+#      uma cópia enfraquecida das regras.
 #   2. Casa por id: id que não existe no banco é erro, não é silenciosamente
 #      ignorado.
 #   3. Não faz commit nem mexe em VERSAO — as duas etapas continuam manuais.

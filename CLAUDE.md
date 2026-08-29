@@ -87,9 +87,9 @@ no Safari do iPhone sem nenhuma etapa de compilação.
    silêncio quando `CACHE_BANCO` foi criado, e isso atrasou o diagnóstico
    de um bug real no Painel de desempenho porque a versão exibida não
    dizia se o aparelho já tinha o código novo.
-3. **Rodar `validar.py` (ou `validar.ps1`) antes de qualquer commit.** Falha
-   se houver questão malformada, duplicada, sem fonte ou com viés
-   estatístico piorando (ver seção de viés, abaixo).
+3. **Rodar `validar.py` antes de qualquer commit.** Falha se houver
+   questão malformada, duplicada, sem fonte ou com viés estatístico
+   piorando (ver seção de viés, abaixo).
 
    **`validar.py` também roda `testar.js`, que é a conduta do MOTOR** —
    Leitner, grafo de pré-requisito, escada de nível, meta do dia, fuso de
@@ -100,6 +100,15 @@ no Safari do iPhone sem nenhuma etapa de compilação.
    passar. Teste que ninguém consegue fazer falhar não protege nada: ao
    escrever um caso novo, quebre o código de propósito e confirme que ele
    acusa, antes de confiar nele.
+
+   **`validar.ps1` é só um invólucro que chama o `validar.py`** — não valida
+   nada por conta própria. Foram duas implementações até agosto/2026, e elas
+   divergiram: 76 checagens de um lado, 25 do outro, e o que faltava não era
+   detalhe — o `.ps1` não conferia `requisitos.json` nem `topicos.json` de
+   jeito nenhum. Como os scripts de gravação gateavam nele (regra 9), a
+   garantia descrita ali rodava a um terço da força. **Sem Python a validação
+   agora PARA, em vez de rodar pela metade** — falhar fechado é o certo, mas
+   é mudança real em relação ao que o arquivo prometia.
 4. **Não adicionar dependências externas nem CDN.** Vale para `testar.js`
    também: ele usa só o `node` que o `validar.py` já exigia, sem framework
    de teste.
@@ -117,8 +126,8 @@ no Safari do iPhone sem nenhuma etapa de compilação.
    Windows PowerShell 5.1 os lê como ANSI e o parser quebra.
 7. **A chave `service_role` do Supabase nunca entra no repositório.** Ela
    ignora toda a RLS. A chave pública (`sb_publishable_...`/`anon`) pode
-   ficar no cliente. `validar.ps1`/`validar.py` varrem o repositório e
-   acusam se a secreta vazar em algum arquivo.
+   ficar no cliente. `validar.py` varre o repositório e acusa
+   se a secreta vazar em algum arquivo.
 8. **Nomes de classe CSS genéricos (`.vazio`, `.card`, `.stat`...) combinam
    com qualquer elemento que os use, mesmo junto de outra classe.** Ao
    nomear uma classe de estado (vazio, cheio, ativo...), checar se o nome já
@@ -135,7 +144,11 @@ no Safari do iPhone sem nenhuma etapa de compilação.
    isso porque nenhum reimplementa checagem: rodam `validar` de verdade
    antes de gravar (via `-Patches` no caso de `explicar-alternativas.ps1`,
    que valida a alteração em memória, contra o banco inteiro, sem tocar
-   disco) e falham fechado se ele reprovar.
+   disco) e falham fechado se ele reprovar. **"De verdade" passou a ser
+   literal em agosto/2026**: eles chamam `validar.ps1`, que até então era
+   uma segunda implementação com um terço das checagens e nenhuma sobre
+   `requisitos.json`/`topicos.json`. Hoje é invólucro do `validar.py`
+   (regra 3), então o gate é o validador inteiro.
 10. **`schema.sql`: a seção que torna as FKs para `auth.users` adiáveis
     precisa ser a ÚLTIMA do arquivo.** Ela descobre as chaves estrangeiras
     dinamicamente via `pg_constraint` — só enxerga o que já existe no
@@ -812,7 +825,7 @@ refletir essa pressão de verdade, não a promessa que o teto vai quebrar.
 
 **Resolvido, e é regra permanente, não histórico.** A alternativa correta
 não pode ser visivelmente mais longa que os distratores — isso permite
-acertar sem saber o conteúdo. `validar.py`/`validar.ps1` falham se alguma
+acertar sem saber o conteúdo. `validar.py` falha se alguma
 questão exceder a segunda alternativa mais longa em mais de 20 caracteres;
 diferenças de 1 a 10 caracteres são ruído, não pista.
 
@@ -827,7 +840,7 @@ coisas opostas e mente com cara de saúde: já esteve em 18% — dentro do acaso
 com *toda* matéria ativa em 0% e as duas inativas em 59%. Medido de outro
 jeito: com Português a 100% (viés máximo) injetado num teste, o número do banco
 chegou a 40,3%, mal cruzando o limiar. Quem estuda vê uma matéria, não o banco.
-Por isso `validar.py`/`validar.ps1` quebram a conta por matéria, e só olham
+Por isso `validar.py` quebra a conta por matéria, e só olha
 matéria com 20+ questões de pista — abaixo disso a amostra não diz nada.
 
 **0% também é viés, e é o mais fácil de criar sem perceber.** "A mais longa

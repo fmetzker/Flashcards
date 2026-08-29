@@ -64,7 +64,8 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 | `banco/reescritas.json` | Mapa id antigo→novo de enunciados corrigidos — preserva progresso |
 | `sw.js` | Service worker, rede-primeiro. `VERSAO` sobe a cada mudança no app |
 | `manifest.json`, `icone-*.png`, `apple-touch-icon.png` | PWA |
-| `validar.py` / `validar.ps1` | Integridade do banco. `--rascunho` valida candidato, `--patches` valida `eo`/`n`/`o`/`s`/`c`/`e`/`t`, nenhum dos dois grava |
+| `validar.py` | Integridade do banco **e** conduta do motor (roda o `testar.js`). `--rascunho` valida candidato, `--patches` valida `eo`/`n`/`o`/`s`/`c`/`e`/`t`, nenhum dos dois grava |
+| `validar.ps1` | Invólucro: só chama o `validar.py` com os mesmos argumentos. Não valida nada por conta própria |
 | `testar.js` + `testes/*.js` | Conduta do **motor** (Leitner, pré-requisito, nível, meta, fuso). `node testar.js [filtro]`; o `validar.py` roda sozinho |
 | `auditar-banco.py` / `.ps1` | Mede contra o `PADRAO-DOS-CARTOES.md`. Mede, não reprova |
 | `rascunho.json` | Cartões em elaboração, sem `id`. Vazio quando não há trabalho |
@@ -180,11 +181,10 @@ matéria órfã.
 | `sw.js` → lista dentro de `install()` (cache `CACHE_BANCO`) | cache do PWA |
 | `gerar-offline.ps1` → `$arquivos` | embutir no `offline.html` |
 | `validar.py` → lista em `carrega_banco` | exceção de "matéria órfã" |
-| `validar.ps1` → mesma lista | idem |
 
-Os dois validadores precisam concordar: `validar.ps1` é o que roda antes de
-**gravar**, `validar.py` é o mais completo (só ele confere `topicos.json`,
-`requisitos.json` e a sintaxe do JS, esta última se houver Node).
+Uma lista a menos desde agosto/2026: o `validar.ps1` tinha uma cópia desta
+e precisava andar junto. Hoje ele é só invólucro do `validar.py`, então
+existe um validador só — e um lugar só para manter em dia.
 
 ---
 

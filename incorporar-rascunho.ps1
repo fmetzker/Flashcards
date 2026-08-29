@@ -7,8 +7,9 @@
 # o validador reprova.
 #
 # A disciplina que este script impõe:
-#   1. NADA é gravado antes de `validar.ps1 -Rascunho` passar limpo. O script
-#      roda o validador de verdade; não há cópia das regras aqui.
+#   1. NADA é gravado antes de `validar.ps1 -Rascunho` passar limpo — e
+#      `validar.ps1` é só o invólucro do `validar.py`, então o gate é o
+#      validador inteiro, não uma cópia enfraquecida das regras.
 #   2. O id sai do SHA-1 do enunciado, calculado na hora (regra 5).
 #   3. Não faz commit nem mexe em VERSAO — as duas etapas continuam manuais,
 #      a mesma disciplina de incorporar-propostas.ps1.
