@@ -498,7 +498,154 @@
           "Connectors",
           "Vocabulary in Context"
         ]
-      }
+      },
+      "requisitos_subtopicos": {
+        "Reading Comprehension|Skimming and scanning": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Main idea"
+          }
+        ],
+        "Reading Comprehension|Vocabulary in context (leitura)": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Main idea"
+          }
+        ],
+        "Reading Comprehension|Detail": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Main idea"
+          }
+        ],
+        "Reading Comprehension|Sequencing": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Main idea"
+          }
+        ],
+        "Reading Comprehension|Pronoun reference": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Main idea"
+          }
+        ],
+        "Reading Comprehension|Fact vs. opinion": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Main idea"
+          }
+        ],
+        "Reading Comprehension|Cause and effect": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Fact vs. opinion"
+          }
+        ],
+        "Reading Comprehension|Compare and contrast": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Fact vs. opinion"
+          }
+        ],
+        "Reading Comprehension|Author's purpose": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Fact vs. opinion"
+          }
+        ],
+        "Reading Comprehension|Tone": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Author's purpose"
+          }
+        ],
+        "Reading Comprehension|Inference": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Author's purpose"
+          }
+        ],
+        "Modal Verbs|Advice and polite requests": [
+          {
+            "t": "Modal Verbs",
+            "s": "Ability"
+          }
+        ],
+        "Modal Verbs|Obligation and prohibition": [
+          {
+            "t": "Modal Verbs",
+            "s": "Advice and polite requests"
+          }
+        ],
+        "Modal Verbs|Possibility and deduction": [
+          {
+            "t": "Modal Verbs",
+            "s": "Obligation and prohibition"
+          }
+        ],
+        "Comparatives and Superlatives|Superlative": [
+          {
+            "t": "Comparatives and Superlatives",
+            "s": "Comparative of superiority"
+          }
+        ],
+        "Comparatives and Superlatives|Equality and inferiority": [
+          {
+            "t": "Comparatives and Superlatives",
+            "s": "Superlative"
+          }
+        ],
+        "Comparatives and Superlatives|Special structures": [
+          {
+            "t": "Comparatives and Superlatives",
+            "s": "Equality and inferiority"
+          }
+        ],
+        "Connectors|Contrast": [
+          {
+            "t": "Connectors",
+            "s": "Addition and purpose"
+          }
+        ],
+        "Connectors|Cause and consequence": [
+          {
+            "t": "Connectors",
+            "s": "Contrast"
+          }
+        ],
+        "Connectors|Condition": [
+          {
+            "t": "Connectors",
+            "s": "Cause and consequence"
+          }
+        ],
+        "Verb Tenses|Past tenses": [
+          {
+            "t": "Verb Tenses",
+            "s": "Present tenses"
+          }
+        ],
+        "Verb Tenses|Future tenses": [
+          {
+            "t": "Verb Tenses",
+            "s": "Past tenses"
+          }
+        ],
+        "Passive Voice|Passive by tense": [
+          {
+            "t": "Passive Voice",
+            "s": "Concept and use"
+          }
+        ],
+        "Passive Voice|Special forms": [
+          {
+            "t": "Passive Voice",
+            "s": "Passive by tense"
+          }
+        ]
+      },
+      "criterio_subtopicos": "Escada em ondas, mesmo espirito de Matematica: poucos subtopicos abrem de cada vez, do mais basico ao mais complexo, usando ordem pedagogica onde nao ha dependencia gramatical real entre os subtopicos (a maioria aqui e vocabulario/habilidade paralela, nao pre-requisito conceitual de verdade). Reading Comprehension (12 subtopicos, o maior): Main idea e a raiz (entender do que o texto trata e a habilidade mais basica de leitura). Onda 2: Skimming and scanning, Vocabulary in context, Detail, Sequencing, Pronoun reference e Fact vs. opinion - habilidades de leitura literal, proximas ao texto. Onda 3 (apos Fact vs. opinion, a mais avancada da onda 2): Cause and effect, Compare and contrast e Author's purpose - ja exigem relacionar partes do texto entre si. Onda 4 (apos Author's purpose): Tone e Inference, as duas habilidades mais interpretativas, que combinam tudo que veio antes. Modal Verbs (4): ordem classica de ensino de ingles - Ability (can/could, o modal mais simples) -> Advice and polite requests (should) -> Obligation and prohibition (must/have to) -> Possibility and deduction (might/must have), o uso mais abstrato. Comparatives and Superlatives (4): Comparative of superiority (-er than, a forma mais comum) -> Superlative (-est) -> Equality and inferiority (as...as, less than) -> Special structures (formas irregulares e casos especiais, o mais avancado). Connectors (4): Addition and purpose (and, also - os conectivos mais simples) -> Contrast (but, however) -> Cause and consequence (because, so) -> Condition (if, a estrutura condicional, a mais complexa). Verb Tenses (3): Present tenses (a base de qualquer conjugacao) -> Past tenses -> Future tenses, a ordem classica de ensino de tempos verbais. Passive Voice (3): Concept and use (quando e por que usar a voz passiva) -> Passive by tense (aplicar a diferentes tempos verbais) -> Special forms (casos especiais e mais avancados)."
     },
     "manutencao-mecanica": {
       "criterio": "Aqui os 23 tópicos têm 9 cartões cada, e dentro de cada um os cartões são um glossário de fatos paralelos (cada instrumento, cada ensaio, cada elemento de máquina é seu próprio fato independente, sem um 'conceito geral' do qual os outros derivem) — por isso nenhum tópico ganhou escada interna (campo n), só a trava entre tópicos. As arestas seguem a dependência real de um currículo de mecânica: Ensaios metalúrgicos, Metalografia e tratamentos térmicos, Ensaios mecânicos destrutivos e não destrutivos, Processos de fabricação e Noções de soldagem exigem Materiais de construção mecânica porque testam, tratam ou transformam um material que precisa ser conhecido antes; Resistência dos materiais exige Materiais E Mecânica Geral (resistência é força aplicada a um material); Elementos de máquinas exige Mecânica Geral e Resistência dos materiais (engrenagem, mola e rolamento são objetos de análise de força e tensão); Mecânica dos Fluidos exige Mecânica Geral; Sistemas hidráulicos e pneumáticos exige Mecânica dos Fluidos; Instrumentos de medição exige Sistema Internacional de Unidades e Noções de metrologia; Medidas de pressão, nível, temperatura e vazão exige Instrumentos de medição; Sistema de ajuste e tolerância exige Noções de metrologia; Equipamentos mecânicos e Lubrificação exigem Elementos de máquinas (equipamento é montado com elementos de máquina, que precisam de lubrificação); Gestão da Manutenção exige Equipamentos mecânicos (só se gerencia a manutenção do que já se entende como equipamento). Oito tópicos-base não dependem de conceito nenhum outro (ver '_cadeia_entre_raizes' no topo do arquivo): Sistema Internacional de Unidades, Noções de metrologia, Desenho técnico mecânico, Segurança do trabalho/meio ambiente/saúde, Normas técnicas nacionais e internacionais, Materiais de construção mecânica, Mecânica Geral e Noções de eletrotécnica. Ganharam uma cadeia de ordem: Sistema Internacional de Unidades primeiro — nenhuma medida em mecânica (dimensão de peça, tolerância, pressão) faz sentido sem unidade — depois Noções de metrologia, que é literalmente medir com essas unidades; os dois já travam Instrumentos de medição, que trava mais dois tópicos por baixo. Em seguida os dois tópicos mais carregados de dependentes reais: Materiais de construção mecânica (trava cinco: os três tipos de ensaio, Processos de fabricação e Noções de soldagem, além de contribuir para Resistência dos materiais) e Mecânica Geral (trava Resistência dos materiais, Mecânica dos Fluidos e, por tabela, Elementos de máquinas). Os quatro últimos — Desenho técnico mecânico, Segurança do trabalho/meio ambiente/saúde, Normas técnicas nacionais e internacionais e Noções de eletrotécnica — não travam mais nada na árvore, e fecham a fila.",
