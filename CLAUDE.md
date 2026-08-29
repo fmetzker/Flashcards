@@ -414,9 +414,15 @@ mesmo `materiasInscritas()` (no cliente) já não contando com ele.
 - Conta que nunca sincronizou `materias_ativas` (perfil de antes desta
   versão, ou que não abriu o app depois dela) mostra **"–"**, não **0**,
   em vez de fingir que está em dia.
-- **"Cartões estudados"** é `respostas_total` de `resumo_desempenho` — total
-  de respostas já dadas, sem filtro nenhum (não é sobre atraso, é sobre
-  volume de estudo).
+- **"Cartões estudados"** conta linhas de `estado_cartao` por aluno — a
+  view já é `DISTINCT ON (usuario_id, questao_id)` (seção 5), então é
+  direto "quantos cartões DIFERENTES", igual a "Já vistas" na tela
+  Estatísticas pessoal (`Object.keys(E.cartoes).length`). **Não** é
+  `respostas_total` de `resumo_desempenho` — esse conta toda REVISÃO
+  repetida do mesmo cartão e serve só pra acurácia
+  (`acertos_total/respostas_total`). A primeira versão do painel usou
+  `respostas_total` aqui por engano e mostrou 336 "estudados" pra uma
+  conta com 69 cartões diferentes.
 
 ## Banco colaborativo
 

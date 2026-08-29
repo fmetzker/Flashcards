@@ -3971,8 +3971,15 @@ async function indiceBancoCompleto(){
    antigo, ou nunca abriu o app depois desta versão) mostra "–" em vez de
    0 — 0 diria "está em dia" quando na verdade é "não sei".
 
-   "Cartões estudados" é `respostas_total` de resumo_desempenho — total de
-   respostas já dadas, sem filtro nenhum (não é sobre atraso).
+   "Cartões estudados" conta linhas de estado_cartao por aluno — a view já
+   é DISTINCT ON (usuario_id, questao_id) (schema.sql, seção 5), então cada
+   linha é um cartão DIFERENTE, nunca uma revisão repetida do mesmo. É o
+   mesmo número que "Já vistas" mede na tela Estatísticas pessoal
+   (Object.keys(E.cartoes).length). NÃO é respostas_total de
+   resumo_desempenho — esse é o total de RESPOSTAS (conta toda revisão
+   repetida do mesmo cartão), usado só na acurácia geral. Primeira versão
+   deste painel confundiu os dois e mostrou 336 "estudados" pra uma conta
+   com 69 cartões diferentes.
 
    Fontes de dado:
    - resumo_desempenho (view no servidor): agrega TODO o histórico
@@ -4032,11 +4039,18 @@ async function pintarPainel(){
     if(dia >= seteDiasAtras) seteDiasCont[ev.usuario_id] = (seteDiasCont[ev.usuario_id]||0) + 1;
   });
 
-  // agrupa os cartões VENCIDOS de cada aluno — o filtro por matéria ativa
-  // só acontece depois, já dentro do map de `linhas`, porque cada aluno
-  // tem seu próprio materias_ativas
-  const vencidosPorAluno = {};
+  /* agrupa por aluno o que estado_cartao já devolve DEDUPLICADO — uma
+     linha por (usuario_id, questao_id), nunca duas para o mesmo cartão
+     (é o próprio DISTINCT ON da view, ver schema.sql seção 5). Por isso
+     `vistos.length` é diretamente "quantos cartões DIFERENTES essa conta
+     já respondeu" — o mesmo que "Já vistas" mede na tela Estatísticas
+     pessoal (Object.keys(E.cartoes).length, também sem filtro de matéria).
+     `respostas_total` (resumo_desempenho) é outra coisa: TOTAL de
+     respostas, contando toda revisão repetida do mesmo cartão — é o que
+     entra na acurácia (acertos_total/respostas_total), não em "estudados". */
+  const vencidosPorAluno = {}, vistosPorAluno = {};
   estados.forEach(e2=>{
+    (vistosPorAluno[e2.usuario_id] = vistosPorAluno[e2.usuario_id] || []).push(e2.questao_id);
     if(e2.prox >= h) return;
     (vencidosPorAluno[e2.usuario_id] = vencidosPorAluno[e2.usuario_id] || []).push(e2.questao_id);
   });
@@ -4058,7 +4072,7 @@ async function pintarPainel(){
       seteDias: seteDiasCont[p.id] || 0,
       acuracia: r.respostas_total ? Math.round(r.acertos_total/r.respostas_total*100) : null,
       atrasadas: semSincronizar ? null : atrasadasAtivas,
-      estudados: r.respostas_total,
+      estudados: (vistosPorAluno[p.id] || []).length,
       ultimaAtividade: r.ultima_atividade
     };
   });
