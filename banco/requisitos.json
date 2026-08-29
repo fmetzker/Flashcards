@@ -470,7 +470,178 @@
         "Transferência inter-hospitalar": [
           "PNAU"
         ]
-      }
+      },
+      "requisitos_subtopicos": {
+        "Lei 8.080/90|Princípios/diretrizes do SUS (art. 7º)": [
+          {
+            "t": "Lei 8.080/90",
+            "s": "Objetivos, campo de atuação e conceitos"
+          }
+        ],
+        "Lei 8.080/90|Competências das esferas de gestão": [
+          {
+            "t": "Lei 8.080/90",
+            "s": "Princípios/diretrizes do SUS (art. 7º)"
+          }
+        ],
+        "Lei 8.080/90|Gestão compartilhada (CIT/CIB)": [
+          {
+            "t": "Lei 8.080/90",
+            "s": "Princípios/diretrizes do SUS (art. 7º)"
+          }
+        ],
+        "Lei 8.080/90|Participação complementar do setor privado": [
+          {
+            "t": "Lei 8.080/90",
+            "s": "Competências das esferas de gestão"
+          }
+        ],
+        "PNAB|Composição e dimensionamento das equipes": [
+          {
+            "t": "PNAB",
+            "s": "Fundamentos e diretrizes da APS/PNAB"
+          }
+        ],
+        "PNAB|Atribuições dos profissionais": [
+          {
+            "t": "PNAB",
+            "s": "Composição e dimensionamento das equipes"
+          }
+        ],
+        "PNAB|Tipos de equipes especializadas": [
+          {
+            "t": "PNAB",
+            "s": "Composição e dimensionamento das equipes"
+          }
+        ],
+        "PNAB|Processos de trabalho e ferramentas": [
+          {
+            "t": "PNAB",
+            "s": "Atribuições dos profissionais"
+          }
+        ],
+        "Rede Alyne|Organização/componentes da rede": [
+          {
+            "t": "Rede Alyne",
+            "s": "Instituição, objetivos e princípios"
+          }
+        ],
+        "Rede Alyne|Pré-natal e vinculação à maternidade": [
+          {
+            "t": "Rede Alyne",
+            "s": "Organização/componentes da rede"
+          }
+        ],
+        "Rede Alyne|Pontos de atenção especializados": [
+          {
+            "t": "Rede Alyne",
+            "s": "Organização/componentes da rede"
+          }
+        ],
+        "Rede Alyne|Puerpério e pós-parto": [
+          {
+            "t": "Rede Alyne",
+            "s": "Pré-natal e vinculação à maternidade"
+          }
+        ],
+        "Lei 8.142/90|Conselho de Saúde": [
+          {
+            "t": "Lei 8.142/90",
+            "s": "Instâncias de participação (visão geral)"
+          }
+        ],
+        "Lei 8.142/90|Conferência de Saúde": [
+          {
+            "t": "Lei 8.142/90",
+            "s": "Instâncias de participação (visão geral)"
+          }
+        ],
+        "Lei 8.142/90|Fundo Nacional de Saúde": [
+          {
+            "t": "Lei 8.142/90",
+            "s": "Conselho de Saúde"
+          }
+        ],
+        "Constituição Federal|Competências do SUS (art. 200)": [
+          {
+            "t": "Constituição Federal",
+            "s": "Direito à saúde (arts. 196-198)"
+          }
+        ],
+        "Constituição Federal|Financiamento (art. 198 §1º)": [
+          {
+            "t": "Constituição Federal",
+            "s": "Competências do SUS (art. 200)"
+          }
+        ],
+        "Constituição Federal|Participação da iniciativa privada": [
+          {
+            "t": "Constituição Federal",
+            "s": "Competências do SUS (art. 200)"
+          }
+        ],
+        "Controle social|Outros canais de participação": [
+          {
+            "t": "Controle social",
+            "s": "Conselho de Saúde"
+          }
+        ],
+        "Controle social|Financiamento (condicionantes FNS)": [
+          {
+            "t": "Controle social",
+            "s": "Outros canais de participação"
+          }
+        ],
+        "Transferência inter-hospitalar|Preparo pré-transporte": [
+          {
+            "t": "Transferência inter-hospitalar",
+            "s": "Regulação e autorização"
+          }
+        ],
+        "Transferência inter-hospitalar|Equipe e conduta durante o transporte": [
+          {
+            "t": "Transferência inter-hospitalar",
+            "s": "Preparo pré-transporte"
+          }
+        ],
+        "Transferência inter-hospitalar|Responsabilidade e documentação": [
+          {
+            "t": "Transferência inter-hospitalar",
+            "s": "Equipe e conduta durante o transporte"
+          }
+        ],
+        "Organização do SUS|Decreto nº 7.508/2011": [
+          {
+            "t": "Organização do SUS",
+            "s": "Princípios organizativos"
+          }
+        ],
+        "Organização do SUS|Comissões Intergestores (CIT/CIB)": [
+          {
+            "t": "Organização do SUS",
+            "s": "Decreto nº 7.508/2011"
+          }
+        ],
+        "PNH|Diretrizes da PNH": [
+          {
+            "t": "PNH",
+            "s": "Contexto histórico da PNH"
+          }
+        ],
+        "PNH|Dispositivos/ferramentas da PNH": [
+          {
+            "t": "PNH",
+            "s": "Diretrizes da PNH"
+          }
+        ],
+        "PNAU|SAMU 192": [
+          {
+            "t": "PNAU",
+            "s": "Componentes da RUE"
+          }
+        ]
+      },
+      "criterio_subtopicos": "Escada em ondas, mesmo espirito das outras materias: poucos subtopicos abrem de cada vez, do mais introdutorio ao mais especifico/operacional. Lei 8.080/90 (5): Objetivos, campo de atuacao e conceitos e a raiz (a introducao da lei) -> Principios/diretrizes do SUS, art. 7o (o nucleo normativo) -> Competencias das esferas de gestao e Gestao compartilhada CIT/CIB (a estrutura operacional que aplica os principios) -> Participacao complementar do setor privado (o caso mais especifico). PNAB (5): Fundamentos e diretrizes da APS/PNAB e a raiz -> Composicao e dimensionamento das equipes (a estrutura basica) -> Atribuicoes dos profissionais e Tipos de equipes especializadas (variacoes sobre essa estrutura) -> Processos de trabalho e ferramentas (a aplicacao pratica, mais avancada). Rede Alyne (5): Instituicao, objetivos e principios e a raiz -> Organizacao/componentes da rede -> Pre-natal e vinculacao a maternidade e Pontos de atencao especializados (os dois ramos da rede) -> Puerperio e pos-parto (a fase clinica seguinte ao pre-natal, cronologicamente depois). Lei 8.142/90 (4): Instancias de participacao (visao geral) e a raiz -> Conselho de Saude e Conferencia de Saude, as duas instancias principais -> Fundo Nacional de Saude, o mecanismo de financiamento mais especifico. Constituicao Federal (4): Direito a saude, arts. 196-198, e a raiz (o principio constitucional basico) -> Competencias do SUS, art. 200 (o que decorre desse direito) -> Financiamento, art. 198 par. 1o, e Participacao da iniciativa privada (dispositivos mais especificos). Controle social (4): Conselho de Saude e Conferencia de Saude sao as duas raizes (os dois canais formais classicos) -> Outros canais de participacao (extensao) -> Financiamento, condicionantes FNS (o detalhe mais tecnico). Transferencia inter-hospitalar (4): segue a ordem cronologica real do processo -- Regulacao e autorizacao (a raiz, o primeiro passo) -> Preparo pre-transporte -> Equipe e conduta durante o transporte -> Responsabilidade e documentacao (o registro, que atravessa e fecha o processo). Organizacao do SUS (3): Principios organizativos e a raiz -> Decreto no 7.508/2011 (que regulamenta esses principios) -> Comissoes Intergestores CIT/CIB (o mecanismo operacional mais avancado que o decreto instituiu). PNH (3): Contexto historico da PNH e a raiz -> Diretrizes da PNH -> Dispositivos/ferramentas da PNH, a aplicacao pratica mais avancada. PNAU (2): Componentes da RUE e a raiz (a rede inteira) -> SAMU 192, um componente especifico dela."
     },
     "ingles": {
       "criterio": "Verb Tenses é a base: modal verb muda a forma do verbo principal, e voz passiva é o tempo verbal de 'to be' aplicado ao particípio — os dois pressupõem already saber conjugar nos tempos verbais. Reading Comprehension exige três bases ao mesmo tempo (Verb Tenses, Connectors e Vocabulary in Context) porque um texto real mistura tempo verbal, conectivos lógicos e vocabulário em contexto — não dá para treinar compreensão de texto sem já ter alguma base nos três. Cinco tópicos não dependem de conceito nenhum outro (ver '_cadeia_entre_raizes' no topo do arquivo): Verb Tenses, Comparatives and Superlatives, Connectors, False Cognates e Vocabulary in Context. Ganharam uma cadeia de ordem: Verb Tenses primeiro, por já ser 'a base de tudo' (trava Modal Verbs, Passive Voice e um terço de Reading Comprehension); Connectors e Vocabulary in Context em seguida, por serem as outras duas bases de que Reading Comprehension precisa — assim que os três abrirem e a pessoa dominar a base de cada um, o tópico de topo da matéria já libera; Comparatives and Superlatives e False Cognates, que não travam mais nada na árvore, fecham a fila.",
