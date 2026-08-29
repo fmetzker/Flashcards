@@ -3004,6 +3004,7 @@ function embaralhaOrdem(n){
 }
 
 function mostrarQuestao(){
+  window.scrollTo(0,0);   // cartão novo sempre começa do topo, mesmo se o anterior foi respondido rolado pra baixo
   const id = S.lista[S.pos], q = porId[id];
   S.respondida = false;
   S.perm = embaralhaOrdem(q.o.length);
