@@ -384,6 +384,40 @@ def valida_requisitos(B, materias):
                 if subs_do_topico and not raizes_sub:
                     erros.append(f"requisitos.json: matéria '{mid}', tópico '{t_pai}': todo "
                                  "subtópico tem pré-requisito — nenhum abriria")
+
+        # ---- limite de ondas puladas (ver '_limite_de_ondas_puladas' no arquivo) ----
+        # Dependência de TÓPICO sobre {t,s} de OUTRO tópico não pode pular mais de
+        # 2 ondas restantes da escada interna do exigido — senão libera o tópico
+        # inteiro tendo visto só uma fração pequena do que ele exige de verdade.
+        LIMITE_ONDAS = 2
+        memo_prof = {}
+        def profundidade_sub(t, s):
+            chave_s = f"{t}|{s}"
+            if chave_s in memo_prof:
+                return memo_prof[chave_s]
+            memo_prof[chave_s] = 0   # guarda de recursão — ciclo já é barrado acima
+            prof = 0
+            for d in req_sub.get(chave_s, []):
+                if isinstance(d, dict) and d.get('t') and d.get('s'):
+                    prof = max(prof, 1 + profundidade_sub(d['t'], d['s']))
+            memo_prof[chave_s] = prof
+            return prof
+        for t, deps in req.items():
+            for d in deps:
+                if not isinstance(d, dict):
+                    continue
+                alvo_t, alvo_s = d.get('t'), d.get('s')
+                if not alvo_t or not alvo_s:
+                    continue
+                prof_alvo = profundidade_sub(alvo_t, alvo_s)
+                subs_do_alvo = {s_b for (t_b, s_b) in pares_banco if t_b == alvo_t}
+                prof_max = max((profundidade_sub(alvo_t, s_b) for s_b in subs_do_alvo), default=0)
+                ondas_puladas = prof_max - prof_alvo
+                if ondas_puladas > LIMITE_ONDAS:
+                    erros.append(f"requisitos.json: matéria '{mid}': '{t}' exige só "
+                                 f"'{alvo_t}/{alvo_s}', que pula {ondas_puladas} onda(s) restante(s) "
+                                 f"da escada de '{alvo_t}' (limite {LIMITE_ONDAS}) — vire dependência "
+                                 f"do tópico '{alvo_t}' inteiro (ver _limite_de_ondas_puladas)")
     # matéria ativa sem requisitos declarados: nenhum tópico dela trava
     declaradas = set(reg)
     ativas = materias_ativas()

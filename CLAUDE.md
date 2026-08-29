@@ -602,6 +602,22 @@ Os invariantes, que não podem ser afrouxados:
   vira só tamanho, como sempre foi antes de ter requisito declarado — a
   regra não exige escada nova em lugar nenhum, só manda a exibição seguir a
   que já existe.
+- **Dependência de um tópico sobre `{t,s}` de OUTRO tópico não pode pular
+  mais de 2 ondas restantes da escada interna do exigido.** Achado em
+  setembro/2026: Análise combinatória abria só com Multiplicação dominada —
+  a RAIZ de uma escada de 8 ondas em Aritmética, então o tópico liberava
+  tendo visto 1 dos 17 subtópicos da matéria. "Ondas restantes" é a maior
+  profundidade entre os subtópicos do exigido, menos a profundidade do alvo
+  escolhido; passou de 2, a dependência tem que virar o TÓPICO INTEIRO (sem
+  `s`) em vez do subtópico — foi o que aconteceu com Análise combinatória e
+  Estatística (matemática), que passaram a exigir `"Aritmética"` inteira. O
+  limite 2 não é arbitrário: é o maior valor que já existia entre os casos
+  considerados corretos (Trigonometria→Geometria/Triângulos, Matrizes→
+  Álgebra/Sistemas de equações, Flexão verbal/nominal→Classes de palavras/
+  Verbo|Substantivo) — não se aplica a `requisitos_subtopicos` (dependência
+  DENTRO do mesmo tópico), só entre tópicos diferentes, e só quando o alvo é
+  `{t,s}` (dependência de tópico inteiro não tem o que pular). `validar.py`
+  reprova automaticamente quem violar isso.
 
 `validar.py` barra grafia que não existe no banco, pré-requisito circular,
 tópico que exige a si mesmo, matéria em que nenhum tópico abriria, e nível
