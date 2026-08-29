@@ -1097,14 +1097,24 @@ function rotuloDep(d){ return typeof d === "string" ? d : d.s + " (em " + d.t + 
 
 /* Cartão NOVO só entra se o tópico dele estiver aberto, o SUBTÓPICO dele
    (se tiver `s` e ele estiver em requisitos_subtopicos) também estiver
-   aberto, E o degrau dele já tiver sido alcançado dentro do tópico. Vale só
-   para cartão novo: revisão vencida nunca é travada, nem por degrau nem por
-   pré-requisito (de tópico ou de subtópico), porque travar revisão
-   transformaria a escada num jeito de esconder o que a pessoa já errou. */
+   aberto, E o degrau dele já tiver sido alcançado — DENTRO DO SUBTÓPICO
+   quando o cartão tem um, dentro do tópico inteiro quando não tem.
+
+   Antes disto, grauLiberado(q.m, q.t) sempre olhava o TÓPICO inteiro,
+   somando cartão de nível 1 de TODO subtópico — inclusive os ainda
+   travados pela escada de subtópico. Isso empacava a escada: o nível 1 do
+   tópico só "vencia" quando o último subtópico da cadeia abrisse e fosse
+   dominado, então nível 2 de QUALQUER subtópico ficava inatingível até a
+   escada de subtópico inteira terminar — o oposto de liberação gradual.
+   Passar q.s aqui faz cada subtópico ter sua própria escada de nível,
+   casada com a escada de desbloqueio que já existe (grauLiberado ignora
+   cartão de outro subtópico quando `s` é passado). Tópico sem subtópico
+   (q.s undefined) continua idêntico a sempre: grauLiberado trata `s`
+   ausente como "olha o tópico inteiro". */
 function grauAberto(q){
   if(!topicoAberto(q.m, q.t)) return false;
   if(q.s && !subtopicoAberto(q.m, q.t, q.s)) return false;
-  return grauDe(q) <= grauLiberado(q.m, q.t);
+  return grauDe(q) <= grauLiberado(q.m, q.t, q.s);
 }
 
 /* união das matérias de TODOS os concursos inscritos, MAIS as matérias
@@ -2445,13 +2455,23 @@ function resumoDoBanco(){
         if(c.caixa >= 2) n.dominados++;
       }
     });
-    /* quanto do tópico está atrás do degrau fechado, e quanto falta acertar
-       para abrir o próximo — a tela precisa dos dois para explicar a trava */
+    /* quanto do tópico (e, se houver subtópico, do PRÓPRIO subtópico) está
+       atrás do degrau fechado, e quanto falta acertar pra abrir o próximo —
+       a tela precisa dos dois pra explicar a trava. Grava nos dois níveis
+       porque grauAberto() agora escala por subtópico quando o cartão tem um
+       (ver comentário de grauAberto) — dt.graus fica pra tópico sem
+       subtópico nenhum; ds.graus é o que trava de verdade quando existe. */
     const g = grauDe(q);
     dt.graus = dt.graus || {};
     const dg = dt.graus[g] = dt.graus[g] || {total:0, dominados:0};
     dg.total++;
     if(c && c.caixa >= 2) dg.dominados++;
+    if(ds){
+      ds.graus = ds.graus || {};
+      const dgs = ds.graus[g] = ds.graus[g] || {total:0, dominados:0};
+      dgs.total++;
+      if(c && c.caixa >= 2) dgs.dominados++;
+    }
   });
 
   /* Acrescenta o que o edital cobra e o banco ainda não cobre: tópico com
@@ -2533,13 +2553,20 @@ function porDesbloqueio(mid, mapa){
 
 /* Estado da escada de um tópico, para a tela explicar a trava em vez de só
    esconder o botão. Devolve null quando o tópico não tem escada (um degrau
-   só) ou quando tudo já está aberto — nesses casos não há nada a dizer. */
-function travaDoTopico(mid, t, dt){
+   só) ou quando tudo já está aberto — nesses casos não há nada a dizer.
+
+   A checagem de GRAU só roda pra tópico SEM subtópico. Tópico com
+   subtópico delega a escada de nível pra dentro de cada subtópico (ver
+   grauAberto() e travaDoSubtopico()) — mostrar "nível 2 travado" aqui
+   também, somando os subtópicos todos juntos, voltaria a ser o número
+   errado que motivou a mudança (um subtópico ainda fechado não pode
+   seguntar o nível de outro que já abriu). */
+function travaDoTopico(mid, t, dt, temSub){
   /* pré-requisito vem primeiro: enquanto ele não é cumprido, o tópico inteiro
      está fechado e o estado interno da escada é irrelevante */
   const pend = requisitosPendentes(mid, t);
   if(pend.length) return {tipo:"requisito", faltam:pend};
-  if(!dt || !dt.graus) return null;
+  if(temSub || !dt || !dt.graus) return null;
   const graus = Object.keys(dt.graus).map(Number).sort((a,b)=>a-b);
   if(graus.length < 2) return null;
   const aberto = grauLiberado(mid, t);
@@ -2550,14 +2577,25 @@ function travaDoTopico(mid, t, dt){
   return {tipo:"grau", aberto, faltam: Math.max(0, dg.total - dg.dominados), presos};
 }
 
-/* mesma ideia de travaDoTopico(), um nível mais fundo: se o subtópico tem
-   requisito PRÓPRIO (requisitos_subtopicos) pendente, a linha explica o quê
-   falta em vez de só sumir com o botão. O tópico já foi conferido aberto
-   antes de chamar renderTopico() nesse subtópico, então aqui só sobra a
-   checagem de subtópico mesmo. */
-function travaDoSubtopico(mid, t, s){
+/* mesma ideia de travaDoTopico(), um nível mais fundo: pré-requisito PRÓPRIO
+   (requisitos_subtopicos) vem primeiro — enquanto pendente, o subtópico
+   inteiro está fechado e o estado da escada interna é irrelevante. Depois,
+   a MESMA checagem de grau que travaDoTopico() fazia pro tópico inteiro,
+   agora escopada a este subtópico (ds = dt.subs[s], que resumoDoBanco()
+   já agrega por subtópico — ver grauAberto()). O tópico já foi conferido
+   aberto antes de chamar renderTopico() nesse subtópico. */
+function travaDoSubtopico(mid, t, s, ds){
   const pend = requisitosPendentesSub(mid, t, s);
-  return pend.length ? {tipo:"requisito", faltam:pend} : null;
+  if(pend.length) return {tipo:"requisito", faltam:pend};
+  if(!ds || !ds.graus) return null;
+  const graus = Object.keys(ds.graus).map(Number).sort((a,b)=>a-b);
+  if(graus.length < 2) return null;
+  const aberto = grauLiberado(mid, t, s);
+  if(aberto > graus[graus.length-1]) return null;
+  const dg = ds.graus[aberto] || {total:0, dominados:0};
+  const presos = graus.filter(g=> g > aberto)
+                      .reduce((sum,g)=> sum + ds.graus[g].total, 0);
+  return {tipo:"grau", aberto, faltam: Math.max(0, dg.total - dg.dominados), presos};
 }
 
 /* uma linha com nome, barra de acerto, contagem e botão de estudar.
@@ -2681,7 +2719,7 @@ function pintarMaterias(){
       const linha = linhaNivel("topico", t, dt, ev=>{
         ev.stopPropagation();
         iniciarSessao("filtro", {m:mid, t:t});
-      }, travaDoTopico(mid, t, dt));
+      }, travaDoTopico(mid, t, dt, temSub));
 
       if(!temSub){ corpo.appendChild(linha); return; }
 
@@ -2700,7 +2738,7 @@ function pintarMaterias(){
         dentro.appendChild(linhaNivel("subtopico", s, dt.subs[s], ev=>{
           ev.stopPropagation();
           iniciarSessao("filtro", {m:mid, t:t, s:s});
-        }, travaDoSubtopico(mid, t, s)));
+        }, travaDoSubtopico(mid, t, s, dt.subs[s])));
       });
       grupo.appendChild(dentro);
       corpo.appendChild(grupo);

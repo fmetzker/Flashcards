@@ -519,8 +519,21 @@ tópicos em "a palavra / a relação entre palavras / o texto" — e foi removid
 porque era rótulo decorativo que contradizia o motor: ao dominar Classes de
 palavras abriam ao mesmo tempo um tópico rotulado camada 1 e outro rotulado
 camada 3, porque quem decide o que abre é o grafo de pré-requisitos. A tela
-anunciava uma hierarquia que não existia. **Nível é uma noção só, e ela vive
-dentro do tópico.**
+anunciava uma hierarquia que não existia. **Nível é uma noção só.**
+
+**Nível (`n`) de cartão com subtópico é avaliado DENTRO DO SUBTÓPICO, nunca
+do tópico inteiro.** `grauLiberado`/`grauAberto` escalam pelo recorte mais
+fino que o cartão tem: `{m,t,s}` quando existe subtópico, `{m,t}` quando
+não. Existe desde agosto/2026, quando a escada de subtópico (audite acima)
+expôs um impasse que a escada de tópico nunca tinha: medir o nível 1 pelo
+TÓPICO inteiro soma cartão de todo subtópico, inclusive os ainda fechados
+pela escada de desbloqueio — e cartão fechado é inacessível, nunca dá pra
+dominar. O nível 1 do tópico inteiro nunca "vencia", e nível 2 de NENHUM
+subtópico jamais abria, até a cadeia de subtópico inteira ser percorrida.
+Escalar por subtópico resolve: cada um tem a própria escada de
+definição→exercício, independente dos outros — exatamente como a escada de
+desbloqueio já pressupunha. Tópico sem subtópico continua idêntico a
+sempre (o cartão não tem `s`, cai no recorte de tópico automaticamente).
 
 Os invariantes, que não podem ser afrouxados:
 
