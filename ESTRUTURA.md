@@ -65,6 +65,7 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 | `sw.js` | Service worker, rede-primeiro. `VERSAO` sobe a cada mudança no app |
 | `manifest.json`, `icone-*.png`, `apple-touch-icon.png` | PWA |
 | `validar.py` / `validar.ps1` | Integridade do banco. `--rascunho` valida candidato, `--patches` valida `eo`/`n`/`o`/`s`/`c`/`e`/`t`, nenhum dos dois grava |
+| `testar.js` + `testes/*.js` | Conduta do **motor** (Leitner, pré-requisito, nível, meta, fuso). `node testar.js [filtro]`; o `validar.py` roda sozinho |
 | `auditar-banco.py` / `.ps1` | Mede contra o `PADRAO-DOS-CARTOES.md`. Mede, não reprova |
 | `rascunho.json` | Cartões em elaboração, sem `id`. Vazio quando não há trabalho |
 | `explicacoes.json` | Patches por `id`: `eo`, `n`, `o`, `s`, `c`, `e` e/ou `t`. Vazio quando não há trabalho |
@@ -235,8 +236,25 @@ servidor **e login**, e é onde dá para verificar mudança de JS sem Supabase.
 Abrir `index.html` direto do disco não funciona: o banco é lido por `fetch`,
 bloqueado em `file://`.
 
-**Não há Node nesta máquina**, então `validar.py` não confere a sintaxe do
-JS: mudança em `index.html` só está verificada depois de rodar no navegador.
+### Testar o motor
+
+```bash
+node testar.js
+```
+
+```bash
+node testar.js requisito    # só os testes cujo nome casa com o filtro
+```
+
+`testar.js` lê o **próprio `index.html`**, extrai o bloco `<script>` e roda
+dentro de um `vm` do node com o mínimo de browser fingido — não existe cópia
+do motor que possa divergir do que vai pro ar. O banco entra por
+`window.DADOS`, o mesmo gancho do `offline.html`, então os testes correm
+contra `banco/*.json` de verdade. Um teste por invariante do `CLAUDE.md`, com
+o nome dizendo qual; os casos vivem em `testes/*.js`, um arquivo por assunto
+(datas, leitner, requisitos, meta, sessão).
+
+`validar.py` roda isso sozinho e **reprova o commit** se a conduta mudar.
 
 ---
 
@@ -247,5 +265,6 @@ JS: mudança em `index.html` só está verificada depois de rodar no navegador.
 | Posso mexer nisso? Por quê é assim? | `CLAUDE.md` (regras invioláveis) |
 | Como escrever um bom cartão? | `PADRAO-DOS-CARTOES.md` |
 | Onde fica a função X? | este arquivo |
+| O motor pode se comportar assim? | `testes/*.js` — a regra em forma executável |
 | O que fazer agora? | `.claude/commands/decidir.md` |
 | Como publicar? | `TUTORIAL.md` |

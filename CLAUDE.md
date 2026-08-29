@@ -90,7 +90,19 @@ no Safari do iPhone sem nenhuma etapa de compilação.
 3. **Rodar `validar.py` (ou `validar.ps1`) antes de qualquer commit.** Falha
    se houver questão malformada, duplicada, sem fonte ou com viés
    estatístico piorando (ver seção de viés, abaixo).
-4. **Não adicionar dependências externas nem CDN.**
+
+   **`validar.py` também roda `testar.js`, que é a conduta do MOTOR** —
+   Leitner, grafo de pré-requisito, escada de nível, meta do dia, fuso de
+   Brasília. Antes dele, nada disso tinha teste: o `node --check` só olhava
+   sintaxe, e cada invariante era verificado à mão, no navegador, uma vez.
+   **Mudou o comportamento do motor de propósito? O teste correspondente
+   muda junto, no mesmo commit** — nunca se apaga um teste para o commit
+   passar. Teste que ninguém consegue fazer falhar não protege nada: ao
+   escrever um caso novo, quebre o código de propósito e confirme que ele
+   acusa, antes de confiar nele.
+4. **Não adicionar dependências externas nem CDN.** Vale para `testar.js`
+   também: ele usa só o `node` que o `validar.py` já exigia, sem framework
+   de teste.
 5. **O `id` da questão é o SHA-1 do enunciado**, truncado em 10 hexadecimais,
    e é o que amarra o progresso salvo à questão. O validador confere que
    `id == sha1(q)`. Corrigir alternativas, explicação e fonte é livre — não

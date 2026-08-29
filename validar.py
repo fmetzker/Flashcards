@@ -481,6 +481,40 @@ def valida_js(fonte):
         os.unlink(tmp)
 
 
+def valida_motor():
+    """Roda testar.js — a CONDUTA do motor, não só a sintaxe.
+
+    Leitner, grafo de pré-requisito, escada de nível, meta do dia e fuso de
+    Brasília eram verificados só à mão, no navegador. Cada caso de testar.js
+    é uma regra do CLAUDE.md em forma executável; regra em prosa envelhece
+    calada, teste que falha não. Ele carrega o PRÓPRIO index.html dentro do
+    node (não há cópia do motor que possa divergir) e roda contra o banco
+    real de banco/*.json.
+    """
+    if not os.path.exists('testar.js'):
+        avisos.append("testar.js ausente: a conduta do motor NÃO foi conferida")
+        return
+    try:
+        r = subprocess.run(['node', 'testar.js'], capture_output=True, text=True,
+                           encoding='utf-8', errors='replace')
+    except FileNotFoundError:
+        avisos.append("node não encontrado: a conduta do motor NÃO foi conferida")
+        return
+    saida = ((r.stdout or '') + (r.stderr or '')).strip()
+    if r.returncode != 0:
+        # as linhas de falha do testar.js já dizem qual regra quebrou —
+        # repassar inteiras vale mais que um resumo
+        falhas = [l.strip() for l in saida.split('\n')
+                  if 'FALHOU' in l or l.strip().startswith('esperava')
+                  or l.strip().startswith('não ')]
+        erros.append("testar.js reprovou (a conduta do motor mudou):\n      "
+                     + "\n      ".join(falhas[:20] or [saida[-500:]]))
+        return
+    ultima = [l for l in saida.split('\n') if 'testes passaram' in l]
+    if ultima:
+        print("  " + ultima[-1].strip())
+
+
 def valida_questoes(B):
     v, ids = set(), set()
     for q in B:
@@ -924,6 +958,7 @@ def main():
         B = carrega_patches(B, alvo)
 
     valida_js(fonte)
+    valida_motor()
     ids = valida_questoes(B)
     valida_migracao(B, ids)
     valida_topicos(B, materias)
