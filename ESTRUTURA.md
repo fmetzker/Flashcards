@@ -151,7 +151,11 @@ Migrações que rodam no boot: `migrarSessaoDoPerfil`, `migrarEstadoDoPerfil`,
 `pintarReportes`, `pintarAprovar`.
 
 Auxiliares da tela Matérias: `resumoDoBanco` (agrega por matéria/tópico/
-subtópico **e por degrau**), `porTamanho`, `travaDoTopico`, `linhaNivel`,
+subtópico **e por degrau**, este último dos dois: `dt.graus` por tópico,
+`ds.graus` por subtópico), `porDesbloqueio`/`profundidadeTopico` e
+`porDesbloqueioSub`/`profundidadeSubtopico` (ordem de EXIBIÇÃO — sempre
+pela profundidade no grafo de pré-requisitos, nunca por tamanho/alfabeto,
+ver CLAUDE.md), `travaDoTopico`/`travaDoSubtopico`, `linhaNivel`,
 `miniBarra`.
 
 Simulado: `pintarSimuladoInicio`, `sorteia`, `iniciarSimulado`, `mostrarSim`,

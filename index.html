@@ -2516,10 +2516,6 @@ const abertas = {};
    "bloqueados" — chave é só o id da matéria, não precisa de tópico */
 const abaTopicos = {};
 
-/* ordena do maior para o menor, desempatando pelo nome */
-const porTamanho = mapa => Object.keys(mapa)
-  .sort((x,y)=> mapa[y].total - mapa[x].total || x.localeCompare(y,"pt"));
-
 /* Profundidade de um tópico no grafo de requisitos.json: 0 para quem não
    exige nada, e 1 + a maior profundidade entre o que ele exige, senão.
    É a mesma leitura de "quantos elos da corrente até a raiz" — quanto
@@ -2546,6 +2542,37 @@ function porDesbloqueio(mid, mapa){
   const memo = {};
   return Object.keys(mapa).sort((x,y)=>
     profundidadeTopico(mid, x, memo) - profundidadeTopico(mid, y, memo)
+    || mapa[y].total - mapa[x].total
+    || x.localeCompare(y,"pt")
+  );
+}
+
+/* mesma ideia de profundidadeTopico(), um nível mais fundo: profundidade de
+   um SUBTÓPICO no grafo de requisitos_subtopicos. Uma dependência de
+   subtópico é sempre {t,s} (nunca string solta — ver _forma_do_item em
+   requisitos.json), e pode apontar pra um subtópico de OUTRO tópico (ex.:
+   Trigonometria usa {Geometria,Triângulos) — por isso recebe mid+t+s
+   completos, não só s, e a recursão desce por dep.t/dep.s, não por `t`
+   fixo. */
+function profundidadeSubtopico(mid, t, s, memo){
+  const chave = mid+"|"+t+"|"+s;
+  if(chave in memo) return memo[chave];
+  memo[chave] = 0;
+  const deps = REQUISITOS_SUB[chave] || [];
+  const prof = deps.reduce((max, dep)=>
+    Math.max(max, 1 + profundidadeSubtopico(mid, dep.t, dep.s, memo)), 0);
+  memo[chave] = prof;
+  return prof;
+}
+
+/* ordena os subtópicos de UM tópico pela ordem em que a escada de
+   requisitos_subtopicos os libera — mesma regra de porDesbloqueio(), um
+   nível mais fundo. Tópico sem requisitos_subtopicos cai todo na
+   profundidade 0 e a ordem volta a ser só por tamanho. */
+function porDesbloqueioSub(mid, t, mapa){
+  const memo = {};
+  return Object.keys(mapa).sort((x,y)=>
+    profundidadeSubtopico(mid, t, x, memo) - profundidadeSubtopico(mid, t, y, memo)
     || mapa[y].total - mapa[x].total
     || x.localeCompare(y,"pt")
   );
@@ -2734,7 +2761,7 @@ function pintarMaterias(){
       grupo.appendChild(linha);
 
       const dentro = document.createElement("div"); dentro.className = "corpoT";
-      porTamanho(dt.subs).forEach(s=>{
+      porDesbloqueioSub(mid, t, dt.subs).forEach(s=>{
         dentro.appendChild(linhaNivel("subtopico", s, dt.subs[s], ev=>{
           ev.stopPropagation();
           iniciarSessao("filtro", {m:mid, t:t, s:s});

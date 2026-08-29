@@ -563,6 +563,17 @@ Os invariantes, que não podem ser afrouxados:
   edital e exige `fonte`; ordem de estudo é julgamento nosso, e nenhum edital
   diz de que tópico (ou subtópico) depende qual. Chamar de "fonte" fingiria
   autoridade que não existe — mesmo cuidado da regra 11.
+- **A tela sempre lista tópico e subtópico na ordem em que a escada os
+  libera, de cima pra baixo — nunca por tamanho, alfabeto ou ordem do
+  banco.** `porDesbloqueio()` (tópico) e `porDesbloqueioSub()` (subtópico,
+  um nível mais fundo, por tópico) ordenam pela profundidade no grafo de
+  pré-requisitos (`profundidadeTopico`/`profundidadeSubtopico`: raiz = 0,
+  cada elo soma 1) — quem abre primeiro aparece primeiro. Tamanho (maior
+  primeiro) só desempata dentro da mesma profundidade, e nome só desempata
+  o resto. Matéria/tópico sem grafo cai toda na profundidade 0 e a ordem
+  vira só tamanho, como sempre foi antes de ter requisito declarado — a
+  regra não exige escada nova em lugar nenhum, só manda a exibição seguir a
+  que já existe.
 
 `validar.py` barra grafia que não existe no banco, pré-requisito circular,
 tópico que exige a si mesmo, matéria em que nenhum tópico abriria, e nível
