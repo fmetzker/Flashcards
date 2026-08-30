@@ -124,6 +124,94 @@ module.exports = function (APP, t) {
     }
   });
 
+  t.grupo('ordem embaralhada — a ordem do arquivo não decide nada');
+
+  /* A tabuada é o caso real que motivou isto (relatado em uso): no arquivo
+     ela está em sequência — 3x2, 3x3, 3x4... — e estudar nessa ordem deixa
+     responder somando o anterior em vez de lembrar, que é o oposto de
+     recordação ativa. Ver cmpId() no motor.js. */
+  const tabuada = () => APP.BANCO.filter(q => q.s === 'Multiplicação');
+  const limpar = () => { APP.E.cartoes = {}; APP.limparCacheGrau(); };
+
+  t.teste('cartão novo sai ordenado por id, não pela ordem do arquivo', async () => {
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const noArquivo = tabuada().map(q => q.id);
+    const naFila = APP.fila().novas.filter(id => APP.porId[id].s === 'Multiplicação');
+    t.ok(naFila.length >= 10, 'preciso da tabuada aberta para testar');
+    t.igual(naFila, [...naFila].sort(APP.cmpId), 'cartão novo devia sair ordenado por id');
+    t.naoIgual(naFila, noArquivo.slice(0, naFila.length), 'saiu na ordem do arquivo');
+  });
+
+  t.teste('a tabuada não sai em sequência numérica', async () => {
+    /* O teste que fala a língua do problema: não importa por qual regra,
+       importa que 3x2, 3x3, 3x4 não venham em fila. */
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const chave = q => { const m = q.q.match(/(\d+) × (\d+)/); return m ? +m[1] * 10 + +m[2] : 0; };
+    const nums = APP.fila().novas.map(id => APP.porId[id])
+      .filter(q => q.s === 'Multiplicação').map(chave);
+    t.ok(nums.length >= 10, 'preciso da tabuada');
+    t.ok(!nums.every((v, i) => i === 0 || v > nums[i - 1]),
+      'a tabuada saiu em sequência crescente — dá para responder somando o anterior');
+  });
+
+  t.teste('revisão com prioridade empatada desempata por id', async () => {
+    /* Empate é o caso COMUM, não a exceção: todo cartão de mesma caixa, sem
+       histórico de erro, do mesmo bloco, dá exatamente o mesmo número — e
+       sort estável devolvia a ordem do arquivo. */
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const dez = tabuada().slice(0, 10);
+    dez.forEach(q => { APP.E.cartoes[q.id] = { caixa: 1, acertos: 0, erros: 1, prox: APP.hoje() }; });
+    APP.limparCacheGrau();
+    const rev = APP.fila().revisar;
+    t.igual(new Set(rev.map(id => APP.prioridade(id))).size, 1,
+      'o caso só testa o que quero se as prioridades empatarem');
+    t.igual(rev, [...rev].sort(APP.cmpId), 'empate devia sair ordenado por id');
+    t.naoIgual(rev, dez.map(q => q.id), 'saiu na ordem do arquivo');
+    limpar();
+  });
+
+  t.teste('o desempate por id NÃO atropela prioridade()', async () => {
+    /* O id é o ÚLTIMO critério, nunca o primeiro: caixa 1 quer dizer "errei
+       na revisão mais recente", e nada pode passar na frente disso. */
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const ids = tabuada().map(q => q.id).sort(APP.cmpId);
+    const menor = ids[0], maior = ids[ids.length - 1];
+    APP.E.cartoes[menor] = { caixa: 3, acertos: 3, erros: 0, prox: APP.hoje() };
+    APP.E.cartoes[maior] = { caixa: 1, acertos: 0, erros: 1, prox: APP.hoje() };
+    APP.limparCacheGrau();
+    t.igual(APP.fila().revisar, [maior, menor],
+      'caixa 1 tem que vir antes da caixa 3, mesmo tendo o id maior');
+    limpar();
+  });
+
+  t.teste('a ordem é a mesma em toda chamada — sem sorteio', async () => {
+    /* fila() roda de novo a cada reabastecimento da sessão: com Math.random()
+       a ordem mudaria no meio dela, e nenhum teste conseguiria travá-la. */
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    t.igual(APP.fila().novas, APP.fila().novas, 'duas chamadas deram ordens diferentes');
+  });
+
+  t.teste('o modo filtro embaralha igual', async () => {
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const lote = APP.montarLoteSessao('filtro',
+      { m: 'matematica', t: 'Aritmética', s: 'Multiplicação' }, new Set());
+    t.ok(lote.length >= 10, 'preciso de cartões');
+    t.igual(lote, [...lote].sort(APP.cmpId), 'o modo filtro saiu fora da ordem por id');
+    t.naoIgual(lote, tabuada().slice(0, lote.length).map(q => q.id), 'saiu na ordem do arquivo');
+  });
+
+  t.teste('o modo erros embaralha igual', async () => {
+    /* Ali a ordem acidental é outra: a de inserção em E.cartoes. */
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const oito = tabuada().slice(0, 8);
+    oito.forEach(q => { APP.E.cartoes[q.id] = { caixa: 1, acertos: 0, erros: 2, prox: APP.hoje() }; });
+    APP.limparCacheGrau();
+    const lote = APP.montarLoteSessao('erros', null, new Set());
+    t.igual(lote, [...lote].sort(APP.cmpId), 'o modo erros saiu na ordem de inserção no E');
+    t.naoIgual(lote, oito.map(q => q.id), 'saiu na ordem do arquivo');
+    limpar();
+  });
+
   t.grupo('repetição do cartão errado');
 
   function sessaoFalsa(modo) {

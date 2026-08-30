@@ -437,6 +437,24 @@ function prioridade(id){
   return c.caixa - erro * 0.6 - peso * 0.3;
 }
 
+/* A ORDEM DO ARQUIVO NUNCA DECIDE NADA. Onde nenhum critério pedagógico
+   distingue dois cartões, quem desempata é o id — e isso é um embaralhamento
+   de graça: o id é o SHA-1 do enunciado truncado (regra 5), ou seja, um valor
+   uniformemente aleatório sem relação nenhuma com o conteúdo do cartão nem
+   com a posição dele no arquivo. Ordenar por id É embaralhar.
+
+   Determinístico de propósito, em vez de Math.random(): fila() roda de novo a
+   cada reabastecimento da sessão, então com sorteio a ordem mudaria no meio
+   dela e nenhum teste conseguiria travar o comportamento. Sem semente, sem
+   estado, igual para todo mundo.
+
+   Isto NÃO é um segundo critério pedagógico por cima do que já existe — é o
+   contrário: tira de cena um critério acidental (a ordem em que os cartões
+   foram escritos no arquivo), que estava decidindo coisa que ninguém pediu.
+   Sem ele, a tabuada saía 3x2, 3x3, 3x4... e dava pra responder somando o
+   anterior em vez de lembrar. */
+function cmpId(a, b){ return a < b ? -1 : a > b ? 1 : 0; }
+
 function fila(){
   const h = hoje();
   limparCacheGrau();
@@ -448,12 +466,18 @@ function fila(){
     if(!c){ if(grauAberto(q)) novas.push(q.id); }
     else if(c.prox <= h) revisar.push(q.id);
   });
-  revisar.sort((a,b)=> prioridade(a) - prioridade(b));
-  /* `novas` NÃO é reordenada: sai na ordem do arquivo do banco. A ordem
-     pedagógica já foi imposta pelo filtro acima — o cartão só chega aqui se
-     o tópico dele estiver aberto E o degrau dele alcançado. Ordenar de novo
-     por um segundo critério de "nível" foi o que criou a incoerência que
-     motivou a remoção das camadas entre tópicos. */
+  /* prioridade() continua mandando na revisão; o id só entra quando ela
+     empata — e empata muito: todo cartão de mesma caixa, sem histórico de
+     erro, do mesmo bloco, dá exatamente o mesmo número. */
+  revisar.sort((a,b)=> prioridade(a) - prioridade(b) || cmpId(a,b));
+  /* `novas` não tem critério nenhum acima do id: a ordem pedagógica já foi
+     imposta pelo filtro acima — o cartão só chega aqui se o tópico dele
+     estiver aberto E o degrau dele alcançado, e dentro de um mesmo recorte
+     aberto todos os cartões novos são do mesmo degrau. Ordenar por um
+     segundo critério de "nível" foi o que criou a incoerência que motivou a
+     remoção das camadas entre tópicos; o id não é critério, é a ausência
+     deliberada de um. */
+  novas.sort(cmpId);
   return {revisar, novas};
 }
 
@@ -651,7 +675,9 @@ function montarLoteSessao(modo, filtro, excluir){
   const q = fila();
   let lista = [];
   if(modo==="erros"){
-    lista = Object.keys(E.cartoes).filter(id=>porId[id] && E.cartoes[id].caixa<=2 && E.cartoes[id].erros>0 && !excluir.has(id));
+    /* sem sort por id, isto sairia na ordem em que os cartões entraram no
+       E.cartoes — outra ordem acidental, ver cmpId() */
+    lista = Object.keys(E.cartoes).filter(id=>porId[id] && E.cartoes[id].caixa<=2 && E.cartoes[id].erros>0 && !excluir.has(id)).sort(cmpId);
   } else if(modo==="filtro"){
     /* uma matéria ou um tópico isolado: vale a mesma ordem do estudo normal —
        o que está vencido primeiro, depois o que nunca foi visto */
@@ -669,7 +695,8 @@ function montarLoteSessao(modo, filtro, excluir){
       if(!c){ if(grauAberto(x)) nov.push(x.id); }
       else if(c.prox <= h) rev.push(x.id);
     });
-    rev.sort((a,b)=> prioridade(a) - prioridade(b));   // mesma ordem do estudo normal
+    rev.sort((a,b)=> prioridade(a) - prioridade(b) || cmpId(a,b));   // mesma ordem do estudo normal
+    nov.sort(cmpId);
     lista = intercalar(rev, nov).slice(0, E.meta);
   } else {
     /* Monta a sessão RESPEITANDO A COTA DE CADA BLOCO DA META — a união dos

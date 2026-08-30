@@ -775,6 +775,27 @@ para o desconto somado ficar **abaixo de 1** — erro e peso ordenam *dentro*
 da caixa e nunca atravessam a fronteira dela, porque caixa 1 ("errei na
 revisão mais recente") é o sinal mais forte que existe.
 
+**A ordem do arquivo nunca decide nada.** Onde nenhum critério pedagógico
+distingue dois cartões, quem desempata é o `id` — e isso é um embaralhamento
+de graça: o `id` é o SHA-1 do enunciado truncado (regra 5), ou seja, um valor
+uniformemente aleatório sem relação com o conteúdo do cartão nem com a
+posição dele no arquivo. **Ordenar por `id` é embaralhar** (`cmpId()`), e vale
+nos quatro lugares em que uma ordem acidental estava decidindo: `novas` e o
+desempate de `revisar` em `fila()`, e os modos `"filtro"` e `"erros"` de
+`montarLoteSessao()`. Sem isso a tabuada saía 3×2, 3×3, 3×4… — dava para
+responder somando o anterior em vez de lembrar, o oposto de recordação ativa,
+e valia tanto para cartão novo (ordem do arquivo) quanto para revisão (a
+`prioridade()` empata em todo cartão de mesma caixa, sem erro, do mesmo
+bloco, e `sort` estável devolvia o arquivo de novo).
+
+Duas coisas que isso **não** é. Não é critério pedagógico novo por cima dos
+que existem: é o contrário, tira de cena um critério acidental que ninguém
+escolheu — o `id` é o ÚLTIMO desempate, nunca passa na frente de
+`prioridade()`. E não é sorteio: `fila()` roda de novo a cada reabastecimento
+da sessão, então com `Math.random()` a ordem mudaria no meio dela e nenhum
+teste conseguiria travá-la. O simulado é o único que sorteia de verdade
+(`sorteia()`, Fisher–Yates), porque ali cada prova tem que ser diferente.
+
 **O dia sempre vira no fuso de Brasília, nunca no fuso do aparelho.**
 `hoje()` usa `Intl.DateTimeFormat` com `timeZone:"America/Sao_Paulo"` fixo —
 não um offset `-3` na unha. Qualquer soma ou comparação de data usa

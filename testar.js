@@ -52,7 +52,7 @@ const GLOBAIS_CONST = [
 /* As funções puras do motor — nenhuma toca DOM nem localStorage. */
 const FUNCOES = [
   'hoje', 'diaUTC', 'somarDias', 'proximaData', 'diasAteMaisProxima',
-  'prioridade', 'fila', 'intercalar',
+  'prioridade', 'fila', 'intercalar', 'cmpId',
   'indexarRequisitos', 'topicoAberto', 'subtopicoAberto',
   'requisitosPendentes', 'requisitosPendentesSub', 'baseDominada',
   'grauDe', 'grauLiberado', 'grauAberto', 'menorGrauExistente', 'limparCacheGrau',

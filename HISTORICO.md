@@ -164,6 +164,30 @@ desbloqueio. A tela mostrava uma ordem e a escada seguia outra.
 
 ## Sessão de estudo
 
+**A tabuada saía em ordem — e a revisão também.** Relatado em uso: "em
+Multiplicação, a tabuada vem em ordem". Vinha mesmo — 3×2, 3×3, 3×4… —, e
+estudar assim deixa responder somando o anterior em vez de lembrar, o oposto
+da recordação ativa que o `PADRAO-DOS-CARTOES.md` pede. Cartão novo saía na
+ordem do arquivo, e isso estava até documentado como decisão ("`novas` NÃO é
+reordenada"). O que ninguém sabia é que a **revisão** saía igual:
+`prioridade()` devolve exatamente o mesmo número para todo cartão de mesma
+caixa, sem histórico de erro, do mesmo bloco — e `sort` estável devolvia a
+ordem do arquivo de volta. A tabuada voltava em sequência nas duas filas.
+
+A correção não precisou de gerador de aleatório: o `id` do cartão já é o
+SHA-1 do enunciado truncado (regra 5), ou seja, um valor uniformemente
+aleatório e sem relação nenhuma com o conteúdo ou com a posição no arquivo.
+Ordenar por `id` É embaralhar, de graça e sem estado. Virou regra geral — *a
+ordem do arquivo nunca decide nada* — aplicada nos quatro pontos em que uma
+ordem acidental mandava: `novas` e o desempate de `revisar` em `fila()`, e os
+modos `"filtro"` e `"erros"` de `montarLoteSessao()` (neste último a ordem
+acidental era outra, a de inserção em `E.cartoes`).
+
+Determinístico de propósito: `fila()` roda de novo a cada reabastecimento da
+sessão, então `Math.random()` mudaria a ordem no meio dela e nenhum teste
+conseguiria travar o comportamento. O simulado continua sorteando de verdade
+(`sorteia()`), porque ali cada prova precisa ser diferente.
+
 **A sessão fechava ao fim do lote.** Era uma lista fixa: acabou, voltou para o
 Início. Virou contínua em agosto/2026 — reabastece com o mesmo motor e só
 termina quando não há mais nada para estudar hoje.
