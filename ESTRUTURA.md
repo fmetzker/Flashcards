@@ -91,7 +91,7 @@ falham fechado.
 | Script | Entrada | Escreve | Uso |
 |---|---|---|---|
 | `incorporar-rascunho.ps1` | `rascunho.json` | cartão novo inteiro | cartão escrito à mão |
-| `explicar-alternativas.ps1` | `explicacoes.json` | `eo`, `n`, `o`, `s`, `c`, `e`, `t` e/ou `f` por `id` | campo em cartão que já existe |
+| `explicar-alternativas.ps1` | `explicacoes.json`, ou `-DoSupabase` (caixa `correcoes`) | `eo`, `n`, `o`, `s`, `c`, `e`, `t` e/ou `f` por `id` | campo em cartão que já existe |
 | `incorporar-propostas.ps1` | Supabase | cartão novo inteiro | caixa de entrada colaborativa |
 | `reescrever-questoes.ps1` | — | `q` + `banco/reescritas.json` | único jeito de mudar enunciado |
 

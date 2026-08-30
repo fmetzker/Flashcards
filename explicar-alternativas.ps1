@@ -19,6 +19,15 @@
 #   .\explicar-alternativas.ps1 -DryRun     mostra o que faria, não grava
 #   .\explicar-alternativas.ps1             grava, se o validador passar
 #   .\explicar-alternativas.ps1 -Arquivo outro.json
+#   .\explicar-alternativas.ps1 -DoSupabase puxa as correções APROVADAS na
+#       caixa de entrada do app (tabela `correcoes`, schema.sql 8.5), escreve
+#       em explicacoes.json e segue pelo caminho normal. Pede a chave SECRETA,
+#       igual ao incorporar-propostas.ps1, e marca `incorporada_em` no fim.
+#
+#       Antes de aceitar cada uma, confere o `antes` que o editor guardou
+#       contra o banco de HOJE: campo que mudou no meio do caminho é recusado
+#       e segue pendente no servidor, em vez de desfazer em silêncio o que
+#       outra pessoa corrigiu.
 #
 # Formato de explicacoes.json: array de {id, ...}, com um ou mais destes:
 #   eo  array do mesmo tamanho de 'o' (string vazia pula a posição).
@@ -57,6 +66,7 @@
 
 param(
   [switch]$DryRun,
+  [switch]$DoSupabase,
   [string]$Arquivo = 'explicacoes.json'
 )
 
@@ -65,6 +75,101 @@ $raiz = $PSScriptRoot
 $dir  = Join-Path $raiz 'banco'
 
 $arqP = if ([System.IO.Path]::IsPathRooted($Arquivo)) { $Arquivo } else { Join-Path $raiz $Arquivo }
+
+# ---- 0. -DoSupabase: puxa as correcoes aprovadas e monta o arquivo de patches ----
+#
+# So monta o ARQUIVO; dai pra frente o caminho e o mesmo de sempre (validador,
+# gravacao, esvaziar). Reaproveitar em vez de duplicar e o que mantem uma
+# unica porta de escrita — a regra 9 segue com tres scripts.
+$idsCorrecao = @()
+if ($DoSupabase) {
+  $supaJson = Join-Path $raiz 'supabase.json'
+  if (-not (Test-Path $supaJson)) { throw "supabase.json nao encontrado" }
+  $supa = Get-Content $supaJson -Raw | ConvertFrom-Json
+  if (-not $supa.url -or $supa.url -like '*SEU-PROJETO*') {
+    throw "supabase.json ainda nao tem a URL de verdade"
+  }
+
+  $chave = $env:SUPABASE_SERVICE_ROLE
+  if (-not $chave) {
+    $segura = Read-Host "Cole a chave SECRETA do Supabase (sb_secret_...)" -AsSecureString
+    $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($segura)
+    $chave = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
+    [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
+  }
+  if ($chave -notlike 'sb_secret_*') {
+    throw "isso nao parece a chave secreta (sb_secret_...) — confira se nao colou a publica"
+  }
+  $headers = @{ apikey = $chave; Authorization = "Bearer $chave" }
+
+  $url = $supa.url.TrimEnd('/') + '/rest/v1/correcoes?status=eq.aprovada&incorporada_em=is.null&select=*'
+  $correcoes = @(Invoke-RestMethod -Uri $url -Headers $headers -Method Get)
+  if ($correcoes.Count -eq 0) {
+    Write-Host "Nenhuma correcao aprovada pendente de incorporacao."
+    exit 0
+  }
+  Write-Host "$($correcoes.Count) correcao(oes) aprovada(s) para incorporar.`n"
+
+  # indice id -> cartao, pra conferir o `antes` contra o banco de HOJE
+  $porIdBanco = @{}
+  foreach ($m in (Get-Content (Join-Path $dir 'materias.json') -Raw | ConvertFrom-Json)) {
+    $arqM = Join-Path $dir "$($m.id).json"
+    if (-not (Test-Path $arqM)) { continue }
+    foreach ($q in (Get-Content $arqM -Raw | ConvertFrom-Json)) { $porIdBanco[$q.id] = $q }
+  }
+
+  # Compara por JSON compacto: cobre array ('o', 'eo') e escalar do mesmo
+  # jeito, sem uma regra por tipo.
+  function Mesmo-Valor($a, $b) {
+    $ja = if ($null -eq $a) { 'null' } else { $a | ConvertTo-Json -Compress -Depth 5 }
+    $jb = if ($null -eq $b) { 'null' } else { $b | ConvertTo-Json -Compress -Depth 5 }
+    return $ja -eq $jb
+  }
+
+  $aceitos = @(); $recusados = 0
+  foreach ($cor in $correcoes) {
+    $q = $porIdBanco[$cor.questao_id]
+    if (-not $q) {
+      Write-Host "  PULANDO [$($cor.questao_id)]: id nao existe no banco atual (removido, ou enunciado reescrito)" -ForegroundColor Yellow
+      $recusados++; continue
+    }
+
+    # DERIVA: o `antes` guardado na edicao tem de bater com o banco de agora.
+    # Se nao bate, alguem mexeu no cartao no meio do caminho e aplicar por cima
+    # desfaria aquilo em silencio — recusa e deixa pra decisao humana.
+    $divergiu = $null
+    foreach ($campo in $cor.antes.PSObject.Properties.Name) {
+      $atual = if ($q.PSObject.Properties.Name -contains $campo) { $q.$campo } else { $null }
+      # 's' e 'n' ausentes no cartao valem "" e null, como o editor registrou
+      if ($campo -eq 's' -and $null -eq $atual) { $atual = '' }
+      if (-not (Mesmo-Valor $atual $cor.antes.$campo)) { $divergiu = $campo; break }
+    }
+    if ($divergiu) {
+      Write-Host "  PULANDO [$($cor.questao_id)]: o campo '$divergiu' mudou no banco desde a correcao" -ForegroundColor Yellow
+      Write-Host "     esperado: $($cor.antes.$divergiu | ConvertTo-Json -Compress -Depth 5)"
+      Write-Host "     no banco: $((if ($q.PSObject.Properties.Name -contains $divergiu) { $q.$divergiu } else { $null }) | ConvertTo-Json -Compress -Depth 5)"
+      $recusados++; continue
+    }
+
+    $aceitos += $cor.patch
+    $idsCorrecao += $cor.id
+  }
+
+  if ($aceitos.Count -eq 0) {
+    Write-Host "`nNenhuma correcao aplicavel ($recusados recusada(s) por divergencia). Nada gravado."
+    exit 1
+  }
+  if ($recusados -gt 0) {
+    Write-Host "`n$recusados correcao(oes) recusada(s) por divergencia — seguem pendentes no servidor.`n"
+  }
+
+  # grava no arquivo de patches e segue pelo caminho normal
+  $json = if ($aceitos.Count -eq 1) { "[`n" + ($aceitos[0] | ConvertTo-Json -Compress -Depth 5) + "`n]" }
+          else { $aceitos | ConvertTo-Json -Depth 5 }
+  [System.IO.File]::WriteAllText($arqP, $json + "`n", (New-Object System.Text.UTF8Encoding $false))
+  Write-Host "$($aceitos.Count) correcao(oes) escrita(s) em $Arquivo.`n"
+}
+
 if (-not (Test-Path $arqP)) { throw "patches não encontrado: $arqP" }
 
 $raw = [System.IO.File]::ReadAllText($arqP, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
@@ -188,4 +293,24 @@ Write-Host "`n$alterados cartão(ões) alterado(s)."
 # esvazia o arquivo de trabalho: o que foi incorporado não pode ser incorporado de novo
 [System.IO.File]::WriteAllText($arqP, "[`n]`n", (New-Object System.Text.UTF8Encoding $false))
 Write-Host "$Arquivo esvaziado."
+
+# marca no servidor o que ja virou cartao — sem isso a proxima execucao
+# puxaria as mesmas correcoes de novo. So depois de gravar de verdade: se a
+# gravacao tivesse falhado, elas precisam continuar pendentes.
+if ($DoSupabase -and $idsCorrecao.Count -gt 0) {
+  $agora = (Get-Date).ToUniversalTime().ToString('o')
+  $marcados = 0
+  foreach ($idc in $idsCorrecao) {
+    $u = $supa.url.TrimEnd('/') + "/rest/v1/correcoes?id=eq.$idc"
+    try {
+      Invoke-RestMethod -Uri $u -Headers ($headers + @{ 'Content-Type' = 'application/json'; Prefer = 'return=minimal' }) `
+        -Method Patch -Body (@{ incorporada_em = $agora } | ConvertTo-Json -Compress) | Out-Null
+      $marcados++
+    } catch {
+      Write-Host "  AVISO: nao consegui marcar a correcao $idc como incorporada: $($_.Exception.Message)" -ForegroundColor Yellow
+    }
+  }
+  Write-Host "$marcados correcao(oes) marcada(s) como incorporada(s) no servidor."
+}
+
 Write-Host "Falta, à mão: validar.ps1, gerar-offline.ps1, VERSAO no sw.js, commit."
