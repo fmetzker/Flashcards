@@ -43,9 +43,10 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 
 | Eixo | Onde | Efeito |
 |---|---|---|
-| `t` / `s` | no cartão | agrupa por assunto; `s` também pode ser alvo de `requisitos`/`requisitos_subtopicos` |
-| `requisitos` | `banco/requisitos.json` | **trava** tópico até a base do exigido (tópico inteiro ou só um `{t,s}`) estar dominada |
-| `requisitos_subtopicos` | `banco/requisitos.json` | **trava** subtópico até a base do exigido (sempre `{t,s}`) estar dominada — um nível mais fundo que `requisitos`, dentro de um tópico grande |
+| `t` / `s` | no cartão | agrupa por assunto; `s` também é o item da fila em `requisitos_subtopicos`, e o alvo `{t,s}` de `requisitos_conceituais` |
+| `requisitos` | `banco/requisitos.json` | a FILA de tópicos (corrente linear): **trava** cada tópico até a base do ANTERIOR da fila estar dominada — abre um por vez |
+| `requisitos_subtopicos` | `banco/requisitos.json` | a mesma fila um nível mais fundo, dentro de um tópico grande: **trava** cada subtópico (sempre `{t,s}`) até a base do anterior estar dominada |
+| `requisitos_conceituais` (+`_subtopicos`) | `banco/requisitos.json` | **não trava nada** — o grafo de dependência real, contra o qual `validar.py` prova que a fila não contraria o conteúdo |
 | `n` | no cartão | **trava** degrau dentro do tópico |
 
 ---
@@ -60,7 +61,7 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 | `banco/materias.json` | Lista de matérias, na ordem de exibição |
 | `banco/<matéria>.json` | Questões daquela matéria, uma por linha |
 | `banco/topicos.json` | Árvore oficial do edital — mostra tópico que a prova cobra e o banco não cobre |
-| `banco/requisitos.json` | Pré-requisitos entre tópicos e entre subtópicos — **travam** cartão novo até a base do exigido |
+| `banco/requisitos.json` | A fila de estudo (tópico e subtópico) — **trava** cartão novo até a base do anterior da fila; mais o grafo conceitual que a justifica |
 | `banco/indice-legado.json` | Ids na ordem antiga do array — migra progresso pré-id estável |
 | `banco/reescritas.json` | Mapa id antigo→novo de enunciados corrigidos — preserva progresso |
 | `sw.js` | Service worker, rede-primeiro. `VERSAO` sobe a cada mudança no app |
@@ -168,7 +169,7 @@ Auxiliares da tela Matérias: `resumoDoBanco` (agrega por matéria/tópico/
 subtópico **e por degrau**, este último dos dois: `dt.graus` por tópico,
 `ds.graus` por subtópico), `porDesbloqueio`/`profundidadeTopico` e
 `porDesbloqueioSub`/`profundidadeSubtopico` (ordem de EXIBIÇÃO — sempre
-pela profundidade no grafo de pré-requisitos, nunca por tamanho/alfabeto,
+pela profundidade na fila de pré-requisitos, nunca por tamanho/alfabeto,
 ver CLAUDE.md), `travaDoTopico`/`travaDoSubtopico`, `linhaNivel`,
 `miniBarra`.
 

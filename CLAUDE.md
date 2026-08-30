@@ -595,51 +595,62 @@ primeiro.
 
 ## Ordem de aprendizado
 
-**Entender o conceito antes de exercitar.** É o único princípio, e ele se
-realiza por três mecanismos, os três de bloqueio — não existe nenhum
-mecanismo que apenas *ordene*:
+**Entender o conceito antes de exercitar, e um assunto de cada vez.** São
+dois princípios, e eles se realizam por três mecanismos, os três de bloqueio
+— não existe nenhum mecanismo que apenas *ordene*:
 
 | | onde vive | o que trava |
 |---|---|---|
-| **pré-requisito** entre tópicos | `banco/requisitos.json` → `requisitos` | o tópico, até a base do exigido estar dominada |
-| **pré-requisito** entre subtópicos | `banco/requisitos.json` → `requisitos_subtopicos` | o subtópico, até a base do exigido estar dominada |
+| **fila** de tópicos | `banco/requisitos.json` → `requisitos` | o tópico, até a base do anterior da fila estar dominada |
+| **fila** de subtópicos | `banco/requisitos.json` → `requisitos_subtopicos` | o subtópico, até a base do anterior estar dominada |
 | **nível do cartão** dentro do tópico | campo `n` | o degrau, até o anterior estar acertado |
 
 Os três são opcionais: sem eles, nada trava. Formato e mecânica em
 `ESTRUTURA.md`.
 
-**Pré-requisito de tópico pode apontar para um subtópico do exigido, não só
-para o tópico inteiro.** Uma entrada de `requisitos` é uma lista onde cada
-item é uma string (tópico inteiro, como sempre foi) ou um objeto
-`{"t":"Tópico", "s":"Subtópico"}` (só aquele subtópico). Existe para o caso
-em que só uma fatia do tópico exigido é base de verdade — ex.: para abrir
-"Flexão verbal" não é preciso dominar Classes de palavras inteira, só o
-subtópico Verbo dela. Isso **não** cria uma segunda escada: o subtópico aqui
-é só o alvo do pré-requisito, e a trava continua sendo do tópico inteiro que
-o declara — o que muda é a granularidade do que precisa estar pronto do lado
-exigido, não como o lado exigente é travado.
+**`requisitos` é uma FILA, não um grafo: uma corrente linear em que cada
+tópico exige exatamente o anterior, pelo nome inteiro.** É o que faz abrir
+**um tópico por vez**. Enquanto foi grafo, tópico abria em leque — Classes
+de palavras destrava 9 em Português, Anatomia e Fisiologia abria 7 de
+Enfermagem com 11 cartões estudados, Aritmética abria 5 de Matemática — e
+uma dependência por subtópico podia custar um cartão só (`HISTORICO.md`).
+Nenhuma linha de código mudou para isso: com uma corrente,
+`profundidadeTopico()` devolve 0,1,2,3… e `porDesbloqueio()` já pinta a tela
+Matérias exatamente na ordem da fila.
 
-**Pré-requisito entre subtópicos afina o lado que TRAVA, não só o exigido —
-para tópico grande e heterogêneo o suficiente pra merecer ordem interna.**
-Aritmética (16 subtópicos que não têm nada a ver entre si — Frações,
-Progressões, Sistema de unidades de medida...) é o primeiro caso: abrir
-tudo de uma vez, no dia em que a matéria libera, não ensina em ordem
-nenhuma, e o campo `n` não resolve isso porque gradua definição→exercício
-DENTRO do mesmo fato, não sequencia subtópicos irmãos entre si. Chave
-`requisitos_subtopicos` em `banco/requisitos.json`, formato `"Tópico|Subtópico":
-[{"t":..,"s":..}, ...]` — cada dependência é **sempre** `{t,s}`, nunca string
-solta (dentro de uma chave de subtópico, string ambiguaria entre "o tópico X
-inteiro" e "o subtópico X deste mesmo tópico"). Um subtópico só abre se o
-TÓPICO dele já estiver aberto — a trava de subtópico é uma camada A MAIS,
-nunca um atalho que pule a de tópico — e tópico sem nenhuma entrada aqui
-continua com todos os subtópicos abertos assim que ele mesmo abrir: é
-opcional em cima de opcional. Exige `criterio_subtopicos` pela mesma razão
-de `criterio` — é julgamento pedagógico nosso, não transcrição de edital.
+**O grafo de dependência de conceito continua existindo, em
+`requisitos_conceituais` — e o motor não o lê.** Ele registra o que pressupõe
+o que de verdade, com `criterio_conceitual` dizendo por que cada aresta
+existe, e serve de PROVA: `validar.py` confere que a fila **nunca contraria o
+grafo** — nenhum tópico pode vir na fila antes de algo que ele conceitualmente
+exige. Sem essa checagem a fila seria opinião solta; com ela, é uma ordem de
+ensino provadamente compatível com a dependência declarada. Matéria sem a
+chave é matéria cuja fila é ordem de ensino pura, sem dependência de conceito
+nenhuma entre os tópicos (`enfermagem-trabalho`, `maritimo-maquinas`).
+
+**A forma `{"t":"Tópico", "s":"Subtópico"}` só vale no grafo conceitual.**
+Ela registra que só uma fatia do exigido é base de verdade — para "Flexão
+verbal" não é preciso Classes de palavras inteira, só o subtópico Verbo dela.
+Na fila, nunca: item de fila é sempre o nome do tópico anterior, inteiro.
+
+**A fila de subtópicos é a mesma ideia um nível mais fundo**, para tópico
+grande e heterogêneo o suficiente pra merecer ordem interna (Aritmética tem
+17 subtópicos que não têm nada a ver entre si — Frações, Progressões, Sistema
+de unidades de medida...), e o campo `n` não resolve isso porque gradua
+definição→exercício DENTRO do mesmo fato, não sequencia subtópicos irmãos
+entre si. Formato `"Tópico|Subtópico": [{"t":..,"s":..}]` — a dependência é
+**sempre** `{t,s}`, nunca string solta (dentro de uma chave de subtópico,
+string ambiguaria entre "o tópico X inteiro" e "o subtópico X deste mesmo
+tópico"). Um subtópico só abre se o TÓPICO dele já estiver aberto — a trava
+de subtópico é uma camada A MAIS, nunca um atalho que pule a de tópico — e
+tópico sem nenhuma entrada aqui continua com todos os subtópicos abertos
+assim que ele mesmo abrir: é opcional em cima de opcional. A ordem pedagógica
+de onde essa fila saiu (subtópicos irmãos em **ondas**) fica registrada em
+`requisitos_conceituais_subtopicos`, conferida contra a fila do mesmo jeito.
 
 **Não existe nível ENTRE tópicos. Nível é uma noção só.** Quem decide o que
-abre é o grafo de pré-requisitos; qualquer camada por cima dele é rótulo
-decorativo que a tela anuncia e o motor contradiz. Já existiu uma, e foi
-removida (`HISTORICO.md`).
+abre é a fila; qualquer camada por cima dela é rótulo decorativo que a tela
+anuncia e o motor contradiz. Já existiu uma, e foi removida (`HISTORICO.md`).
 
 **Nível (`n`) de cartão com subtópico é avaliado DENTRO DO SUBTÓPICO, nunca
 do tópico inteiro.** `grauLiberado`/`grauAberto` escalam pelo recorte mais
@@ -649,7 +660,7 @@ O motivo é mecânico: medir pelo tópico inteiro soma cartão de todo subtópic
 inclusive os ainda FECHADOS — e cartão fechado é inacessível, logo impossível
 de dominar. O degrau nunca sobe e a escada trava inteira (foi um bug real,
 `HISTORICO.md`). Por subtópico, cada um tem a própria escada
-definição→exercício, como a escada de desbloqueio já pressupunha. Tópico sem
+definição→exercício, como a fila de desbloqueio já pressupunha. Tópico sem
 subtópico cai no recorte de tópico automaticamente.
 
 Os invariantes, que não podem ser afrouxados:
@@ -660,56 +671,64 @@ Os invariantes, que não podem ser afrouxados:
 - **Cartão sem `n` vale 1, e o degrau 1 nunca trava.** Enquanto o banco não
   estiver todo classificado, ligar o recurso não pode trancar o que ninguém
   classificou.
-- **Sempre existe tópico sem pré-requisito** — o validador reprova se não
-  houver nenhum. A trava não pode deixar a pessoa sem nada para estudar. Vale
-  também por subtópico: todo tópico que declara `requisitos_subtopicos` para
-  algum dos seus subtópicos precisa deixar pelo menos um subtópico dele sem
-  requisito — senão o tópico abre e nenhum subtópico dele nunca abriria.
+- **A fila tem exatamente um começo, e alcança todos os tópicos do banco.**
+  O começo é o que a pessoa vê no primeiro dia — a trava não pode deixar
+  ninguém sem nada para estudar —, e tópico fora da fila nunca abriria. Vale
+  também por subtópico: todo tópico que declara `requisitos_subtopicos`
+  precisa deixar exatamente um subtópico sem requisito e alcançar todos os
+  outros.
+- **Abre no máximo UM tópico por vez.** É o que a fila existe para garantir,
+  e `testes/requisitos.js` confere pelo comportamento: simula cada matéria do
+  zero, dominando um tópico por passo, e reprova se dois abrirem juntos.
 - **Subtópico só abre com o tópico já aberto — transitivo, como topicoAberto().**
   `baseDominada()` verifica `subtopicoAberto()` (não só a caixa em dia) antes
   de considerar uma dependência `{t,s}` cumprida, pelo mesmo motivo que já
-  valia para tópico: histórico espalhado (de antes da cadeia existir, ou de
+  valia para tópico: histórico espalhado (de antes da fila existir, ou de
   quando cabia estudar em qualquer ordem) não pode destravar o que vem depois
   sem ter passado pela base de verdade.
 - **O simulado ignora os três eixos.** Ele imita a prova, e a prova não
   respeita escada nenhuma.
-- **A trava não tem escape.** Tópico ou subtópico fechado por pré-requisito
-  não ganha botão Estudar; degrau fechado não é alcançável nem pelo atalho de
-  "revisar adiantado".
-- **`criterio`/`criterio_subtopicos`, não `fonte`.** `topicos.json` transcreve
-  edital e exige `fonte`; ordem de estudo é julgamento nosso, e nenhum edital
-  diz de que tópico (ou subtópico) depende qual. Chamar de "fonte" fingiria
-  autoridade que não existe — mesmo cuidado da regra 11.
-- **A tela sempre lista tópico e subtópico na ordem em que a escada os
-  libera, de cima pra baixo — nunca por tamanho, alfabeto ou ordem do
-  banco.** `porDesbloqueio()` (tópico) e `porDesbloqueioSub()` (subtópico,
-  um nível mais fundo, por tópico) ordenam pela profundidade no grafo de
-  pré-requisitos (`profundidadeTopico`/`profundidadeSubtopico`: raiz = 0,
-  cada elo soma 1) — quem abre primeiro aparece primeiro. Tamanho (maior
-  primeiro) só desempata dentro da mesma profundidade, e nome só desempata
-  o resto. Matéria/tópico sem grafo cai toda na profundidade 0 e a ordem
-  vira só tamanho, como sempre foi antes de ter requisito declarado — a
-  regra não exige escada nova em lugar nenhum, só manda a exibição seguir a
-  que já existe.
-- **Dependência de um tópico sobre `{t,s}` de OUTRO tópico não pode pular
-  mais de 2 ondas restantes da escada interna do exigido.** "Ondas
-  restantes" é a maior profundidade entre os subtópicos do exigido menos a
-  profundidade do alvo escolhido; passou de 2, a dependência tem que virar o
-  TÓPICO INTEIRO. Vale só entre tópicos diferentes e só quando o alvo é
-  `{t,s}` — dependência de tópico inteiro não tem o que pular, e
-  `requisitos_subtopicos` é dentro do mesmo tópico. O limite 2 não é
+- **A trava não tem escape.** Tópico ou subtópico fechado não ganha botão
+  Estudar; degrau fechado não é alcançável nem pelo atalho de "revisar
+  adiantado".
+- **`criterio`/`criterio_conceitual`/`criterio_subtopicos`, não `fonte`.**
+  `topicos.json` transcreve edital e exige `fonte`; ordem de estudo é
+  julgamento nosso, e nenhum edital diz em que ordem ensinar nem de que
+  tópico depende qual. Chamar de "fonte" fingiria autoridade que não existe —
+  mesmo cuidado da regra 11.
+- **A tela sempre lista tópico e subtópico na ordem em que a fila os libera,
+  de cima pra baixo — nunca por tamanho, alfabeto ou ordem do banco.**
+  `porDesbloqueio()` (tópico) e `porDesbloqueioSub()` (subtópico, um nível
+  mais fundo, por tópico) ordenam pela profundidade
+  (`profundidadeTopico`/`profundidadeSubtopico`: começo da fila = 0, cada elo
+  soma 1) — quem abre primeiro aparece primeiro. Numa corrente a profundidade
+  é única por item, então tamanho e nome, que ainda desempatam no código,
+  nunca chegam a ser consultados. Matéria/tópico sem fila cai toda na
+  profundidade 0 e a ordem vira só tamanho, como era antes de haver requisito
+  declarado.
+- **Dependência CONCEITUAL de um tópico sobre `{t,s}` de OUTRO tópico não
+  pode pular mais de 2 ondas restantes da escada interna do exigido.** "Ondas
+  restantes" é a maior profundidade entre os subtópicos do exigido em
+  `requisitos_conceituais_subtopicos` menos a profundidade do alvo escolhido;
+  passou de 2, a dependência tem que virar o TÓPICO INTEIRO. O limite 2 não é
   arbitrário: é o maior valor que já existia entre os casos considerados
-  corretos. `validar.py` reprova automaticamente quem violar.
+  corretos. Desde a fila nada trava por essa aresta, mas uma aresta conceitual
+  que pula meia matéria continua sendo uma afirmação errada sobre o conteúdo —
+  por isso `validar.py` segue reprovando quem violar.
 
 `validar.py` barra grafia que não existe no banco, pré-requisito circular,
-tópico que exige a si mesmo, matéria em que nenhum tópico abriria, e nível
+tópico que exige a si mesmo, matéria em que nenhum tópico abriria, fila que
+não é corrente (item com duas dependências, item na forma `{t,s}`, dois
+começos, fila bifurcada, tópico que a fila não alcança), fila que contraria o
+grafo conceitual, `requisitos_conceituais` sem `criterio_conceitual`, e nível
 fora de 1–9. E **avisa** qual tópico tem cartão de nível 2+ sem nenhum de
-nível 1: ali a escada não segura nada, e esse aviso é a lista de trabalho de
-quais definições ainda faltam escrever. As mesmas checagens de pré-requisito
-valem por subtópico em `requisitos_subtopicos` (dependência que não existe
-no banco, ciclo — combinando o grafo de tópico com o de subtópico, já que um
-subtópico depende implicitamente do próprio tópico —, subtópico que exige a
-si mesmo, tópico em que nenhum subtópico abriria).
+nível 1 — ali a escada não segura nada, e esse aviso é a lista de trabalho de
+quais definições ainda faltam escrever — e qual tópico tem vários subtópicos
+sem fila declarada, que por isso abrem todos de uma vez. As mesmas checagens
+valem por subtópico, nas duas chaves (dependência que não existe no banco,
+ciclo — combinando o grafo de tópico com o de subtópico, já que um subtópico
+depende implicitamente do próprio tópico —, subtópico que exige a si mesmo,
+tópico em que nenhum subtópico abriria).
 
 O campo `n` é gravado pelos caminhos de sempre — `incorporar-rascunho.ps1` e
 `explicar-alternativas.ps1`. Nenhum script novo: a regra 9 segue com três.

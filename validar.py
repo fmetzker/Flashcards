@@ -231,14 +231,21 @@ def valida_topicos(B, materias):
 
 
 def valida_requisitos(B, materias):
-    """Os pré-requisitos entre tópicos (opcional) precisam apontar para coisa
-    que existe, e não podem formar ciclo.
+    """A FILA de estudo (quem abre depois de quem) e o grafo conceitual que a
+    justifica precisam apontar para coisa que existe, e concordar entre si.
 
-    Ordem de estudo é julgamento pedagógico, não transcrição de edital — por
-    isso o arquivo exige 'criterio' e não 'fonte' (ver banco/requisitos.json).
+    'requisitos' é uma corrente linear: cada tópico exige exatamente o anterior
+    da fila, e por isso abre UM tópico por vez. 'requisitos_conceituais' é o
+    grafo de dependência real, que o motor não lê — existe para registrar o
+    porquê e para ser conferido contra a fila. Ordem de estudo é julgamento
+    pedagógico, não transcrição de edital, por isso o arquivo exige 'criterio'
+    e não 'fonte' (ver banco/requisitos.json).
+
     O que o validador cobra é coerência: tópico escrito errado aqui não daria
     erro visível — ele travaria um tópico por uma dependência inexistente, ou
-    o destravaria por engano, em silêncio."""
+    o destravaria por engano, em silêncio. E fila que contraria o conceitual
+    manda estudar B antes de A tendo declarado, no mesmo arquivo, que B
+    pressupõe A."""
     caminho = os.path.join(BANCO_DIR, 'requisitos.json')
     if not os.path.exists(caminho):
         return
@@ -249,147 +256,249 @@ def valida_requisitos(B, materias):
             erros.append(f"requisitos.json: matéria '{mid}' não existe em materias.json")
             continue
         if not dado.get('criterio'):
-            erros.append(f"requisitos.json: matéria '{mid}' sem 'criterio' — por que esta ordem, e não outra?")
+            erros.append(f"requisitos.json: matéria '{mid}' sem 'criterio' — por que esta fila, e não outra?")
         do_banco = {q['t'] for q in B if q.get('m') == mid}
         # pares (tópico, subtópico) que existem de verdade nesta matéria —
-        # é contra isto que um requisito {"t":..,"s":..} é conferido
+        # é contra isto que uma dependência {"t":..,"s":..} é conferida
         pares_banco = {(q['t'], q.get('s')) for q in B if q.get('m') == mid and q.get('s')}
-        req = dado.get('requisitos') or {}
-        for t, deps in req.items():
-            if t not in do_banco:
-                erros.append(f"requisitos.json: matéria '{mid}': requisito declarado para tópico "
-                             f"'{t}', que não existe no banco desta matéria")
-            for d in deps:
-                # 'd' é string (tópico inteiro) ou {"t":..,"s":..} (só um
-                # subtópico daquele tópico) — ver '_forma_do_item' no arquivo
-                if isinstance(d, dict):
-                    if (d.get('t'), d.get('s')) not in pares_banco:
-                        erros.append(f"requisitos.json: matéria '{mid}', tópico '{t}': pré-requisito "
-                                     f"'{d.get('t')}/{d.get('s')}' não existe no banco desta matéria")
-                    if d.get('t') == t:
-                        erros.append(f"requisitos.json: matéria '{mid}': tópico '{t}' é pré-requisito "
-                                     "de um subtópico de si mesmo")
-                else:
-                    if d not in do_banco:
-                        erros.append(f"requisitos.json: matéria '{mid}', tópico '{t}': pré-requisito "
-                                     f"'{d}' não existe no banco desta matéria")
-                    if d == t:
-                        erros.append(f"requisitos.json: matéria '{mid}': tópico '{t}' é pré-requisito "
-                                     "de si mesmo")
-        # ciclo trancaria os tópicos envolvidos para sempre, sem nenhum aviso
-        # visível no app — a pessoa simplesmente nunca veria aqueles cartões.
-        # O grafo de ciclo é sempre em nível de TÓPICO: uma dependência de
-        # subtópico {"t":..,"s":..} vira aresta para aquele 't', porque uma
-        # trava por subtópico ainda tranca o mesmo jeito se formar ciclo.
-        estado = {}
-        def ciclo(t, caminho_atual):
-            if estado.get(t) == 'ok':
-                return None
-            if estado.get(t) == 'visitando':
-                return caminho_atual[caminho_atual.index(t):] + [t]
-            estado[t] = 'visitando'
-            for d in req.get(t, []):
-                d_topico = d['t'] if isinstance(d, dict) else d
-                achado = ciclo(d_topico, caminho_atual + [t])
-                if achado:
-                    return achado
-            estado[t] = 'ok'
-            return None
-        for t in list(req):
-            c = ciclo(t, [])
-            if c:
-                # sem seta unicode: o console do Windows é cp1252 e derrubava o
-                # validador inteiro ao tentar imprimir U+2192
-                erros.append(f"requisitos.json: matéria '{mid}': ciclo de pré-requisitos "
-                             f"({' -> '.join(c)}) — esses tópicos nunca destravariam")
-                break
-        # tópico sem pré-requisito é NORMAL e necessário: se todos tivessem,
-        # nada abriria no primeiro dia. Só avisa se NENHUM ficou aberto.
-        raizes = [t for t in do_banco if not req.get(t)]
-        if do_banco and not raizes:
-            erros.append(f"requisitos.json: matéria '{mid}': todo tópico tem pré-requisito — "
-                         "nenhum abriria no primeiro dia")
 
-        # ---- requisitos_subtopicos: mesma ideia, um nível mais fundo ----
-        # chave "Tópico|Subtópico" -> lista de deps, cada uma OBRIGATORIAMENTE
-        # {"t":..,"s":..} (nunca string solta — ver _forma_do_item no arquivo
-        # e o comentário de requisitosPendentesSub() no index.html).
+        req = dado.get('requisitos') or {}
         req_sub = dado.get('requisitos_subtopicos') or {}
+        req_conc = dado.get('requisitos_conceituais') or {}
+        req_sub_conc = dado.get('requisitos_conceituais_subtopicos') or {}
+        if req_conc and not dado.get('criterio_conceitual'):
+            erros.append(f"requisitos.json: matéria '{mid}' tem 'requisitos_conceituais' mas sem "
+                         "'criterio_conceitual' — por que cada aresta existe?")
         if req_sub and not dado.get('criterio_subtopicos'):
             erros.append(f"requisitos.json: matéria '{mid}' tem 'requisitos_subtopicos' mas "
                          "sem 'criterio_subtopicos' — por que esta ordem, e não outra?")
-        chaves_validas = {}   # "Tópico|Subtópico" -> (t, s), só as que existem de verdade
-        for (t_b, s_b) in pares_banco:
-            chaves_validas[f"{t_b}|{s_b}"] = (t_b, s_b)
-        for chave, deps in req_sub.items():
-            if chave not in chaves_validas:
-                erros.append(f"requisitos.json: matéria '{mid}': requisitos_subtopicos declarado "
-                             f"para '{chave}', que não existe como par tópico/subtópico no banco")
-                continue
-            t_chave, s_chave = chaves_validas[chave]
-            for d in deps:
-                if not isinstance(d, dict):
-                    erros.append(f"requisitos.json: matéria '{mid}', '{chave}': dependência de "
-                                 "subtópico precisa ser {\"t\":..,\"s\":..} — string solta é ambígua aqui")
-                    continue
-                if (d.get('t'), d.get('s')) not in pares_banco:
-                    erros.append(f"requisitos.json: matéria '{mid}', '{chave}': pré-requisito "
-                                 f"'{d.get('t')}/{d.get('s')}' não existe no banco desta matéria")
-                if d.get('t') == t_chave and d.get('s') == s_chave:
-                    erros.append(f"requisitos.json: matéria '{mid}': '{chave}' é pré-requisito de "
-                                 "si mesmo")
-        # ciclo combinado: nó de tópico ("T:x") e nó de subtópico ("S:x|y"),
-        # com a aresta implícita S:t|s -> T:t (subtópico nunca abre antes do
-        # próprio tópico) somada às arestas explícitas dos dois arquivos.
-        if req_sub:
-            estado2 = {}
-            def no_topico(t): return "T:" + t
-            def no_sub(t, s): return "S:" + t + "|" + s
-            def vizinhos(no):
-                if no.startswith("T:"):
-                    t = no[2:]
-                    return [no_topico(d) if isinstance(d, str) else no_sub(d['t'], d['s'])
-                            for d in req.get(t, [])]
-                t, s = no[2:].split("|", 1)
-                viz = [no_topico(t)]
-                for d in req_sub.get(f"{t}|{s}", []):
-                    if isinstance(d, dict) and d.get('t') and d.get('s'):
-                        viz.append(no_sub(d['t'], d['s']))
-                return viz
-            def ciclo2(no, caminho_atual):
-                if estado2.get(no) == 'ok':
+
+        # =========== checagens que valem para os DOIS grafos ===========
+        # A fila e o grafo conceitual têm a mesma forma; o que muda é quem
+        # trava. Errar um nome em qualquer um dos dois é igualmente invisível.
+        def checa_grafo(rotulo, r, rs):
+            for t, deps in r.items():
+                if t not in do_banco:
+                    erros.append(f"requisitos.json: matéria '{mid}': {rotulo} declarado para tópico "
+                                 f"'{t}', que não existe no banco desta matéria")
+                for d in deps:
+                    # 'd' é string (tópico inteiro) ou {"t":..,"s":..} (só um
+                    # subtópico daquele tópico) — ver '_forma_do_item' no arquivo
+                    if isinstance(d, dict):
+                        if (d.get('t'), d.get('s')) not in pares_banco:
+                            erros.append(f"requisitos.json: matéria '{mid}', tópico '{t}' ({rotulo}): "
+                                         f"pré-requisito '{d.get('t')}/{d.get('s')}' não existe no "
+                                         "banco desta matéria")
+                        if d.get('t') == t:
+                            erros.append(f"requisitos.json: matéria '{mid}' ({rotulo}): tópico '{t}' é "
+                                         "pré-requisito de um subtópico de si mesmo")
+                    else:
+                        if d not in do_banco:
+                            erros.append(f"requisitos.json: matéria '{mid}', tópico '{t}' ({rotulo}): "
+                                         f"pré-requisito '{d}' não existe no banco desta matéria")
+                        if d == t:
+                            erros.append(f"requisitos.json: matéria '{mid}' ({rotulo}): tópico '{t}' é "
+                                         "pré-requisito de si mesmo")
+            # ciclo trancaria os tópicos envolvidos para sempre, sem nenhum aviso
+            # visível no app — a pessoa simplesmente nunca veria aqueles cartões.
+            # O grafo de ciclo é sempre em nível de TÓPICO: uma dependência de
+            # subtópico {"t":..,"s":..} vira aresta para aquele 't', porque uma
+            # trava por subtópico ainda tranca o mesmo jeito se formar ciclo.
+            estado = {}
+            def ciclo(t, caminho_atual):
+                if estado.get(t) == 'ok':
                     return None
-                if estado2.get(no) == 'visitando':
-                    return caminho_atual[caminho_atual.index(no):] + [no]
-                estado2[no] = 'visitando'
-                for viz in vizinhos(no):
-                    achado = ciclo2(viz, caminho_atual + [no])
+                if estado.get(t) == 'visitando':
+                    return caminho_atual[caminho_atual.index(t):] + [t]
+                estado[t] = 'visitando'
+                for d in r.get(t, []):
+                    d_topico = d['t'] if isinstance(d, dict) else d
+                    achado = ciclo(d_topico, caminho_atual + [t])
                     if achado:
                         return achado
-                estado2[no] = 'ok'
+                estado[t] = 'ok'
                 return None
-            for chave in list(req_sub):
-                t_chave, s_chave = chave.split("|", 1)
-                c = ciclo2(no_sub(t_chave, s_chave), [])
+            for t in list(r):
+                c = ciclo(t, [])
                 if c:
-                    erros.append(f"requisitos.json: matéria '{mid}': ciclo de pré-requisitos entre "
-                                 f"subtópicos ({' -> '.join(c)}) — nunca destravariam")
+                    # sem seta unicode: o console do Windows é cp1252 e derrubava o
+                    # validador inteiro ao tentar imprimir U+2192
+                    erros.append(f"requisitos.json: matéria '{mid}' ({rotulo}): ciclo de "
+                                 f"pré-requisitos ({' -> '.join(c)}) — esses tópicos nunca destravariam")
                     break
-            # por tópico que declara requisito de subtópico: ao menos um
-            # subtópico DELE precisa ficar sem requisito (senão, mesmo com o
-            # tópico aberto, nenhum subtópico jamais abriria)
-            topicos_com_req_sub = {chave.split("|", 1)[0] for chave in req_sub}
-            for t_pai in topicos_com_req_sub:
-                subs_do_topico = {s_b for (t_b, s_b) in pares_banco if t_b == t_pai}
-                raizes_sub = [s_b for s_b in subs_do_topico if not req_sub.get(f"{t_pai}|{s_b}")]
-                if subs_do_topico and not raizes_sub:
-                    erros.append(f"requisitos.json: matéria '{mid}', tópico '{t_pai}': todo "
-                                 "subtópico tem pré-requisito — nenhum abriria")
+            # tópico sem pré-requisito é NORMAL e necessário: se todos tivessem,
+            # nada abriria no primeiro dia. Só reprova se NENHUM ficou aberto.
+            raizes = [t for t in do_banco if not r.get(t)]
+            if do_banco and r and not raizes:
+                erros.append(f"requisitos.json: matéria '{mid}' ({rotulo}): todo tópico tem "
+                             "pré-requisito — nenhum abriria no primeiro dia")
+
+            # ---- subtópicos: mesma ideia, um nível mais fundo ----
+            # chave "Tópico|Subtópico" -> lista de deps, cada uma OBRIGATORIAMENTE
+            # {"t":..,"s":..} (nunca string solta — ver _forma_do_item no arquivo
+            # e o comentário de requisitosPendentesSub() no index.html).
+            chaves_validas = {f"{t_b}|{s_b}": (t_b, s_b) for (t_b, s_b) in pares_banco}
+            for chave, deps in rs.items():
+                if chave not in chaves_validas:
+                    erros.append(f"requisitos.json: matéria '{mid}': {rotulo} de subtópico declarado "
+                                 f"para '{chave}', que não existe como par tópico/subtópico no banco")
+                    continue
+                t_chave, s_chave = chaves_validas[chave]
+                for d in deps:
+                    if not isinstance(d, dict):
+                        erros.append(f"requisitos.json: matéria '{mid}', '{chave}' ({rotulo}): dependência "
+                                     "de subtópico precisa ser {\"t\":..,\"s\":..} — string solta é ambígua aqui")
+                        continue
+                    if (d.get('t'), d.get('s')) not in pares_banco:
+                        erros.append(f"requisitos.json: matéria '{mid}', '{chave}' ({rotulo}): pré-requisito "
+                                     f"'{d.get('t')}/{d.get('s')}' não existe no banco desta matéria")
+                    if d.get('t') == t_chave and d.get('s') == s_chave:
+                        erros.append(f"requisitos.json: matéria '{mid}' ({rotulo}): '{chave}' é "
+                                     "pré-requisito de si mesmo")
+            # ciclo combinado: nó de tópico ("T:x") e nó de subtópico ("S:x|y"),
+            # com a aresta implícita S:t|s -> T:t (subtópico nunca abre antes do
+            # próprio tópico) somada às arestas explícitas dos dois níveis.
+            if rs:
+                estado2 = {}
+                def no_topico(t): return "T:" + t
+                def no_sub(t, s): return "S:" + t + "|" + s
+                def vizinhos(no):
+                    if no.startswith("T:"):
+                        t = no[2:]
+                        return [no_topico(d) if isinstance(d, str) else no_sub(d['t'], d['s'])
+                                for d in r.get(t, [])]
+                    t, s = no[2:].split("|", 1)
+                    viz = [no_topico(t)]
+                    for d in rs.get(f"{t}|{s}", []):
+                        if isinstance(d, dict) and d.get('t') and d.get('s'):
+                            viz.append(no_sub(d['t'], d['s']))
+                    return viz
+                def ciclo2(no, caminho_atual):
+                    if estado2.get(no) == 'ok':
+                        return None
+                    if estado2.get(no) == 'visitando':
+                        return caminho_atual[caminho_atual.index(no):] + [no]
+                    estado2[no] = 'visitando'
+                    for viz in vizinhos(no):
+                        achado = ciclo2(viz, caminho_atual + [no])
+                        if achado:
+                            return achado
+                    estado2[no] = 'ok'
+                    return None
+                for chave in list(rs):
+                    if chave not in chaves_validas:
+                        continue
+                    t_chave, s_chave = chave.split("|", 1)
+                    c = ciclo2(no_sub(t_chave, s_chave), [])
+                    if c:
+                        erros.append(f"requisitos.json: matéria '{mid}' ({rotulo}): ciclo de "
+                                     f"pré-requisitos entre subtópicos ({' -> '.join(c)}) — nunca destravariam")
+                        break
+                # por tópico que declara requisito de subtópico: ao menos um
+                # subtópico DELE precisa ficar sem requisito (senão, mesmo com o
+                # tópico aberto, nenhum subtópico jamais abriria)
+                for t_pai in {chave.split("|", 1)[0] for chave in rs}:
+                    subs_do_topico = {s_b for (t_b, s_b) in pares_banco if t_b == t_pai}
+                    raizes_sub = [s_b for s_b in subs_do_topico if not rs.get(f"{t_pai}|{s_b}")]
+                    if subs_do_topico and not raizes_sub:
+                        erros.append(f"requisitos.json: matéria '{mid}' ({rotulo}), tópico '{t_pai}': "
+                                     "todo subtópico tem pré-requisito — nenhum abriria")
+
+        checa_grafo('requisitos', req, req_sub)
+        if req_conc or req_sub_conc:
+            checa_grafo('requisitos_conceituais', req_conc, req_sub_conc)
+
+        # =========== a FILA precisa ser uma corrente linear ===========
+        # É o que faz abrir UM tópico por vez (ver '_a_fila' no arquivo).
+        # Devolve a ordem da fila, ou None se ela não for uma corrente.
+        def corrente(r, universo, rotulo, onde):
+            if not r:
+                return None
+            quebrou = False
+            for chave, deps in r.items():
+                if len(deps) != 1 or isinstance(deps[0], dict):
+                    erros.append(f"requisitos.json: matéria '{mid}'{onde}: '{chave}' em {rotulo} tem "
+                                 f"{len(deps)} dependência(s) — a fila é uma corrente, cada item exige "
+                                 "exatamente o anterior, sempre pelo nome inteiro")
+                    quebrou = True
+            if quebrou:
+                return None
+            raizes = sorted(x for x in universo if not r.get(x))
+            if len(raizes) != 1:
+                erros.append(f"requisitos.json: matéria '{mid}'{onde}: {rotulo} tem {len(raizes)} "
+                             f"começo(s) de fila ({', '.join(raizes) or 'nenhum'}) — precisa de "
+                             "exatamente um")
+                return None
+            proximo = {}
+            for chave, deps in r.items():
+                ant = deps[0]
+                if ant in proximo:
+                    erros.append(f"requisitos.json: matéria '{mid}'{onde}: '{ant}' é o anterior de "
+                                 f"'{proximo[ant]}' E de '{chave}' — a fila bifurcou")
+                    return None
+                proximo[ant] = chave
+            ordem, x = [], raizes[0]
+            while x is not None:
+                ordem.append(x)
+                x = proximo.get(x)
+            if len(ordem) != len(universo):
+                fora = sorted(set(universo) - set(ordem))
+                erros.append(f"requisitos.json: matéria '{mid}'{onde}: a fila de {rotulo} não alcança "
+                             f"{len(fora)} item(ns) do banco: {', '.join(fora)}")
+                return None
+            return {x: i for i, x in enumerate(ordem)}
+
+        pos = corrente(req, do_banco, 'requisitos', '')
+        # e a mesma corrente, um nível mais fundo, dentro de cada tópico
+        pos_sub = {}
+        for t_pai in {chave.split("|", 1)[0] for chave in req_sub}:
+            subs_do_topico = {s_b for (t_b, s_b) in pares_banco if t_b == t_pai}
+            r_t = {chave.split("|", 1)[1]: [d.get('s') for d in deps if isinstance(d, dict)]
+                   for chave, deps in req_sub.items() if chave.split("|", 1)[0] == t_pai}
+            p = corrente(r_t, subs_do_topico, 'requisitos_subtopicos', f", tópico '{t_pai}'")
+            if p:
+                pos_sub[t_pai] = p
+        # tópico com vários subtópicos e sem fila abre todos de uma vez — não é
+        # erro (a fila de subtópico é opcional), mas é sempre bom saber
+        sem_fila = sorted({t_b for (t_b, _s) in pares_banco
+                           if len({s for (tb2, s) in pares_banco if tb2 == t_b}) > 1
+                           and t_b not in {c.split("|", 1)[0] for c in req_sub}})
+        if sem_fila:
+            avisos.append(f"requisitos.json: matéria '{mid}': {len(sem_fila)} tópico(s) com vários "
+                          f"subtópicos e sem fila de subtópico — abrem todos de uma vez: "
+                          f"{', '.join(sem_fila)}")
+
+        # =========== a fila não pode contrariar o grafo conceitual ===========
+        # Sem isto a fila seria opinião solta. Com isto, é uma ordem de ensino
+        # provadamente compatível com o que o próprio arquivo declara sobre a
+        # dependência de conceito (ver '_conceitual_vs_fila').
+        if pos:
+            for t, deps in req_conc.items():
+                for d in deps:
+                    d_topico = d['t'] if isinstance(d, dict) else d
+                    if d_topico in pos and t in pos and pos[d_topico] >= pos[t]:
+                        erros.append(f"requisitos.json: matéria '{mid}': a fila põe '{t}' "
+                                     f"(#{pos[t] + 1}) ANTES de '{d_topico}' (#{pos[d_topico] + 1}), "
+                                     "que ele exige conceitualmente")
+        for chave, deps in req_sub_conc.items():
+            t_pai, s_filho = chave.split("|", 1)
+            p = pos_sub.get(t_pai)
+            if not p:
+                continue
+            for d in deps:
+                if not isinstance(d, dict) or d.get('t') != t_pai:
+                    continue
+                if d['s'] in p and s_filho in p and p[d['s']] >= p[s_filho]:
+                    erros.append(f"requisitos.json: matéria '{mid}', tópico '{t_pai}': a fila põe "
+                                 f"'{s_filho}' (#{p[s_filho] + 1}) ANTES de '{d['s']}' "
+                                 f"(#{p[d['s']] + 1}), que ele exige conceitualmente")
 
         # ---- limite de ondas puladas (ver '_limite_de_ondas_puladas' no arquivo) ----
-        # Dependência de TÓPICO sobre {t,s} de OUTRO tópico não pode pular mais de
-        # 2 ondas restantes da escada interna do exigido — senão libera o tópico
-        # inteiro tendo visto só uma fração pequena do que ele exige de verdade.
+        # Vale sobre o grafo CONCEITUAL: dependência de tópico sobre {t,s} de
+        # outro tópico não pode pular mais de 2 ondas restantes da escada
+        # interna do exigido. A fila nunca usa {t,s}, então nada trava por
+        # aqui — mas uma aresta conceitual que pula meia matéria continua sendo
+        # uma afirmação errada sobre o conteúdo, e é o que esta regra pega.
         LIMITE_ONDAS = 2
         memo_prof = {}
         def profundidade_sub(t, s):
@@ -398,12 +507,12 @@ def valida_requisitos(B, materias):
                 return memo_prof[chave_s]
             memo_prof[chave_s] = 0   # guarda de recursão — ciclo já é barrado acima
             prof = 0
-            for d in req_sub.get(chave_s, []):
+            for d in req_sub_conc.get(chave_s, []):
                 if isinstance(d, dict) and d.get('t') and d.get('s'):
                     prof = max(prof, 1 + profundidade_sub(d['t'], d['s']))
             memo_prof[chave_s] = prof
             return prof
-        for t, deps in req.items():
+        for t, deps in req_conc.items():
             for d in deps:
                 if not isinstance(d, dict):
                     continue
@@ -419,13 +528,13 @@ def valida_requisitos(B, materias):
                                  f"'{alvo_t}/{alvo_s}', que pula {ondas_puladas} onda(s) restante(s) "
                                  f"da escada de '{alvo_t}' (limite {LIMITE_ONDAS}) — vire dependência "
                                  f"do tópico '{alvo_t}' inteiro (ver _limite_de_ondas_puladas)")
-    # matéria ativa sem requisitos declarados: nenhum tópico dela trava
+    # matéria ativa sem fila declarada: nenhum tópico dela trava
     declaradas = set(reg)
     ativas = materias_ativas()
     faltando = sorted(m['id'] for m in materias if m['id'] in ativas and m['id'] not in declaradas)
     if faltando:
-        avisos.append(f"requisitos.json: {len(faltando)} matéria(s) ativa(s) sem pré-requisitos "
-                      f"declarados: {', '.join(faltando)}")
+        avisos.append(f"requisitos.json: {len(faltando)} matéria(s) ativa(s) sem fila de estudo "
+                      f"declarada: {', '.join(faltando)}")
 
 
 

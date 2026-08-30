@@ -1,15 +1,16 @@
 {
-  "_leia": "Pre-requisitos entre topicos: de quais outros topicos (ou subtopicos) cada topico depende para abrir. TRAVA cartao NOVO: enquanto a base do exigido nao estiver dominada, os cartoes novos daquele topico nao entram na fila e a tela Materias mostra o topico sem botao. Revisao vencida NUNCA e travada. O arquivo e OPCIONAL - sem ele, nenhum topico fica travado por dependencia, e so a escada interna (campo 'n' do cartao) continua valendo.",
-  "_requisito_cumprido": "Requisito cumprido = a BASE (degrau 1) do exigido dominada, ou seja, todo cartao de nivel 1 dele na caixa 2 ou acima. Nao o topico inteiro: para comecar Regencia basta saber o que e cada classe de palavra, nao ter terminado todos os exercicios de Classes de palavras.",
-  "_forma_do_item": "Cada item da lista de 'requisitos' de um topico e uma string (nome de um topico inteiro, como sempre foi) OU um objeto {\"t\":\"Topico\",\"s\":\"Subtopico\"} (so aquele subtopico especifico do topico t). Exemplo: \"Flexao verbal\": [{\"t\": \"Classes de palavras\", \"s\": \"Verbo\"}] exige so o subtopico Verbo de Classes de palavras, nao a materia inteira. Nao muda a trava do lado esquerdo (quem exige continua travado por TOPICO inteiro) - so afina o que precisa estar pronto do lado direito (o exigido).",
-  "_criterio_nao_e_fonte": "Cada materia declara 'criterio', nao 'fonte', e a diferenca e proposital. banco/topicos.json transcreve o conteudo programatico do edital e por isso exige fonte. Ordem de estudo e JULGAMENTO PEDAGOGICO nosso: nenhum edital diz de que topico depende qual. Chamar isso de 'fonte' fingiria uma autoridade que nao existe - mesmo cuidado da regra 11 do CLAUDE.md.",
-  "_por_que_nao_ha_camadas": "Existiu aqui uma segunda estrutura, 'niveis', que agrupava os topicos em tres camadas (a palavra / a relacao entre palavras / o texto) e servia para ORDENAR. Foi removida porque virou rotulo enganoso: quem decide o que abre e o grafo de requisitos, nao a camada. Ao dominar Classes de palavras abriam ao mesmo tempo Pronomes (rotulado camada 1) e Tipologia textual (rotulado camada 3) — a tela anunciava uma hierarquia que o motor nao usava. Nivel agora existe em UM lugar so: dentro do topico, no campo 'n' do cartao.",
-  "_cadeia_entre_raizes": "Auditoria de agosto/2026: toda materia com grafo tinha VARIOS topicos abertos ao mesmo tempo no primeiro dia (o 'sem requisito' de cada um, ate entao, so queria dizer 'nao depende de conceito nenhum OUTRO' - nunca foi pensado como ordem de apresentacao). Pedido explicito: abrir um so de cada vez tambem entre esses topicos-raiz, nao so dentro da arvore que already dependia deles. A cadeia adicionada e ORDEM DE ENSINO, nao dependencia de conceito nova - os topicos SEGUEM sem precisar um do outro de verdade (a razao de cada um estar 'sem requisito' no criterio de cada materia continua valendo), so passaram a exigir o ANTERIOR da fila como formalidade de sequencia. Dois criterios guiaram a ordem escolhida em cada materia: (1) o mais basico/introdutorio vai primeiro (a materia so tem 'zero pre-requisito' de verdade nesse), e (2) entre os que restam, quem trava MAIS coisa na arvore de baixo vem mais cedo, pra nao segurar o resto do banco atras de um topico decorativo.",
-  "_requisitos_subtopicos": "Chave irma de 'requisitos', um nivel mais fundo: pre-requisito ENTRE SUBTOPICOS de um topico grande (Aritmetica, 16 subtopicos que nao tem nada a ver entre si - abrir tudo de uma vez nao ensina em ordem nenhuma, e o campo 'n' nao resolve porque gradua definicao->exercicio DENTRO do mesmo fato, nao sequencia subtopicos irmaos). Cada materia declara 'criterio_subtopicos' (exigido sempre que 'requisitos_subtopicos' existir - mesma logica de 'criterio' vs 'fonte': e julgamento pedagogico nosso, nao transcricao de edital) e 'requisitos_subtopicos', chave \"Topico|Subtopico\" -> lista de dependencias. Cada dependencia e OBRIGATORIAMENTE {\"t\":..,\"s\":..} - nunca string solta, porque dentro de uma chave de subtopico uma string ambiguaria entre 'o topico X inteiro' e 'o subtopico X deste mesmo topico'. Um subtopico so abre se o TOPICO dele ja estiver aberto (a trava de subtopico e uma camada A MAIS, nunca um atalho); topico sem nenhuma entrada aqui continua com todos os subtopicos abertos assim que ele mesmo abrir. Opcional em cima de opcional: sem esta chave, nada muda no comportamento de sempre.",
-  "_limite_de_ondas_puladas": "Regra encontrada em setembro/2026: quando 'requisitos' (entre TOPICOS DIFERENTES) aponta pra um {t,s} em vez do topico inteiro, o subtopico alvo nao pode estar a mais de 2 ondas do topo da escada interna dele (requisitos_subtopicos do topico exigido) - senao a dependencia libera um topico inteiro tendo pulado a maior parte do exigido, o que nao tem logica nenhuma (caso real: Analise combinatoria abria so com Multiplicacao dominada, a RAIZ de uma escada de 8 ondas em Aritmetica - abria tendo visto 1/17 dos subtopicos da materia). O numero 2 nao e arbitrario: e o maior valor que ja existia entre os casos considerados corretos (Trigonometria->Geometria/Triangulos, Matrizes->Algebra/Sistemas de equacoes, Flexao verbal/nominal->Classes de palavras/Verbo|Substantivo). validar.py confere isso automaticamente pra toda dependencia {t,s} entre topicos diferentes. Nao vale pra requisitos_subtopicos (dependencia DENTRO do mesmo topico) - ali toda a escada e pensada pra andar em ondas pequenas de proposito.",
+  "_leia": "A FILA de estudo de cada materia: em que ordem os topicos abrem, UM DE CADA VEZ. 'requisitos' e uma CORRENTE LINEAR - cada topico exige exatamente o anterior da fila, e o primeiro da fila nao exige nada. TRAVA cartao NOVO: enquanto a base do anterior nao estiver dominada, os cartoes novos daquele topico nao entram na fila de estudo e a tela Materias mostra o topico sem botao. Revisao vencida NUNCA e travada. O arquivo e OPCIONAL - sem ele, nenhum topico fica travado por dependencia, e so a escada interna (campo 'n' do cartao) continua valendo. A dependencia de CONCEITO entre topicos - o que pressupoe o que de verdade - mora em 'requisitos_conceituais', que o motor nao le; ver '_conceitual_vs_fila'.",
+  "_a_fila": "Por que uma fila, e nao um grafo. Ate agosto/2026 'requisitos' era o proprio grafo de dependencia: cada topico exigia os conceitos de que depende. Medida no banco, a consequencia era que topico abria em LEQUE, nunca um por vez - Classes de palavras destrava 9 topicos de Portugues, Anatomia e Fisiologia abria 7 topicos de Enfermagem de uma vez (com 11 cartoes estudados), Aritmetica abria 5 de Matematica. E uma dependencia por SUBTOPICO podia custar um cartao so: Flexao verbal (51 cartoes) abria com o unico cartao de nivel 1 de 'Classes de palavras|Verbo', logo depois de Gramatica - na tela parecia que terminar Gramatica liberava dois topicos de uma vez. Pedido explicito: abrir UM topico por vez, sempre, em toda materia. A fila resolve isso sem uma linha de codigo novo: com uma corrente, profundidadeTopico() devolve 0,1,2,3... e porDesbloqueio() ja pinta a tela Materias exatamente na ordem da fila. Efeito medido nas nove materias com grafo: o maximo que abre ao mesmo tempo caiu de 7 para 1, e o piso de cartoes por elo subiu de 1 para 10. Existia antes uma 'cadeia entre raizes' que ordenava so os topicos sem pre-requisito conceitual, deixando o leque intacto do meio da arvore pra baixo; ela foi absorvida - a fila INTEIRA e ordem de ensino, e nao ha mais dois tipos de aresta em 'requisitos'.",
+  "_conceitual_vs_fila": "'requisitos_conceituais' guarda o grafo de dependencia REAL entre topicos - o que pressupoe o que -, e 'criterio_conceitual' diz por que cada aresta existe. O motor NAO le essa chave: quem trava e a fila. Ela existe por dois motivos. (1) Registro: apagar o grafo apagaria o porque, e a fila viraria uma lista sem justificativa que ninguem consegue auditar depois. (2) Prova: validar.py confere que a FILA nunca contraria o grafo - nenhum topico pode vir na fila antes de algo que ele conceitualmente exige. Sem essa checagem a fila seria opiniao solta; com ela, e uma ordem de ensino provadamente compativel com a dependencia de conceito. Materia que nao declara a chave (enfermagem-trabalho, maritimo-maquinas) e materia cuja fila e ordem de ensino pura, sem dependencia de conceito nenhuma entre os topicos - e isso ja estava escrito no criterio das duas antes de a fila existir.",
+  "_requisito_cumprido": "Requisito cumprido = a BASE (degrau 1) do exigido dominada, ou seja, todo cartao de nivel 1 dele na caixa 2 ou acima. Nao o topico inteiro: para abrir o proximo da fila basta ter a base do anterior, nao ter terminado todos os exercicios dele. Como na fila o exigido e sempre um TOPICO inteiro, e o degrau 1 de um topico inclui o degrau 1 de cada subtopico dele, fechar um elo exige descer a escada de subtopicos ate o fim. E dai que veio o piso: com dependencia por subtopico solto, Flexao verbal abria com 1 cartao; com a fila, o menor elo do banco inteiro custa 10 cartoes, e a mediana fica entre 10 e 39 conforme a materia.",
+  "_forma_do_item": "Em 'requisitos' (a FILA), cada topico tem uma lista de exatamente UM item, e esse item e uma string: o nome do topico anterior da fila. O primeiro topico da fila simplesmente nao aparece na chave. Em 'requisitos_conceituais' o item pode ser string (topico inteiro) OU objeto {\"t\":\"Topico\",\"s\":\"Subtopico\"} (so aquele subtopico do topico t) - e assim que se registra que Flexao verbal pressupoe so o subtopico Verbo de Classes de palavras, e nao a materia inteira. A forma {t,s} nao trava mais nada por si: e documentacao do grafo, conferida por validar.py.",
+  "_criterio_nao_e_fonte": "Cada materia declara 'criterio', nao 'fonte', e a diferenca e proposital. banco/topicos.json transcreve o conteudo programatico do edital e por isso exige fonte. Ordem de estudo e JULGAMENTO PEDAGOGICO nosso: nenhum edital diz em que ordem ensinar, nem de que topico depende qual. Chamar isso de 'fonte' fingiria uma autoridade que nao existe - mesmo cuidado da regra 11 do CLAUDE.md. Vale para os tres textos: 'criterio' (por que ESTA fila), 'criterio_conceitual' (por que cada aresta do grafo) e 'criterio_subtopicos' (por que esta fila de subtopicos).",
+  "_requisitos_subtopicos": "Chave irma de 'requisitos', um nivel mais fundo, e com a mesma forma: uma FILA de subtopicos dentro de cada topico, um de cada vez. Chave \"Topico|Subtopico\" -> lista de exatamente um item, sempre um objeto {\"t\":..,\"s\":..} (nunca string solta, porque dentro de uma chave de subtopico uma string ambiguaria entre 'o topico X inteiro' e 'o subtopico X deste mesmo topico'). Um subtopico so abre se o TOPICO dele ja estiver aberto - a trava de subtopico e uma camada A MAIS, nunca um atalho; topico sem nenhuma entrada aqui continua com todos os subtopicos abertos assim que ele mesmo abrir. Opcional em cima de opcional. A ordem pedagogica de onde essa fila saiu esta em 'requisitos_conceituais_subtopicos': ali os subtopicos vinham em ONDAS (varios irmaos abrindo juntos apos o mesmo antecessor), e a fila e a serializacao dessas ondas, respeitando-as - nao inventa ordem nova, so desempata dentro de cada onda. Conferido no banco inteiro antes da conversao: nao existe topico com mais de um subtopico que nao tivesse ja uma onda declarada.",
+  "_limite_de_ondas_puladas": "Regra encontrada em setembro/2026: quando uma dependencia entre TOPICOS DIFERENTES aponta pra um {t,s} em vez do topico inteiro, o subtopico alvo nao pode estar a mais de 2 ondas do topo da escada interna dele - senao a dependencia trata um topico inteiro como cumprido tendo pulado a maior parte do exigido (caso real: Analise combinatoria abria so com Multiplicacao dominada, a RAIZ de uma escada de 8 ondas em Aritmetica). O numero 2 nao e arbitrario: e o maior valor que ja existia entre os casos considerados corretos. Desde a fila, essa regra vale sobre 'requisitos_conceituais' (documentacao) e sobre as ondas de 'requisitos_conceituais_subtopicos', nao sobre o que trava: a fila nunca usa {t,s}, so o topico anterior inteiro. Fica valendo porque o grafo conceitual continua sendo conferido, e uma aresta conceitual que pula meia materia continua sendo uma afirmacao errada sobre o conteudo, mesmo sem travar nada.",
+  "_por_que_nao_ha_camadas": "Existiu aqui uma segunda estrutura, 'niveis', que agrupava os topicos em tres camadas (a palavra / a relacao entre palavras / o texto) e servia para ORDENAR. Foi removida porque virou rotulo enganoso: quem decidia o que abre era o grafo de requisitos, nao a camada, e ao dominar Classes de palavras abriam ao mesmo tempo Pronomes (rotulada camada 1) e Tipologia textual (camada 3) - a tela anunciava uma hierarquia que o motor nao usava. A fila e a sucessora honesta daquela ideia: a ordem que a tela mostra agora E a ordem que o motor usa, porque e o mesmo dado. Nao reintroduzir rotulo de camada por cima dela - se a progressao importa, ela cabe na propria ordem da fila e no texto de 'criterio'. Nivel continua existindo em UM lugar so: dentro do topico, no campo 'n' do cartao.",
   "materias": {
     "portugues": {
-      "criterio": "Cada aresta é uma dependência real de conceito, não uma ordem estética: um tópico só exige outro quando os exercícios dele pressupõem, de fato, a base do exigido. Crase exige Regência porque só há crase quando o termo regente pede a preposição 'a'; Colocação pronominal exige Pronomes, e não Classes de palavras inteiro; Tipologia textual exige Classes de palavras porque o tipo se reconhece pelo verbo (imperativo = injuntivo, ação em sequência = narrativo). Flexão verbal e Flexão nominal são o primeiro caso de requisito por SUBTÓPICO, não tópico inteiro: para flexionar verbo em tempo/modo só é preciso já reconhecer o que é um verbo, não ter terminado Classes de palavras inteira (que também cobre substantivo, adjetivo, artigo...); por isso exigem só {Classes de palavras, Verbo} e {Classes de palavras, Substantivo}, respectivamente — a mesma lógica de 'basta a base do exigido' que já valia para tópico inteiro, agora afinada para dentro dele. Reescrita passou a exigir também Flexão verbal (tópico inteiro, não só um subtópico dele — reescrever mistura voz, tempo e modo, não um recorte só), além de Sintaxe/Concordância/Regência, porque parte dela é justamente manipular o verbo (voz ativa/passiva, discurso direto/indireto). Interpretação de texto exige Semântica e Coerência porque compreender um texto (aplicado a um texto nomeado ou como habilidade genérica — inferência, explícito×implícito, coesão referencial curta) pressupõe reconhecer sentido de palavra/frase e a amarração lógica entre elas; até uma auditoria de agosto/2026, esse tópico convivia com um homônimo no plural ('Interpretação de textos') cobrindo o mesmo assunto sob rótulo diferente, sem requisito declarado nem entrada na lista de tópicos autocontidos abaixo — os dois foram fundidos sob o nome no singular. Nenhum dos oito tópicos abaixo depende de CONCEITO de outro (ver '_cadeia_entre_raizes' no topo do arquivo) — Classes de palavras, Ortografia, Acentuação e Semântica (os quatro de sempre) mais Formação de palavras (morfologia da palavra isolada), Variação linguística (teoria da língua), Gramática (a introdução do que é gramática e suas divisões — mais básica que qualquer outro tópico da matéria) e Fonética (fonema, sílaba, dígrafo — nível do som). Mas oito tópicos abertos ao mesmo tempo não guiava ninguém, então ganharam uma CADEIA DE ORDEM (não de conceito): Gramática abre primeiro por ser a introdução da matéria; Classes de palavras logo em seguida, porque é o tópico mais carregado de dependentes reais (Pronomes, Sintaxe, Coordenação, Tipologia textual e os subtópicos de Flexão nominal/verbal só abrem depois dela) — segurar essa árvore inteira atrás de Fonética/Ortografia seria prender o banco atrás de um aquecimento; dali em diante, a trilha segue a progressão clássica de ensino de língua — som (Fonética) → grafia (Acentuação, Ortografia) → sentido (Semântica) → e os dois que não travam mais nada na árvore (Formação de palavras, Variação linguística) fecham a fila.",
+      "criterio": "A fila abre com a espinha que a matéria já tinha, inteira e contígua, e depois desce por recortes cada vez maiores. (1) Gramática, a introdução do que é gramática e suas divisões, mais básica que qualquer outro tópico. (2) Classes de palavras, o hub da matéria — nove tópicos dependem dela de verdade. (3-8) a progressão clássica de ensino de língua: som (Fonética) → grafia (Acentuação, Ortografia) → sentido (Semântica) → e os dois que fecham o nível da palavra isolada, Formação de palavras (morfologia) e Variação linguística (teoria da língua). (9-10) a morfologia flexional: Flexão nominal e Flexão verbal são o que se faz com substantivo e verbo depois de saber reconhecê-los. (11-23) a frase: Pronomes e Colocação pronominal, depois Sintaxe e tudo que ela sustenta (Concordância, Regência, Crase, Pontuação, Coordenação, Subordinação e a junção das duas), fechando com os três que cruzam sintaxe e sentido — Ambiguidade, Figuras de linguagem e Reescrita, que precisa de Flexão verbal, Sintaxe, Concordância e Regência ao mesmo tempo. (24-29) o texto: Tipologia textual e Gêneros textuais, depois Coesão → Coerência → Interpretação de texto → Intertextualidade, a culminância da matéria. Decisão consciente: manter a espinha som→grafia→sentido contígua empurra Sintaxe, o segundo maior hub, para o 13º lugar. Numa fila isso não custa nada — não existe mais 'segurar a árvore atrás de um aquecimento', porque só há um caminho e todo mundo passa por ele na mesma ordem.",
       "requisitos": {
         "Classes de palavras": [
           "Gramática"
@@ -32,6 +33,72 @@
         "Variação linguística": [
           "Formação de palavras"
         ],
+        "Flexão nominal": [
+          "Variação linguística"
+        ],
+        "Flexão verbal": [
+          "Flexão nominal"
+        ],
+        "Pronomes": [
+          "Flexão verbal"
+        ],
+        "Colocação pronominal": [
+          "Pronomes"
+        ],
+        "Sintaxe": [
+          "Colocação pronominal"
+        ],
+        "Concordância": [
+          "Sintaxe"
+        ],
+        "Regência": [
+          "Concordância"
+        ],
+        "Crase": [
+          "Regência"
+        ],
+        "Pontuação": [
+          "Crase"
+        ],
+        "Coordenação": [
+          "Pontuação"
+        ],
+        "Subordinação": [
+          "Coordenação"
+        ],
+        "Coordenação e subordinação": [
+          "Subordinação"
+        ],
+        "Ambiguidade": [
+          "Coordenação e subordinação"
+        ],
+        "Figuras de linguagem": [
+          "Ambiguidade"
+        ],
+        "Reescrita": [
+          "Figuras de linguagem"
+        ],
+        "Tipologia textual": [
+          "Reescrita"
+        ],
+        "Gêneros textuais": [
+          "Tipologia textual"
+        ],
+        "Coesão": [
+          "Gêneros textuais"
+        ],
+        "Coerência": [
+          "Coesão"
+        ],
+        "Interpretação de texto": [
+          "Coerência"
+        ],
+        "Intertextualidade": [
+          "Interpretação de texto"
+        ]
+      },
+      "criterio_conceitual": "Cada aresta é uma dependência real de conceito, não uma ordem estética: um tópico só exige outro quando os exercícios dele pressupõem, de fato, a base do exigido. Crase exige Regência porque só há crase quando o termo regente pede a preposição 'a'; Colocação pronominal exige Pronomes, e não Classes de palavras inteiro; Tipologia textual exige Classes de palavras porque o tipo se reconhece pelo verbo (imperativo = injuntivo, ação em sequência = narrativo). Flexão verbal e Flexão nominal são o primeiro caso de requisito por SUBTÓPICO, não tópico inteiro: para flexionar verbo em tempo/modo só é preciso já reconhecer o que é um verbo, não ter terminado Classes de palavras inteira (que também cobre substantivo, adjetivo, artigo...); por isso exigem só {Classes de palavras, Verbo} e {Classes de palavras, Substantivo}, respectivamente — a mesma lógica de 'basta a base do exigido' que já valia para tópico inteiro, agora afinada para dentro dele. Reescrita passou a exigir também Flexão verbal (tópico inteiro, não só um subtópico dele — reescrever mistura voz, tempo e modo, não um recorte só), além de Sintaxe/Concordância/Regência, porque parte dela é justamente manipular o verbo (voz ativa/passiva, discurso direto/indireto). Interpretação de texto exige Semântica e Coerência porque compreender um texto (aplicado a um texto nomeado ou como habilidade genérica — inferência, explícito×implícito, coesão referencial curta) pressupõe reconhecer sentido de palavra/frase e a amarração lógica entre elas; até uma auditoria de agosto/2026, esse tópico convivia com um homônimo no plural ('Interpretação de textos') cobrindo o mesmo assunto sob rótulo diferente, sem requisito declarado nem entrada na lista de tópicos autocontidos abaixo — os dois foram fundidos sob o nome no singular. Oito tópicos não dependem de CONCEITO de nenhum outro, e por isso não aparecem no grafo: Classes de palavras, Ortografia, Acentuação e Semântica (os quatro de sempre) mais Formação de palavras (morfologia da palavra isolada), Variação linguística (teoria da língua), Gramática (a introdução do que é gramática e suas divisões) e Fonética (fonema, sílaba, dígrafo — nível do som). Em que ordem eles são estudados é decisão da fila, não dependência: ver 'criterio'.",
+      "requisitos_conceituais": {
         "Pronomes": [
           "Classes de palavras"
         ],
@@ -114,7 +181,160 @@
           }
         ]
       },
+      "criterio_subtopicos": "Escada em ondas, mesmo espirito das outras materias. Classes de palavras (10, o hub da materia -- Substantivo e Verbo ja sao raiz de outros topicos via requisitos de topico, entao continuam raiz aqui tambem, sem empurra-los pra baixo na fila): Substantivo, Verbo e Interjeicao sao as tres raizes (Interjeicao e a classe mais autocontida, sem depender de nada). Onda 2 (apos Substantivo): Artigo, Numeral, Adjetivo e Pronome -- as quatro classes que giram em torno do substantivo (determinam, quantificam, qualificam ou substituem ele). Onda 3 (apos Verbo): Adverbio e Preposicao -- adverbio modifica principalmente o verbo; preposicao rege complementos verbais. Onda 4 (apos Adverbio): Conjuncao, a classe mais avancada, que prepara o terreno pra Coordenacao/Subordinacao mais adiante na materia. Pronomes (6): Pessoal e a raiz (eu, tu, ele -- o pronome mais basico) -> Possessivo e Demonstrativo (proximos e concretos) -> Indefinido e Tratamento (mais especificos) -> Relativo, o mais avancado (usado em oracoes subordinadas). Figuras de linguagem (3): Figuras de palavra (metafora, metonimia -- nivel da palavra, o caso classico) -> Figuras de pensamento (ironia, hiperbole -- nivel do sentido) -> Figuras de sintaxe (elipse, zeugma -- nivel da estrutura da frase, o mais abstrato). Flexao nominal (3): Genero e Numero sao as duas raizes (as duas flexoes mais basicas do substantivo/adjetivo) -> Grau (aumentativo/diminutivo), mais especifico. Flexao verbal (3): Tempo e modo e a raiz (o nucleo da conjugacao verbal) -> Vozes verbais (ativa/passiva) -> Formas especiais, os casos irregulares mais avancados. Variacao linguistica (3): Concepcoes de linguagem e a raiz (a base teorica) -> Fatores de variacao (regional, social) -> Lingua falada e escrita, uma aplicacao mais especifica dos fatores de variacao. Gramatica (2): Divisoes da gramatica (fonetica, morfologia, sintaxe...) e a raiz -> Tipos de gramatica (normativa, descritiva), mais conceitual. Ortografia (2): os dois subtopicos ja eram os cartoes de aplicacao em texto (exercicio) do proprio topico -- Acentuacao em trechos e a raiz (regra mais simples de aplicar) -> Crase em trechos, que ja exige saber regencia (mesma dependencia real que o topico Crase tem de Regencia). Semantica (2): Sinonimos e antonimos e a raiz (relacao de sentido mais direta) -> Figuras de linguagem em trechos, que exige reconhecer sentido figurado, mais avancado. Interpretacao de texto (1 subtopico): sem escada interna, nao ha o que ordenar. Desde a fila, esses subtópicos abrem UM DE CADA VEZ: 'requisitos_subtopicos' é a serialização das ondas descritas acima — mesma ordem, desempatada dentro de cada onda pelo subtópico com mais cartões —, e as ondas originais ficam registradas em 'requisitos_conceituais_subtopicos'.",
       "requisitos_subtopicos": {
+        "Figuras de linguagem|Figuras de pensamento": [
+          {
+            "t": "Figuras de linguagem",
+            "s": "Figuras de palavra"
+          }
+        ],
+        "Figuras de linguagem|Figuras de sintaxe": [
+          {
+            "t": "Figuras de linguagem",
+            "s": "Figuras de pensamento"
+          }
+        ],
+        "Classes de palavras|Verbo": [
+          {
+            "t": "Classes de palavras",
+            "s": "Substantivo"
+          }
+        ],
+        "Classes de palavras|Advérbio": [
+          {
+            "t": "Classes de palavras",
+            "s": "Verbo"
+          }
+        ],
+        "Classes de palavras|Adjetivo": [
+          {
+            "t": "Classes de palavras",
+            "s": "Advérbio"
+          }
+        ],
+        "Classes de palavras|Pronome": [
+          {
+            "t": "Classes de palavras",
+            "s": "Adjetivo"
+          }
+        ],
+        "Classes de palavras|Preposição": [
+          {
+            "t": "Classes de palavras",
+            "s": "Pronome"
+          }
+        ],
+        "Classes de palavras|Conjunção": [
+          {
+            "t": "Classes de palavras",
+            "s": "Preposição"
+          }
+        ],
+        "Classes de palavras|Numeral": [
+          {
+            "t": "Classes de palavras",
+            "s": "Conjunção"
+          }
+        ],
+        "Classes de palavras|Artigo": [
+          {
+            "t": "Classes de palavras",
+            "s": "Numeral"
+          }
+        ],
+        "Classes de palavras|Interjeição": [
+          {
+            "t": "Classes de palavras",
+            "s": "Artigo"
+          }
+        ],
+        "Pronomes|Demonstrativo": [
+          {
+            "t": "Pronomes",
+            "s": "Pessoal"
+          }
+        ],
+        "Pronomes|Indefinido": [
+          {
+            "t": "Pronomes",
+            "s": "Demonstrativo"
+          }
+        ],
+        "Pronomes|Relativo": [
+          {
+            "t": "Pronomes",
+            "s": "Indefinido"
+          }
+        ],
+        "Pronomes|Tratamento": [
+          {
+            "t": "Pronomes",
+            "s": "Relativo"
+          }
+        ],
+        "Pronomes|Possessivo": [
+          {
+            "t": "Pronomes",
+            "s": "Tratamento"
+          }
+        ],
+        "Flexão nominal|Número": [
+          {
+            "t": "Flexão nominal",
+            "s": "Gênero"
+          }
+        ],
+        "Flexão nominal|Grau": [
+          {
+            "t": "Flexão nominal",
+            "s": "Número"
+          }
+        ],
+        "Flexão verbal|Vozes verbais": [
+          {
+            "t": "Flexão verbal",
+            "s": "Tempo e modo"
+          }
+        ],
+        "Flexão verbal|Formas especiais": [
+          {
+            "t": "Flexão verbal",
+            "s": "Vozes verbais"
+          }
+        ],
+        "Variação linguística|Fatores de variação": [
+          {
+            "t": "Variação linguística",
+            "s": "Concepções de linguagem"
+          }
+        ],
+        "Variação linguística|Língua falada e escrita": [
+          {
+            "t": "Variação linguística",
+            "s": "Fatores de variação"
+          }
+        ],
+        "Gramática|Tipos de gramática": [
+          {
+            "t": "Gramática",
+            "s": "Divisões da gramática"
+          }
+        ],
+        "Ortografia|Crase em trechos": [
+          {
+            "t": "Ortografia",
+            "s": "Acentuação em trechos"
+          }
+        ],
+        "Semântica|Figuras de linguagem em trechos": [
+          {
+            "t": "Semântica",
+            "s": "Sinônimos e antônimos"
+          }
+        ]
+      },
+      "requisitos_conceituais_subtopicos": {
         "Classes de palavras|Artigo": [
           {
             "t": "Classes de palavras",
@@ -247,15 +467,44 @@
             "s": "Sinônimos e antônimos"
           }
         ]
-      },
-      "criterio_subtopicos": "Escada em ondas, mesmo espirito das outras materias. Classes de palavras (10, o hub da materia -- Substantivo e Verbo ja sao raiz de outros topicos via requisitos de topico, entao continuam raiz aqui tambem, sem empurra-los pra baixo na fila): Substantivo, Verbo e Interjeicao sao as tres raizes (Interjeicao e a classe mais autocontida, sem depender de nada). Onda 2 (apos Substantivo): Artigo, Numeral, Adjetivo e Pronome -- as quatro classes que giram em torno do substantivo (determinam, quantificam, qualificam ou substituem ele). Onda 3 (apos Verbo): Adverbio e Preposicao -- adverbio modifica principalmente o verbo; preposicao rege complementos verbais. Onda 4 (apos Adverbio): Conjuncao, a classe mais avancada, que prepara o terreno pra Coordenacao/Subordinacao mais adiante na materia. Pronomes (6): Pessoal e a raiz (eu, tu, ele -- o pronome mais basico) -> Possessivo e Demonstrativo (proximos e concretos) -> Indefinido e Tratamento (mais especificos) -> Relativo, o mais avancado (usado em oracoes subordinadas). Figuras de linguagem (3): Figuras de palavra (metafora, metonimia -- nivel da palavra, o caso classico) -> Figuras de pensamento (ironia, hiperbole -- nivel do sentido) -> Figuras de sintaxe (elipse, zeugma -- nivel da estrutura da frase, o mais abstrato). Flexao nominal (3): Genero e Numero sao as duas raizes (as duas flexoes mais basicas do substantivo/adjetivo) -> Grau (aumentativo/diminutivo), mais especifico. Flexao verbal (3): Tempo e modo e a raiz (o nucleo da conjugacao verbal) -> Vozes verbais (ativa/passiva) -> Formas especiais, os casos irregulares mais avancados. Variacao linguistica (3): Concepcoes de linguagem e a raiz (a base teorica) -> Fatores de variacao (regional, social) -> Lingua falada e escrita, uma aplicacao mais especifica dos fatores de variacao. Gramatica (2): Divisoes da gramatica (fonetica, morfologia, sintaxe...) e a raiz -> Tipos de gramatica (normativa, descritiva), mais conceitual. Ortografia (2): os dois subtopicos ja eram os cartoes de aplicacao em texto (exercicio) do proprio topico -- Acentuacao em trechos e a raiz (regra mais simples de aplicar) -> Crase em trechos, que ja exige saber regencia (mesma dependencia real que o topico Crase tem de Regencia). Semantica (2): Sinonimos e antonimos e a raiz (relacao de sentido mais direta) -> Figuras de linguagem em trechos, que exige reconhecer sentido figurado, mais avancado. Interpretacao de texto (1 subtopico): sem escada interna, nao ha o que ordenar."
+      }
     },
     "matematica": {
-      "criterio": "Cada aresta segue a dependência matemática real: um tópico só exige outro quando suas contas pressupõem, de fato, a base do exigido. Álgebra exige Aritmética porque equação é conta com incógnita, não conta nova; Geometria exige Aritmética porque área e volume são produtos de medidas; Funções exige Álgebra porque função é a mesma manipulação simbólica aplicada a f(x); Probabilidade exige Análise combinatória (contar casos favoráveis e possíveis) e Aritmética (razão/porcentagem). Lógica não depende de conceito nenhum outro (nem consta do Anexo IV), mas ganhou uma aresta de ORDEM (ver '_cadeia_entre_raizes' no topo do arquivo) para não abrir junto de Aritmética no primeiro dia: exige Aritmética (tópico inteiro), a raiz de fato da matéria. Trigonometria, Matrizes e Vetores usam requisito por SUBTÓPICO, cada um pedindo só a fatia de que depende de verdade: Trigonometria precisa só do subtópico Triângulos de Geometria (é dali que vêm Pitágoras e as razões no triângulo retângulo que a trigonometria usa) — não exige Funções: os cartões do banco são razão/ângulo/lei do triângulo, não gráfico ou domínio de função trigonométrica, então essa aresta foi removida na auditoria de agosto/2026 por falta de dependência real; Matrizes precisa do subtópico Sistemas de equações de Álgebra (é a mesma conta — resolver sistema linear —, só que representada em tabela, e os cartões do banco são justamente sobre determinante e invertibilidade, que decidem se um sistema tem solução); Vetores precisa do subtópico Geometria analítica de Geometria (vetor em ℝ² /ℝ³ dado por coordenadas é geometria analítica pura — produto escalar, módulo, ponto inicial/final). Os três ficam dentro do limite de 'no máximo 2 ondas restantes' (ver regra em CLAUDE.md, seção Ordem de aprendizado): o alvo de cada um está a 1-2 ondas do topo da escada interna do exigido, não na raiz dela. Análise combinatória e Estatística NÃO usam mais requisito por subtópico — usaram até uma auditoria de setembro/2026: Análise combinatória exigia só {Aritmética, Multiplicação} (o princípio multiplicativo generaliza a tabuada) e Estatística só {Aritmética, Médias} (é literalmente soma e divisão), os dois raciocínios continuam certos, mas Multiplicação é a RAIZ da escada de 17 subtópicos/8 ondas de Aritmética — a mais longa do banco — e Médias fica só na 2ª onda: as duas dependências liberavam o tópico inteiro tendo pulado 8 e 6 ondas de Aritmética, respectivamente, muito acima do limite de 2. Viraram 'Aritmética' (tópico inteiro), como Lógica. Aritmética é a única raiz de verdade da matéria (sem pré-requisito nenhum, nem de tópico nem de subtópico) — Multiplicação (a tabuada), que travava Aritmética e Análise combinatória de fora até agosto/2026, virou subtópico DELA por pedido explícito, e a mesma trava foi refeita um nível mais fundo, dentro do próprio grafo de subtópicos de Aritmética (ver 'criterio_subtopicos').",
+      "criterio": "A fila segue os blocos naturais da matéria, cada um do mais geral para o mais específico. (1) Aritmética, a única raiz conceitual e o maior tópico do banco. (2-4) álgebra: Álgebra, depois Funções (a mesma manipulação simbólica aplicada a f(x)) e Matrizes (o mesmo sistema linear representado em tabela). (5-7) geometria: Geometria, depois Trigonometria (que vem das razões no triângulo retângulo) e Vetores (geometria analítica pura). (8-10) contagem e dados: Análise combinatória → Probabilidade (contar casos favoráveis e possíveis) → Estatística. (11) Lógica por último, e de propósito: é o único tópico da matéria que NÃO consta do Anexo IV. Fica no banco por ser útil, mas obrigar a passar por 90 cartões fora do edital para alcançar conteúdo cobrado seria cobrar da pessoa o que a prova não cobra — na fila, tudo que é do edital vem antes.",
       "requisitos": {
-        "Lógica": [
+        "Álgebra": [
           "Aritmética"
         ],
+        "Funções": [
+          "Álgebra"
+        ],
+        "Matrizes": [
+          "Funções"
+        ],
+        "Geometria": [
+          "Matrizes"
+        ],
+        "Trigonometria": [
+          "Geometria"
+        ],
+        "Vetores": [
+          "Trigonometria"
+        ],
+        "Análise combinatória": [
+          "Vetores"
+        ],
+        "Probabilidade": [
+          "Análise combinatória"
+        ],
+        "Estatística": [
+          "Probabilidade"
+        ],
+        "Lógica": [
+          "Estatística"
+        ]
+      },
+      "criterio_conceitual": "Cada aresta segue a dependência matemática real: um tópico só exige outro quando suas contas pressupõem, de fato, a base do exigido. Álgebra exige Aritmética porque equação é conta com incógnita, não conta nova; Geometria exige Aritmética porque área e volume são produtos de medidas; Funções exige Álgebra porque função é a mesma manipulação simbólica aplicada a f(x); Probabilidade exige Análise combinatória (contar casos favoráveis e possíveis) e Aritmética (razão/porcentagem). Lógica não depende de conceito nenhum outro, e nem consta do Anexo IV — por isso não aparece no grafo; onde ela entra na fila é decisão de 'criterio'. Trigonometria, Matrizes e Vetores usam requisito por SUBTÓPICO, cada um pedindo só a fatia de que depende de verdade: Trigonometria precisa só do subtópico Triângulos de Geometria (é dali que vêm Pitágoras e as razões no triângulo retângulo que a trigonometria usa) — não exige Funções: os cartões do banco são razão/ângulo/lei do triângulo, não gráfico ou domínio de função trigonométrica, então essa aresta foi removida na auditoria de agosto/2026 por falta de dependência real; Matrizes precisa do subtópico Sistemas de equações de Álgebra (é a mesma conta — resolver sistema linear —, só que representada em tabela, e os cartões do banco são justamente sobre determinante e invertibilidade, que decidem se um sistema tem solução); Vetores precisa do subtópico Geometria analítica de Geometria (vetor em ℝ² /ℝ³ dado por coordenadas é geometria analítica pura — produto escalar, módulo, ponto inicial/final). Os três ficam dentro do limite de 'no máximo 2 ondas restantes' (ver regra em CLAUDE.md, seção Ordem de aprendizado): o alvo de cada um está a 1-2 ondas do topo da escada interna do exigido, não na raiz dela. Análise combinatória e Estatística NÃO usam mais requisito por subtópico — usaram até uma auditoria de setembro/2026: Análise combinatória exigia só {Aritmética, Multiplicação} (o princípio multiplicativo generaliza a tabuada) e Estatística só {Aritmética, Médias} (é literalmente soma e divisão), os dois raciocínios continuam certos, mas Multiplicação é a RAIZ da escada de 17 subtópicos/8 ondas de Aritmética — a mais longa do banco — e Médias fica só na 2ª onda: as duas dependências liberavam o tópico inteiro tendo pulado 8 e 6 ondas de Aritmética, respectivamente, muito acima do limite de 2. Viraram 'Aritmética' (tópico inteiro), como Lógica. Aritmética é a única raiz de verdade da matéria (sem pré-requisito nenhum, nem de tópico nem de subtópico) — Multiplicação (a tabuada), que travava Aritmética e Análise combinatória de fora até agosto/2026, virou subtópico DELA por pedido explícito, e a mesma trava foi refeita um nível mais fundo, dentro do próprio grafo de subtópicos de Aritmética (ver 'criterio_subtopicos').",
+      "requisitos_conceituais": {
         "Álgebra": [
           "Aritmética"
         ],
@@ -294,8 +543,304 @@
           }
         ]
       },
-      "criterio_subtopicos": "Escada em ONDAS: dentro de cada tópico grande, uma leva pequena de subtópicos abre de cada vez (2 a 4), não tudo nem um por um — os mais básicos primeiro, os mais complexos esperando mais. Onde existe dependência matemática real, ela manda; onde os subtópicos são fatos paralelos sem dependência real entre si, a ordem é pedagógica (mesmo espírito do '_cadeia_entre_raizes' do topo do arquivo, um nível mais fundo). Aritmética (17 subtópicos): Multiplicação é a única raiz — sustenta todo o resto. Onda 2 (após Multiplicação): Operações e expressões numéricas e Conjuntos numéricos, os dois mais básicos. Onda 3 (após Operações): Sistema de unidades de medida, Divisibilidade e Médias — contas do dia a dia sobre a base de operações já dominada. Onda 4 (após Divisibilidade): Sequências numéricas, Radiciação, Notação científica — mais especializadas. Dali em diante, a cadeia de dependência real de sempre: Fatoração em números primos -> MMC e MDC (os dois) -> Frações -> Razão e proporção -> Porcentagem/Regra de três -> Juros; e Sequências numéricas -> Progressões. Álgebra (12 subtópicos): duas raízes — Equações do 1º grau (a mais básica de verdade) e Produtos notáveis (identidades algébricas, base de fatoração). Inequações, Sistemas de equações e Equações exponenciais exigem só 1º grau (generalizam ou reaplicam a mesma manipulação); Fatoração e Equações racionais exigem Produtos notáveis (fatorar é aplicar as identidades). Equações do 2º grau exige Fatoração (resolver por fatoração é o método mais básico); dali saem Equações biquadradas e irracionais (ambas reduzem a uma equação do 2º grau depois de uma substituição ou de elevar ao quadrado). Equações modulares exige só 1º grau; Equações logarítmicas exige Equações exponenciais, sua operação inversa. Geometria (9 subtópicos): duas raízes — Ângulos e Segmentos, as duas medidas mais elementares. Polígonos e quadriláteros e Circunferência e círculo exigem Ângulos; Triângulos exige os dois (usa ângulo interno e comprimento de lado). Poliedros exige Polígonos (um sólido é limitado por faces poligonais); Áreas compostas e Geometria analítica exigem Triângulos (área composta decompõe em triângulos; geometria analítica usa distância/ponto médio de segmento, que o triângulo retângulo de apoio já pressupõe). Geometria espacial, o tópico mais avançado, exige Poliedros. Lógica (8 subtópicos): quatro raízes verdadeiramente independentes — Proposições, Conjuntos, Associação lógica e Sequências lógicas (as duas últimas são estilos de questão próprios, sem pré-requisito real). Conectivos e tabela-verdade e Quantificadores exigem só Proposições; Equivalências lógicas e Argumentos e silogismos exigem Conectivos e tabela-verdade, que é a ferramenta que os dois usam pra verificar validade. Funções (4 subtópicos): Conceitos gerais de função é a única raiz; Função afim exige essa base; Função quadrática e Função exponencial e logarítmica exigem Função afim, o tipo mais simples de função antes de generalizar. Trigonometria (4 subtópicos): Razões no triângulo retângulo é a raiz (a mesma que Trigonometria já exige de Geometria); Ângulos notáveis e Leis do triângulo exigem essa base (a lei do triângulo generaliza a razão do triângulo retângulo pra qualquer triângulo); Círculo trigonométrico, o mais abstrato, exige Ângulos notáveis. Matrizes (2 subtópicos): Operações com matrizes é a raiz; Determinantes exige essa base, porque o cálculo de determinante parte das mesmas operações.",
+      "criterio_subtopicos": "Escada em ONDAS: dentro de cada tópico grande, uma leva pequena de subtópicos abre de cada vez (2 a 4), não tudo nem um por um — os mais básicos primeiro, os mais complexos esperando mais. Onde existe dependência matemática real, ela manda; onde os subtópicos são fatos paralelos sem dependência real entre si, a ordem é pedagógica (mesmo espírito do '_cadeia_entre_raizes' do topo do arquivo, um nível mais fundo). Aritmética (17 subtópicos): Multiplicação é a única raiz — sustenta todo o resto. Onda 2 (após Multiplicação): Operações e expressões numéricas e Conjuntos numéricos, os dois mais básicos. Onda 3 (após Operações): Sistema de unidades de medida, Divisibilidade e Médias — contas do dia a dia sobre a base de operações já dominada. Onda 4 (após Divisibilidade): Sequências numéricas, Radiciação, Notação científica — mais especializadas. Dali em diante, a cadeia de dependência real de sempre: Fatoração em números primos -> MMC e MDC (os dois) -> Frações -> Razão e proporção -> Porcentagem/Regra de três -> Juros; e Sequências numéricas -> Progressões. Álgebra (12 subtópicos): duas raízes — Equações do 1º grau (a mais básica de verdade) e Produtos notáveis (identidades algébricas, base de fatoração). Inequações, Sistemas de equações e Equações exponenciais exigem só 1º grau (generalizam ou reaplicam a mesma manipulação); Fatoração e Equações racionais exigem Produtos notáveis (fatorar é aplicar as identidades). Equações do 2º grau exige Fatoração (resolver por fatoração é o método mais básico); dali saem Equações biquadradas e irracionais (ambas reduzem a uma equação do 2º grau depois de uma substituição ou de elevar ao quadrado). Equações modulares exige só 1º grau; Equações logarítmicas exige Equações exponenciais, sua operação inversa. Geometria (9 subtópicos): duas raízes — Ângulos e Segmentos, as duas medidas mais elementares. Polígonos e quadriláteros e Circunferência e círculo exigem Ângulos; Triângulos exige os dois (usa ângulo interno e comprimento de lado). Poliedros exige Polígonos (um sólido é limitado por faces poligonais); Áreas compostas e Geometria analítica exigem Triângulos (área composta decompõe em triângulos; geometria analítica usa distância/ponto médio de segmento, que o triângulo retângulo de apoio já pressupõe). Geometria espacial, o tópico mais avançado, exige Poliedros. Lógica (8 subtópicos): quatro raízes verdadeiramente independentes — Proposições, Conjuntos, Associação lógica e Sequências lógicas (as duas últimas são estilos de questão próprios, sem pré-requisito real). Conectivos e tabela-verdade e Quantificadores exigem só Proposições; Equivalências lógicas e Argumentos e silogismos exigem Conectivos e tabela-verdade, que é a ferramenta que os dois usam pra verificar validade. Funções (4 subtópicos): Conceitos gerais de função é a única raiz; Função afim exige essa base; Função quadrática e Função exponencial e logarítmica exigem Função afim, o tipo mais simples de função antes de generalizar. Trigonometria (4 subtópicos): Razões no triângulo retângulo é a raiz (a mesma que Trigonometria já exige de Geometria); Ângulos notáveis e Leis do triângulo exigem essa base (a lei do triângulo generaliza a razão do triângulo retângulo pra qualquer triângulo); Círculo trigonométrico, o mais abstrato, exige Ângulos notáveis. Matrizes (2 subtópicos): Operações com matrizes é a raiz; Determinantes exige essa base, porque o cálculo de determinante parte das mesmas operações. Desde a fila, esses subtópicos abrem UM DE CADA VEZ: 'requisitos_subtopicos' é a serialização das ondas descritas acima — mesma ordem, desempatada dentro de cada onda pelo subtópico com mais cartões —, e as ondas originais ficam registradas em 'requisitos_conceituais_subtopicos'.",
       "requisitos_subtopicos": {
+        "Aritmética|Operações e expressões numéricas": [
+          {
+            "t": "Aritmética",
+            "s": "Multiplicação"
+          }
+        ],
+        "Aritmética|Divisibilidade": [
+          {
+            "t": "Aritmética",
+            "s": "Operações e expressões numéricas"
+          }
+        ],
+        "Aritmética|Fatoração em números primos": [
+          {
+            "t": "Aritmética",
+            "s": "Divisibilidade"
+          }
+        ],
+        "Aritmética|MMC e MDC": [
+          {
+            "t": "Aritmética",
+            "s": "Fatoração em números primos"
+          }
+        ],
+        "Aritmética|Frações": [
+          {
+            "t": "Aritmética",
+            "s": "MMC e MDC"
+          }
+        ],
+        "Aritmética|Razão e proporção": [
+          {
+            "t": "Aritmética",
+            "s": "Frações"
+          }
+        ],
+        "Aritmética|Porcentagem": [
+          {
+            "t": "Aritmética",
+            "s": "Razão e proporção"
+          }
+        ],
+        "Aritmética|Sequências numéricas": [
+          {
+            "t": "Aritmética",
+            "s": "Porcentagem"
+          }
+        ],
+        "Aritmética|Sistema de unidades de medida": [
+          {
+            "t": "Aritmética",
+            "s": "Sequências numéricas"
+          }
+        ],
+        "Aritmética|Radiciação": [
+          {
+            "t": "Aritmética",
+            "s": "Sistema de unidades de medida"
+          }
+        ],
+        "Aritmética|Regra de três": [
+          {
+            "t": "Aritmética",
+            "s": "Radiciação"
+          }
+        ],
+        "Aritmética|Progressões": [
+          {
+            "t": "Aritmética",
+            "s": "Regra de três"
+          }
+        ],
+        "Aritmética|Conjuntos numéricos": [
+          {
+            "t": "Aritmética",
+            "s": "Progressões"
+          }
+        ],
+        "Aritmética|Juros": [
+          {
+            "t": "Aritmética",
+            "s": "Conjuntos numéricos"
+          }
+        ],
+        "Aritmética|Médias": [
+          {
+            "t": "Aritmética",
+            "s": "Juros"
+          }
+        ],
+        "Aritmética|Notação científica": [
+          {
+            "t": "Aritmética",
+            "s": "Médias"
+          }
+        ],
+        "Álgebra|Produtos notáveis": [
+          {
+            "t": "Álgebra",
+            "s": "Equações do 1º grau"
+          }
+        ],
+        "Álgebra|Fatoração": [
+          {
+            "t": "Álgebra",
+            "s": "Produtos notáveis"
+          }
+        ],
+        "Álgebra|Equações do 2º grau": [
+          {
+            "t": "Álgebra",
+            "s": "Fatoração"
+          }
+        ],
+        "Álgebra|Equações exponenciais": [
+          {
+            "t": "Álgebra",
+            "s": "Equações do 2º grau"
+          }
+        ],
+        "Álgebra|Sistemas de equações": [
+          {
+            "t": "Álgebra",
+            "s": "Equações exponenciais"
+          }
+        ],
+        "Álgebra|Equações logarítmicas": [
+          {
+            "t": "Álgebra",
+            "s": "Sistemas de equações"
+          }
+        ],
+        "Álgebra|Inequações": [
+          {
+            "t": "Álgebra",
+            "s": "Equações logarítmicas"
+          }
+        ],
+        "Álgebra|Equações irracionais": [
+          {
+            "t": "Álgebra",
+            "s": "Inequações"
+          }
+        ],
+        "Álgebra|Equações racionais": [
+          {
+            "t": "Álgebra",
+            "s": "Equações irracionais"
+          }
+        ],
+        "Álgebra|Equações modulares": [
+          {
+            "t": "Álgebra",
+            "s": "Equações racionais"
+          }
+        ],
+        "Álgebra|Equações biquadradas": [
+          {
+            "t": "Álgebra",
+            "s": "Equações modulares"
+          }
+        ],
+        "Funções|Função afim": [
+          {
+            "t": "Funções",
+            "s": "Conceitos gerais de função"
+          }
+        ],
+        "Funções|Função quadrática": [
+          {
+            "t": "Funções",
+            "s": "Função afim"
+          }
+        ],
+        "Funções|Função exponencial e logarítmica": [
+          {
+            "t": "Funções",
+            "s": "Função quadrática"
+          }
+        ],
+        "Trigonometria|Ângulos notáveis": [
+          {
+            "t": "Trigonometria",
+            "s": "Razões no triângulo retângulo"
+          }
+        ],
+        "Trigonometria|Círculo trigonométrico": [
+          {
+            "t": "Trigonometria",
+            "s": "Ângulos notáveis"
+          }
+        ],
+        "Trigonometria|Leis do triângulo": [
+          {
+            "t": "Trigonometria",
+            "s": "Círculo trigonométrico"
+          }
+        ],
+        "Geometria|Segmentos": [
+          {
+            "t": "Geometria",
+            "s": "Ângulos"
+          }
+        ],
+        "Geometria|Triângulos": [
+          {
+            "t": "Geometria",
+            "s": "Segmentos"
+          }
+        ],
+        "Geometria|Polígonos e quadriláteros": [
+          {
+            "t": "Geometria",
+            "s": "Triângulos"
+          }
+        ],
+        "Geometria|Poliedros": [
+          {
+            "t": "Geometria",
+            "s": "Polígonos e quadriláteros"
+          }
+        ],
+        "Geometria|Geometria espacial": [
+          {
+            "t": "Geometria",
+            "s": "Poliedros"
+          }
+        ],
+        "Geometria|Circunferência e círculo": [
+          {
+            "t": "Geometria",
+            "s": "Geometria espacial"
+          }
+        ],
+        "Geometria|Geometria analítica": [
+          {
+            "t": "Geometria",
+            "s": "Circunferência e círculo"
+          }
+        ],
+        "Geometria|Áreas compostas": [
+          {
+            "t": "Geometria",
+            "s": "Geometria analítica"
+          }
+        ],
+        "Lógica|Conectivos e tabela-verdade": [
+          {
+            "t": "Lógica",
+            "s": "Proposições"
+          }
+        ],
+        "Lógica|Conjuntos": [
+          {
+            "t": "Lógica",
+            "s": "Conectivos e tabela-verdade"
+          }
+        ],
+        "Lógica|Equivalências lógicas": [
+          {
+            "t": "Lógica",
+            "s": "Conjuntos"
+          }
+        ],
+        "Lógica|Quantificadores": [
+          {
+            "t": "Lógica",
+            "s": "Equivalências lógicas"
+          }
+        ],
+        "Lógica|Argumentos e silogismos": [
+          {
+            "t": "Lógica",
+            "s": "Quantificadores"
+          }
+        ],
+        "Lógica|Sequências lógicas": [
+          {
+            "t": "Lógica",
+            "s": "Argumentos e silogismos"
+          }
+        ],
+        "Lógica|Associação lógica": [
+          {
+            "t": "Lógica",
+            "s": "Sequências lógicas"
+          }
+        ],
+        "Matrizes|Determinantes": [
+          {
+            "t": "Matrizes",
+            "s": "Operações com matrizes"
+          }
+        ]
+      },
+      "requisitos_conceituais_subtopicos": {
         "Aritmética|Operações e expressões numéricas": [
           {
             "t": "Aritmética",
@@ -571,8 +1116,38 @@
       }
     },
     "sus": {
-      "criterio": "Cada aresta segue a hierarquia normativa real: um tópico só exige outro quando o exigido é a norma que o institui ou estrutura. Lei 8.080/90 exige Constituição Federal porque é a lei que regulamenta os arts. 196-200 da Carta; Lei 8.142/90 exige Lei 8.080/90 por ser a mesma reforma sanitária, tratando de participação popular e financiamento; Organização do SUS exige Lei 8.080/90 porque a estrutura (direção única, regionalização, hierarquização) vem dela; Controle social exige Lei 8.142/90, que instituiu Conselhos e Conferências de Saúde; PNAB, PNAU e PNH exigem Organização do SUS porque são políticas que operam DENTRO da rede e dos níveis de atenção que ela define; Rede Alyne exige Organização do SUS pelo mesmo motivo (é uma rede temática dentro do SUS); Transferência inter-hospitalar exige PNAU porque o processo de transferência regulada é conduzido pela mesma central de regulação e rede de urgência/emergência da PNAU. Fica SEM requisito, e portanto aberta desde o primeiro dia, só a Constituição Federal — a base de tudo o que vem depois.",
+      "criterio": "A fila segue a hierarquia normativa, do que institui para o que opera dentro. (1) Constituição Federal, a base de tudo. (2-4) as duas leis orgânicas e o que uma delas cria: Lei 8.080/90, Lei 8.142/90 e Controle social, que é literalmente o Conselho e a Conferência que a 8.142 instituiu. (5) Organização do SUS, a estrutura (direção única, regionalização, hierarquização) que sai da 8.080. (6-10) as políticas e redes que operam dentro dessa estrutura, da porta de entrada até o caso mais específico: PNAB (atenção básica) → PNH (o modo de acolher, transversal) → Rede Alyne (rede temática que atravessa a atenção básica) → PNAU (urgência) → Transferência inter-hospitalar, que é um processo dentro da própria rede de urgência.",
       "requisitos": {
+        "Lei 8.080/90": [
+          "Constituição Federal"
+        ],
+        "Lei 8.142/90": [
+          "Lei 8.080/90"
+        ],
+        "Controle social": [
+          "Lei 8.142/90"
+        ],
+        "Organização do SUS": [
+          "Controle social"
+        ],
+        "PNAB": [
+          "Organização do SUS"
+        ],
+        "PNH": [
+          "PNAB"
+        ],
+        "Rede Alyne": [
+          "PNH"
+        ],
+        "PNAU": [
+          "Rede Alyne"
+        ],
+        "Transferência inter-hospitalar": [
+          "PNAU"
+        ]
+      },
+      "criterio_conceitual": "Cada aresta segue a hierarquia normativa real: um tópico só exige outro quando o exigido é a norma que o institui ou estrutura. Lei 8.080/90 exige Constituição Federal porque é a lei que regulamenta os arts. 196-200 da Carta; Lei 8.142/90 exige Lei 8.080/90 por ser a mesma reforma sanitária, tratando de participação popular e financiamento; Organização do SUS exige Lei 8.080/90 porque a estrutura (direção única, regionalização, hierarquização) vem dela; Controle social exige Lei 8.142/90, que instituiu Conselhos e Conferências de Saúde; PNAB, PNAU e PNH exigem Organização do SUS porque são políticas que operam DENTRO da rede e dos níveis de atenção que ela define; Rede Alyne exige Organização do SUS pelo mesmo motivo (é uma rede temática dentro do SUS); Transferência inter-hospitalar exige PNAU porque o processo de transferência regulada é conduzido pela mesma central de regulação e rede de urgência/emergência da PNAU. Fica sem dependência conceitual só a Constituição Federal — a base de tudo o que vem depois, e por isso também a primeira da fila.",
+      "requisitos_conceituais": {
         "Lei 8.080/90": [
           "Constituição Federal"
         ],
@@ -601,7 +1176,184 @@
           "PNAU"
         ]
       },
+      "criterio_subtopicos": "Escada em ondas, mesmo espirito das outras materias: poucos subtopicos abrem de cada vez, do mais introdutorio ao mais especifico/operacional. Lei 8.080/90 (5): Objetivos, campo de atuacao e conceitos e a raiz (a introducao da lei) -> Principios/diretrizes do SUS, art. 7o (o nucleo normativo) -> Competencias das esferas de gestao e Gestao compartilhada CIT/CIB (a estrutura operacional que aplica os principios) -> Participacao complementar do setor privado (o caso mais especifico). PNAB (5): Fundamentos e diretrizes da APS/PNAB e a raiz -> Composicao e dimensionamento das equipes (a estrutura basica) -> Atribuicoes dos profissionais e Tipos de equipes especializadas (variacoes sobre essa estrutura) -> Processos de trabalho e ferramentas (a aplicacao pratica, mais avancada). Rede Alyne (5): Instituicao, objetivos e principios e a raiz -> Organizacao/componentes da rede -> Pre-natal e vinculacao a maternidade e Pontos de atencao especializados (os dois ramos da rede) -> Puerperio e pos-parto (a fase clinica seguinte ao pre-natal, cronologicamente depois). Lei 8.142/90 (4): Instancias de participacao (visao geral) e a raiz -> Conselho de Saude e Conferencia de Saude, as duas instancias principais -> Fundo Nacional de Saude, o mecanismo de financiamento mais especifico. Constituicao Federal (4): Direito a saude, arts. 196-198, e a raiz (o principio constitucional basico) -> Competencias do SUS, art. 200 (o que decorre desse direito) -> Financiamento, art. 198 par. 1o, e Participacao da iniciativa privada (dispositivos mais especificos). Controle social (4): Conselho de Saude e Conferencia de Saude sao as duas raizes (os dois canais formais classicos) -> Outros canais de participacao (extensao) -> Financiamento, condicionantes FNS (o detalhe mais tecnico). Transferencia inter-hospitalar (4): segue a ordem cronologica real do processo -- Regulacao e autorizacao (a raiz, o primeiro passo) -> Preparo pre-transporte -> Equipe e conduta durante o transporte -> Responsabilidade e documentacao (o registro, que atravessa e fecha o processo). Organizacao do SUS (3): Principios organizativos e a raiz -> Decreto no 7.508/2011 (que regulamenta esses principios) -> Comissoes Intergestores CIT/CIB (o mecanismo operacional mais avancado que o decreto instituiu). PNH (3): Contexto historico da PNH e a raiz -> Diretrizes da PNH -> Dispositivos/ferramentas da PNH, a aplicacao pratica mais avancada. PNAU (2): Componentes da RUE e a raiz (a rede inteira) -> SAMU 192, um componente especifico dela. Desde a fila, esses subtópicos abrem UM DE CADA VEZ: 'requisitos_subtopicos' é a serialização das ondas descritas acima — mesma ordem, desempatada dentro de cada onda pelo subtópico com mais cartões —, e as ondas originais ficam registradas em 'requisitos_conceituais_subtopicos'.",
       "requisitos_subtopicos": {
+        "Lei 8.080/90|Princípios/diretrizes do SUS (art. 7º)": [
+          {
+            "t": "Lei 8.080/90",
+            "s": "Objetivos, campo de atuação e conceitos"
+          }
+        ],
+        "Lei 8.080/90|Competências das esferas de gestão": [
+          {
+            "t": "Lei 8.080/90",
+            "s": "Princípios/diretrizes do SUS (art. 7º)"
+          }
+        ],
+        "Lei 8.080/90|Gestão compartilhada (CIT/CIB)": [
+          {
+            "t": "Lei 8.080/90",
+            "s": "Competências das esferas de gestão"
+          }
+        ],
+        "Lei 8.080/90|Participação complementar do setor privado": [
+          {
+            "t": "Lei 8.080/90",
+            "s": "Gestão compartilhada (CIT/CIB)"
+          }
+        ],
+        "Lei 8.142/90|Conselho de Saúde": [
+          {
+            "t": "Lei 8.142/90",
+            "s": "Instâncias de participação (visão geral)"
+          }
+        ],
+        "Lei 8.142/90|Fundo Nacional de Saúde": [
+          {
+            "t": "Lei 8.142/90",
+            "s": "Conselho de Saúde"
+          }
+        ],
+        "Lei 8.142/90|Conferência de Saúde": [
+          {
+            "t": "Lei 8.142/90",
+            "s": "Fundo Nacional de Saúde"
+          }
+        ],
+        "Organização do SUS|Decreto nº 7.508/2011": [
+          {
+            "t": "Organização do SUS",
+            "s": "Princípios organizativos"
+          }
+        ],
+        "Organização do SUS|Comissões Intergestores (CIT/CIB)": [
+          {
+            "t": "Organização do SUS",
+            "s": "Decreto nº 7.508/2011"
+          }
+        ],
+        "Constituição Federal|Competências do SUS (art. 200)": [
+          {
+            "t": "Constituição Federal",
+            "s": "Direito à saúde (arts. 196-198)"
+          }
+        ],
+        "Constituição Federal|Participação da iniciativa privada": [
+          {
+            "t": "Constituição Federal",
+            "s": "Competências do SUS (art. 200)"
+          }
+        ],
+        "Constituição Federal|Financiamento (art. 198 §1º)": [
+          {
+            "t": "Constituição Federal",
+            "s": "Participação da iniciativa privada"
+          }
+        ],
+        "Controle social|Outros canais de participação": [
+          {
+            "t": "Controle social",
+            "s": "Conselho de Saúde"
+          }
+        ],
+        "Controle social|Conferência de Saúde": [
+          {
+            "t": "Controle social",
+            "s": "Outros canais de participação"
+          }
+        ],
+        "Controle social|Financiamento (condicionantes FNS)": [
+          {
+            "t": "Controle social",
+            "s": "Conferência de Saúde"
+          }
+        ],
+        "PNAB|Composição e dimensionamento das equipes": [
+          {
+            "t": "PNAB",
+            "s": "Fundamentos e diretrizes da APS/PNAB"
+          }
+        ],
+        "PNAB|Atribuições dos profissionais": [
+          {
+            "t": "PNAB",
+            "s": "Composição e dimensionamento das equipes"
+          }
+        ],
+        "PNAB|Processos de trabalho e ferramentas": [
+          {
+            "t": "PNAB",
+            "s": "Atribuições dos profissionais"
+          }
+        ],
+        "PNAB|Tipos de equipes especializadas": [
+          {
+            "t": "PNAB",
+            "s": "Processos de trabalho e ferramentas"
+          }
+        ],
+        "PNH|Diretrizes da PNH": [
+          {
+            "t": "PNH",
+            "s": "Contexto histórico da PNH"
+          }
+        ],
+        "PNH|Dispositivos/ferramentas da PNH": [
+          {
+            "t": "PNH",
+            "s": "Diretrizes da PNH"
+          }
+        ],
+        "PNAU|SAMU 192": [
+          {
+            "t": "PNAU",
+            "s": "Componentes da RUE"
+          }
+        ],
+        "Transferência inter-hospitalar|Preparo pré-transporte": [
+          {
+            "t": "Transferência inter-hospitalar",
+            "s": "Regulação e autorização"
+          }
+        ],
+        "Transferência inter-hospitalar|Equipe e conduta durante o transporte": [
+          {
+            "t": "Transferência inter-hospitalar",
+            "s": "Preparo pré-transporte"
+          }
+        ],
+        "Transferência inter-hospitalar|Responsabilidade e documentação": [
+          {
+            "t": "Transferência inter-hospitalar",
+            "s": "Equipe e conduta durante o transporte"
+          }
+        ],
+        "Rede Alyne|Organização/componentes da rede": [
+          {
+            "t": "Rede Alyne",
+            "s": "Instituição, objetivos e princípios"
+          }
+        ],
+        "Rede Alyne|Pré-natal e vinculação à maternidade": [
+          {
+            "t": "Rede Alyne",
+            "s": "Organização/componentes da rede"
+          }
+        ],
+        "Rede Alyne|Pontos de atenção especializados": [
+          {
+            "t": "Rede Alyne",
+            "s": "Pré-natal e vinculação à maternidade"
+          }
+        ],
+        "Rede Alyne|Puerpério e pós-parto": [
+          {
+            "t": "Rede Alyne",
+            "s": "Pontos de atenção especializados"
+          }
+        ]
+      },
+      "requisitos_conceituais_subtopicos": {
         "Lei 8.080/90|Princípios/diretrizes do SUS (art. 7º)": [
           {
             "t": "Lei 8.080/90",
@@ -770,24 +1522,35 @@
             "s": "Componentes da RUE"
           }
         ]
-      },
-      "criterio_subtopicos": "Escada em ondas, mesmo espirito das outras materias: poucos subtopicos abrem de cada vez, do mais introdutorio ao mais especifico/operacional. Lei 8.080/90 (5): Objetivos, campo de atuacao e conceitos e a raiz (a introducao da lei) -> Principios/diretrizes do SUS, art. 7o (o nucleo normativo) -> Competencias das esferas de gestao e Gestao compartilhada CIT/CIB (a estrutura operacional que aplica os principios) -> Participacao complementar do setor privado (o caso mais especifico). PNAB (5): Fundamentos e diretrizes da APS/PNAB e a raiz -> Composicao e dimensionamento das equipes (a estrutura basica) -> Atribuicoes dos profissionais e Tipos de equipes especializadas (variacoes sobre essa estrutura) -> Processos de trabalho e ferramentas (a aplicacao pratica, mais avancada). Rede Alyne (5): Instituicao, objetivos e principios e a raiz -> Organizacao/componentes da rede -> Pre-natal e vinculacao a maternidade e Pontos de atencao especializados (os dois ramos da rede) -> Puerperio e pos-parto (a fase clinica seguinte ao pre-natal, cronologicamente depois). Lei 8.142/90 (4): Instancias de participacao (visao geral) e a raiz -> Conselho de Saude e Conferencia de Saude, as duas instancias principais -> Fundo Nacional de Saude, o mecanismo de financiamento mais especifico. Constituicao Federal (4): Direito a saude, arts. 196-198, e a raiz (o principio constitucional basico) -> Competencias do SUS, art. 200 (o que decorre desse direito) -> Financiamento, art. 198 par. 1o, e Participacao da iniciativa privada (dispositivos mais especificos). Controle social (4): Conselho de Saude e Conferencia de Saude sao as duas raizes (os dois canais formais classicos) -> Outros canais de participacao (extensao) -> Financiamento, condicionantes FNS (o detalhe mais tecnico). Transferencia inter-hospitalar (4): segue a ordem cronologica real do processo -- Regulacao e autorizacao (a raiz, o primeiro passo) -> Preparo pre-transporte -> Equipe e conduta durante o transporte -> Responsabilidade e documentacao (o registro, que atravessa e fecha o processo). Organizacao do SUS (3): Principios organizativos e a raiz -> Decreto no 7.508/2011 (que regulamenta esses principios) -> Comissoes Intergestores CIT/CIB (o mecanismo operacional mais avancado que o decreto instituiu). PNH (3): Contexto historico da PNH e a raiz -> Diretrizes da PNH -> Dispositivos/ferramentas da PNH, a aplicacao pratica mais avancada. PNAU (2): Componentes da RUE e a raiz (a rede inteira) -> SAMU 192, um componente especifico dela."
+      }
     },
     "ingles": {
-      "criterio": "Verb Tenses é a base: modal verb muda a forma do verbo principal, e voz passiva é o tempo verbal de 'to be' aplicado ao particípio — os dois pressupõem already saber conjugar nos tempos verbais. Reading Comprehension exige três bases ao mesmo tempo (Verb Tenses, Connectors e Vocabulary in Context) porque um texto real mistura tempo verbal, conectivos lógicos e vocabulário em contexto — não dá para treinar compreensão de texto sem já ter alguma base nos três. Cinco tópicos não dependem de conceito nenhum outro (ver '_cadeia_entre_raizes' no topo do arquivo): Verb Tenses, Comparatives and Superlatives, Connectors, False Cognates e Vocabulary in Context. Ganharam uma cadeia de ordem: Verb Tenses primeiro, por já ser 'a base de tudo' (trava Modal Verbs, Passive Voice e um terço de Reading Comprehension); Connectors e Vocabulary in Context em seguida, por serem as outras duas bases de que Reading Comprehension precisa — assim que os três abrirem e a pessoa dominar a base de cada um, o tópico de topo da matéria já libera; Comparatives and Superlatives e False Cognates, que não travam mais nada na árvore, fecham a fila.",
+      "criterio": "A fila vai de gramática a leitura. (1-3) o verbo: Verb Tenses primeiro, porque modal verb muda a forma do verbo principal e voz passiva é o tempo verbal de 'to be' no particípio — Modal Verbs e Passive Voice vêm logo atrás. (4-5) o resto da gramática: Connectors e Comparatives and Superlatives. (6-7) vocabulário: Vocabulary in Context e False Cognates. (8) Reading Comprehension por último, como culminância: é o único tópico que exige três bases ao mesmo tempo (tempo verbal, conectivo lógico e vocabulário em contexto), que é o que um texto real mistura.",
       "requisitos": {
-        "Connectors": [
+        "Modal Verbs": [
           "Verb Tenses"
         ],
-        "Vocabulary in Context": [
-          "Connectors"
+        "Passive Voice": [
+          "Modal Verbs"
+        ],
+        "Connectors": [
+          "Passive Voice"
         ],
         "Comparatives and Superlatives": [
-          "Vocabulary in Context"
+          "Connectors"
         ],
-        "False Cognates": [
+        "Vocabulary in Context": [
           "Comparatives and Superlatives"
         ],
+        "False Cognates": [
+          "Vocabulary in Context"
+        ],
+        "Reading Comprehension": [
+          "False Cognates"
+        ]
+      },
+      "criterio_conceitual": "Verb Tenses é a base: modal verb muda a forma do verbo principal, e voz passiva é o tempo verbal de 'to be' aplicado ao particípio — os dois pressupõem already saber conjugar nos tempos verbais. Reading Comprehension exige três bases ao mesmo tempo (Verb Tenses, Connectors e Vocabulary in Context) porque um texto real mistura tempo verbal, conectivos lógicos e vocabulário em contexto — não dá para treinar compreensão de texto sem já ter alguma base nos três. Cinco tópicos não dependem de conceito nenhum outro, e por isso não aparecem no grafo: Verb Tenses, Comparatives and Superlatives, Connectors, False Cognates e Vocabulary in Context. Em que ordem são estudados é decisão da fila: ver 'criterio'.",
+      "requisitos_conceituais": {
         "Modal Verbs": [
           "Verb Tenses"
         ],
@@ -800,7 +1563,154 @@
           "Vocabulary in Context"
         ]
       },
+      "criterio_subtopicos": "Escada em ondas, mesmo espirito de Matematica: poucos subtopicos abrem de cada vez, do mais basico ao mais complexo, usando ordem pedagogica onde nao ha dependencia gramatical real entre os subtopicos (a maioria aqui e vocabulario/habilidade paralela, nao pre-requisito conceitual de verdade). Reading Comprehension (12 subtopicos, o maior): Main idea e a raiz (entender do que o texto trata e a habilidade mais basica de leitura). Onda 2: Skimming and scanning, Vocabulary in context, Detail, Sequencing, Pronoun reference e Fact vs. opinion - habilidades de leitura literal, proximas ao texto. Onda 3 (apos Fact vs. opinion, a mais avancada da onda 2): Cause and effect, Compare and contrast e Author's purpose - ja exigem relacionar partes do texto entre si. Onda 4 (apos Author's purpose): Tone e Inference, as duas habilidades mais interpretativas, que combinam tudo que veio antes. Modal Verbs (4): ordem classica de ensino de ingles - Ability (can/could, o modal mais simples) -> Advice and polite requests (should) -> Obligation and prohibition (must/have to) -> Possibility and deduction (might/must have), o uso mais abstrato. Comparatives and Superlatives (4): Comparative of superiority (-er than, a forma mais comum) -> Superlative (-est) -> Equality and inferiority (as...as, less than) -> Special structures (formas irregulares e casos especiais, o mais avancado). Connectors (4): Addition and purpose (and, also - os conectivos mais simples) -> Contrast (but, however) -> Cause and consequence (because, so) -> Condition (if, a estrutura condicional, a mais complexa). Verb Tenses (3): Present tenses (a base de qualquer conjugacao) -> Past tenses -> Future tenses, a ordem classica de ensino de tempos verbais. Passive Voice (3): Concept and use (quando e por que usar a voz passiva) -> Passive by tense (aplicar a diferentes tempos verbais) -> Special forms (casos especiais e mais avancados). Desde a fila, esses subtópicos abrem UM DE CADA VEZ: 'requisitos_subtopicos' é a serialização das ondas descritas acima — mesma ordem, desempatada dentro de cada onda pelo subtópico com mais cartões —, e as ondas originais ficam registradas em 'requisitos_conceituais_subtopicos'.",
       "requisitos_subtopicos": {
+        "Verb Tenses|Past tenses": [
+          {
+            "t": "Verb Tenses",
+            "s": "Present tenses"
+          }
+        ],
+        "Verb Tenses|Future tenses": [
+          {
+            "t": "Verb Tenses",
+            "s": "Past tenses"
+          }
+        ],
+        "Modal Verbs|Advice and polite requests": [
+          {
+            "t": "Modal Verbs",
+            "s": "Ability"
+          }
+        ],
+        "Modal Verbs|Obligation and prohibition": [
+          {
+            "t": "Modal Verbs",
+            "s": "Advice and polite requests"
+          }
+        ],
+        "Modal Verbs|Possibility and deduction": [
+          {
+            "t": "Modal Verbs",
+            "s": "Obligation and prohibition"
+          }
+        ],
+        "Passive Voice|Passive by tense": [
+          {
+            "t": "Passive Voice",
+            "s": "Concept and use"
+          }
+        ],
+        "Passive Voice|Special forms": [
+          {
+            "t": "Passive Voice",
+            "s": "Passive by tense"
+          }
+        ],
+        "Comparatives and Superlatives|Superlative": [
+          {
+            "t": "Comparatives and Superlatives",
+            "s": "Comparative of superiority"
+          }
+        ],
+        "Comparatives and Superlatives|Equality and inferiority": [
+          {
+            "t": "Comparatives and Superlatives",
+            "s": "Superlative"
+          }
+        ],
+        "Comparatives and Superlatives|Special structures": [
+          {
+            "t": "Comparatives and Superlatives",
+            "s": "Equality and inferiority"
+          }
+        ],
+        "Connectors|Contrast": [
+          {
+            "t": "Connectors",
+            "s": "Addition and purpose"
+          }
+        ],
+        "Connectors|Cause and consequence": [
+          {
+            "t": "Connectors",
+            "s": "Contrast"
+          }
+        ],
+        "Connectors|Condition": [
+          {
+            "t": "Connectors",
+            "s": "Cause and consequence"
+          }
+        ],
+        "Reading Comprehension|Fact vs. opinion": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Main idea"
+          }
+        ],
+        "Reading Comprehension|Author's purpose": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Fact vs. opinion"
+          }
+        ],
+        "Reading Comprehension|Skimming and scanning": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Author's purpose"
+          }
+        ],
+        "Reading Comprehension|Cause and effect": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Skimming and scanning"
+          }
+        ],
+        "Reading Comprehension|Compare and contrast": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Cause and effect"
+          }
+        ],
+        "Reading Comprehension|Detail": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Compare and contrast"
+          }
+        ],
+        "Reading Comprehension|Inference": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Detail"
+          }
+        ],
+        "Reading Comprehension|Pronoun reference": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Inference"
+          }
+        ],
+        "Reading Comprehension|Sequencing": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Pronoun reference"
+          }
+        ],
+        "Reading Comprehension|Tone": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Sequencing"
+          }
+        ],
+        "Reading Comprehension|Vocabulary in context (leitura)": [
+          {
+            "t": "Reading Comprehension",
+            "s": "Tone"
+          }
+        ]
+      },
+      "requisitos_conceituais_subtopicos": {
         "Reading Comprehension|Skimming and scanning": [
           {
             "t": "Reading Comprehension",
@@ -945,33 +1855,80 @@
             "s": "Passive by tense"
           }
         ]
-      },
-      "criterio_subtopicos": "Escada em ondas, mesmo espirito de Matematica: poucos subtopicos abrem de cada vez, do mais basico ao mais complexo, usando ordem pedagogica onde nao ha dependencia gramatical real entre os subtopicos (a maioria aqui e vocabulario/habilidade paralela, nao pre-requisito conceitual de verdade). Reading Comprehension (12 subtopicos, o maior): Main idea e a raiz (entender do que o texto trata e a habilidade mais basica de leitura). Onda 2: Skimming and scanning, Vocabulary in context, Detail, Sequencing, Pronoun reference e Fact vs. opinion - habilidades de leitura literal, proximas ao texto. Onda 3 (apos Fact vs. opinion, a mais avancada da onda 2): Cause and effect, Compare and contrast e Author's purpose - ja exigem relacionar partes do texto entre si. Onda 4 (apos Author's purpose): Tone e Inference, as duas habilidades mais interpretativas, que combinam tudo que veio antes. Modal Verbs (4): ordem classica de ensino de ingles - Ability (can/could, o modal mais simples) -> Advice and polite requests (should) -> Obligation and prohibition (must/have to) -> Possibility and deduction (might/must have), o uso mais abstrato. Comparatives and Superlatives (4): Comparative of superiority (-er than, a forma mais comum) -> Superlative (-est) -> Equality and inferiority (as...as, less than) -> Special structures (formas irregulares e casos especiais, o mais avancado). Connectors (4): Addition and purpose (and, also - os conectivos mais simples) -> Contrast (but, however) -> Cause and consequence (because, so) -> Condition (if, a estrutura condicional, a mais complexa). Verb Tenses (3): Present tenses (a base de qualquer conjugacao) -> Past tenses -> Future tenses, a ordem classica de ensino de tempos verbais. Passive Voice (3): Concept and use (quando e por que usar a voz passiva) -> Passive by tense (aplicar a diferentes tempos verbais) -> Special forms (casos especiais e mais avancados)."
+      }
     },
     "manutencao-mecanica": {
-      "criterio": "Aqui os 23 tópicos têm 9 cartões cada, e dentro de cada um os cartões são um glossário de fatos paralelos (cada instrumento, cada ensaio, cada elemento de máquina é seu próprio fato independente, sem um 'conceito geral' do qual os outros derivem) — por isso nenhum tópico ganhou escada interna (campo n), só a trava entre tópicos. As arestas seguem a dependência real de um currículo de mecânica: Ensaios metalúrgicos, Metalografia e tratamentos térmicos, Ensaios mecânicos destrutivos e não destrutivos, Processos de fabricação e Noções de soldagem exigem Materiais de construção mecânica porque testam, tratam ou transformam um material que precisa ser conhecido antes; Resistência dos materiais exige Materiais E Mecânica Geral (resistência é força aplicada a um material); Elementos de máquinas exige Mecânica Geral e Resistência dos materiais (engrenagem, mola e rolamento são objetos de análise de força e tensão); Mecânica dos Fluidos exige Mecânica Geral; Sistemas hidráulicos e pneumáticos exige Mecânica dos Fluidos; Instrumentos de medição exige Sistema Internacional de Unidades e Noções de metrologia; Medidas de pressão, nível, temperatura e vazão exige Instrumentos de medição; Sistema de ajuste e tolerância exige Noções de metrologia; Equipamentos mecânicos e Lubrificação exigem Elementos de máquinas (equipamento é montado com elementos de máquina, que precisam de lubrificação); Gestão da Manutenção exige Equipamentos mecânicos (só se gerencia a manutenção do que já se entende como equipamento). Oito tópicos-base não dependem de conceito nenhum outro (ver '_cadeia_entre_raizes' no topo do arquivo): Sistema Internacional de Unidades, Noções de metrologia, Desenho técnico mecânico, Segurança do trabalho/meio ambiente/saúde, Normas técnicas nacionais e internacionais, Materiais de construção mecânica, Mecânica Geral e Noções de eletrotécnica. Ganharam uma cadeia de ordem: Sistema Internacional de Unidades primeiro — nenhuma medida em mecânica (dimensão de peça, tolerância, pressão) faz sentido sem unidade — depois Noções de metrologia, que é literalmente medir com essas unidades; os dois já travam Instrumentos de medição, que trava mais dois tópicos por baixo. Em seguida os dois tópicos mais carregados de dependentes reais: Materiais de construção mecânica (trava cinco: os três tipos de ensaio, Processos de fabricação e Noções de soldagem, além de contribuir para Resistência dos materiais) e Mecânica Geral (trava Resistência dos materiais, Mecânica dos Fluidos e, por tabela, Elementos de máquinas). Os quatro últimos — Desenho técnico mecânico, Segurança do trabalho/meio ambiente/saúde, Normas técnicas nacionais e internacionais e Noções de eletrotécnica — não travam mais nada na árvore, e fecham a fila.",
+      "criterio": "A fila segue a sequência de um curso de mecânica: primeiro medir, depois o material, depois a mecânica, depois a máquina, e por fim gerir. (1-6) o bloco dimensional: Sistema Internacional de Unidades (nenhuma medida faz sentido sem unidade), Noções de metrologia (medir com essas unidades), Instrumentos de medição, Medidas de pressão/nível/temperatura/vazão, Sistema de ajuste e tolerância e Desenho técnico mecânico, que é onde a cota e a tolerância aparecem escritas. (7-12) o material e o que se faz com ele: Materiais de construção mecânica e os cinco tópicos que o testam, tratam ou transformam — Metalografia e tratamentos térmicos, Ensaios metalúrgicos, Ensaios mecânicos destrutivos e não destrutivos, Processos de fabricação mecânica, Noções de soldagem. (13-19) a mecânica e a máquina: Mecânica Geral → Resistência dos materiais → Elementos de máquinas → Lubrificação, e a linha dos fluidos, Mecânica dos Fluidos → Sistemas hidráulicos e pneumáticos, chegando em Equipamentos mecânicos, que é o que se monta com tudo isso. (20-23) Gestão da Manutenção (só se gerencia a manutenção do que já se entende como equipamento), Noções de eletrotécnica, Segurança do trabalho/meio ambiente/saúde e Normas técnicas, os três últimos sem dependência conceitual nenhuma e sem travar nada abaixo.",
       "requisitos": {
         "Noções de metrologia": [
           "Sistema Internacional de Unidades"
         ],
-        "Materiais de construção mecânica": [
+        "Instrumentos de medição": [
           "Noções de metrologia"
         ],
-        "Mecânica Geral": [
-          "Materiais de construção mecânica"
+        "Medidas de pressão, nível, temperatura e vazão": [
+          "Instrumentos de medição"
+        ],
+        "Sistema de ajuste e tolerância": [
+          "Medidas de pressão, nível, temperatura e vazão"
         ],
         "Desenho técnico mecânico": [
+          "Sistema de ajuste e tolerância"
+        ],
+        "Materiais de construção mecânica": [
+          "Desenho técnico mecânico"
+        ],
+        "Metalografia e tratamentos térmicos": [
+          "Materiais de construção mecânica"
+        ],
+        "Ensaios metalúrgicos": [
+          "Metalografia e tratamentos térmicos"
+        ],
+        "Ensaios mecânicos destrutivos e não destrutivos": [
+          "Ensaios metalúrgicos"
+        ],
+        "Processos de fabricação mecânica": [
+          "Ensaios mecânicos destrutivos e não destrutivos"
+        ],
+        "Noções de soldagem": [
+          "Processos de fabricação mecânica"
+        ],
+        "Mecânica Geral": [
+          "Noções de soldagem"
+        ],
+        "Resistência dos materiais": [
           "Mecânica Geral"
         ],
+        "Elementos de máquinas": [
+          "Resistência dos materiais"
+        ],
+        "Lubrificação": [
+          "Elementos de máquinas"
+        ],
+        "Mecânica dos Fluidos": [
+          "Lubrificação"
+        ],
+        "Sistemas hidráulicos e pneumáticos": [
+          "Mecânica dos Fluidos"
+        ],
+        "Equipamentos mecânicos": [
+          "Sistemas hidráulicos e pneumáticos"
+        ],
+        "Gestão da Manutenção": [
+          "Equipamentos mecânicos"
+        ],
+        "Noções de eletrotécnica": [
+          "Gestão da Manutenção"
+        ],
         "Segurança do trabalho, meio ambiente e saúde": [
-          "Desenho técnico mecânico"
+          "Noções de eletrotécnica"
         ],
         "Normas técnicas nacionais e internacionais": [
           "Segurança do trabalho, meio ambiente e saúde"
-        ],
-        "Noções de eletrotécnica": [
-          "Normas técnicas nacionais e internacionais"
-        ],
+        ]
+      },
+      "criterio_conceitual": "Aqui os 23 tópicos têm 9 cartões cada, e dentro de cada um os cartões são um glossário de fatos paralelos (cada instrumento, cada ensaio, cada elemento de máquina é seu próprio fato independente, sem um 'conceito geral' do qual os outros derivem) — por isso nenhum tópico ganhou escada interna (campo n), só a trava entre tópicos. As arestas seguem a dependência real de um currículo de mecânica: Ensaios metalúrgicos, Metalografia e tratamentos térmicos, Ensaios mecânicos destrutivos e não destrutivos, Processos de fabricação e Noções de soldagem exigem Materiais de construção mecânica porque testam, tratam ou transformam um material que precisa ser conhecido antes; Resistência dos materiais exige Materiais E Mecânica Geral (resistência é força aplicada a um material); Elementos de máquinas exige Mecânica Geral e Resistência dos materiais (engrenagem, mola e rolamento são objetos de análise de força e tensão); Mecânica dos Fluidos exige Mecânica Geral; Sistemas hidráulicos e pneumáticos exige Mecânica dos Fluidos; Instrumentos de medição exige Sistema Internacional de Unidades e Noções de metrologia; Medidas de pressão, nível, temperatura e vazão exige Instrumentos de medição; Sistema de ajuste e tolerância exige Noções de metrologia; Equipamentos mecânicos e Lubrificação exigem Elementos de máquinas (equipamento é montado com elementos de máquina, que precisam de lubrificação); Gestão da Manutenção exige Equipamentos mecânicos (só se gerencia a manutenção do que já se entende como equipamento). Oito tópicos-base não dependem de conceito nenhum outro, e por isso não aparecem no grafo: Sistema Internacional de Unidades, Noções de metrologia, Desenho técnico mecânico, Segurança do trabalho/meio ambiente/saúde, Normas técnicas nacionais e internacionais, Materiais de construção mecânica, Mecânica Geral e Noções de eletrotécnica. Em que ordem são estudados é decisão da fila: ver 'criterio'.",
+      "requisitos_conceituais": {
         "Ensaios metalúrgicos": [
           "Materiais de construção mecânica"
         ],
@@ -1021,7 +1978,184 @@
           "Equipamentos mecânicos"
         ]
       },
+      "criterio_subtopicos": "Escada em ondas, mesmo espirito das outras materias -- do conceito basico pro caso aplicado/avancado. Como os 15 topicos aqui sao todos do mesmo tipo (glossario de fatos paralelos dentro de si, sem 'conceito geral' do qual os outros derivem -- mesma observacao ja feita no criterio de topico desta materia), a maioria das cadeias segue conceito basico -> aplicacao -> caso mais complexo/especifico, sem dependencia tecnica profunda entre os subtopicos (ordem pedagogica, nao conceito). Ensaios metalurgicos: Conceito geral (destrutivo x nao destrutivo) e a raiz -> Ensaios de dureza e Exame metalografico/estrutural (os dois tipos mais basicos de ensaio) -> Ensaios sob carga (tracao/impacto/fadiga/torcao), o mais elaborado. Medidas de pressao/nivel/temperatura/vazao: Pressao e Temperatura sao as duas raizes (as grandezas mais medidas na industria) -> Nivel -> Vazao, a mais derivada (depende de escoamento, nao so de uma leitura direta). Nocoes de metrologia: Conceitos fundamentais e a raiz -> Caracteristicas do instrumento -> Calibracao/rastreabilidade e padroes, o processo mais avancado (pressupoe entender o instrumento primeiro). Sistema Internacional de Unidades: Definicoes e classificacao de unidades e a raiz -> Conversoes numericas (aplica as definicoes) -> Redefinicao do SI (2019), o detalhe historico mais especifico. Sistema de ajuste e tolerancia: Tolerancia dimensional e qualidade IT e a raiz (o conceito basico) -> Tipos de ajuste e calculo -> Sistemas de ajuste (furo-base x eixo-base), a aplicacao mais especifica. Mecanica dos Fluidos: Propriedades do fluido e a raiz -> Fluidoestatica (fluido parado, mais simples) -> Fluidodinamica (fluido em movimento, mais avancado). Materiais de construcao mecanica: Metais ferrosos e a raiz (os mais comuns na industria) -> Metais nao-ferrosos -> Polimeros, a categoria mais distinta. Processos de fabricacao mecanica: Fundicao e a raiz (um dos processos mais antigos e basicos) -> Conformacao mecanica -> Usinagem, o processo de maior precisao. Gestao da Manutencao: Tipos/politicas de manutencao e a raiz (preventiva, corretiva, preditiva -- o vocabulario basico) -> Metodologias e programas de gestao -> Indicadores de manutencao, a camada analitica mais avancada. Sistemas hidraulicos e pneumaticos: Geracao e condicionamento de energia do fluido e a raiz (de onde vem a energia do sistema) -> Valvulas (controle) -> Atuadores, a saida final do sistema. Equipamentos mecanicos: Valvulas e acessorios de tubulacao e a raiz (os componentes mais basicos de uma linha) -> Equipamentos estaticos e de transmissao -> Maquinas de fluxo, os equipamentos dinamicos mais complexos. Nocoes de eletrotecnica: Circuitos e leis basicas de CC e a raiz (lei de Ohm, o ponto de partida) -> Corrente alternada e distribuicao -> Seguranca eletrica, a aplicacao pratica que pressupoe entender o circuito primeiro. Resistencia dos materiais: Tensao, deformacao e propriedades elasticas e a raiz -> Modos de falha e projeto, que aplica esses conceitos a um caso real de projeto. Elementos de maquinas: Fixacao e posicionamento e a raiz (parafuso, pino -- os elementos mais simples) -> Transmissao e suporte de movimento (engrenagem, rolamento -- elementos dinamicos mais complexos). Metalografia e tratamentos termicos: Metalografia (microestruturas) e a raiz -- entender a microestrutura vem antes de saber como ela e ALTERADA -> Tratamentos termicos, que modificam essa microestrutura. Desde a fila, esses subtópicos abrem UM DE CADA VEZ: 'requisitos_subtopicos' é a serialização das ondas descritas acima — mesma ordem, desempatada dentro de cada onda pelo subtópico com mais cartões —, e as ondas originais ficam registradas em 'requisitos_conceituais_subtopicos'.",
       "requisitos_subtopicos": {
+        "Noções de metrologia|Características do instrumento": [
+          {
+            "t": "Noções de metrologia",
+            "s": "Conceitos fundamentais"
+          }
+        ],
+        "Noções de metrologia|Calibração, rastreabilidade e padrões": [
+          {
+            "t": "Noções de metrologia",
+            "s": "Características do instrumento"
+          }
+        ],
+        "Sistema Internacional de Unidades|Conversões numéricas": [
+          {
+            "t": "Sistema Internacional de Unidades",
+            "s": "Definições e classificação de unidades"
+          }
+        ],
+        "Sistema Internacional de Unidades|Redefinição do SI (2019)": [
+          {
+            "t": "Sistema Internacional de Unidades",
+            "s": "Conversões numéricas"
+          }
+        ],
+        "Sistema de ajuste e tolerância|Tipos de ajuste e cálculo": [
+          {
+            "t": "Sistema de ajuste e tolerância",
+            "s": "Tolerância dimensional e qualidade IT"
+          }
+        ],
+        "Sistema de ajuste e tolerância|Sistemas de ajuste (furo-base × eixo-base)": [
+          {
+            "t": "Sistema de ajuste e tolerância",
+            "s": "Tipos de ajuste e cálculo"
+          }
+        ],
+        "Resistência dos materiais|Modos de falha e projeto": [
+          {
+            "t": "Resistência dos materiais",
+            "s": "Tensão, deformação e propriedades elásticas"
+          }
+        ],
+        "Elementos de máquinas|Transmissão e suporte de movimento": [
+          {
+            "t": "Elementos de máquinas",
+            "s": "Fixação e posicionamento"
+          }
+        ],
+        "Mecânica dos Fluidos|Fluidoestática": [
+          {
+            "t": "Mecânica dos Fluidos",
+            "s": "Propriedades do fluido"
+          }
+        ],
+        "Mecânica dos Fluidos|Fluidodinâmica": [
+          {
+            "t": "Mecânica dos Fluidos",
+            "s": "Fluidoestática"
+          }
+        ],
+        "Metalografia e tratamentos térmicos|Tratamentos térmicos": [
+          {
+            "t": "Metalografia e tratamentos térmicos",
+            "s": "Metalografia (microestruturas)"
+          }
+        ],
+        "Materiais de construção mecânica|Metais não-ferrosos": [
+          {
+            "t": "Materiais de construção mecânica",
+            "s": "Metais ferrosos"
+          }
+        ],
+        "Materiais de construção mecânica|Polímeros": [
+          {
+            "t": "Materiais de construção mecânica",
+            "s": "Metais não-ferrosos"
+          }
+        ],
+        "Ensaios metalúrgicos|Ensaios de dureza": [
+          {
+            "t": "Ensaios metalúrgicos",
+            "s": "Conceito geral (destrutivo × não destrutivo)"
+          }
+        ],
+        "Ensaios metalúrgicos|Ensaios sob carga (tração/impacto/fadiga/torção)": [
+          {
+            "t": "Ensaios metalúrgicos",
+            "s": "Ensaios de dureza"
+          }
+        ],
+        "Ensaios metalúrgicos|Exame metalográfico/estrutural": [
+          {
+            "t": "Ensaios metalúrgicos",
+            "s": "Ensaios sob carga (tração/impacto/fadiga/torção)"
+          }
+        ],
+        "Processos de fabricação mecânica|Conformação mecânica": [
+          {
+            "t": "Processos de fabricação mecânica",
+            "s": "Fundição"
+          }
+        ],
+        "Processos de fabricação mecânica|Usinagem": [
+          {
+            "t": "Processos de fabricação mecânica",
+            "s": "Conformação mecânica"
+          }
+        ],
+        "Gestão da Manutenção|Metodologias e programas de gestão": [
+          {
+            "t": "Gestão da Manutenção",
+            "s": "Tipos/políticas de manutenção"
+          }
+        ],
+        "Gestão da Manutenção|Indicadores de manutenção": [
+          {
+            "t": "Gestão da Manutenção",
+            "s": "Metodologias e programas de gestão"
+          }
+        ],
+        "Sistemas hidráulicos e pneumáticos|Válvulas": [
+          {
+            "t": "Sistemas hidráulicos e pneumáticos",
+            "s": "Geração e condicionamento de energia do fluido"
+          }
+        ],
+        "Sistemas hidráulicos e pneumáticos|Atuadores": [
+          {
+            "t": "Sistemas hidráulicos e pneumáticos",
+            "s": "Válvulas"
+          }
+        ],
+        "Equipamentos mecânicos|Equipamentos estáticos e de transmissão": [
+          {
+            "t": "Equipamentos mecânicos",
+            "s": "Válvulas e acessórios de tubulação"
+          }
+        ],
+        "Equipamentos mecânicos|Máquinas de fluxo": [
+          {
+            "t": "Equipamentos mecânicos",
+            "s": "Equipamentos estáticos e de transmissão"
+          }
+        ],
+        "Medidas de pressão, nível, temperatura e vazão|Nível": [
+          {
+            "t": "Medidas de pressão, nível, temperatura e vazão",
+            "s": "Pressão"
+          }
+        ],
+        "Medidas de pressão, nível, temperatura e vazão|Temperatura": [
+          {
+            "t": "Medidas de pressão, nível, temperatura e vazão",
+            "s": "Nível"
+          }
+        ],
+        "Medidas de pressão, nível, temperatura e vazão|Vazão": [
+          {
+            "t": "Medidas de pressão, nível, temperatura e vazão",
+            "s": "Temperatura"
+          }
+        ],
+        "Noções de eletrotécnica|Corrente alternada e distribuição": [
+          {
+            "t": "Noções de eletrotécnica",
+            "s": "Circuitos e leis básicas de CC"
+          }
+        ],
+        "Noções de eletrotécnica|Segurança elétrica": [
+          {
+            "t": "Noções de eletrotécnica",
+            "s": "Corrente alternada e distribuição"
+          }
+        ]
+      },
+      "requisitos_conceituais_subtopicos": {
         "Ensaios metalúrgicos|Ensaios de dureza": [
           {
             "t": "Ensaios metalúrgicos",
@@ -1190,21 +2324,68 @@
             "s": "Metalografia (microestruturas)"
           }
         ]
-      },
-      "criterio_subtopicos": "Escada em ondas, mesmo espirito das outras materias -- do conceito basico pro caso aplicado/avancado. Como os 15 topicos aqui sao todos do mesmo tipo (glossario de fatos paralelos dentro de si, sem 'conceito geral' do qual os outros derivem -- mesma observacao ja feita no criterio de topico desta materia), a maioria das cadeias segue conceito basico -> aplicacao -> caso mais complexo/especifico, sem dependencia tecnica profunda entre os subtopicos (ordem pedagogica, nao conceito). Ensaios metalurgicos: Conceito geral (destrutivo x nao destrutivo) e a raiz -> Ensaios de dureza e Exame metalografico/estrutural (os dois tipos mais basicos de ensaio) -> Ensaios sob carga (tracao/impacto/fadiga/torcao), o mais elaborado. Medidas de pressao/nivel/temperatura/vazao: Pressao e Temperatura sao as duas raizes (as grandezas mais medidas na industria) -> Nivel -> Vazao, a mais derivada (depende de escoamento, nao so de uma leitura direta). Nocoes de metrologia: Conceitos fundamentais e a raiz -> Caracteristicas do instrumento -> Calibracao/rastreabilidade e padroes, o processo mais avancado (pressupoe entender o instrumento primeiro). Sistema Internacional de Unidades: Definicoes e classificacao de unidades e a raiz -> Conversoes numericas (aplica as definicoes) -> Redefinicao do SI (2019), o detalhe historico mais especifico. Sistema de ajuste e tolerancia: Tolerancia dimensional e qualidade IT e a raiz (o conceito basico) -> Tipos de ajuste e calculo -> Sistemas de ajuste (furo-base x eixo-base), a aplicacao mais especifica. Mecanica dos Fluidos: Propriedades do fluido e a raiz -> Fluidoestatica (fluido parado, mais simples) -> Fluidodinamica (fluido em movimento, mais avancado). Materiais de construcao mecanica: Metais ferrosos e a raiz (os mais comuns na industria) -> Metais nao-ferrosos -> Polimeros, a categoria mais distinta. Processos de fabricacao mecanica: Fundicao e a raiz (um dos processos mais antigos e basicos) -> Conformacao mecanica -> Usinagem, o processo de maior precisao. Gestao da Manutencao: Tipos/politicas de manutencao e a raiz (preventiva, corretiva, preditiva -- o vocabulario basico) -> Metodologias e programas de gestao -> Indicadores de manutencao, a camada analitica mais avancada. Sistemas hidraulicos e pneumaticos: Geracao e condicionamento de energia do fluido e a raiz (de onde vem a energia do sistema) -> Valvulas (controle) -> Atuadores, a saida final do sistema. Equipamentos mecanicos: Valvulas e acessorios de tubulacao e a raiz (os componentes mais basicos de uma linha) -> Equipamentos estaticos e de transmissao -> Maquinas de fluxo, os equipamentos dinamicos mais complexos. Nocoes de eletrotecnica: Circuitos e leis basicas de CC e a raiz (lei de Ohm, o ponto de partida) -> Corrente alternada e distribuicao -> Seguranca eletrica, a aplicacao pratica que pressupoe entender o circuito primeiro. Resistencia dos materiais: Tensao, deformacao e propriedades elasticas e a raiz -> Modos de falha e projeto, que aplica esses conceitos a um caso real de projeto. Elementos de maquinas: Fixacao e posicionamento e a raiz (parafuso, pino -- os elementos mais simples) -> Transmissao e suporte de movimento (engrenagem, rolamento -- elementos dinamicos mais complexos). Metalografia e tratamentos termicos: Metalografia (microestruturas) e a raiz -- entender a microestrutura vem antes de saber como ela e ALTERADA -> Tratamentos termicos, que modificam essa microestrutura."
+      }
     },
     "enfermagem": {
-      "criterio": "18 tópicos, alguns com subtópico (Doenças Transmissíveis chega a 25). O grafo aqui travava só no nível do TÓPICO até esta leva — agora Doenças Transmissíveis é o primeiro caso em Enfermagem de requisito por SUBTÓPICO: em vez de exigir Vigilância em Saúde inteira, exige só o subtópico Vigilância epidemiológica dela, porque monitorar doença transmissível é especificamente vigilância epidemiológica, não vigilância sanitária (inspeção de estabelecimento) nem ambiental (água, ar, solo). Saúde do Trabalhador continua exigindo Vigilância em Saúde inteira, porque saúde do trabalhador usa os três tipos (epidemiológica, sanitária do ambiente de trabalho, ambiental). As demais arestas seguem a dependência clínica real: Fundamentos e Procedimentos de Enfermagem exige Anatomia e Fisiologia porque todo procedimento (punção, sondagem, ausculta) pressupõe saber a estrutura do corpo que está sendo manipulada; Controle de Infecção e Segurança do Paciente, Farmacologia e Medicamentos, Feridas/Estomias e Reabilitação, Imunização e Atenção Domiciliar exigem Fundamentos e Procedimentos porque aplicam a mesma base técnica (higienização, administração, curativo) a um contexto específico; Centro Cirúrgico e CME e Urgência/Emergência e Terapia Intensiva exigem também Controle de Infecção, por serem os dois ambientes de maior risco de infecção do hospital; os quatro tópicos por ciclo de vida — Saúde da Criança e do Adolescente, Saúde da Mulher, Saúde do Adulto e do Idoso, Saúde do Homem — e Saúde Mental exigem Anatomia e Fisiologia, a base biológica de qualquer um deles. Quatro tópicos não dependem de conceito nenhum outro (ver '_cadeia_entre_raizes' no topo do arquivo): Anatomia e Fisiologia (a base de tudo), Processo de Enfermagem e Registros (o método da profissão), Ética e Exercício Profissional (base legal/deontológica) e Vigilância em Saúde (sistemas de monitoramento, domínio próprio de saúde pública). Ganharam uma cadeia de ordem: Anatomia e Fisiologia primeiro, de longe o mais carregado de dependentes reais (Fundamentos e Procedimentos e os cinco tópicos que dependem dela); Vigilância em Saúde em seguida, por travar Doenças Transmissíveis e Saúde do Trabalhador; Processo de Enfermagem e Registros e Ética e Exercício Profissional, que não travam mais nada na árvore, fecham a fila. A escada INTERNA (campo n) foi feita depois, numa passada própria tópico por tópico, e cobre os 686 cartões: nível 1 é o que RECONHECER (a estrutura anatômica, o que a escala mede, como se classifica o achado, como a doença transmite) e nível 2 é o que FAZER com isso (a conduta, a técnica, a dose, o prazo, o ponto de corte). Em conteúdo clínico esse é o corte que importa: numa parada, reconhecer se o ritmo é chocável decide se choca — e vem antes de saber a carga do desfibrilador.",
+      "criterio": "A fila vai da base biológica ao coletivo, em quatro blocos. (1-4) a base da profissão: Anatomia e Fisiologia, Fundamentos e Procedimentos de Enfermagem, Processo de Enfermagem e Registros (o método) e Ética e Exercício Profissional (a base deontológica). Os dois últimos subiram na fila de propósito: eles fechavam a antiga cadeia de raízes porque 'não travavam nada' abaixo, argumento que numa fila não vale mais — método de cuidado e base legal são fundamento, não apêndice. (5-9) a técnica hospitalar, do geral ao ambiente de risco: Controle de Infecção e Segurança do Paciente, Farmacologia e Medicamentos, Feridas/Estomias e Reabilitação, Centro Cirúrgico e CME, Urgência/Emergência e Terapia Intensiva. (10-14) os ciclos de vida, na ordem do próprio ciclo: Criança e Adolescente, Mulher, Adulto e Idoso, Homem, e Saúde Mental. (15-19) a saúde coletiva: Vigilância em Saúde, Doenças Transmissíveis, Imunização, Saúde do Trabalhador e Atenção Domiciliar, que é onde o cuidado sai do hospital.",
       "requisitos": {
-        "Vigilância em Saúde": [
+        "Fundamentos e Procedimentos de Enfermagem": [
           "Anatomia e Fisiologia"
         ],
         "Processo de Enfermagem e Registros": [
-          "Vigilância em Saúde"
+          "Fundamentos e Procedimentos de Enfermagem"
         ],
         "Ética e Exercício Profissional": [
           "Processo de Enfermagem e Registros"
         ],
+        "Controle de Infecção e Segurança do Paciente": [
+          "Ética e Exercício Profissional"
+        ],
+        "Farmacologia e Medicamentos": [
+          "Controle de Infecção e Segurança do Paciente"
+        ],
+        "Feridas, Estomias e Reabilitação": [
+          "Farmacologia e Medicamentos"
+        ],
+        "Centro Cirúrgico e CME": [
+          "Feridas, Estomias e Reabilitação"
+        ],
+        "Urgência, Emergência e Terapia Intensiva": [
+          "Centro Cirúrgico e CME"
+        ],
+        "Saúde da Criança e do Adolescente": [
+          "Urgência, Emergência e Terapia Intensiva"
+        ],
+        "Saúde da Mulher": [
+          "Saúde da Criança e do Adolescente"
+        ],
+        "Saúde do Adulto e do Idoso": [
+          "Saúde da Mulher"
+        ],
+        "Saúde do Homem": [
+          "Saúde do Adulto e do Idoso"
+        ],
+        "Saúde Mental": [
+          "Saúde do Homem"
+        ],
+        "Vigilância em Saúde": [
+          "Saúde Mental"
+        ],
+        "Doenças Transmissíveis": [
+          "Vigilância em Saúde"
+        ],
+        "Imunização": [
+          "Doenças Transmissíveis"
+        ],
+        "Saúde do Trabalhador": [
+          "Imunização"
+        ],
+        "Atenção Domiciliar": [
+          "Saúde do Trabalhador"
+        ]
+      },
+      "criterio_conceitual": "18 tópicos, alguns com subtópico (Doenças Transmissíveis chega a 25). O grafo aqui travava só no nível do TÓPICO até esta leva — agora Doenças Transmissíveis é o primeiro caso em Enfermagem de requisito por SUBTÓPICO: em vez de exigir Vigilância em Saúde inteira, exige só o subtópico Vigilância epidemiológica dela, porque monitorar doença transmissível é especificamente vigilância epidemiológica, não vigilância sanitária (inspeção de estabelecimento) nem ambiental (água, ar, solo). Saúde do Trabalhador continua exigindo Vigilância em Saúde inteira, porque saúde do trabalhador usa os três tipos (epidemiológica, sanitária do ambiente de trabalho, ambiental). As demais arestas seguem a dependência clínica real: Fundamentos e Procedimentos de Enfermagem exige Anatomia e Fisiologia porque todo procedimento (punção, sondagem, ausculta) pressupõe saber a estrutura do corpo que está sendo manipulada; Controle de Infecção e Segurança do Paciente, Farmacologia e Medicamentos, Feridas/Estomias e Reabilitação, Imunização e Atenção Domiciliar exigem Fundamentos e Procedimentos porque aplicam a mesma base técnica (higienização, administração, curativo) a um contexto específico; Centro Cirúrgico e CME e Urgência/Emergência e Terapia Intensiva exigem também Controle de Infecção, por serem os dois ambientes de maior risco de infecção do hospital; os quatro tópicos por ciclo de vida — Saúde da Criança e do Adolescente, Saúde da Mulher, Saúde do Adulto e do Idoso, Saúde do Homem — e Saúde Mental exigem Anatomia e Fisiologia, a base biológica de qualquer um deles. Quatro tópicos não dependem de conceito nenhum outro, e por isso não aparecem no grafo: Anatomia e Fisiologia (a base de tudo), Processo de Enfermagem e Registros (o método da profissão), Ética e Exercício Profissional (base legal/deontológica) e Vigilância em Saúde (sistemas de monitoramento, domínio próprio de saúde pública). Em que ordem são estudados é decisão da fila: ver 'criterio'. A escada INTERNA (campo n) foi feita depois, numa passada própria tópico por tópico, e cobre os 686 cartões: nível 1 é o que RECONHECER (a estrutura anatômica, o que a escala mede, como se classifica o achado, como a doença transmite) e nível 2 é o que FAZER com isso (a conduta, a técnica, a dose, o prazo, o ponto de corte). Em conteúdo clínico esse é o corte que importa: numa parada, reconhecer se o ritmo é chocável decide se choca — e vem antes de saber a carga do desfibrilador.",
+      "requisitos_conceituais": {
         "Fundamentos e Procedimentos de Enfermagem": [
           "Anatomia e Fisiologia"
         ],
@@ -1256,7 +2437,634 @@
           "Anatomia e Fisiologia"
         ]
       },
+      "criterio_subtopicos": "Escada em ondas, mesmo espirito das outras materias -- poucos subtopicos abrem de cada vez, do mais basico/comum ao mais especifico/avancado. A maioria das cadeias e ordem pedagogica (fatos clinicos paralelos, sem dependencia real entre si), exceto onde ha dependencia real de fato (indicada abaixo). Doencas Transmissiveis (25, o maior de toda a materia): 5 ondas de 5, agrupadas por familia clinica -- onda 1, as doencas classicas do calendario vacinal infantil (Sarampo, Rubeola, Varicela, Difteria, Coqueluche); onda 2, mais imunopreviniveis e respiratorias comuns (Tetano, Poliomielite, Meningite, Hepatites virais, Influenza); onda 3, respiratorias/cronicas e de pele (Tuberculose, Hanseniase, Covid-19, Raiva, Escabiose); onda 4, IST e zoonoses de transmissao indireta (IST, Sifilis, Toxoplasmose, Leptospirose, Febre maculosa); onda 5, arboviroses e doencas tropicais vetoriais, as mais especializadas (Arboviroses, Malaria, Leishmaniose, Doenca de Chagas, Esquistossomose). Continua exigindo tambem o subtopico Vigilancia epidemiologica de Vigilancia em Saude (requisito de topico ja existente) -- por isso esse subtopico la continua raiz. Urgencia, Emergencia e UTI (10): Acolhimento e classificacao de risco e a raiz (o primeiro passo de qualquer atendimento) -> vias aereas e RCP (o ABC da emergencia) -> choque/sepse/anafilaxia e emergencias cardiovasculares -> neurologicas, clinicas e trauma -> intoxicacoes e cuidado critico continuo, o mais avancado. Fundamentos e Procedimentos (10): Sinais vitais e Higiene/conforto sao as raizes (a base de qualquer cuidado) -> procedimentos gerais e coleta de exames -> puncao venosa, sondagem e oxigenoterapia (tecnicas mais invasivas) -> avaliacao e curativo de ferida -> estomias, o caso mais especializado. Saude do Adulto e do Idoso (10): Doencas cronicas - atencao basica e a raiz -> hipertensao e diabetes, as duas doencas cronicas mais comuns -> obesidade e saude do idoso -> avaliacao funcional, saude do homem e violencia contra o idoso -> cancer/paliativos e reabilitacao, os mais avancados. Controle de Infeccao e Seguranca do Paciente (10): Higienizacao das maos e EPI sao as raizes (a base classica de qualquer prevencao) -> controle de infeccao e precaucoes/isolamento -> IRAS/vigilancia, limpeza e acidente biologico -> metas de seguranca do paciente, o arcabouco mais amplo -> identificacao/cirurgia segura e prevencao de quedas, metas especificas dentro desse arcabouco. Saude da Mulher (9): atencao basica e a raiz -> planejamento reprodutivo e rastreamento de cancer -> pre-natal e climaterio/violencia -> parto e emergencias obstetricas -> puerperio e aleitamento, a fase seguinte ao parto. Imunizacao (8): Calendario vacinal e a raiz -> normas de vacinacao e rede de frio -> tecnica e vias de administracao -> situacoes especiais e eventos adversos -> imunobiologicos especiais/CRIE e profilaxia da raiva, os casos mais especificos. Saude da Crianca e do Adolescente (8): atencao basica e a raiz -> recem-nascido e crescimento/desenvolvimento -> triagem neonatal e alimentacao infantil -> doencas comuns da infancia e saude do adolescente -> violencia contra a crianca, o topico mais avancado. Farmacologia e Medicamentos (5): vias de administracao -> seguranca na administracao -> calculo de dose/gotejamento -> farmacologia aplicada e medicamentos controlados, os mais avancados. Saude Mental (5): RAPS e reforma psiquiatrica, o arcabouco institucional, e a raiz -> transtornos e cuidado em crise -> prevencao do suicidio e alcool/drogas -> psicofarmacologia, o mais tecnico. Feridas, Estomias e Reabilitacao (4): avaliacao e tratamento de ferida -> classificacao de lesao por pressao -> estomias -> reabilitacao e pessoa com deficiencia, o mais amplo. Vigilancia em Saude (3): Vigilancia epidemiologica e a raiz -- de proposito, porque Doencas Transmissiveis ja depende dela via requisito de topico, e nao pode ficar presa atras de mais nada -> Vigilancia sanitaria e ambiental. Centro Cirurgico e CME (3): Centro cirurgico -> Periodo perioperatorio -> CME e processamento de materiais, o mais tecnico/especializado. Etica e Exercicio Profissional (3): Codigo de Etica -> Exercicio profissional -> Educacao permanente. Anatomia e Fisiologia (3): geral e a raiz -> sistema cardiovascular/respiratorio e sistemas digestorio/urinario/endocrino, os sistemas especificos. Saude do Homem (3): PNAISH, o arcabouco de politica -> saude sexual e reprodutiva -> rastreamento de cancer de prostata, o mais clinico/especifico. Processo de Enfermagem e Registros (2): o metodo -> o registro dele. Desde a fila, esses subtópicos abrem UM DE CADA VEZ: 'requisitos_subtopicos' é a serialização das ondas descritas acima — mesma ordem, desempatada dentro de cada onda pelo subtópico com mais cartões —, e as ondas originais ficam registradas em 'requisitos_conceituais_subtopicos'.",
       "requisitos_subtopicos": {
+        "Urgência, Emergência e Terapia Intensiva|Emergências respiratórias e via aérea": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Acolhimento e classificação de risco"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Choque, sepse e anafilaxia": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Emergências respiratórias e via aérea"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Emergências neurológicas": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Choque, sepse e anafilaxia"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Parada cardiorrespiratória e RCP": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Emergências neurológicas"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Trauma e atendimento pré-hospitalar": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Parada cardiorrespiratória e RCP"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Intoxicações e emergências ambientais": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Trauma e atendimento pré-hospitalar"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Cuidados ao paciente crítico": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Intoxicações e emergências ambientais"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Emergências cardiovasculares": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Cuidados ao paciente crítico"
+          }
+        ],
+        "Urgência, Emergência e Terapia Intensiva|Emergências clínicas": [
+          {
+            "t": "Urgência, Emergência e Terapia Intensiva",
+            "s": "Emergências cardiovasculares"
+          }
+        ],
+        "Doenças Transmissíveis|Tétano": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Sarampo"
+          }
+        ],
+        "Doenças Transmissíveis|Tuberculose": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Tétano"
+          }
+        ],
+        "Doenças Transmissíveis|IST": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Tuberculose"
+          }
+        ],
+        "Doenças Transmissíveis|Arboviroses": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "IST"
+          }
+        ],
+        "Doenças Transmissíveis|Hanseníase": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Arboviroses"
+          }
+        ],
+        "Doenças Transmissíveis|Sífilis": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Hanseníase"
+          }
+        ],
+        "Doenças Transmissíveis|Hepatites virais": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Sífilis"
+          }
+        ],
+        "Doenças Transmissíveis|Influenza": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Hepatites virais"
+          }
+        ],
+        "Doenças Transmissíveis|Meningite": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Influenza"
+          }
+        ],
+        "Doenças Transmissíveis|Covid-19": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Meningite"
+          }
+        ],
+        "Doenças Transmissíveis|Raiva": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Covid-19"
+          }
+        ],
+        "Doenças Transmissíveis|Coqueluche": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Raiva"
+          }
+        ],
+        "Doenças Transmissíveis|Difteria": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Coqueluche"
+          }
+        ],
+        "Doenças Transmissíveis|Doença de Chagas": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Difteria"
+          }
+        ],
+        "Doenças Transmissíveis|Escabiose": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Doença de Chagas"
+          }
+        ],
+        "Doenças Transmissíveis|Esquistossomose": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Escabiose"
+          }
+        ],
+        "Doenças Transmissíveis|Febre maculosa": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Esquistossomose"
+          }
+        ],
+        "Doenças Transmissíveis|Leishmaniose": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Febre maculosa"
+          }
+        ],
+        "Doenças Transmissíveis|Leptospirose": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Leishmaniose"
+          }
+        ],
+        "Doenças Transmissíveis|Malária": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Leptospirose"
+          }
+        ],
+        "Doenças Transmissíveis|Poliomielite": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Malária"
+          }
+        ],
+        "Doenças Transmissíveis|Rubéola": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Poliomielite"
+          }
+        ],
+        "Doenças Transmissíveis|Toxoplasmose": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Rubéola"
+          }
+        ],
+        "Doenças Transmissíveis|Varicela": [
+          {
+            "t": "Doenças Transmissíveis",
+            "s": "Toxoplasmose"
+          }
+        ],
+        "Imunização|Normas e procedimentos de vacinação": [
+          {
+            "t": "Imunização",
+            "s": "Calendário vacinal"
+          }
+        ],
+        "Imunização|Técnica e vias de administração": [
+          {
+            "t": "Imunização",
+            "s": "Normas e procedimentos de vacinação"
+          }
+        ],
+        "Imunização|Situações especiais e contraindicações": [
+          {
+            "t": "Imunização",
+            "s": "Técnica e vias de administração"
+          }
+        ],
+        "Imunização|Rede de frio": [
+          {
+            "t": "Imunização",
+            "s": "Situações especiais e contraindicações"
+          }
+        ],
+        "Imunização|Imunobiológicos especiais e CRIE": [
+          {
+            "t": "Imunização",
+            "s": "Rede de frio"
+          }
+        ],
+        "Imunização|Profilaxia da raiva": [
+          {
+            "t": "Imunização",
+            "s": "Imunobiológicos especiais e CRIE"
+          }
+        ],
+        "Imunização|Eventos adversos pós-vacinação": [
+          {
+            "t": "Imunização",
+            "s": "Profilaxia da raiva"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Procedimentos de enfermagem": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Sinais vitais e avaliação"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Punção venosa e terapia intravenosa": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Procedimentos de enfermagem"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Avaliação e classificação de feridas": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Punção venosa e terapia intravenosa"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Curativos e coberturas": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Avaliação e classificação de feridas"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Sondagens e cateterismo": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Curativos e coberturas"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Coleta de exames": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Sondagens e cateterismo"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Estomias": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Coleta de exames"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Higiene, conforto e mobilidade": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Estomias"
+          }
+        ],
+        "Fundamentos e Procedimentos de Enfermagem|Oxigenoterapia e aspiração": [
+          {
+            "t": "Fundamentos e Procedimentos de Enfermagem",
+            "s": "Higiene, conforto e mobilidade"
+          }
+        ],
+        "Saúde da Mulher|Planejamento reprodutivo": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Saúde da mulher — atenção básica"
+          }
+        ],
+        "Saúde da Mulher|Pré-natal": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Planejamento reprodutivo"
+          }
+        ],
+        "Saúde da Mulher|Parto e nascimento": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Pré-natal"
+          }
+        ],
+        "Saúde da Mulher|Emergências obstétricas": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Parto e nascimento"
+          }
+        ],
+        "Saúde da Mulher|Rastreamento de câncer": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Emergências obstétricas"
+          }
+        ],
+        "Saúde da Mulher|Aleitamento materno": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Rastreamento de câncer"
+          }
+        ],
+        "Saúde da Mulher|Climatério e violência": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Aleitamento materno"
+          }
+        ],
+        "Saúde da Mulher|Puerpério": [
+          {
+            "t": "Saúde da Mulher",
+            "s": "Climatério e violência"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Hipertensão arterial": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Doenças crônicas — atenção básica"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Obesidade e fatores de risco": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Hipertensão arterial"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Avaliação funcional e fragilidade": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Obesidade e fatores de risco"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Diabetes mellitus": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Avaliação funcional e fragilidade"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Saúde do idoso": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Diabetes mellitus"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Saúde do homem": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Saúde do idoso"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Violência e proteção da pessoa idosa": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Saúde do homem"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Reabilitação": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Violência e proteção da pessoa idosa"
+          }
+        ],
+        "Saúde do Adulto e do Idoso|Câncer e cuidados paliativos": [
+          {
+            "t": "Saúde do Adulto e do Idoso",
+            "s": "Reabilitação"
+          }
+        ],
+        "Saúde da Criança e do Adolescente|Recém-nascido": [
+          {
+            "t": "Saúde da Criança e do Adolescente",
+            "s": "Saúde da criança — atenção básica"
+          }
+        ],
+        "Saúde da Criança e do Adolescente|Triagem neonatal": [
+          {
+            "t": "Saúde da Criança e do Adolescente",
+            "s": "Recém-nascido"
+          }
+        ],
+        "Saúde da Criança e do Adolescente|Doenças comuns da infância": [
+          {
+            "t": "Saúde da Criança e do Adolescente",
+            "s": "Triagem neonatal"
+          }
+        ],
+        "Saúde da Criança e do Adolescente|Alimentação e nutrição infantil": [
+          {
+            "t": "Saúde da Criança e do Adolescente",
+            "s": "Doenças comuns da infância"
+          }
+        ],
+        "Saúde da Criança e do Adolescente|Crescimento e desenvolvimento": [
+          {
+            "t": "Saúde da Criança e do Adolescente",
+            "s": "Alimentação e nutrição infantil"
+          }
+        ],
+        "Saúde da Criança e do Adolescente|Saúde do adolescente": [
+          {
+            "t": "Saúde da Criança e do Adolescente",
+            "s": "Crescimento e desenvolvimento"
+          }
+        ],
+        "Saúde da Criança e do Adolescente|Violência e proteção da criança": [
+          {
+            "t": "Saúde da Criança e do Adolescente",
+            "s": "Saúde do adolescente"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|Controle de infecção": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "Higienização das mãos"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|IRAS e vigilância de infecção": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "Controle de infecção"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|Metas de segurança do paciente": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "IRAS e vigilância de infecção"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|Limpeza, desinfecção e resíduos": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "Metas de segurança do paciente"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|Precauções e isolamento": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "Limpeza, desinfecção e resíduos"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|Identificação e cirurgia segura": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "Precauções e isolamento"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|Acidente com material biológico": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "Identificação e cirurgia segura"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|EPI": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "Acidente com material biológico"
+          }
+        ],
+        "Controle de Infecção e Segurança do Paciente|Prevenção de quedas e lesões": [
+          {
+            "t": "Controle de Infecção e Segurança do Paciente",
+            "s": "EPI"
+          }
+        ],
+        "Vigilância em Saúde|Vigilância ambiental": [
+          {
+            "t": "Vigilância em Saúde",
+            "s": "Vigilância epidemiológica"
+          }
+        ],
+        "Vigilância em Saúde|Vigilância sanitária": [
+          {
+            "t": "Vigilância em Saúde",
+            "s": "Vigilância ambiental"
+          }
+        ],
+        "Farmacologia e Medicamentos|Segurança na administração": [
+          {
+            "t": "Farmacologia e Medicamentos",
+            "s": "Vias de administração"
+          }
+        ],
+        "Farmacologia e Medicamentos|Cálculo de dose e gotejamento": [
+          {
+            "t": "Farmacologia e Medicamentos",
+            "s": "Segurança na administração"
+          }
+        ],
+        "Farmacologia e Medicamentos|Farmacologia aplicada": [
+          {
+            "t": "Farmacologia e Medicamentos",
+            "s": "Cálculo de dose e gotejamento"
+          }
+        ],
+        "Farmacologia e Medicamentos|Medicamentos controlados": [
+          {
+            "t": "Farmacologia e Medicamentos",
+            "s": "Farmacologia aplicada"
+          }
+        ],
+        "Centro Cirúrgico e CME|Período perioperatório": [
+          {
+            "t": "Centro Cirúrgico e CME",
+            "s": "Centro cirúrgico"
+          }
+        ],
+        "Centro Cirúrgico e CME|CME e processamento de materiais": [
+          {
+            "t": "Centro Cirúrgico e CME",
+            "s": "Período perioperatório"
+          }
+        ],
+        "Saúde Mental|Transtornos e cuidado em crise": [
+          {
+            "t": "Saúde Mental",
+            "s": "RAPS e reforma psiquiátrica"
+          }
+        ],
+        "Saúde Mental|Prevenção do suicídio": [
+          {
+            "t": "Saúde Mental",
+            "s": "Transtornos e cuidado em crise"
+          }
+        ],
+        "Saúde Mental|Psicofarmacologia": [
+          {
+            "t": "Saúde Mental",
+            "s": "Prevenção do suicídio"
+          }
+        ],
+        "Saúde Mental|Álcool e outras drogas": [
+          {
+            "t": "Saúde Mental",
+            "s": "Psicofarmacologia"
+          }
+        ],
+        "Ética e Exercício Profissional|Exercício profissional": [
+          {
+            "t": "Ética e Exercício Profissional",
+            "s": "Código de Ética"
+          }
+        ],
+        "Ética e Exercício Profissional|Educação permanente": [
+          {
+            "t": "Ética e Exercício Profissional",
+            "s": "Exercício profissional"
+          }
+        ],
+        "Anatomia e Fisiologia|Sistema cardiovascular e respiratório": [
+          {
+            "t": "Anatomia e Fisiologia",
+            "s": "Anatomia e fisiologia geral"
+          }
+        ],
+        "Anatomia e Fisiologia|Sistemas digestório, urinário e endócrino": [
+          {
+            "t": "Anatomia e Fisiologia",
+            "s": "Sistema cardiovascular e respiratório"
+          }
+        ],
+        "Processo de Enfermagem e Registros|Registros de enfermagem": [
+          {
+            "t": "Processo de Enfermagem e Registros",
+            "s": "Processo de enfermagem"
+          }
+        ],
+        "Saúde do Homem|Saúde sexual e reprodutiva masculina": [
+          {
+            "t": "Saúde do Homem",
+            "s": "PNAISH"
+          }
+        ],
+        "Saúde do Homem|Rastreamento e prevenção do câncer de próstata": [
+          {
+            "t": "Saúde do Homem",
+            "s": "Saúde sexual e reprodutiva masculina"
+          }
+        ],
+        "Feridas, Estomias e Reabilitação|Classificação de lesão por pressão": [
+          {
+            "t": "Feridas, Estomias e Reabilitação",
+            "s": "Avaliação e tratamento de feridas"
+          }
+        ],
+        "Feridas, Estomias e Reabilitação|Estomias": [
+          {
+            "t": "Feridas, Estomias e Reabilitação",
+            "s": "Classificação de lesão por pressão"
+          }
+        ],
+        "Feridas, Estomias e Reabilitação|Reabilitação e atenção à pessoa com deficiência": [
+          {
+            "t": "Feridas, Estomias e Reabilitação",
+            "s": "Estomias"
+          }
+        ]
+      },
+      "requisitos_conceituais_subtopicos": {
         "Doenças Transmissíveis|Tétano": [
           {
             "t": "Doenças Transmissíveis",
@@ -1845,12 +3653,41 @@
             "s": "Processo de enfermagem"
           }
         ]
-      },
-      "criterio_subtopicos": "Escada em ondas, mesmo espirito das outras materias -- poucos subtopicos abrem de cada vez, do mais basico/comum ao mais especifico/avancado. A maioria das cadeias e ordem pedagogica (fatos clinicos paralelos, sem dependencia real entre si), exceto onde ha dependencia real de fato (indicada abaixo). Doencas Transmissiveis (25, o maior de toda a materia): 5 ondas de 5, agrupadas por familia clinica -- onda 1, as doencas classicas do calendario vacinal infantil (Sarampo, Rubeola, Varicela, Difteria, Coqueluche); onda 2, mais imunopreviniveis e respiratorias comuns (Tetano, Poliomielite, Meningite, Hepatites virais, Influenza); onda 3, respiratorias/cronicas e de pele (Tuberculose, Hanseniase, Covid-19, Raiva, Escabiose); onda 4, IST e zoonoses de transmissao indireta (IST, Sifilis, Toxoplasmose, Leptospirose, Febre maculosa); onda 5, arboviroses e doencas tropicais vetoriais, as mais especializadas (Arboviroses, Malaria, Leishmaniose, Doenca de Chagas, Esquistossomose). Continua exigindo tambem o subtopico Vigilancia epidemiologica de Vigilancia em Saude (requisito de topico ja existente) -- por isso esse subtopico la continua raiz. Urgencia, Emergencia e UTI (10): Acolhimento e classificacao de risco e a raiz (o primeiro passo de qualquer atendimento) -> vias aereas e RCP (o ABC da emergencia) -> choque/sepse/anafilaxia e emergencias cardiovasculares -> neurologicas, clinicas e trauma -> intoxicacoes e cuidado critico continuo, o mais avancado. Fundamentos e Procedimentos (10): Sinais vitais e Higiene/conforto sao as raizes (a base de qualquer cuidado) -> procedimentos gerais e coleta de exames -> puncao venosa, sondagem e oxigenoterapia (tecnicas mais invasivas) -> avaliacao e curativo de ferida -> estomias, o caso mais especializado. Saude do Adulto e do Idoso (10): Doencas cronicas - atencao basica e a raiz -> hipertensao e diabetes, as duas doencas cronicas mais comuns -> obesidade e saude do idoso -> avaliacao funcional, saude do homem e violencia contra o idoso -> cancer/paliativos e reabilitacao, os mais avancados. Controle de Infeccao e Seguranca do Paciente (10): Higienizacao das maos e EPI sao as raizes (a base classica de qualquer prevencao) -> controle de infeccao e precaucoes/isolamento -> IRAS/vigilancia, limpeza e acidente biologico -> metas de seguranca do paciente, o arcabouco mais amplo -> identificacao/cirurgia segura e prevencao de quedas, metas especificas dentro desse arcabouco. Saude da Mulher (9): atencao basica e a raiz -> planejamento reprodutivo e rastreamento de cancer -> pre-natal e climaterio/violencia -> parto e emergencias obstetricas -> puerperio e aleitamento, a fase seguinte ao parto. Imunizacao (8): Calendario vacinal e a raiz -> normas de vacinacao e rede de frio -> tecnica e vias de administracao -> situacoes especiais e eventos adversos -> imunobiologicos especiais/CRIE e profilaxia da raiva, os casos mais especificos. Saude da Crianca e do Adolescente (8): atencao basica e a raiz -> recem-nascido e crescimento/desenvolvimento -> triagem neonatal e alimentacao infantil -> doencas comuns da infancia e saude do adolescente -> violencia contra a crianca, o topico mais avancado. Farmacologia e Medicamentos (5): vias de administracao -> seguranca na administracao -> calculo de dose/gotejamento -> farmacologia aplicada e medicamentos controlados, os mais avancados. Saude Mental (5): RAPS e reforma psiquiatrica, o arcabouco institucional, e a raiz -> transtornos e cuidado em crise -> prevencao do suicidio e alcool/drogas -> psicofarmacologia, o mais tecnico. Feridas, Estomias e Reabilitacao (4): avaliacao e tratamento de ferida -> classificacao de lesao por pressao -> estomias -> reabilitacao e pessoa com deficiencia, o mais amplo. Vigilancia em Saude (3): Vigilancia epidemiologica e a raiz -- de proposito, porque Doencas Transmissiveis ja depende dela via requisito de topico, e nao pode ficar presa atras de mais nada -> Vigilancia sanitaria e ambiental. Centro Cirurgico e CME (3): Centro cirurgico -> Periodo perioperatorio -> CME e processamento de materiais, o mais tecnico/especializado. Etica e Exercicio Profissional (3): Codigo de Etica -> Exercicio profissional -> Educacao permanente. Anatomia e Fisiologia (3): geral e a raiz -> sistema cardiovascular/respiratorio e sistemas digestorio/urinario/endocrino, os sistemas especificos. Saude do Homem (3): PNAISH, o arcabouco de politica -> saude sexual e reprodutiva -> rastreamento de cancer de prostata, o mais clinico/especifico. Processo de Enfermagem e Registros (2): o metodo -> o registro dele."
+      }
     },
     "biologia-celular": {
-      "criterio": "10 tópicos, sem subtópico, cada um cobrindo um recorte fechado do currículo de biologia celular (Alberts, Fundamentos da biologia celular). Teoria celular é a base histórica — quem descobriu a célula e como — e não pressupõe nada. Microscopia e classificação celular (procarionte×eucarionte, técnicas de observação) exige Teoria celular porque classificar célula pressupõe já saber o que é uma célula. Daqui o grafo se ramifica em três frentes que não dependem uma da outra, todas exigindo só Microscopia e classificação celular como base comum: (1) Célula animal, vegetal e vírus — comparação de tipos celulares e a posição do vírus como parasita intracelular obrigatório, síntese que só faz sentido depois de já saber classificar célula; (2) a membrana — Composição da membrana e mosaico fluido é o primeiro passo, Especializações da membrana e transporte passivo exige o modelo de mosaico fluido pra explicar como a especialização e o transporte passivo atravessam essa estrutura, e Transporte ativo e endo/exocitose exige o transporte passivo por ser o próximo degrau (ativo é o que passivo não explica: contra gradiente, com gasto de ATP); a sinalização celular também parte da membrana — Moléculas e tipos de sinalização celular exige Composição da membrana porque sinalização parácrina/endócrina/autócrina se liga a receptores DA membrana, e Receptores celulares e proteína G exige Moléculas e tipos de sinalização porque o receptor é o mecanismo, não faz sentido sem já saber que tipos de sinal existem; (3) o citoesqueleto — Citosol e microtúbulos exige só Microscopia e classificação celular (microtúbulo é uma estrutura da célula eucarionte), e Actina e filamentos intermediários exige Citosol e microtúbulos por ser a continuação do mesmo assunto (as três famílias de filamento do citoesqueleto, na ordem que o próprio banco já usa). Fica sem requisito, e portanto aberta desde o primeiro dia, só Teoria celular — a base de tudo o que vem depois.",
+      "criterio": "A fila segue a própria estrutura do curso (Alberts, Fundamentos da biologia celular), do que é uma célula até como ela conversa. (1-3) a base: Teoria celular (quem descobriu a célula e como), Microscopia e classificação celular (procarionte × eucarionte, técnicas de observação) e Célula animal, vegetal e vírus, a comparação de tipos que só faz sentido depois de saber classificar. (4-6) a membrana: Composição da membrana e mosaico fluido → Especializações da membrana e transporte passivo → Transporte ativo e endo/exocitose, que é o degrau seguinte (ativo é o que passivo não explica: contra gradiente, com gasto de ATP). (7-8) a sinalização, que parte da mesma membrana: Moléculas e tipos de sinalização celular → Receptores celulares e proteína G, o mecanismo. (9-10) o citoesqueleto: Citosol e microtúbulos → Actina e filamentos intermediários, as três famílias de filamento na ordem que o próprio banco já usa.",
       "requisitos": {
+        "Microscopia e classificação celular": [
+          "Teoria celular"
+        ],
+        "Célula animal, vegetal e vírus": [
+          "Microscopia e classificação celular"
+        ],
+        "Composição da membrana e mosaico fluido": [
+          "Célula animal, vegetal e vírus"
+        ],
+        "Especializações da membrana e transporte passivo": [
+          "Composição da membrana e mosaico fluido"
+        ],
+        "Transporte ativo e endo/exocitose": [
+          "Especializações da membrana e transporte passivo"
+        ],
+        "Moléculas e tipos de sinalização celular": [
+          "Transporte ativo e endo/exocitose"
+        ],
+        "Receptores celulares e proteína G": [
+          "Moléculas e tipos de sinalização celular"
+        ],
+        "Citosol e microtúbulos": [
+          "Receptores celulares e proteína G"
+        ],
+        "Actina e filamentos intermediários": [
+          "Citosol e microtúbulos"
+        ]
+      },
+      "criterio_conceitual": "10 tópicos, sem subtópico, cada um cobrindo um recorte fechado do currículo de biologia celular (Alberts, Fundamentos da biologia celular). Teoria celular é a base histórica — quem descobriu a célula e como — e não pressupõe nada. Microscopia e classificação celular (procarionte×eucarionte, técnicas de observação) exige Teoria celular porque classificar célula pressupõe já saber o que é uma célula. Daqui o grafo se ramifica em três frentes que não dependem uma da outra, todas exigindo só Microscopia e classificação celular como base comum: (1) Célula animal, vegetal e vírus — comparação de tipos celulares e a posição do vírus como parasita intracelular obrigatório, síntese que só faz sentido depois de já saber classificar célula; (2) a membrana — Composição da membrana e mosaico fluido é o primeiro passo, Especializações da membrana e transporte passivo exige o modelo de mosaico fluido pra explicar como a especialização e o transporte passivo atravessam essa estrutura, e Transporte ativo e endo/exocitose exige o transporte passivo por ser o próximo degrau (ativo é o que passivo não explica: contra gradiente, com gasto de ATP); a sinalização celular também parte da membrana — Moléculas e tipos de sinalização celular exige Composição da membrana porque sinalização parácrina/endócrina/autócrina se liga a receptores DA membrana, e Receptores celulares e proteína G exige Moléculas e tipos de sinalização porque o receptor é o mecanismo, não faz sentido sem já saber que tipos de sinal existem; (3) o citoesqueleto — Citosol e microtúbulos exige só Microscopia e classificação celular (microtúbulo é uma estrutura da célula eucarionte), e Actina e filamentos intermediários exige Citosol e microtúbulos por ser a continuação do mesmo assunto (as três famílias de filamento do citoesqueleto, na ordem que o próprio banco já usa). Fica sem dependência conceitual só Teoria celular — a base de tudo o que vem depois, e por isso também a primeira da fila.",
+      "requisitos_conceituais": {
         "Microscopia e classificação celular": [
           "Teoria celular"
         ],
@@ -1881,7 +3718,7 @@
       }
     },
     "enfermagem-trabalho": {
-      "criterio": "17 tópicos, todos fatos paralelos dentro de si (mesmo caso de manutencao-mecanica: nenhum ganhou escada interna, campo n). Matéria ficou sem nenhuma entrada aqui até virar avulsa — os 17 abriam juntos, sem ordem nenhuma. Cadeia de ORDEM DE ENSINO (não dependência de conceito — ver '_cadeia_entre_raizes' no topo do arquivo), seguindo a lógica de um currículo de saúde do trabalhador: Sistema de Saúde Brasileiro abre primeiro por situar onde a saúde do trabalhador entra dentro do SUS, a base institucional de tudo; Legislação de Segurança e Medicina do Trabalho em seguida, o arcabouço legal (NRs) que sustenta os programas que vêm depois; Elementos de Higiene Ocupacional introduz os agentes de risco (físico, químico, biológico) que Toxicologia da Indústria de Petróleo, Gás e Derivados especializa para o setor, e que Biossegurança e Saúde complementa do lado da proteção; Epidemiologia e Vigilância da Saúde do Trabalhador dá o instrumental de medição que Doenças Profissionais e Doenças Relacionadas ao Trabalho aplica; PCMSO segue por ser o programa que rastreia justamente essas doenças, e Administração de Serviços de Saúde e dos SESMT vem depois por ser a estrutura organizacional que roda o PCMSO; Gestão de Segurança e Saúde do Trabalho generaliza essa gestão; Ergonomia Aplicada ao Trabalho e Bem-Estar, Saúde e Qualidade de Vida no Trabalho tratam do lado humano/postural, o segundo generalizando o primeiro; Níveis de Atenção à Saúde situa onde a assistência acontece; Sistematização da Assistência de Enfermagem é o método de cuidado que Assistência de Enfermagem em Urgências e Emergências aplica a um contexto agudo; Ética e Deontologia de Enfermagem, base profissional que atravessa tudo, mas sem travar nada abaixo dela; Bioestatística, ferramenta de análise que não trava nem depende de nenhum outro tópico da lista, fecha a fila.",
+      "criterio": "17 tópicos, todos fatos paralelos dentro de si (mesmo caso de manutencao-mecanica: nenhum ganhou escada interna, campo n). Matéria ficou sem nenhuma entrada aqui até virar avulsa — os 17 abriam juntos, sem ordem nenhuma. Fila de ORDEM DE ENSINO (não dependência de conceito — ver '_a_fila' no topo do arquivo), seguindo a lógica de um currículo de saúde do trabalhador: Sistema de Saúde Brasileiro abre primeiro por situar onde a saúde do trabalhador entra dentro do SUS, a base institucional de tudo; Legislação de Segurança e Medicina do Trabalho em seguida, o arcabouço legal (NRs) que sustenta os programas que vêm depois; Elementos de Higiene Ocupacional introduz os agentes de risco (físico, químico, biológico) que Toxicologia da Indústria de Petróleo, Gás e Derivados especializa para o setor, e que Biossegurança e Saúde complementa do lado da proteção; Epidemiologia e Vigilância da Saúde do Trabalhador dá o instrumental de medição que Doenças Profissionais e Doenças Relacionadas ao Trabalho aplica; PCMSO segue por ser o programa que rastreia justamente essas doenças, e Administração de Serviços de Saúde e dos SESMT vem depois por ser a estrutura organizacional que roda o PCMSO; Gestão de Segurança e Saúde do Trabalho generaliza essa gestão; Ergonomia Aplicada ao Trabalho e Bem-Estar, Saúde e Qualidade de Vida no Trabalho tratam do lado humano/postural, o segundo generalizando o primeiro; Níveis de Atenção à Saúde situa onde a assistência acontece; Sistematização da Assistência de Enfermagem é o método de cuidado que Assistência de Enfermagem em Urgências e Emergências aplica a um contexto agudo; Ética e Deontologia de Enfermagem, base profissional que atravessa tudo, mas sem travar nada abaixo dela; Bioestatística, ferramenta de análise que não trava nem depende de nenhum outro tópico da lista, fecha a fila.",
       "requisitos": {
         "Legislação de Segurança e Medicina do Trabalho": [
           "Sistema de Saúde Brasileiro"
@@ -1934,7 +3771,7 @@
       }
     },
     "maritimo-maquinas": {
-      "criterio": "16 tópicos, também todos fatos paralelos dentro de si, sem escada interna (mesmo caso de manutencao-mecanica). Sem nenhuma entrada até virar avulsa. Cadeia de ORDEM DE ENSINO (ver '_cadeia_entre_raizes' no topo do arquivo), seguindo a sequência real de um curso de praticagem/máquinas: os quatro treinamentos básicos de segurança do STCW abrem a fila — Segurança no Trabalho primeiro (a base de qualquer atividade a bordo), Conhecimentos Elementares de Primeiros Socorros, Técnicas de Sobrevivência Pessoal e Prevenção e Combate a Incêndio na sequência —, dos quais Procedimentos de Emergências deriva (aplica os quatro numa situação real de emergência a bordo); Conscientização sobre proteção de navio e Relações Interpessoais e Responsabilidades Sociais são os outros dois módulos STCW de base (segurança patrimonial e fator humano), e vêm em seguida; Legislação Marítima e Ambiental dá a base legal de que Prevenção e Controle da Poluição do Meio Ambiente Aquaviário precisa; Arquitetura Naval Aplicada introduz a estrutura do navio, pré-requisito de bom senso pra falar de Máquinas e Sistemas Auxiliares, que por sua vez introduz o que Motores Diesel e Sistemas de Propulsão detalha (o motor é o principal sistema entre os auxiliares); Ferramentaria dá o instrumental prático que Manutenção de Máquinas e Equipamentos Auxiliares usa; Serviço de Quarto de Máquinas de Apoio aplica esse conhecimento todo à rotina real de vigília na praça de máquinas, por isso vem depois de Manutenção; Pintura e Conservação de Embarcação, tarefa de manutenção mais isolada e que não trava nada abaixo, fecha a fila.",
+      "criterio": "16 tópicos, também todos fatos paralelos dentro de si, sem escada interna (mesmo caso de manutencao-mecanica). Sem nenhuma entrada até virar avulsa. Fila de ORDEM DE ENSINO (ver '_a_fila' no topo do arquivo), seguindo a sequência real de um curso de praticagem/máquinas: os quatro treinamentos básicos de segurança do STCW abrem a fila — Segurança no Trabalho primeiro (a base de qualquer atividade a bordo), Conhecimentos Elementares de Primeiros Socorros, Técnicas de Sobrevivência Pessoal e Prevenção e Combate a Incêndio na sequência —, dos quais Procedimentos de Emergências deriva (aplica os quatro numa situação real de emergência a bordo); Conscientização sobre proteção de navio e Relações Interpessoais e Responsabilidades Sociais são os outros dois módulos STCW de base (segurança patrimonial e fator humano), e vêm em seguida; Legislação Marítima e Ambiental dá a base legal de que Prevenção e Controle da Poluição do Meio Ambiente Aquaviário precisa; Arquitetura Naval Aplicada introduz a estrutura do navio, pré-requisito de bom senso pra falar de Máquinas e Sistemas Auxiliares, que por sua vez introduz o que Motores Diesel e Sistemas de Propulsão detalha (o motor é o principal sistema entre os auxiliares); Ferramentaria dá o instrumental prático que Manutenção de Máquinas e Equipamentos Auxiliares usa; Serviço de Quarto de Máquinas de Apoio aplica esse conhecimento todo à rotina real de vigília na praça de máquinas, por isso vem depois de Manutenção; Pintura e Conservação de Embarcação, tarefa de manutenção mais isolada e que não trava nada abaixo, fecha a fila.",
       "requisitos": {
         "Conhecimentos Elementares de Primeiros Socorros": [
           "Segurança no Trabalho"

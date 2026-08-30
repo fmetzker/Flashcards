@@ -97,6 +97,42 @@ cache assume se ela demorar.
 
 ## Ordem de aprendizado
 
+**O grafo abria em leque; virou fila.** Até agosto/2026 `requisitos` era o
+próprio grafo de dependência de conceito, e "abrir um por vez" só valia entre
+os tópicos-raiz — uma cadeia de ordem acrescentada pouco antes, que enfileirava
+a largada e deixava o resto da árvore intacto. O relato que abriu o caso foi
+"Português libera Classes de palavras e Flexão verbal ao concluir Gramática".
+Era verdade, e medido no motor matéria por matéria o problema era maior do que
+o relato: Classes de palavras destrava 9 tópicos de Português (5 no mesmo
+instante), Anatomia e Fisiologia abria 7 de Enfermagem com 11 cartões
+estudados, Aritmética abria 5 de Matemática. O piso era pior que o leque —
+Flexão verbal, 51 cartões, dependia de `{Classes de palavras, Verbo}`, e esse
+subtópico tem UM cartão de nível 1: um acerto e o tópico inteiro abria, um
+cartão depois de Gramática.
+
+A correção não foi no motor. `requisitos` virou uma corrente linear — cada
+tópico exige exatamente o anterior — e o grafo de dependência real mudou de
+casa para `requisitos_conceituais`, que ninguém lê em tempo de execução. Com
+uma corrente, `profundidadeTopico()` devolve 0,1,2,3… e `porDesbloqueio()` já
+pintava a tela Matérias na ordem certa: nenhuma linha de `motor.js` ou
+`index.html` mudou. O máximo que abre ao mesmo tempo caiu de 7 para 1 nas nove
+matérias com fila, e o menor elo do banco inteiro subiu de 1 para 10 cartões.
+
+O grafo não foi apagado porque ele virou a PROVA: `validar.py` confere que a
+fila nunca contraria a dependência declarada. Sem isso a fila seria uma lista
+de opinião que ninguém consegue auditar depois; com isso, é uma ordem de
+ensino que se pode conferir contra o que o próprio arquivo afirma sobre o
+conteúdo. Duas matérias (`enfermagem-trabalho`, `maritimo-maquinas`) não têm
+grafo nenhum — a fila delas sempre foi ordem de ensino pura, e já dizia isso
+por escrito antes da mudança.
+
+**As ondas de subtópico viraram fila junto.** Elas abriam vários irmãos ao
+mesmo tempo (Classes de palavras soltava Substantivo, Verbo e Interjeição de
+uma vez). Serializar não inventou pedagogia nova: conferido antes de mexer,
+não havia no banco inteiro um só tópico com mais de um subtópico que já não
+declarasse ordem — a fila só desempata dentro de cada onda, e as ondas
+originais ficaram registradas em `requisitos_conceituais_subtopicos`.
+
 **Camadas entre tópicos, removidas.** Existiram rótulos agrupando os tópicos
 em "a palavra / a relação entre palavras / o texto". Eram decorativos e
 contradiziam o motor: ao dominar Classes de palavras abriam ao mesmo tempo um

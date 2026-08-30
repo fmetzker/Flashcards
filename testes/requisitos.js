@@ -134,12 +134,12 @@ module.exports = function (APP, t) {
   t.teste('subtópico dominado mas FECHADO não destrava quem depende dele', async () => {
     /* Mesma regra transitiva de tópico, um nível mais fundo: baseDominada()
        chama subtopicoAberto(), não só "a caixa está em dia". Sem isso,
-       histórico de antes da escada abriria a onda seguinte de graça.
+       histórico de antes da escada abriria o próximo da fila de graça.
        Cadeia: Multiplicação -> Operações e expressões numéricas ->
-       Sistema de unidades de medida. */
+       Divisibilidade. */
     await APP.montar({ concursos: ['transpetro-mec'] });
     const meio = 'Operações e expressões numéricas';
-    const fim = 'Sistema de unidades de medida';
+    const fim = 'Divisibilidade';
     t.ok(!APP.subtopicoAberto('matematica', 'Aritmética', meio), meio + ' começa fechado');
 
     dominar('matematica', 'Aritmética', meio);   // domina o meio, pulando Multiplicação
@@ -150,21 +150,47 @@ module.exports = function (APP, t) {
 
     dominar('matematica', 'Aritmética', 'Multiplicação');
     t.ok(APP.subtopicoAberto('matematica', 'Aritmética', meio), meio + ' abre');
-    t.ok(APP.subtopicoAberto('matematica', 'Aritmética', fim), 'e a onda seguinte também');
+    t.ok(APP.subtopicoAberto('matematica', 'Aritmética', fim), 'e o seguinte da fila também');
   });
 
-  t.teste('a escada interna avança uma onda por vez', async () => {
+  t.teste('a escada interna avança UM subtópico por vez', async () => {
+    /* requisitos_subtopicos é uma FILA, não ondas: cada subtópico exige
+       exatamente o anterior. Ver '_requisitos_subtopicos' no requisitos.json. */
     await APP.montar({ concursos: ['transpetro-mec'] });
     const abertos = () => subsDe('matematica', 'Aritmética')
       .filter(s => APP.subtopicoAberto('matematica', 'Aritmética', s)).sort();
     t.igual(abertos(), ['Multiplicação']);
     dominar('matematica', 'Aritmética', 'Multiplicação');
-    const onda2 = abertos();
-    t.ok(onda2.includes('Operações e expressões numéricas'), 'onda 2 devia abrir');
-    t.ok(onda2.includes('Conjuntos numéricos'), 'onda 2 devia abrir');
-    t.ok(!onda2.includes('Divisibilidade'), 'onda 3 ainda não');
+    t.igual(abertos(), ['Multiplicação', 'Operações e expressões numéricas'],
+      'só o próximo da fila podia ter aberto');
     dominar('matematica', 'Aritmética', 'Operações e expressões numéricas');
-    t.ok(abertos().includes('Divisibilidade'), 'agora a onda 3 abre');
+    t.ok(abertos().includes('Divisibilidade'), 'agora o terceiro da fila abre');
+    t.ok(!abertos().includes('Fatoração em números primos'), 'e o quarto ainda não');
+  });
+
+  t.teste('em toda matéria abre no máximo UM tópico por vez', async () => {
+    /* O invariante que a fila existe para garantir. Antes dela, requisitos
+       era um grafo e um tópico destravava vários de uma vez — Anatomia e
+       Fisiologia abria 7 tópicos de Enfermagem com 11 cartões estudados.
+       Ver '_a_fila' no banco/requisitos.json. */
+    await APP.montar({ materias: APP.ORDEM_MATERIAS });
+    for (const mid of APP.ORDEM_MATERIAS) {
+      const topicos = [...new Set(APP.BANCO.filter(q => q.m === mid).map(q => q.t))];
+      const temFila = topicos.some(tt => (APP.REQUISITOS[mid + '|' + tt] || []).length);
+      if (!temFila) continue;                    // matéria sem fila declarada: fora do escopo
+      esquecerTudo();
+      const vistos = new Set();
+      for (let passo = 0; passo <= topicos.length; passo++) {
+        const novos = topicos.filter(tt => APP.topicoAberto(mid, tt) && !vistos.has(tt));
+        t.ok(novos.length <= 1,
+          `${mid}: ${novos.length} tópicos abriram de uma vez (${novos.join(', ')})`);
+        if (!novos.length) break;
+        vistos.add(novos[0]);
+        dominar(mid, novos[0]);
+      }
+      t.igual(vistos.size, topicos.length, `${mid}: a fila não alcança todos os tópicos`);
+    }
+    esquecerTudo();
   });
 
   t.grupo('a trava só vale para cartão NOVO');
@@ -241,7 +267,7 @@ module.exports = function (APP, t) {
        Aritmética é o caso real: 17 subtópicos, e vários dos fechados têm
        cartão de nível 1 que a pessoa não tem como alcançar ainda. */
     await APP.montar({ concursos: ['transpetro-mec'] });
-    dominar('matematica', 'Aritmética', 'Multiplicação');       // abre a onda 2
+    dominar('matematica', 'Aritmética', 'Multiplicação');       // abre o 2º da fila
     const alvo = 'Operações e expressões numéricas';
     t.ok(APP.subtopicoAberto('matematica', 'Aritmética', alvo), alvo + ' devia ter aberto');
 
