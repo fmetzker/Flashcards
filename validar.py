@@ -994,14 +994,15 @@ def carrega_patches(B, caminho):
         patches = [patches]
     por_id = {q['id']: q for q in B}
     aplicados = 0
-    campos_validos = ('eo', 'n', 'o', 's', 'c', 'e', 't')
+    campos_validos = ('eo', 'n', 'o', 's', 'c', 'e', 't', 'f')
     for p in patches:
         pid = p.get('id')
         if not pid or pid not in por_id:
             erros.append(f"patches: id '{pid}' não existe no banco")
             continue
         if not any(k in p for k in campos_validos):
-            erros.append(f"patches: id '{pid}' não traz 'eo', 'n', 'o', 's', 'c', 'e' nem 't' — nada a aplicar")
+            erros.append(f"patches: id '{pid}' não traz nenhum campo aplicável "
+                         f"({', '.join(campos_validos)}) — nada a aplicar")
             continue
         falhou = False
         if 'o' in p:
@@ -1040,6 +1041,15 @@ def carrega_patches(B, caminho):
                 erros.append(f"patches: id '{pid}': 't' não pode ser vazio")
                 continue
             por_id[pid]['t'] = novo_t
+        if 'f' in p:
+            # 'f' é obrigatório no cartão (CLAUDE.md, "Formato do banco"), então
+            # patch que a esvazie é erro aqui e não só lá adiante: a mensagem
+            # fica no campo certo em vez de sair como "[id] sem fonte"
+            nova_f = p.get('f')
+            if not isinstance(nova_f, str) or not nova_f.strip():
+                erros.append(f"patches: id '{pid}': 'f' não pode ser vazio — fonte é obrigatória")
+                continue
+            por_id[pid]['f'] = nova_f
         if 'eo' in p:
             por_id[pid]['eo'] = p.get('eo')
         if 'n' in p:

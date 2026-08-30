@@ -1,6 +1,6 @@
 ﻿# Grava 'eo' (explicação por alternativa), 'n' (nível), 'o' (alternativas,
 # para corrigir viés), 's' (subtópico), 'c' (índice da correta), 'e'
-# (explicação principal) e/ou 't' (tópico) em cartão que JÁ EXISTE no banco,
+# (explicação principal), 't' (tópico) e/ou 'f' (fonte) em cartão que JÁ EXISTE no banco,
 # casando por id — só se o validador passar. Terceiro e último script
 # autorizado a escrever em banco/*.json (regra 9 do CLAUDE.md); os outros
 # dois (incorporar-rascunho.ps1, incorporar-propostas.ps1) ACRESCENTAM
@@ -41,6 +41,8 @@
 #       reescrita vira cartão que aponta pra resposta certa com explicação da
 #       errada. validar.py recusa 'c' sem 'e' junto.
 #   e   explicação principal (substitui a que o cartão já tinha).
+#   f   fonte (substitui a que o cartão já tinha). Não pode ficar vazia — a
+#       fonte é obrigatória, e o validar.py recusa patch que a esvazie.
 #   t   tópico (substitui o que o cartão já tinha) — para corrigir cartão
 #       classificado no tópico errado (ex.: rótulo que devia ser subtópico
 #       virou tópico, ou tópico que não existe na árvore do banco). Mesma
@@ -103,7 +105,7 @@ if ($DryRun) {
 
 # ---- 2. acha em qual banco/<matéria>.json cada id mora ------------------------
 $materias = [System.IO.File]::ReadAllText((Join-Path $dir 'materias.json'), [System.Text.Encoding]::UTF8) | ConvertFrom-Json
-# Um patch traz 'eo', 'n', 'o', 's', 'c', 'e', 't', ou uma combinação. Guardo
+# Um patch traz 'eo', 'n', 'o', 's', 'c', 'e', 't', 'f', ou uma combinação. Guardo
 # em mapas separados porque campo ausente no patch NÃO pode apagar o que o
 # cartão já tem — quem só define 'n' não deve perder o 'eo' escrito antes, e
 # vice-versa.
@@ -114,7 +116,7 @@ $materias = [System.IO.File]::ReadAllText((Join-Path $dir 'materias.json'), [Sys
 # viés). Quem garante que o patch de 'o' sem 'c' não troca a correta de
 # lugar, e que todo patch de 'c' vem com 'e' nova junto, é o validar.py, que
 # roda logo acima — este script não reimplementa essa checagem (regra 9).
-$eoPorId = @{}; $nPorId = @{}; $oPorId = @{}; $sPorId = @{}; $cPorId = @{}; $ePorId = @{}; $tPorId = @{}; $alvos = @{}
+$eoPorId = @{}; $nPorId = @{}; $oPorId = @{}; $sPorId = @{}; $cPorId = @{}; $ePorId = @{}; $tPorId = @{}; $fPorId = @{}; $alvos = @{}
 foreach ($p in $patches) {
   $campos = $p.PSObject.Properties.Name
   if ($campos -contains 'eo') { $eoPorId[$p.id] = @($p.eo) }
@@ -124,6 +126,7 @@ foreach ($p in $patches) {
   if ($campos -contains 'c')  { $cPorId[$p.id]  = [int]$p.c }
   if ($campos -contains 'e')  { $ePorId[$p.id]  = [string]$p.e }
   if ($campos -contains 't')  { $tPorId[$p.id]  = [string]$p.t }
+  if ($campos -contains 'f')  { $fPorId[$p.id]  = [string]$p.f }
   $alvos[$p.id] = $true
 }
 
@@ -154,7 +157,7 @@ foreach ($m in $materias) {
     if ($oPorId.ContainsKey($q.id)) { $obj.o = $oPorId[$q.id] } else { $obj.o = @($q.o) }
     $obj.c = if ($cPorId.ContainsKey($q.id)) { $cPorId[$q.id] } else { [int]$q.c }
     $obj.e = if ($ePorId.ContainsKey($q.id)) { $ePorId[$q.id] } else { $q.e }
-    $obj.f = $q.f
+    $obj.f = if ($fPorId.ContainsKey($q.id)) { $fPorId[$q.id] } else { $q.f }
     # o que o patch não trouxe é preservado do cartão original
     if ($nPorId.ContainsKey($q.id))      { $obj.n = $nPorId[$q.id] }
     elseif ($campoQ -contains 'n')       { $obj.n = [int]$q.n }

@@ -145,8 +145,9 @@ no Safari do iPhone sem nenhuma etapa de compilação.
    caixa de entrada. Só **três** scripts gravam em `banco/*.json`, todos
    rodados à mão e seguidos de `validar` e commit manuais:
    `incorporar-propostas.ps1` (caixa do Supabase), `incorporar-rascunho.ps1`
-   (cartão escrito localmente) e `explicar-alternativas.ps1` (acrescenta
-   `eo` a cartão que já existe, casando por `id`). **Não escrever script de
+   (cartão escrito localmente) e `explicar-alternativas.ps1` (altera campo
+   de cartão que já existe, casando por `id` — todos os que não entram no
+   `id`: `eo`, `n`, `o`, `s`, `c`, `e`, `t`, `f`). **Não escrever script de
    gravação por lote** — foi o que corrompeu o banco por encoding e passou
    por cima de regra que o validador reprova. Os três não se qualificam como
    isso porque nenhum reimplementa checagem: rodam `validar` de verdade

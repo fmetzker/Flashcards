@@ -66,12 +66,12 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 | `banco/reescritas.json` | Mapa id antigo→novo de enunciados corrigidos — preserva progresso |
 | `sw.js` | Service worker, rede-primeiro. `VERSAO` sobe a cada mudança no app |
 | `manifest.json`, `icone-*.png`, `apple-touch-icon.png` | PWA |
-| `validar.py` | Integridade do banco **e** conduta do motor (roda o `testar.js`). `--rascunho` valida candidato, `--patches` valida `eo`/`n`/`o`/`s`/`c`/`e`/`t`, nenhum dos dois grava |
+| `validar.py` | Integridade do banco **e** conduta do motor (roda o `testar.js`). `--rascunho` valida candidato, `--patches` valida `eo`/`n`/`o`/`s`/`c`/`e`/`t`/`f`, nenhum dos dois grava |
 | `validar.ps1` | Invólucro: só chama o `validar.py` com os mesmos argumentos. Não valida nada por conta própria |
 | `testar.js` + `testes/*.js` | Conduta do **motor** (Leitner, pré-requisito, nível, meta, fuso). `node testar.js [filtro]`; o `validar.py` roda sozinho |
 | `auditar-banco.py` / `.ps1` | Mede contra o `PADRAO-DOS-CARTOES.md`. Mede, não reprova |
 | `rascunho.json` | Cartões em elaboração, sem `id`. Vazio quando não há trabalho |
-| `explicacoes.json` | Patches por `id`: `eo`, `n`, `o`, `s`, `c`, `e` e/ou `t`. Vazio quando não há trabalho |
+| `explicacoes.json` | Patches por `id`: `eo`, `n`, `o`, `s`, `c`, `e`, `t` e/ou `f`. Vazio quando não há trabalho |
 | `servidor.ps1` | Servidor local, `http://localhost:8080` |
 | `gerar-offline.ps1` → `offline.html` | App inteiro num arquivo. **Gerado — não editar** |
 | `supabase/schema.sql` | Tabelas, RLS, triggers |
@@ -91,7 +91,7 @@ falham fechado.
 | Script | Entrada | Escreve | Uso |
 |---|---|---|---|
 | `incorporar-rascunho.ps1` | `rascunho.json` | cartão novo inteiro | cartão escrito à mão |
-| `explicar-alternativas.ps1` | `explicacoes.json` | `eo`, `n`, `o`, `s`, `c`, `e` e/ou `t` por `id` | campo em cartão que já existe |
+| `explicar-alternativas.ps1` | `explicacoes.json` | `eo`, `n`, `o`, `s`, `c`, `e`, `t` e/ou `f` por `id` | campo em cartão que já existe |
 | `incorporar-propostas.ps1` | Supabase | cartão novo inteiro | caixa de entrada colaborativa |
 | `reescrever-questoes.ps1` | — | `q` + `banco/reescritas.json` | único jeito de mudar enunciado |
 
