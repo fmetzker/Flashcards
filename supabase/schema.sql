@@ -754,7 +754,83 @@ create trigger marcar_revisor_reporte
 
 
 -- ----------------------------------------------------------------------------
--- 8.5 Chaves estrangeiras adiáveis — só para permitir a conferência
+-- 8.5 Correções de questão — caixa de entrada do editor
+--
+-- Irmã de `propostas` (seção 8), e pelo mesmo motivo: o banco continua
+-- ESTÁTICO e versionado (regra 9 do CLAUDE.md). Propor é questão NOVA; aqui é
+-- CORRIGIR uma que já existe. Nos dois casos o app só alimenta uma fila —
+-- quem escreve em banco/*.json é script local, depois de validar.py passar.
+--
+-- `patch` é o mesmo formato que explicar-alternativas.ps1 já consome:
+-- {o, c, e, eo, t, s, n, f}, só com o que MUDOU. Campo ausente preserva o que
+-- o cartão tem. O enunciado (`q`) nunca entra: ele define o id (regra 5) e só
+-- reescrever-questoes.ps1 pode mudá-lo com segurança.
+--
+-- `antes` é o que impede a correção de reverter trabalho alheio em silêncio.
+-- Guarda o valor ATUAL dos mesmos campos, no instante da edição. O banco muda
+-- por commit, e uma correção proposta hoje pode ser incorporada semana que
+-- vem, sobre um cartão que outra pessoa já corrigiu no meio — aplicar por
+-- cima desfaria aquilo sem aparecer em lugar nenhum. Na incorporação os dois
+-- são comparados: divergiu, a correção é recusada e listada, nunca aplicada.
+-- Guardar os valores (e não um hash) tem uma segunda serventia: a tela de
+-- revisão mostra antes→depois de verdade, campo a campo.
+--
+-- `reporte_id` liga a correção ao reporte que a motivou, quando veio de um —
+-- `on delete set null` porque reporte descartado não pode levar a correção
+-- junto. Sem policy de delete aqui, igual às outras: correção rejeitada fica
+-- registrada.
+-- ----------------------------------------------------------------------------
+create table if not exists public.correcoes (
+  id              uuid primary key,
+  autor_id        uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  questao_id      text not null check (questao_id ~ '^[0-9a-f]{10}$'),  -- regra 5
+  reporte_id      uuid references public.reportes(id) on delete set null,
+  patch           jsonb not null,
+  antes           jsonb not null,
+  status          text not null default 'pendente' check (status in ('pendente','aprovada','rejeitada')),
+  motivo_rejeicao text,
+  revisado_por    uuid references auth.users(id),
+  revisado_em     timestamptz,
+  incorporada_em  timestamptz,
+  criado_em       timestamptz not null default now()
+);
+
+create index if not exists correcoes_por_status on public.correcoes (status, criado_em);
+
+alter table public.correcoes enable row level security;
+
+drop policy if exists "autor: corrigir"          on public.correcoes;
+drop policy if exists "autor: ver as próprias"   on public.correcoes;
+drop policy if exists "revisor: ver todas"       on public.correcoes;
+drop policy if exists "revisor: decidir"         on public.correcoes;
+
+-- autor só cria como pendente, e conta ainda não liberada não corrige nada
+create policy "autor: corrigir"
+  on public.correcoes for insert
+  with check (autor_id = auth.uid() and status = 'pendente' and public.conta_aprovada());
+
+create policy "autor: ver as próprias"
+  on public.correcoes for select
+  using (autor_id = auth.uid() and public.conta_aprovada());
+
+-- sou_revisor(), não subquery direta em revisores — ver seção 7.1
+create policy "revisor: ver todas"
+  on public.correcoes for select
+  using (public.sou_revisor());
+
+create policy "revisor: decidir"
+  on public.correcoes for update
+  using (public.sou_revisor())
+  with check (public.sou_revisor());
+
+-- quem decidiu vem do servidor, nunca do cliente — mesmo desenho da seção 8.1
+drop trigger if exists marcar_revisor_correcao on public.correcoes;
+create trigger marcar_revisor_correcao
+  before update on public.correcoes
+  for each row execute function public.marcar_revisor();
+
+-- ----------------------------------------------------------------------------
+-- 8.9 Chaves estrangeiras adiáveis — só para permitir a conferência
 --
 -- Por padrão, uma chave estrangeira é checada no exato momento do INSERT/
 -- UPDATE. "Adiável" (DEFERRABLE) permite pedir pra checagem só rodar no

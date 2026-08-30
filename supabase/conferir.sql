@@ -16,7 +16,7 @@ begin;
 -- fictícios, sem conta de verdade em auth.users — mas várias colunas têm
 -- chave estrangeira pra lá. "DEFERRED" adia a checagem dessas chaves para o
 -- COMMIT; como este arquivo sempre termina em ROLLBACK, a checagem nunca
--- chega a rodar. Precisa que schema.sql (seção 8.5, a última do arquivo)
+-- chega a rodar. Precisa que schema.sql (seção 8.9, a última do arquivo)
 -- já tenha marcado essas chaves como adiáveis — se este comando der erro,
 -- rode schema.sql de novo.
 set constraints all deferred;
@@ -534,6 +534,94 @@ begin
   reset role;
 end $$;
 
+
+
+-- ----------------------------------------------------------------------------
+-- 11. Correções de questão (schema.sql, seção 8.5)
+--     Mesmo desenho de propostas: autor cria e vê só o que é seu, revisor vê
+--     tudo e é o único que decide, e quem assinou a decisão vem do servidor.
+-- ----------------------------------------------------------------------------
+do $$
+declare
+  autor    uuid := 'aaaa1111-0000-0000-0000-00000000c0c0';
+  outro    uuid := 'bbbb2222-0000-0000-0000-00000000c0c0';
+  revisor  uuid := 'cccc3333-0000-0000-0000-00000000c0c0';
+  cor_id   uuid := 'dddd4444-0000-0000-0000-00000000c0c0';
+  visto    int;
+  quem     uuid;
+begin
+  set constraints all deferred;
+
+  insert into public.perfis (id, nome, email, status) values
+    (autor,   'Autor c',   'autor.c@exemplo.com',   'aprovado'),
+    (outro,   'Outro c',   'outro.c@exemplo.com',   'aprovado'),
+    (revisor, 'Revisor c', 'revisor.c@exemplo.com', 'aprovado');
+  insert into public.revisores (user_id) values (revisor) on conflict do nothing;
+
+  insert into public.correcoes (id, autor_id, questao_id, patch, antes)
+  values (cor_id, autor, '0123456789',
+          '{"f":"Lei 8.080/90, art. 7º"}'::jsonb,
+          '{"f":"Lei 8.080/90"}'::jsonb);
+
+  -- autor vê a própria correção
+  set local role authenticated;
+  perform set_config('request.jwt.claims', json_build_object('sub', autor, 'role','authenticated')::text, true);
+  select count(*) into visto from public.correcoes;
+  if visto = 1 then raise notice 'OK — autor vê a própria correção';
+  else raise warning 'FALHOU — autor vê % correções; deveria ver 1', visto; end if;
+
+  -- quem não é autor nem revisor não vê nada
+  perform set_config('request.jwt.claims', json_build_object('sub', outro, 'role','authenticated')::text, true);
+  select count(*) into visto from public.correcoes;
+  if visto = 0 then raise notice 'OK — outra pessoa não vê correção alheia';
+  else raise warning 'FALHOU — outra pessoa vê % correção(ões) que não são dela', visto; end if;
+
+  -- autor não aprova a própria correção
+  perform set_config('request.jwt.claims', json_build_object('sub', autor, 'role','authenticated')::text, true);
+  update public.correcoes set status = 'aprovada' where id = cor_id;
+  if found then raise warning 'FALHOU — o autor conseguiu aprovar a própria correção';
+  else raise notice 'OK — autor não aprova a própria correção'; end if;
+
+  -- revisor vê e decide; a assinatura vem do servidor, não do cliente
+  perform set_config('request.jwt.claims', json_build_object('sub', revisor, 'role','authenticated')::text, true);
+  select count(*) into visto from public.correcoes;
+  if visto = 1 then raise notice 'OK — revisor vê a correção de outra pessoa';
+  else raise warning 'FALHOU — revisor vê % correções; deveria ver 1', visto; end if;
+
+  update public.correcoes set status = 'aprovada', revisado_por = autor where id = cor_id;
+  select revisado_por into quem from public.correcoes where id = cor_id;
+  if quem = revisor then
+    raise notice 'OK — revisado_por vem de auth.uid(), não do que o cliente mandou';
+  else
+    raise warning 'FALHOU — revisado_por = %, deveria ser o revisor (%) — dá pra forjar quem decidiu', quem, revisor;
+  end if;
+
+  reset role;
+end $$;
+
+
+-- ----------------------------------------------------------------------------
+-- 12. Conta PENDENTE não corrige questão
+-- ----------------------------------------------------------------------------
+do $$
+declare
+  pendente uuid := 'eeee5555-0000-0000-0000-00000000c0c0';
+begin
+  set constraints all deferred;
+  insert into public.perfis (id, nome, email, status) values
+    (pendente, 'Pendente c', 'pendente.c@exemplo.com', 'pendente');
+
+  set local role authenticated;
+  perform set_config('request.jwt.claims', json_build_object('sub', pendente, 'role','authenticated')::text, true);
+  begin
+    insert into public.correcoes (id, autor_id, questao_id, patch, antes)
+    values (gen_random_uuid(), pendente, '0123456789', '{"f":"x"}'::jsonb, '{"f":"y"}'::jsonb);
+    raise warning 'FALHOU — conta pendente conseguiu corrigir questão';
+  exception when insufficient_privilege or check_violation then
+    raise notice 'OK — conta pendente não corrige questão';
+  end;
+  reset role;
+end $$;
 
 rollback;
 

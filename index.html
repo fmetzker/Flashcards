@@ -380,6 +380,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
     <button id="menu-propor" style="display:none" onclick="ir('propor')">Propor questão</button>
     <button id="menu-revisar" style="display:none" onclick="ir('revisar')">Revisar propostas</button>
     <button id="menu-reportes" style="display:none" onclick="ir('reportes')">Reportes de questões</button>
+    <button id="menu-correcoes" style="display:none" onclick="ir('correcoes')">Correções de questões</button>
     <button id="menu-aprovar" style="display:none" onclick="ir('aprovar')">Aprovar contas</button>
     <button id="menu-painel" style="display:none" onclick="ir('painel')">Painel de desempenho</button>
   </div>
@@ -586,6 +587,13 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
 
   <div class="aviso" id="ed-erro"></div>
   <div id="ed-saida"></div>
+</div>
+
+<!-- ============ REVISAR CORREÇÕES ============ -->
+<div class="tela" id="tela-correcoes">
+  <h1>Correções de questões</h1>
+  <div class="sub" id="correcoes-sub">–</div>
+  <div id="correcoes-corpo" style="margin-top:16px"></div>
 </div>
 
 <!-- ============ AGUARDANDO APROVAÇÃO ============ -->
@@ -1834,6 +1842,7 @@ function ir(nome){
   if(nome==="propor") pintarPropor();
   if(nome==="revisar") pintarRevisar();
   if(nome==="reportes") pintarReportes();
+  if(nome==="correcoes") pintarCorrecoes();
   rodape(nome);
 }
 /* telas sem navegação: as de foco (responder questão, fazer simulado), onde
@@ -1887,7 +1896,8 @@ function rodape(nome){
     /* volta pra reportes, não pro início: o editor só é alcançado de lá, e
        quem corrige normalmente tem mais de um reporte na fila */
     b("Voltar", ()=>ir("reportes"), "fantasma");
-    b("Gerar patch", gerarPatch, "verde");
+    b("Gerar patch", gerarPatch, "fantasma");
+    if(supaConfigurado() && SESSAO) b("Enviar para revisão", enviarCorrecao, "verde");
   } else {
     b("Voltar ao início", ()=>ir("inicio"), "fantasma");
   }
@@ -1941,6 +1951,7 @@ function pintarInicio(){
   document.getElementById("menu-propor").style.display = (supaConfigurado() && SESSAO) ? "" : "none";
   document.getElementById("menu-revisar").style.display = (supaConfigurado() && SESSAO && SOU_REVISOR) ? "" : "none";
   document.getElementById("menu-reportes").style.display = (supaConfigurado() && SESSAO && SOU_REVISOR) ? "" : "none";
+  document.getElementById("menu-correcoes").style.display = (supaConfigurado() && SESSAO && SOU_REVISOR) ? "" : "none";
   document.getElementById("menu-aprovar").style.display = (supaConfigurado() && SESSAO && SOU_APROVADOR) ? "" : "none";
   document.getElementById("menu-painel").style.display = (supaConfigurado() && SESSAO && SOU_APROVADOR) ? "" : "none";
   // simulado imita uma prova de verdade — sem concurso/processo seletivo
@@ -2864,6 +2875,162 @@ function gerarPatch(){
   };
   cx.appendChild(bt);
   saida.appendChild(cx);
+}
+
+
+/* Manda a correção para a caixa de entrada (`correcoes`, schema.sql 8.5) —
+   o caminho de quem corrige no celular, onde copiar JSON não serve.
+
+   Vai junto o `antes`: o valor ATUAL dos mesmos campos do patch, no instante
+   da edição. É o que impede a correção de reverter, em silêncio, trabalho
+   que outra pessoa fez no meio do caminho — o banco muda por commit, e uma
+   correção pode ser incorporada dias depois. Quem compara é o script, na
+   incorporação. */
+async function enviarCorrecao(){
+  const erro = document.getElementById("ed-erro");
+  const p = montarPatch();
+  const problema = conferenciaRasa(p);
+  if(problema){ erro.style.color = "var(--coral)"; erro.textContent = problema; return; }
+  if(!supaConfigurado() || !SESSAO){
+    erro.style.color = "var(--coral)";
+    erro.textContent = "Sem conta conectada — use \"Gerar patch\" e cole em explicacoes.json.";
+    return;
+  }
+
+  const q = ED.q;
+  const antes = {};
+  Object.keys(p).forEach(k=>{
+    if(k === "id") return;
+    antes[k] = k === "n" ? (q.n == null ? null : q.n)
+             : k === "s" ? (q.s || "")
+             : q[k];
+  });
+
+  erro.textContent = "Enviando…"; erro.style.color = "";
+  try{
+    const corpo = {id: uuidv4(), questao_id: q.id, patch: p, antes};
+    if(ED.reporteId) corpo.reporte_id = ED.reporteId;
+    const r = await chamarRest("correcoes", {method:"POST", headers:{"Prefer":"return=minimal"}, body: JSON.stringify(corpo)});
+    if(!r.ok){
+      const d = await r.json().catch(()=>({}));
+      throw new Error(d.message || d.error || ("o servidor respondeu "+r.status));
+    }
+    erro.style.color = "var(--verde)";
+    erro.textContent = "Correção enviada — entra no banco depois de revisada e de passar pelo validador.";
+    document.getElementById("ed-saida").innerHTML = "";
+  }catch(e){
+    erro.style.color = "var(--coral)";
+    erro.textContent = "Não foi possível enviar: "+e.message;
+  }
+}
+
+/* =======================================================================
+   REVISAR CORREÇÕES
+   Irmã de pintarRevisar() (propostas). A diferença que importa: aqui o
+   revisor precisa ver ANTES→DEPOIS campo a campo, senão está aprovando um
+   JSON no escuro.
+   ======================================================================= */
+async function pintarCorrecoes(){
+  const c = document.getElementById("correcoes-corpo");
+  c.innerHTML = "";
+  const carregando = document.createElement("div"); carregando.className = "vazio"; carregando.textContent = "Carregando…";
+  c.appendChild(carregando);
+
+  let pendentes;
+  try{
+    const r = await chamarRest("correcoes?status=eq.pendente&order=criado_em.asc&select=id,questao_id,patch,antes,criado_em");
+    if(!r.ok) throw new Error("o servidor respondeu "+r.status);
+    pendentes = await r.json();
+  }catch(e){
+    c.innerHTML = "";
+    const erro = document.createElement("div"); erro.className = "aviso";
+    erro.textContent = "Não foi possível carregar: "+e.message;
+    c.appendChild(erro);
+    return;
+  }
+
+  document.getElementById("correcoes-sub").textContent =
+    pendentes.length + (pendentes.length===1 ? " correção pendente" : " correções pendentes");
+  c.innerHTML = "";
+  if(!pendentes.length){
+    const vazio = document.createElement("div"); vazio.className = "vazio";
+    vazio.textContent = "Nada pendente no momento.";
+    c.appendChild(vazio);
+    return;
+  }
+
+  const ROTULO = {o:"Alternativas", c:"Qual é a correta", e:"Explicação", eo:"Notas por alternativa",
+                  t:"Tópico", s:"Subtópico", n:"Nível", f:"Fonte"};
+
+  pendentes.forEach(cor=>{
+    const q = porId[cor.questao_id];
+    const card = document.createElement("div"); card.className = "card"; card.style.marginBottom = "12px";
+
+    const rot = document.createElement("div"); rot.className = "rotulo";
+    rot.textContent = q ? ((MATERIAS[q.m]||{}).nome || q.m)+" · "+q.t : "questão fora do seu banco local";
+    card.appendChild(rot);
+
+    const enun = document.createElement("div");
+    enun.style.cssText = "font-size:15px;line-height:1.45;margin:8px 0";
+    enun.textContent = q ? q.q : "id: "+cor.questao_id;
+    card.appendChild(enun);
+
+    /* antes → depois, campo a campo. Aprovar sem ver isso seria aprovar um
+       JSON no escuro, e é o revisor que decide se a correção está certa. */
+    Object.keys(cor.patch).filter(k=>k!=="id").forEach(k=>{
+      const bloco = document.createElement("div");
+      bloco.style.cssText = "margin-top:10px;padding-top:8px;border-top:1px solid var(--traco)";
+      const nome = document.createElement("div");
+      nome.style.cssText = "font-size:12px;font-weight:600;color:var(--tinta2)";
+      nome.textContent = ROTULO[k] || k;
+      bloco.appendChild(nome);
+      const linha = (marca, valor, cor2)=>{
+        const d = document.createElement("div");
+        d.style.cssText = "font-size:13.5px;line-height:1.4;margin-top:3px;color:"+cor2;
+        d.textContent = marca + " " + (Array.isArray(valor) ? valor.join("  |  ")
+                        : valor === null || valor === "" ? "(vazio)" : String(valor));
+        bloco.appendChild(d);
+      };
+      linha("−", cor.antes[k], "var(--tinta2)");
+      linha("+", cor.patch[k], "var(--verde)");
+      card.appendChild(bloco);
+    });
+
+    const acoes = document.createElement("div");
+    acoes.style.cssText = "display:flex;gap:9px;margin-top:12px";
+    const btOk = document.createElement("button");
+    btOk.className = "pequeno verde"; btOk.textContent = "Aprovar";
+    btOk.onclick = ()=>decidirCorrecao(cor.id, "aprovada");
+    const btNao = document.createElement("button");
+    btNao.className = "pequeno fantasma"; btNao.textContent = "Rejeitar";
+    btNao.onclick = ()=>decidirCorrecao(cor.id, "rejeitada");
+    acoes.appendChild(btOk); acoes.appendChild(btNao);
+    card.appendChild(acoes);
+
+    const nota = document.createElement("div"); nota.className = "aviso"; nota.style.marginTop = "8px";
+    nota.textContent = "Aprovar não escreve no banco: quem grava é explicar-alternativas.ps1, "
+      + "rodado à mão, depois do validador passar.";
+    card.appendChild(nota);
+
+    c.appendChild(card);
+  });
+}
+
+async function decidirCorrecao(id, status){
+  let motivo = null;
+  if(status === "rejeitada"){
+    motivo = prompt("Motivo da rejeição (opcional):");
+    if(motivo === null) return;
+  }
+  try{
+    const corpo = {status};
+    if(motivo) corpo.motivo_rejeicao = motivo;
+    const r = await chamarRest("correcoes?id=eq."+id, {method:"PATCH", headers:{"Prefer":"return=minimal"}, body: JSON.stringify(corpo)});
+    if(!r.ok) throw new Error("o servidor respondeu "+r.status);
+    pintarCorrecoes();
+  }catch(e){
+    alert("Não foi possível registrar a decisão: "+e.message);
+  }
 }
 
 /* =======================================================================
