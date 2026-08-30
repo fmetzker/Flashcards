@@ -549,6 +549,45 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   <div id="reportes-corpo" style="margin-top:16px"></div>
 </div>
 
+<!-- ============ EDITOR DE QUESTÃO ============
+     Alcançado pelo botão "Corrigir" de um reporte. NÃO escreve no banco: o
+     banco é estático e versionado (regra 9), e o que sai daqui é um PATCH no
+     mesmo formato que explicar-alternativas.ps1 já consome. -->
+<div class="tela" id="tela-editor">
+  <h1>Corrigir questão</h1>
+  <div class="sub" id="ed-sub">–</div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="rotulo">Enunciado — não editável aqui</div>
+    <div id="ed-enunciado" style="font-size:15.5px;line-height:1.5;margin-top:6px"></div>
+    <div class="aviso" style="margin-top:8px">O enunciado define o <code>id</code> do cartão (regra 5). Mudá-lo zera o histórico de todo mundo, e só <code>reescrever-questoes.ps1</code> faz isso com segurança.</div>
+  </div>
+
+  <div class="aviso" id="ed-motivo" style="margin-top:12px;color:var(--coral)"></div>
+
+  <label style="margin-top:18px">Alternativas — marque a correta</label>
+  <div id="ed-alternativas"></div>
+  <div class="aviso" id="ed-vies"></div>
+
+  <label for="ed-explicacao">Explicação</label>
+  <textarea id="ed-explicacao"></textarea>
+
+  <label for="ed-fonte">Fonte (lei e artigo, ou manual e capítulo)</label>
+  <input type="text" id="ed-fonte">
+
+  <label for="ed-topico">Tópico</label>
+  <input type="text" id="ed-topico">
+
+  <label for="ed-subtopico">Subtópico (vazio remove)</label>
+  <input type="text" id="ed-subtopico">
+
+  <label for="ed-nivel">Nível (1 a 9, vazio = sem nível)</label>
+  <input type="text" id="ed-nivel" inputmode="numeric">
+
+  <div class="aviso" id="ed-erro"></div>
+  <div id="ed-saida"></div>
+</div>
+
 <!-- ============ AGUARDANDO APROVAÇÃO ============ -->
 <div class="tela" id="tela-espera">
   <h1>Conta aguardando aprovação</h1>
@@ -1800,7 +1839,7 @@ function ir(nome){
 /* telas sem navegação: as de foco (responder questão, fazer simulado), onde
    sair no meio perde trabalho, e as de portão (login, espera, escolha do
    concurso), onde navegar para o lado é justamente o que não pode */
-const SEM_NAV = ["estudo","simulado","login","espera","escolher-concurso"];
+const SEM_NAV = ["estudo","simulado","login","espera","escolher-concurso","editor"];
 /* qual aba fica acesa em cada tela — as que não estão aqui não acendem
    nenhuma (Simulado, Propor, Revisar... são destinos de dentro do Hoje) */
 const ABA_DA_TELA = {inicio:"inicio", materias:"materias", stats:"stats", ajustes:"ajustes"};
@@ -1844,6 +1883,11 @@ function rodape(nome){
     /* destino da própria nav: não precisa de "Voltar ao início", a nav já
        leva a qualquer lugar — o botão só ocuparia espaço */
     box.classList.remove("ativa");
+  } else if(nome==="editor"){
+    /* volta pra reportes, não pro início: o editor só é alcançado de lá, e
+       quem corrige normalmente tem mais de um reporte na fila */
+    b("Voltar", ()=>ir("reportes"), "fantasma");
+    b("Gerar patch", gerarPatch, "verde");
   } else {
     b("Voltar ao início", ()=>ir("inicio"), "fantasma");
   }
@@ -2595,6 +2639,234 @@ function registrar(id, resultado){
 }
 
 /* =======================================================================
+   EDITOR DE QUESTÃO
+
+   O app NÃO escreve no banco — ele é estático e versionado, e só três
+   scripts locais gravam nele (regra 9). O que sai daqui é um PATCH, no
+   mesmo formato que `explicar-alternativas.ps1` já consome, e que só vira
+   questão de verdade depois de `validar.py` passar e de um commit.
+
+   Por isso o editor NÃO reimplementa as regras do validador: ele avisa o
+   óbvio (5 alternativas, sem repetidas, nível fora da faixa) para não
+   desperdiçar a viagem até o script, mas quem reprova de verdade é o
+   validador. Duplicar regra aqui é o caminho para as duas versões
+   divergirem — foi o que aconteceu com os dois validadores.
+
+   O PATCH SÓ LEVA O QUE MUDOU. Campo ausente preserva o que o cartão tem;
+   mandar tudo sempre transformaria "corrigi a fonte" num diff que toca
+   sete campos e esconde a mudança real.
+   ======================================================================= */
+let ED = null;   // {q, reporteId} — questão em edição
+
+/* Abre o editor para uma questão. Carrega a matéria dela sob demanda: quem
+   revisa reporte não segue necessariamente o concurso da questão, e nesse
+   caso ela não está em BANCO/porId (a tela de reportes já avisa isso). */
+async function abrirEditor(questaoId, materia, reporteId, motivo){
+  const erro = document.getElementById("ed-erro");
+  erro.textContent = ""; erro.style.color = "";
+  document.getElementById("ed-saida").innerHTML = "";
+
+  let q = porId[questaoId];
+  if(!q && materia){
+    document.getElementById("ed-sub").textContent = "Carregando a matéria dessa questão…";
+    ir("editor");
+    try{ await carregarBancoParcial([materia]); }catch(e){}
+    q = porId[questaoId];
+  }
+  if(!q){
+    ir("editor");
+    document.getElementById("ed-sub").textContent = "Questão não encontrada";
+    erro.style.color = "var(--coral)";
+    erro.textContent = "O id " + questaoId + " não existe no banco publicado. "
+      + "Ou a questão foi removida, ou o enunciado dela foi reescrito e o id mudou.";
+    return;
+  }
+
+  ED = {q, reporteId, motivo};
+  ir("editor");
+  pintarEditor();
+}
+
+function pintarEditor(){
+  const q = ED.q;
+  document.getElementById("ed-sub").textContent =
+    ((MATERIAS[q.m]||{}).nome || q.m) + " · " + q.id;
+  document.getElementById("ed-enunciado").textContent = q.q;
+
+  const mot = document.getElementById("ed-motivo");
+  mot.style.display = ED.motivo ? "" : "none";
+  mot.textContent = ED.motivo ? "Motivo do reporte: " + ED.motivo : "";
+
+  /* uma alternativa por linha: rádio da correta + o texto + a nota por
+     alternativa (`eo`), que é opcional e por isso vem recolhida */
+  const alvo = document.getElementById("ed-alternativas");
+  alvo.innerHTML = "";
+  const eo = Array.isArray(q.eo) && q.eo.length === q.o.length ? q.eo : q.o.map(()=> "");
+  q.o.forEach((texto, i)=>{
+    const bloco = document.createElement("div");
+    bloco.style.cssText = "margin-bottom:10px";
+
+    const linha = document.createElement("div"); linha.className = "alt-proposta";
+    const rd = document.createElement("input");
+    rd.type = "radio"; rd.name = "ed-correta"; rd.value = i; rd.id = "ed-correta-" + i;
+    if(i === q.c) rd.checked = true;
+    rd.onchange = medirVies;
+    const camp = document.createElement("textarea");
+    camp.id = "ed-alt-" + i; camp.value = texto;
+    camp.style.cssText = "min-height:44px";
+    camp.oninput = medirVies;
+    linha.appendChild(rd); linha.appendChild(camp);
+    bloco.appendChild(linha);
+
+    const nota = document.createElement("textarea");
+    nota.id = "ed-eo-" + i; nota.value = eo[i] || "";
+    nota.placeholder = "por que esta alternativa está errada (opcional)";
+    nota.style.cssText = "min-height:38px;font-size:13.5px;margin-left:26px;width:calc(100% - 26px)";
+    bloco.appendChild(nota);
+
+    alvo.appendChild(bloco);
+  });
+
+  document.getElementById("ed-explicacao").value = q.e || "";
+  document.getElementById("ed-fonte").value = q.f || "";
+  document.getElementById("ed-topico").value = q.t || "";
+  document.getElementById("ed-subtopico").value = q.s || "";
+  document.getElementById("ed-nivel").value = q.n == null ? "" : String(q.n);
+  medirVies();
+}
+
+/* Viés de comprimento, ao vivo. É a correção mais comum e a mais fácil de
+   errar na direção contrária: 0% ("a mais longa nunca é a correta") entrega
+   uma alternativa de graça igual a 60%. O alvo é o acaso, e o validador
+   reprova a correta que passe da segunda mais longa em mais de 20 chars. */
+function medirVies(){
+  const el = document.getElementById("ed-vies");
+  const alts = leAlternativas();
+  const c = leCorreta();
+  if(alts.some(a=>!a.trim())){ el.textContent = ""; return; }
+  const tam = alts.map(a=>a.length).sort((x,y)=>y-x);
+  const folga = alts[c].length - (alts[c].length === tam[0] ? tam[1] : tam[0]);
+  if(alts[c].length !== tam[0]){
+    el.style.color = ""; el.textContent = "A correta não é a mais longa — sem pista de comprimento.";
+  }else if(folga > 20){
+    el.style.color = "var(--coral)";
+    el.textContent = "A correta passa a segunda mais longa em " + folga + " caracteres — o validador reprova acima de 20. "
+      + "Alongue um distrator; nunca encurte a correta.";
+  }else{
+    el.style.color = "";
+    el.textContent = "A correta é a mais longa por " + folga + " caractere(s) — dentro do aceitável (até 20).";
+  }
+}
+
+const leAlternativas = () => ED.q.o.map((_, i)=> document.getElementById("ed-alt-" + i).value);
+const leNotas        = () => ED.q.o.map((_, i)=> document.getElementById("ed-eo-" + i).value);
+function leCorreta(){
+  const m = document.querySelector('input[name="ed-correta"]:checked');
+  return m ? Number(m.value) : ED.q.c;
+}
+
+/* Monta o patch com o que MUDOU, e só isso.
+
+   Uma regra do validador precisa ser espelhada aqui, não por checagem mas
+   por construção: patch de `o` sem `c` exige a correta idêntica e na mesma
+   posição — `c` é índice, não texto, e reescrever a correta sem declarar
+   `c` mudaria a resposta certa sem aparecer no diff. Então, se o texto da
+   correta mudou, o patch leva `c` junto; e `c` obriga `e` junto, porque a
+   explicação antiga quase nunca justifica a resposta nova. */
+function montarPatch(){
+  const q = ED.q;
+  const p = {id: q.id};
+  const alts = leAlternativas(), notas = leNotas(), c = leCorreta();
+
+  const mudouAlgumaAlt = alts.some((a, i)=> a !== q.o[i]);
+  const mudouATextoDaCorreta = alts[q.c] !== q.o[q.c];
+  if(mudouAlgumaAlt) p.o = alts;
+  if(c !== q.c || mudouATextoDaCorreta) p.c = c;
+
+  const expl = document.getElementById("ed-explicacao").value;
+  if(expl !== (q.e || "") || "c" in p) p.e = expl;
+
+  const eoAtual = Array.isArray(q.eo) && q.eo.length === q.o.length ? q.eo : null;
+  const mudouNota = notas.some((x, i)=> x !== ((eoAtual && eoAtual[i]) || ""));
+  /* `eo` acompanha `o` mesmo sem ter mudado: eo[i] explica o[i], e distrator
+     novo com nota velha vira cartão que ensina errado */
+  if(mudouNota || (p.o && eoAtual)) p.eo = notas;
+
+  const f = document.getElementById("ed-fonte").value;
+  if(f !== (q.f || "")) p.f = f;
+  const t = document.getElementById("ed-topico").value;
+  if(t !== (q.t || "")) p.t = t;
+  const sub = document.getElementById("ed-subtopico").value;
+  if(sub !== (q.s || "")) p.s = sub;
+  const nv = document.getElementById("ed-nivel").value.trim();
+  const nAtual = q.n == null ? "" : String(q.n);
+  if(nv !== nAtual) p.n = nv === "" ? null : Number(nv);
+
+  return p;
+}
+
+/* Só o que evita viagem perdida até o validador — não é validação. */
+function conferenciaRasa(p){
+  const alts = leAlternativas();
+  if(alts.some(a=>!a.trim())) return "Nenhuma alternativa pode ficar vazia.";
+  if(new Set(alts.map(a=>a.trim())).size !== alts.length) return "As alternativas precisam ser diferentes entre si.";
+  if("e" in p && !p.e.trim()) return "A explicação não pode ficar vazia.";
+  if("f" in p && !p.f.trim()) return "A fonte não pode ficar vazia — questão sem fonte não entra no banco.";
+  if("t" in p && !p.t.trim()) return "O tópico não pode ficar vazio.";
+  if("n" in p && p.n !== null && !(Number.isInteger(p.n) && p.n >= 1 && p.n <= 9)) return "O nível precisa ser um número de 1 a 9.";
+  if("s" in p && p.s.trim() && p.s.trim() === (("t" in p ? p.t : ED.q.t) || "").trim()) return "O subtópico não pode repetir o tópico.";
+  if(Object.keys(p).length <= 1) return "Nada mudou ainda.";
+  return null;
+}
+
+/* Mostra o patch pronto para colar em explicacoes.json. É o caminho de quem
+   corrige no PC: cola, roda `explicar-alternativas.ps1`, e o validador
+   decide. Do celular, ver "Enviar para revisão". */
+function gerarPatch(){
+  const erro = document.getElementById("ed-erro");
+  const saida = document.getElementById("ed-saida");
+  saida.innerHTML = "";
+  medirVies();   // o indicador nunca pode discordar do patch que está saindo
+  const p = montarPatch();
+  const problema = conferenciaRasa(p);
+  if(problema){
+    erro.style.color = "var(--coral)"; erro.textContent = problema;
+    return;
+  }
+  erro.textContent = "";
+
+  const texto = "[\n" + JSON.stringify(p) + "\n]\n";
+  const cx = document.createElement("div"); cx.className = "card"; cx.style.marginTop = "14px";
+  const rot = document.createElement("div"); rot.className = "rotulo";
+  rot.textContent = "Patch — cole em explicacoes.json e rode explicar-alternativas.ps1";
+  cx.appendChild(rot);
+
+  const campos = document.createElement("div"); campos.className = "aviso"; campos.style.marginTop = "6px";
+  campos.textContent = "Campos que mudaram: " + Object.keys(p).filter(k=>k!=="id").join(", ");
+  cx.appendChild(campos);
+
+  const cod = document.createElement("textarea");
+  cod.value = texto; cod.readOnly = true;
+  cod.style.cssText = "margin-top:8px;min-height:120px;font-family:var(--dado);font-size:12px";
+  cx.appendChild(cod);
+
+  const bt = document.createElement("button");
+  bt.className = "pequeno fantasma"; bt.style.marginTop = "8px"; bt.textContent = "Copiar";
+  bt.onclick = ()=>{
+    cod.select();
+    /* clipboard.writeText não existe fora de https/localhost, e o app roda
+       nos dois — execCommand é o que sobra como reserva */
+    const ok = (navigator.clipboard && navigator.clipboard.writeText)
+      ? (navigator.clipboard.writeText(texto), true)
+      : document.execCommand("copy");
+    bt.textContent = ok ? "Copiado" : "Selecione e copie à mão";
+    setTimeout(()=>{ bt.textContent = "Copiar"; }, 2000);
+  };
+  cx.appendChild(bt);
+  saida.appendChild(cx);
+}
+
+/* =======================================================================
    REPORTAR PROBLEMA EM QUESTÃO
    Canal simples: enunciado, alternativa, explicação ou fonte errados. Usa os
    mesmos revisores de propostas (RLS: sou_revisor(), supabase/schema.sql
@@ -3222,13 +3494,18 @@ async function pintarReportes(){
 
     const acoes = document.createElement("div");
     acoes.style.cssText = "display:flex;gap:9px;margin-top:11px";
+    const btCorrigir = document.createElement("button");
+    btCorrigir.className = "pequeno"; btCorrigir.textContent = "Corrigir";
+    /* rp.materia vem do índice do banco quando a questão não está carregada
+       aqui — o editor usa isso pra buscar a matéria dela sob demanda */
+    btCorrigir.onclick = ()=>abrirEditor(rp.questao_id, q ? q.m : rp.materia, rp.id, rp.motivo);
     const btResolver = document.createElement("button");
     btResolver.className = "pequeno verde"; btResolver.textContent = "Marcar resolvido";
     btResolver.onclick = ()=>decidirReporte(rp.id, "resolvido");
     const btDescartar = document.createElement("button");
     btDescartar.className = "pequeno fantasma"; btDescartar.textContent = "Descartar";
     btDescartar.onclick = ()=>decidirReporte(rp.id, "descartado");
-    acoes.appendChild(btResolver); acoes.appendChild(btDescartar);
+    acoes.appendChild(btCorrigir); acoes.appendChild(btResolver); acoes.appendChild(btDescartar);
     card.appendChild(acoes);
 
     c.appendChild(card);
