@@ -158,6 +158,18 @@ no Safari do iPhone sem nenhuma etapa de compilação.
    uma segunda implementação com um terço das checagens e nenhuma sobre
    `requisitos.json`/`topicos.json`. Hoje é invólucro do `validar.py`
    (regra 3), então o gate é o validador inteiro.
+
+   **`publicar-correcoes.ps1` automatiza a SEQUÊNCIA, não a escrita.** Ele
+   revisa as correções pendentes da caixa do app, chama
+   `explicar-alternativas.ps1` (que continua sendo quem grava), roda o
+   validador de novo com o banco já alterado, regenera o `offline.html`,
+   commita e pergunta antes de publicar. Continuam sendo **três** scripts de
+   escrita. O que muda em relação ao "commit manual" que esta regra pedia
+   antes: o commit passou a poder ser do script — o que protege o banco
+   nunca foi o commit ser digitado à mão, e sim o validador decidir e o
+   script falhar fechado. Dois portões seguram o resto: ele **recusa rodar
+   com mudança fora de `banco/`** (senão a correção sumiria dentro de um
+   commit que mexe noutra coisa) e **pergunta antes do push**.
 10. **`schema.sql`: a seção que torna as FKs para `auth.users` adiáveis
     precisa ser a ÚLTIMA do arquivo.** Ela descobre as chaves estrangeiras
     dinamicamente via `pg_constraint` — só enxerga o que já existe no

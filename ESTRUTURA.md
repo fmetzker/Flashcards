@@ -97,6 +97,11 @@ falham fechado.
 
 Campo ausente no patch é **preservado**: mandar só `n` não apaga o `eo`.
 
+`publicar-correcoes.ps1` não está nesta tabela porque **não escreve**: ele
+revisa as correções pendentes do app, chama o `explicar-alternativas.ps1`,
+valida, regenera o `offline.html`, commita e pergunta antes do push. Recusa
+rodar com mudança fora de `banco/`.
+
 ---
 
 ## 4. Anatomia do app
