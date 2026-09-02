@@ -1030,5 +1030,773 @@
    "",
    ""
   ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Advérbio",
+  "n": 2,
+  "q": "Em \"Talvez a equipe consiga atender oito pacientes antes do almoço, se o sistema não cair de novo\", a palavra \"Talvez\" é:",
+  "o": [
+   "Conjunção",
+   "Advérbio",
+   "Pronome",
+   "Substantivo",
+   "Interjeição"
+  ],
+  "c": 1,
+  "e": "Advérbio modifica o verbo, o adjetivo ou outro advérbio, indicando circunstância. 'Talvez' modifica a ideia da oração inteira, indicando dúvida sobre se a equipe vai conseguir atender os pacientes — advérbio de dúvida, diferente de 'se', mais adiante na mesma frase, que liga duas orações.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: conjunção ligaria duas orações; 'talvez' não liga nada, só expressa incerteza.",
+   "Correta: advérbio de dúvida, expressa incerteza sobre o fato descrito na oração.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Numeral",
+  "n": 2,
+  "q": "Em \"Talvez a equipe consiga atender oito pacientes antes do almoço, se o sistema não cair de novo\", a palavra \"oito\" é:",
+  "o": [
+   "Pronome",
+   "Numeral",
+   "Adjetivo",
+   "Substantivo",
+   "Preposição"
+  ],
+  "c": 1,
+  "e": "Numeral indica quantidade, ordem, multiplicação ou fração de seres. 'Oito' indica a quantidade exata de pacientes que a equipe pretende atender — numeral cardinal.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "Correta: numeral cardinal, indica a quantidade exata de pacientes.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Conjunção",
+  "n": 2,
+  "q": "Em \"Talvez a equipe consiga atender oito pacientes antes do almoço, se o sistema não cair de novo\", a palavra \"se\" é:",
+  "o": [
+   "Preposição",
+   "Pronome",
+   "Conjunção",
+   "Advérbio",
+   "Artigo"
+  ],
+  "c": 2,
+  "e": "Conjunção liga orações ou termos de mesma função, marcando a relação entre eles. 'Se' liga a oração 'o sistema não cair de novo' à primeira, estabelecendo uma condição — conjunção subordinativa condicional.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "Errada: 'se' também é pronome reflexivo em outros contextos ('ele se machucou'); aqui liga duas orações, é conjunção.",
+   "Correta: conjunção subordinativa condicional, liga a condição ('o sistema não cair') ao fato principal.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Substantivo",
+  "n": 2,
+  "q": "Em \"Talvez a equipe consiga atender oito pacientes antes do almoço, se o sistema não cair de novo\", a palavra \"sistema\" é:",
+  "o": [
+   "Verbo",
+   "Adjetivo",
+   "Pronome",
+   "Substantivo",
+   "Numeral"
+  ],
+  "c": 3,
+  "e": "Substantivo nomeia seres, objetos, lugares, sentimentos e ideias. 'Sistema' nomeia aquilo que pode ou não cair — substantivo, antecedido pelo artigo 'o'.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "",
+   "Correta: substantivo, nomeia o que está em risco de cair.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Interjeição",
+  "n": 2,
+  "q": "Em \"Ei! Um novo edital foi publicado ontem, e os inscritos já conferem o resultado\", a palavra \"Ei\" é:",
+  "o": [
+   "Advérbio",
+   "Interjeição",
+   "Verbo",
+   "Substantivo",
+   "Conjunção"
+  ],
+  "c": 1,
+  "e": "Interjeição exprime emoção e forma, sozinha, um enunciado completo. 'Ei!' chama a atenção de alguém e forma sozinha um enunciado completo, sem sujeito nem verbo — interjeição.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "Correta: interjeição, chama a atenção e forma sozinha um enunciado completo.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Artigo",
+  "n": 2,
+  "q": "Em \"Ei! Um novo edital foi publicado ontem, e os inscritos já conferem o resultado\", a palavra \"Um\" é:",
+  "o": [
+   "Numeral",
+   "Artigo",
+   "Pronome",
+   "Preposição",
+   "Adjetivo"
+  ],
+  "c": 1,
+  "e": "Artigo antecede o substantivo, definindo-o ou generalizando-o. Em 'Um novo edital', 'Um' apenas apresenta o edital como algo novo e ainda não identificado — artigo indefinido, diferente de numeral, que exigiria contar quantos editais foram publicados ('apenas um edital, entre vários').",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: numeral cardinal exigiria uma contagem explícita ('apenas um edital, e não dois'); aqui 'Um' só introduz o edital como algo novo, sem contar nada.",
+   "Correta: artigo indefinido, apresenta 'edital' como algo novo e ainda não identificado.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Artigo",
+  "n": 2,
+  "q": "Em \"Ei! Um novo edital foi publicado ontem, e os inscritos já conferem o resultado\", a palavra \"os\" é:",
+  "o": [
+   "Pronome",
+   "Artigo",
+   "Numeral",
+   "Conjunção",
+   "Advérbio"
+  ],
+  "c": 1,
+  "e": "Artigo antecede o substantivo, definindo-o ou generalizando-o. Em 'os inscritos', 'os' antecede o substantivo 'inscritos', definindo-os — artigo definido, ao contrário de 'Um', no início da mesma frase, que é indefinido porque apresenta o edital sem identificá-lo ainda.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: 'os' também pode ser pronome oblíquo, substituindo um substantivo já citado ('o edital publicou-os'); aqui ele vem ANTES de 'inscritos' e o acompanha.",
+   "Correta: artigo definido — diferente de 'Um', no início da frase, que é indefinido.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Adjetivo",
+  "n": 2,
+  "q": "Em \"Ei! Um novo edital foi publicado ontem, e os inscritos já conferem o resultado\", a palavra \"novo\" é:",
+  "o": [
+   "Substantivo",
+   "Verbo",
+   "Adjetivo",
+   "Numeral",
+   "Pronome"
+  ],
+  "c": 2,
+  "e": "Adjetivo atribui qualidade, estado ou característica a um substantivo. 'Novo' atribui uma característica ao substantivo 'edital' — o fato de ele ser recente — concordando com ele em gênero e número.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: adjetivo, atribui a característica de ser recente ao edital.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Pronome",
+  "n": 2,
+  "q": "Em \"Cada técnico revisou um equipamento diferente, sem pular nenhum durante o turno\", a palavra \"Cada\" é:",
+  "o": [
+   "Numeral",
+   "Artigo",
+   "Pronome",
+   "Adjetivo",
+   "Advérbio"
+  ],
+  "c": 2,
+  "e": "Pronome substitui ou acompanha o substantivo, situando-o nas pessoas do discurso. 'Cada' acompanha 'técnico', situando-o individualmente dentro do grupo, um a um — pronome indefinido distributivo.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: numeral daria uma quantidade exata de técnicos; 'cada' não conta o grupo, distribui a ação entre os membros dele, um por um.",
+   "",
+   "Correta: pronome indefinido distributivo, situa cada técnico individualmente na ação.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Preposição",
+  "n": 2,
+  "q": "Em \"Cada técnico revisou um equipamento diferente, sem pular nenhum durante o turno\", a palavra \"sem\" é:",
+  "o": [
+   "Conjunção",
+   "Advérbio",
+   "Preposição",
+   "Pronome",
+   "Artigo"
+  ],
+  "c": 2,
+  "e": "Preposição liga dois termos, subordinando o segundo ao primeiro. 'Sem' liga 'pular' a 'nenhum', subordinando o segundo termo ao primeiro e indicando ausência — preposição.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: preposição, indica a ausência da ação de pular algum equipamento.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Pronome",
+  "n": 2,
+  "q": "Em \"Cada técnico revisou um equipamento diferente, sem pular nenhum durante o turno\", a palavra \"nenhum\" é:",
+  "o": [
+   "Numeral",
+   "Substantivo",
+   "Pronome",
+   "Adjetivo",
+   "Verbo"
+  ],
+  "c": 2,
+  "e": "Pronome substitui ou acompanha o substantivo, situando-o nas pessoas do discurso. 'Nenhum' substitui 'equipamento', situando-o de forma negativa (nenhum equipamento foi pulado) — pronome indefinido, diferente de 'Cada', no início da mesma frase, que é distributivo, não negativo.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: numeral indicaria contagem exata; 'nenhum' nega a existência, não conta.",
+   "Errada: 'nenhum' não nomeia um ser, ele SUBSTITUI 'equipamento' negativamente — por isso é pronome, não substantivo.",
+   "Correta: pronome indefinido negativo, substitui 'equipamento' negando que algum tenha sido pulado.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Adjetivo",
+  "n": 2,
+  "q": "Em \"Cada técnico revisou um equipamento diferente, sem pular nenhum durante o turno\", a palavra \"diferente\" é:",
+  "o": [
+   "Substantivo",
+   "Pronome",
+   "Verbo",
+   "Adjetivo",
+   "Numeral"
+  ],
+  "c": 3,
+  "e": "Adjetivo atribui qualidade, estado ou característica a um substantivo. 'Diferente' atribui uma característica ao substantivo 'equipamento' — cada um distinto do outro — concordando com ele em número.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "",
+   "Correta: adjetivo, caracteriza o equipamento como distinto dos demais.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Conjunção",
+  "n": 2,
+  "q": "Em \"Assim que o soro acabar, a enfermeira trocará o frasco e anotará o horário exato\", a palavra \"Assim que\" é:",
+  "o": [
+   "Preposição",
+   "Advérbio",
+   "Conjunção",
+   "Pronome",
+   "Interjeição"
+  ],
+  "c": 2,
+  "e": "Conjunção liga orações ou termos de mesma função, marcando a relação entre eles. 'Assim que' liga a oração 'o soro acabar' à seguinte, indicando o momento em que a troca vai acontecer (equivale a 'quando') — locução conjuntiva subordinativa temporal.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: preposição ligaria termos dentro da mesma oração; 'assim que' liga duas orações inteiras.",
+   "",
+   "Correta: locução conjuntiva subordinativa temporal, equivale a 'quando'.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Verbo",
+  "n": 2,
+  "q": "Em \"Assim que o soro acabar, a enfermeira trocará o frasco e anotará o horário exato\", a palavra \"trocará\" é:",
+  "o": [
+   "Substantivo",
+   "Adjetivo",
+   "Verbo",
+   "Advérbio",
+   "Pronome"
+  ],
+  "c": 2,
+  "e": "Verbo indica ação, estado ou fenômeno e se conjuga, variando em tempo, modo, número e pessoa. 'Trocará' indica a ação que a enfermeira vai praticar e está conjugado no futuro do presente — verbo.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: verbo, indica a ação de trocar, conjugado no futuro do presente.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Substantivo",
+  "n": 2,
+  "q": "Em \"Assim que o soro acabar, a enfermeira trocará o frasco e anotará o horário exato\", a palavra \"frasco\" é:",
+  "o": [
+   "Adjetivo",
+   "Verbo",
+   "Pronome",
+   "Substantivo",
+   "Preposição"
+  ],
+  "c": 3,
+  "e": "Substantivo nomeia seres, objetos, lugares, sentimentos e ideias. 'Frasco' nomeia o objeto que a enfermeira vai trocar — substantivo, antecedido pelo artigo 'o'.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "",
+   "Correta: substantivo, nomeia o objeto a ser trocado.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Adjetivo",
+  "n": 2,
+  "q": "Em \"Assim que o soro acabar, a enfermeira trocará o frasco e anotará o horário exato\", a palavra \"exato\" é:",
+  "o": [
+   "Substantivo",
+   "Verbo",
+   "Adjetivo",
+   "Numeral",
+   "Advérbio"
+  ],
+  "c": 2,
+  "e": "Adjetivo atribui qualidade, estado ou característica a um substantivo. 'Exato' atribui uma característica ao substantivo 'horário' — a precisão dele — concordando com ele em gênero e número.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: adjetivo, caracteriza o horário como preciso.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Pronome",
+  "n": 2,
+  "q": "Em \"Nossa esquadra realizou quatro manobras, e apenas alguns marinheiros erraram o horário\", a palavra \"Nossa\" é:",
+  "o": [
+   "Artigo",
+   "Interjeição",
+   "Pronome",
+   "Substantivo",
+   "Verbo"
+  ],
+  "c": 2,
+  "e": "Pronome substitui ou acompanha o substantivo, situando-o nas pessoas do discurso. 'Nossa' acompanha 'esquadra', situando-a nas pessoas do discurso (a esquadra de quem fala) — pronome possessivo. É a mesma palavra usada como interjeição em 'Nossa! A tripulação concluiu...' — mas ali ela vinha sozinha e exclamativa; aqui acompanha um substantivo, então é pronome.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: artigo definiria 'esquadra' sem indicar posse; 'nossa' indica DE QUEM é a esquadra.",
+   "Errada: 'Nossa' É interjeição quando aparece sozinha e exclamativa ('Nossa! A tripulação concluiu...'); aqui ela acompanha o substantivo 'esquadra', é pronome.",
+   "Correta: pronome possessivo, indica que a esquadra é de quem fala.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Numeral",
+  "n": 2,
+  "q": "Em \"Nossa esquadra realizou quatro manobras, e apenas alguns marinheiros erraram o horário\", a palavra \"quatro\" é:",
+  "o": [
+   "Pronome",
+   "Numeral",
+   "Substantivo",
+   "Adjetivo",
+   "Artigo"
+  ],
+  "c": 1,
+  "e": "Numeral indica quantidade, ordem, multiplicação ou fração de seres. 'Quatro' indica a quantidade exata de manobras realizadas — numeral cardinal.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "Correta: numeral cardinal, indica a quantidade exata de manobras.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Pronome",
+  "n": 2,
+  "q": "Em \"Nossa esquadra realizou quatro manobras, e apenas alguns marinheiros erraram o horário\", a palavra \"alguns\" é:",
+  "o": [
+   "Numeral",
+   "Adjetivo",
+   "Substantivo",
+   "Pronome",
+   "Verbo"
+  ],
+  "c": 3,
+  "e": "Pronome substitui ou acompanha o substantivo, situando-o nas pessoas do discurso. 'Alguns' acompanha 'marinheiros', situando-os em quantidade imprecisa — pronome indefinido, diferente de 'quatro', na mesma frase, que dá uma contagem exata.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: numeral diria uma quantidade EXATA (como 'quatro', na mesma frase); 'alguns' só indica que foram poucos, sem precisar quantos.",
+   "Errada: adjetivo atribuiria uma qualidade aos marinheiros, não quantos erraram.",
+   "",
+   "Correta: pronome indefinido, indica quantidade imprecisa de marinheiros.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Substantivo",
+  "n": 2,
+  "q": "Em \"Nossa esquadra realizou quatro manobras, e apenas alguns marinheiros erraram o horário\", a palavra \"horário\" é:",
+  "o": [
+   "Verbo",
+   "Adjetivo",
+   "Substantivo",
+   "Pronome",
+   "Conjunção"
+  ],
+  "c": 2,
+  "e": "Substantivo nomeia seres, objetos, lugares, sentimentos e ideias. 'Horário' nomeia aquilo que os marinheiros erraram — substantivo, antecedido pelo artigo 'o'.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: substantivo, nomeia o que foi errado pelos marinheiros.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Preposição",
+  "n": 2,
+  "q": "Em \"Segundo o boletim, a situação é grave, contudo já está sob controle da equipe\", a palavra \"Segundo\" é:",
+  "o": [
+   "Numeral",
+   "Conjunção",
+   "Preposição",
+   "Adjetivo",
+   "Pronome"
+  ],
+  "c": 2,
+  "e": "Preposição liga dois termos, subordinando o segundo ao primeiro. 'Segundo', aqui, liga 'o boletim' ao resto da frase com o sentido de 'de acordo com' — preposição (ou locução prepositiva), diferente de 'segunda' em 'segunda etapa', que é numeral ordinal e indica posição numa sequência.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: numeral ordinal seria 'segunda etapa' (posição numa sequência); aqui 'Segundo' significa 'de acordo com', não indica ordem.",
+   "Errada: conjunção ligaria duas orações; 'Segundo o boletim' liga um termo ao resto da oração, com sentido de conformidade.",
+   "Correta: preposição (locução prepositiva), equivale a 'de acordo com'.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Adjetivo",
+  "n": 2,
+  "q": "Em \"Segundo o boletim, a situação é grave, contudo já está sob controle da equipe\", a palavra \"grave\" é:",
+  "o": [
+   "Substantivo",
+   "Verbo",
+   "Adjetivo",
+   "Advérbio",
+   "Numeral"
+  ],
+  "c": 2,
+  "e": "Adjetivo atribui qualidade, estado ou característica a um substantivo. 'Grave' atribui um estado ao substantivo 'situação' — a gravidade dela — concordando com ele em número.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: adjetivo, atribui o estado de gravidade à situação.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Conjunção",
+  "n": 2,
+  "q": "Em \"Segundo o boletim, a situação é grave, contudo já está sob controle da equipe\", a palavra \"contudo\" é:",
+  "o": [
+   "Preposição",
+   "Advérbio",
+   "Conjunção",
+   "Pronome",
+   "Interjeição"
+  ],
+  "c": 2,
+  "e": "Conjunção liga orações ou termos de mesma função, marcando a relação entre eles. 'Contudo' liga as duas orações da frase marcando contraste (a situação é grave, CONTUDO já está sob controle) — conjunção coordenativa adversativa, equivalente a 'mas' e 'porém'.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: conjunção coordenativa adversativa, equivale a 'mas' e 'porém'.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Preposição",
+  "n": 2,
+  "q": "Em \"Segundo o boletim, a situação é grave, contudo já está sob controle da equipe\", a palavra \"sob\" é:",
+  "o": [
+   "Conjunção",
+   "Advérbio",
+   "Preposição",
+   "Pronome",
+   "Substantivo"
+  ],
+  "c": 2,
+  "e": "Preposição liga dois termos, subordinando o segundo ao primeiro. 'Sob' liga 'está' a 'controle', indicando a situação em que a equipe mantém o caso — preposição, diferente de 'Segundo', no início da mesma frase, que indica conformidade, não posição.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: preposição, indica que a situação está dentro do controle da equipe.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Artigo",
+  "n": 2,
+  "q": "Em \"As normas técnicas exigem que cada válvula seja testada duas vezes antes da instalação\", a palavra \"As\" é:",
+  "o": [
+   "Pronome",
+   "Numeral",
+   "Artigo",
+   "Preposição",
+   "Adjetivo"
+  ],
+  "c": 2,
+  "e": "Artigo antecede o substantivo, definindo-o ou generalizando-o. 'As' antecede o substantivo 'normas', definindo-as — artigo definido feminino plural.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: artigo definido, antecede e define o substantivo 'normas'.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Substantivo",
+  "n": 2,
+  "q": "Em \"As normas técnicas exigem que cada válvula seja testada duas vezes antes da instalação\", a palavra \"normas\" é:",
+  "o": [
+   "Adjetivo",
+   "Verbo",
+   "Substantivo",
+   "Pronome",
+   "Numeral"
+  ],
+  "c": 2,
+  "e": "Substantivo nomeia seres, objetos, lugares, sentimentos e ideias. 'Normas' nomeia aquilo que exige o teste da válvula — substantivo, antecedido pelo artigo 'As'.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: substantivo, nomeia o conjunto de regras técnicas.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Verbo",
+  "n": 2,
+  "q": "Em \"As normas técnicas exigem que cada válvula seja testada duas vezes antes da instalação\", a palavra \"exigem\" é:",
+  "o": [
+   "Substantivo",
+   "Adjetivo",
+   "Verbo",
+   "Preposição",
+   "Advérbio"
+  ],
+  "c": 2,
+  "e": "Verbo indica ação, estado ou fenômeno e se conjuga, variando em tempo, modo, número e pessoa. 'Exigem' indica a ação praticada pelas normas e se conjuga, concordando com 'normas' em número — verbo.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: verbo, indica a ação de exigir, conjugado no presente do indicativo.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Numeral",
+  "n": 2,
+  "q": "Em \"As normas técnicas exigem que cada válvula seja testada duas vezes antes da instalação\", a palavra \"duas\" é:",
+  "o": [
+   "Pronome",
+   "Numeral",
+   "Adjetivo",
+   "Substantivo",
+   "Artigo"
+  ],
+  "c": 1,
+  "e": "Numeral indica quantidade, ordem, multiplicação ou fração de seres. 'Duas', em 'duas vezes', indica a quantidade exata de repetições do teste — numeral cardinal.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "Correta: numeral cardinal, indica a quantidade exata de vezes que a válvula é testada.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Interjeição",
+  "n": 2,
+  "q": "Em \"Ufa! Nada mais atrasou a entrega, felizmente\", a palavra \"Ufa\" é:",
+  "o": [
+   "Substantivo",
+   "Interjeição",
+   "Advérbio",
+   "Verbo",
+   "Conjunção"
+  ],
+  "c": 1,
+  "e": "Interjeição exprime emoção e forma, sozinha, um enunciado completo. 'Ufa!' expressa alívio e forma sozinha um enunciado completo, sem sujeito nem verbo — interjeição.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "Correta: interjeição, expressa alívio e forma sozinha um enunciado completo.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Pronome",
+  "n": 2,
+  "q": "Em \"Ufa! Nada mais atrasou a entrega, felizmente\", a palavra \"Nada\" é:",
+  "o": [
+   "Numeral",
+   "Substantivo",
+   "Pronome",
+   "Adjetivo",
+   "Advérbio"
+  ],
+  "c": 2,
+  "e": "Pronome substitui ou acompanha o substantivo, situando-o nas pessoas do discurso. 'Nada' é sujeito da oração e substitui a ideia de 'nenhuma coisa', negando que algo tenha atrasado a entrega — pronome indefinido.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: numeral indicaria contagem exata; 'nada' nega a existência de qualquer coisa, não conta.",
+   "Errada: 'nada' não nomeia um ser específico, ele SUBSTITUI a ideia de 'nenhuma coisa' — por isso é pronome, não substantivo.",
+   "Correta: pronome indefinido, substitui a ideia de 'nenhuma coisa' que tenha atrasado a entrega.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Advérbio",
+  "n": 2,
+  "q": "Em \"Ufa! Nada mais atrasou a entrega, felizmente\", a palavra \"felizmente\" é:",
+  "o": [
+   "Adjetivo",
+   "Substantivo",
+   "Verbo",
+   "Advérbio",
+   "Conjunção"
+  ],
+  "c": 3,
+  "e": "Advérbio modifica o verbo, o adjetivo ou outro advérbio, indicando circunstância. 'Felizmente' modifica o sentido da oração inteira, exprimindo a atitude de quem fala diante do fato — advérbio, reconhecível pelo sufixo -mente.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "",
+   "Correta: advérbio, exprime a atitude de quem fala em relação ao fato descrito.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Substantivo",
+  "n": 2,
+  "q": "Em \"Ufa! Nada mais atrasou a entrega, felizmente\", a palavra \"entrega\" é:",
+  "o": [
+   "Verbo",
+   "Adjetivo",
+   "Pronome",
+   "Substantivo",
+   "Numeral"
+  ],
+  "c": 3,
+  "e": "Substantivo nomeia seres, objetos, lugares, sentimentos e ideias. 'Entrega' nomeia o fato que não foi atrasado — substantivo, antecedido pelo artigo 'a'. A mesma palavra é verbo em 'ele entrega o pedido'; aqui, precedida de artigo, nomeia o processo, não indica uma ação sendo praticada.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: 'entrega' É verbo em 'ele entrega o pedido' — mas aqui, precedida do artigo 'a', nomeia o processo, é substantivo.",
+   "",
+   "",
+   "Correta: substantivo, nomeia o processo que não foi atrasado.",
+   ""
+  ]
  }
 ]
