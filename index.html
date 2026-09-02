@@ -2508,12 +2508,14 @@ function mostrarQuestao(){
   const id = S.lista[S.pos], q = porId[id];
   S.respondida = false;
   S.perm = embaralhaOrdem(q.o.length);
-  /* o chip apagado mostra o nível de cima quando ele existe: com subtópico,
-     "Imunização · Rede de frio"; sem, só o tópico */
-  const suave = document.getElementById("q-materia");
-  suave.textContent = q.s ? q.t : "";
-  suave.style.display = q.s ? "" : "none";
-  document.getElementById("q-tag").textContent = q.s || q.t;
+  /* tópico/subtópico só aparecem DEPOIS de responder (ver responder()) —
+     antes disso, o próprio rótulo pode entregar a resposta: em "Classes de
+     palavras", por exemplo, o subtópico "Verbo" já diz qual é a classe
+     certa antes de a pessoa ler a alternativa. Aqui só limpa e esconde. */
+  document.getElementById("q-materia").textContent = "";
+  document.getElementById("q-materia").style.display = "none";
+  document.getElementById("q-tag").textContent = "";
+  document.getElementById("q-tag").style.display = "none";
   document.getElementById("q-contador").textContent = (S.pos+1)+"/"+S.lista.length;
   document.getElementById("q-id").textContent = q.id;
   document.getElementById("q-enunciado").textContent = q.q;
@@ -2540,6 +2542,14 @@ function responder(escolha){
   if(S.respondida) return;
   S.respondida = true;
   const id = S.lista[S.pos], q = porId[id];
+  /* só agora, com a resposta já registrada, revela tópico/subtópico — ver o
+     comentário em mostrarQuestao(). Mesmo texto de sempre: com subtópico,
+     "Imunização · Rede de frio"; sem, só o tópico. */
+  const suave = document.getElementById("q-materia");
+  suave.textContent = q.s ? q.t : "";
+  suave.style.display = q.s ? "" : "none";
+  document.getElementById("q-tag").textContent = q.s || q.t;
+  document.getElementById("q-tag").style.display = "";
   // 'eo': explicação por alternativa (opcional) — precisa cobrir as 5 posições
   const porAlternativa = Array.isArray(q.eo) && q.eo.length === q.o.length;
   const alts = document.querySelectorAll("#q-alts .alt");
