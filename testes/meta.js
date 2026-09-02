@@ -188,4 +188,58 @@ module.exports = function (APP, t) {
       t.igual(linha.nome, APP.BLOCOS_META[i].nome, `nome do bloco ${i}`);
     });
   });
+
+  t.grupo('aviso de meta batida — uma vez por DIA, não por sessão');
+
+  const avisos = () => { const a = []; APP.__ctx.mostrarToast = m => a.push(m); return a; };
+
+  t.teste('bater uma matéria mostra o aviso individual uma única vez', async () => {
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const h = APP.hoje();
+    const bMat = bloco('matematica');
+    APP.E.diasMateria[h] = { matematica: bMat.questoes };   // só matemática bate
+    const a = avisos();
+    APP.checarMetasBatidas();
+    t.igual(a.length, 1, 'devia mostrar exatamente um aviso: ' + JSON.stringify(a));
+    t.ok(a[0].includes('Matemática') || a[0].includes(bMat.nome), 'aviso não citou a matéria certa: ' + a[0]);
+    t.ok(!a[0].includes('todas'), 'não devia ser o aviso de "todas as metas" ainda');
+
+    // chamar de novo, sem mudar nada e SEM sessão nenhuma (S null) — não repete
+    APP.S = null;
+    const a2 = avisos();
+    APP.checarMetasBatidas();
+    t.igual(a2.length, 0, 'não podia repetir o aviso só porque a sessão (S) mudou/sumiu');
+  });
+
+  t.teste('fechar a ÚLTIMA matéria pendente mostra só "todas as metas", não o aviso individual dela', async () => {
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const h = APP.hoje();
+    APP.E.diasMateria[h] = {};
+    APP.BLOCOS_META.forEach(bl => { APP.E.diasMateria[h][bl.materias[0]] = bl.questoes; });
+    const a = avisos();
+    APP.checarMetasBatidas();
+    t.igual(a.length, 1, 'devia mostrar exatamente um aviso, não um por matéria + o de todas: ' + JSON.stringify(a));
+    t.ok(a[0].includes('todas as metas'), 'o único aviso tinha que ser o de "todas as metas": ' + a[0]);
+  });
+
+  t.teste('depois de "todas as metas" já anunciado, nenhum aviso novo aparece', async () => {
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const h = APP.hoje();
+    APP.E.diasMateria[h] = {};
+    APP.BLOCOS_META.forEach(bl => { APP.E.diasMateria[h][bl.materias[0]] = bl.questoes; });
+    APP.checarMetasBatidas();   // primeira vez: anuncia "todas"
+    const a = avisos();
+    APP.checarMetasBatidas();   // segunda vez: nada novo
+    t.igual(a.length, 0, 'não podia mostrar nada de novo: ' + JSON.stringify(a));
+  });
+
+  t.teste('o controle fica em E.metasAnunciadas[dia], não em S — dia diferente não herda nada', async () => {
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const h = APP.hoje();
+    const bMat = bloco('matematica');
+    APP.E.diasMateria[h] = { matematica: bMat.questoes };
+    APP.checarMetasBatidas();
+    t.ok(APP.E.metasAnunciadas[h].blocos.includes(bloco('matematica').id), 'devia ter marcado o aviso de hoje');
+    t.igual(APP.E.metasAnunciadas['2020-01-01'], undefined, 'um dia sem histórico não pode ter entrada nenhuma');
+  });
 };

@@ -243,8 +243,7 @@ module.exports = function (APP, t) {
   t.grupo('repetição do cartão errado');
 
   function sessaoFalsa(modo) {
-    return { lista: [], pos: 0, respondida: false, modo, filtro: null,
-      metasAnunciadas: new Set(), todasAnunciada: false, pendentes: [] };
+    return { lista: [], pos: 0, respondida: false, modo, filtro: null, pendentes: [] };
   }
 
   t.teste('acertar não agenda repetição', () => {
