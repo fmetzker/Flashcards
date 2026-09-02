@@ -757,14 +757,6 @@ async function pega(caminho){
    CONCURSO — apenas o que está EM FOCO na tela: cabeçalho, contagem
      regressiva, cartela, simulado, alerta de bloco fraco. Trocar o foco não
      recarrega banco nenhum, só repinta. */
-/* meta diária deixou de ser configurável: é sempre o total de questões da
-   prova do concurso em foco. Somada aqui, não guardada em concursos.json,
-   porque já é a soma de bl.questoes que o cabeçalho/simulado já usam — outra
-   fonte pra o mesmo número só criaria chance de os dois divergirem. */
-function metaDoConcurso(c){
-  return (c.blocos||[]).reduce((soma,bl)=> soma + (bl.questoes||0), 0) || 35;
-}
-
 function aplicarFoco(id){
   const escolhido = id ? INSCRITOS.find(c=>c.id === id) : null;
   E.escopoEstudo = escolhido ? escolhido.id : null;
@@ -775,11 +767,11 @@ function aplicarFoco(id){
   E.concursoAtivo = CONCURSO ? CONCURSO.id : null;
   BLOCOS = CONCURSO ? CONCURSO.blocos : [];
   BLOCOS_META = blocosDaMeta(escolhido ? [escolhido] : INSCRITOS);
-  /* E.meta dobra como "tamanho de sessão" dentro de iniciarSessao() (o
-     .slice(0, E.meta) que fecha a lista) — não pode virar 0 mesmo sem
-     concurso, senão "Estudar agora" monta sessão vazia com fila cheia. */
-  E.meta = BLOCOS_META.reduce((s,bl)=> s + bl.questoes, 0)
-    || (CONCURSO ? metaDoConcurso(CONCURSO) : SESSAO_SEM_CONCURSO);
+  /* meta diária é sempre META_DIARIA (motor.js) — fixa, não depende de
+     quantos concursos/matérias avulsas a conta segue nem do escopo
+     escolhido. blocosDaMeta() já rateia essa constante entre as matérias
+     pelo peso do edital; aqui só grava o total, que nunca muda. */
+  E.meta = META_DIARIA;
   // blocoDaMateria é do concurso em foco: é ele que diz de que bloco da prova
   // cada matéria faz parte (e blocos são por concurso, não globais)
   Object.keys(blocoDaMateria).forEach(k=>delete blocoDaMateria[k]);
@@ -1259,9 +1251,10 @@ function salvar(){
 }
 const padrao = {
   /* meta não é mais configurável pela pessoa: aplicarFoco() sempre
-     sobrescreve com o total de questões da prova em foco (metaDoConcurso).
-     Este 35 só existe como fallback antes do primeiro carregarConfig(). */
-  meta:35, cartoes:{}, dias:{}, simulados:[], ultimoBackup:null, versaoEstado:0,
+     sobrescreve com META_DIARIA (motor.js) — fixa, não depende de quantos
+     concursos a conta segue. Este valor só existe como fallback antes do
+     primeiro carregarConfig(). */
+  meta:50, cartoes:{}, dias:{}, simulados:[], ultimoBackup:null, versaoEstado:0,
   /* respostas do dia POR MATÉRIA. É o que permite a meta valer só para o
      concurso em foco: estudar Matemática (que só cai no CAAQ-CDM) não pode
      empurrar a meta de quem está focado no concurso de Enfermeiro.
@@ -1921,20 +1914,19 @@ function pintarFocoConcurso(){
   if(INSCRITOS.length <= 1){ sel.style.display = "none"; return; }
   sel.style.display = "";
   sel.innerHTML = "";
-  const soma = blocosDaMeta(INSCRITOS).reduce((s,bl)=> s + bl.questoes, 0);
+  /* Não mostra mais "N por dia" por opção: a meta é sempre META_DIARIA fixa
+     (motor.js), qualquer que seja o escopo — trocar de "todos" para "só
+     este concurso" muda a DIVISÃO entre matérias, não o total do dia. Um
+     número igual em toda opção só confundiria. */
   const opTodos = document.createElement("option");
   opTodos.value = "";
-  opTodos.textContent = "Todos os concursos · "+soma+" por dia";
+  opTodos.textContent = "Todos os concursos";
   if(!E.escopoEstudo) opTodos.selected = true;
   sel.appendChild(opTodos);
   INSCRITOS.forEach(c=>{
     const op = document.createElement("option");
     op.value = c.id;
-    /* blocosDaMeta([c]), não metaDoConcurso(c): este último só soma c.blocos,
-       sem a matéria avulsa que blocosDaMeta() sempre mescla — o número aqui
-       precisa bater com o que aplicarFoco(c.id) de fato vai produzir. */
-    const metaComEscopo = blocosDaMeta([c]).reduce((s,bl)=> s + bl.questoes, 0);
-    op.textContent = "Só "+c.cargo + " · " + metaComEscopo + " por dia";
+    op.textContent = "Só "+c.cargo;
     if(c.id === E.escopoEstudo) op.selected = true;
     sel.appendChild(op);
   });
@@ -1987,8 +1979,8 @@ function pintarInicio(){
     contagem.textContent = dias===0 ? "A prova é hoje!"
       : dias===1 ? "Falta 1 dia para a prova" : "Faltam "+dias+" dias para a prova";
   }
-  // sem concurso nenhum, E.meta é só o tamanho de sessão (SESSAO_SEM_CONCURSO),
-  // não uma meta de prova de verdade — o rótulo muda pra não fingir que é
+  // sem concurso nenhum, E.meta (sempre META_DIARIA) não é meta de PROVA
+  // nenhuma — o rótulo muda pra não fingir que é
   document.getElementById("meta-rotulo").textContent = CONCURSO ? "Meta de hoje" : "Sessão de hoje";
   const f = feitasHoje();
   document.getElementById("meta-texto").textContent = f+"/"+E.meta;

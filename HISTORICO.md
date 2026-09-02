@@ -198,9 +198,14 @@ enquanto a sessão tinha tamanho fixo; com a sessão contínua o problema que el
 resolvia deixou de existir, e estudar antes da hora só enfraquece o
 espaçamento. Removida.
 
-**Fila de revisão engolindo a sessão.** Antes de `intercalar()`, revisão e
-novas eram concatenadas: um backlog grande consumia a meta inteira e cartão
-novo não aparecia enquanto o atrasado não zerasse.
+**Fila de revisão engolindo a sessão — e o retorno dela, de propósito.**
+Antes de `intercalar()` (criada em 2026), revisão e novas eram concatenadas:
+um backlog grande consumia a meta inteira e cartão novo não aparecia
+enquanto o atrasado não zerasse. `intercalar()` resolveu espalhando as duas
+listas proporcionalmente. Meses depois, voltou a ser pedido exatamente esse
+efeito — foco em zerar revisão antes de avançar — e `intercalar()` foi
+removida outra vez, desta vez como decisão consciente, não como bug: ver
+"Meta e progresso do dia" no `CLAUDE.md`.
 
 **Cartela de 100 dias.** Havia uma grade 10×10 colorida por meta batida no
 lugar da contagem de dias seguidos. Era cara de carregar e pintar e não dizia

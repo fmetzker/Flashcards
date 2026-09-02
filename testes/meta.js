@@ -5,20 +5,24 @@ module.exports = function (APP, t) {
 
   t.grupo('meta — matéria repetida');
 
-  t.teste('matéria em dois concursos não soma: vale a MAIOR cota', async () => {
-    /* Português cai nos quatro concursos; somar daria 40/dia da mesma
-       matéria. Estudar 10 de Português serve para as quatro provas. */
+  t.teste('matéria em dois concursos não soma: vale o MAIOR peso', async () => {
+    /* Português cai nos quatro concursos; somar o PESO daria um número maior
+       que qualquer um dos dois sozinho. `peso` é a cota do edital ANTES do
+       rateio — é ele quem carrega essa regra (ver comentário em
+       blocosDaMeta()); `questoes`, depois do rateio, não prova mais isto
+       sozinho porque dois pesos diferentes podem cair na mesma cota final
+       por arredondamento. */
     await APP.montar({ concursos: ['vr-enf-2026'] });
-    const soA = bloco('portugues').novos;
+    const soA = bloco('portugues').peso;
 
     await APP.montar({ concursos: ['caaq-cdm'] });
-    const soB = bloco('portugues').novos;
+    const soB = bloco('portugues').peso;
 
     await APP.montar({ concursos: ['vr-enf-2026', 'caaq-cdm'] });
-    const juntos = bloco('portugues').novos;
+    const juntos = bloco('portugues').peso;
 
     t.igual(juntos, Math.max(soA, soB), `${soA} e ${soB} deviam virar ${Math.max(soA, soB)}, veio ${juntos}`);
-    t.ok(juntos < soA + soB || soA === 0 || soB === 0, 'não pode somar as duas cotas');
+    t.ok(juntos < soA + soB || soA === 0 || soB === 0, 'não pode somar os dois pesos');
   });
 
   t.teste('cada matéria aparece uma única vez em BLOCOS_META', async () => {
@@ -66,11 +70,11 @@ module.exports = function (APP, t) {
 
   t.grupo('meta — matéria avulsa');
 
-  t.teste('matéria avulsa vira bloco com cota própria', async () => {
+  t.teste('matéria avulsa vira bloco com peso próprio', async () => {
     await APP.montar({ concursos: [], avulsas: ['biologia-celular'] });
     const b = bloco('biologia-celular');
     t.ok(b, 'avulsa devia ter virado bloco da meta');
-    t.igual(b.novos, APP.META_MATERIA_AVULSA);
+    t.igual(b.peso, APP.META_MATERIA_AVULSA);
   });
 
   t.teste('avulsa não depende de concurso nenhum', async () => {
@@ -80,55 +84,78 @@ module.exports = function (APP, t) {
     t.ok(APP.BLOCOS_META.length > 0, 'mas BLOCOS_META tem o bloco sintético da avulsa');
   });
 
-  t.teste('avulsa que também é matéria de concurso vale a maior cota', async () => {
+  t.teste('avulsa que também é matéria de concurso vale o maior peso', async () => {
     await APP.montar({ concursos: ['vr-enf-2026'], avulsas: [] });
-    const doConcurso = bloco('portugues').novos;
+    const doConcurso = bloco('portugues').peso;
     await APP.montar({ concursos: ['vr-enf-2026'], avulsas: ['portugues'] });
-    const comAvulsa = bloco('portugues').novos;
-    t.igual(comAvulsa, Math.max(doConcurso, APP.META_MATERIA_AVULSA), 'devia ser a maior, nunca a soma');
+    const comAvulsa = bloco('portugues').peso;
+    t.igual(comAvulsa, Math.max(doConcurso, APP.META_MATERIA_AVULSA), 'devia ser o maior, nunca a soma');
   });
 
-  t.grupo('meta — cota = novos + revisão');
+  t.grupo('meta — rateio proporcional (apportion)');
 
-  t.teste('sem nada vencido, a cota é só a do edital', async () => {
-    await APP.montar({ concursos: ['transpetro-mec'] });
-    for (const b of APP.BLOCOS_META) {
-      t.igual(b.revisao, 0, `${b.nome} não devia ter revisão pendente num estado limpo`);
-      t.igual(b.questoes, b.novos, `${b.nome}: questoes devia ser igual a novos`);
+  t.teste('sempre soma exatamente o total pedido', () => {
+    /* Casos que tendem a sobrar/faltar unidade por arredondamento puro —
+       é exatamente o que o método do maior resto existe pra evitar. */
+    const casos = [[1, 1, 1], [10, 20, 5], [3, 3, 3, 3, 3, 3, 3], [1], [7, 1], [100, 1, 1, 1]];
+    for (const pesos of casos) {
+      const r = APP.apportion(pesos, APP.META_DIARIA);
+      const soma = r.reduce((a, b) => a + b, 0);
+      t.igual(soma, APP.META_DIARIA, `pesos ${pesos.join(',')} deviam somar ${APP.META_DIARIA}, veio ${soma}`);
     }
   });
 
-  t.teste('revisão pendente entra na cota, capada em 2x os novos', async () => {
-    await APP.montar({ concursos: ['transpetro-mec'] });
-    const hoje = APP.hoje();
-    const b0 = bloco('matematica');
-    const novos = b0.novos;
-
-    /* vence MUITO mais que o dobro, para o teto entrar em ação */
-    const daMateria = APP.BANCO.filter(q => q.m === 'matematica'
-      && (!b0.topicos || b0.topicos.includes(q.t)));
-    t.ok(daMateria.length > novos * 2, 'preciso de banco maior que o teto para testá-lo');
-    daMateria.slice(0, novos * 2 + 25).forEach(q => {
-      APP.E.cartoes[q.id] = { caixa: 2, acertos: 1, erros: 0, prox: hoje };
-    });
-    APP.aplicarFoco(null);
-
-    const b = bloco('matematica');
-    t.igual(b.revisao, novos * 2, 'a revisão devia estar capada em 2x os novos');
-    t.igual(b.questoes, b.novos + b.revisao, 'questoes = novos + revisao');
+  t.teste('peso maior nunca recebe cota menor que peso menor', () => {
+    const r = APP.apportion([30, 10, 5], 50);
+    t.ok(r[0] >= r[1] && r[1] >= r[2], `rateio não respeitou a ordem dos pesos: ${r.join(',')}`);
   });
 
-  t.teste('a revisão da cota conta cartão de tópico que fechou depois', async () => {
-    /* revisaoPendenteDaMateria NÃO filtra por trava, de propósito: revisão
-       vencida nunca é travada, então tem que contar na cota também. */
+  t.teste('peso zero fica com cota zero, e não disputa a sobra do arredondamento', () => {
+    const r = APP.apportion([10, 0, 10], 50);
+    t.igual(r[1], 0);
+    t.igual(r[0] + r[2], 50);
+  });
+
+  t.teste('pesos iguais somando exatamente o total: cada um recebe sua fatia exata', () => {
+    t.igual(APP.apportion([1, 1, 1, 1, 1], 50), [10, 10, 10, 10, 10]);
+  });
+
+  t.teste('determinístico — mesma entrada, mesma saída sempre', () => {
+    const a = APP.apportion([7, 7, 7, 7], 50), b = APP.apportion([7, 7, 7, 7], 50);
+    t.igual(a, b);
+  });
+
+  t.teste('lista de pesos vazia devolve total zero, sem quebrar', () => {
+    t.igual(APP.apportion([], 50), []);
+  });
+
+  t.grupo('meta — cota é a fatia rateada de META_DIARIA');
+
+  t.teste('a meta do dia é sempre META_DIARIA, com um concurso ou com vários', async () => {
+    /* Antes a meta crescia a cada concurso novo seguido (soma das cotas do
+       edital); agora é sempre a mesma constante — só a DIVISÃO entre
+       matérias muda. */
     await APP.montar({ concursos: ['transpetro-mec'] });
-    const hoje = APP.hoje();
-    t.ok(!APP.topicoAberto('matematica', 'Funções'), 'Funções tem que estar fechada');
-    const deFechado = APP.BANCO.filter(q => q.m === 'matematica' && q.t === 'Funções').slice(0, 4);
-    t.ok(deFechado.length === 4, 'preciso de 4 cartões de tópico fechado');
-    deFechado.forEach(q => { APP.E.cartoes[q.id] = { caixa: 2, acertos: 1, erros: 0, prox: hoje }; });
     APP.aplicarFoco(null);
-    t.ok(bloco('matematica').revisao >= 4, 'cartão de tópico fechado tem que contar na revisão da cota');
+    t.igual(APP.E.meta, APP.META_DIARIA);
+
+    await APP.montar({ concursos: ['vr-enf-2026', 'caaq-cdm', 'transpetro-mec'] });
+    APP.aplicarFoco(null);
+    t.igual(APP.E.meta, APP.META_DIARIA, 'seguir mais concursos não pode inflar a meta');
+  });
+
+  t.teste('a soma das cotas de BLOCOS_META bate com META_DIARIA', async () => {
+    await APP.montar({ concursos: ['vr-enf-2026', 'caaq-cdm'] });
+    const soma = APP.BLOCOS_META.reduce((s, b) => s + b.questoes, 0);
+    t.igual(soma, APP.META_DIARIA);
+  });
+
+  t.teste('escopo restrito a um concurso também soma META_DIARIA', async () => {
+    /* "só este concurso" muda a DIVISÃO, não o total — ver pintarFocoConcurso() */
+    await APP.montar({ concursos: ['vr-enf-2026', 'caaq-cdm'] });
+    const soma = APP.blocosDaMeta([APP.CONCURSOS.find(c => c.id === 'vr-enf-2026')])
+      .reduce((s, b) => s + b.questoes, 0);
+    t.igual(soma, APP.META_DIARIA);
   });
 
   t.grupo('progresso do dia');

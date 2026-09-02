@@ -46,18 +46,18 @@ const GLOBAIS_LET = [
 ];
 const GLOBAIS_CONST = [
   'porId', 'MATERIAS', 'blocoDaMateria', 'INTERVALOS', 'CAIXA_MAX',
-  'META_MATERIA_AVULSA', 'SESSAO_SEM_CONCURSO', 'FUSO_BRASILIA',
+  'META_MATERIA_AVULSA', 'META_DIARIA', 'FUSO_BRASILIA',
   'CHAVE', 'MAX_EVENTOS_PROPRIOS',
 ];
 /* As funções puras do motor — nenhuma toca DOM nem localStorage. */
 const FUNCOES = [
   'hoje', 'diaUTC', 'somarDias', 'proximaData', 'diasAteMaisProxima',
-  'prioridade', 'fila', 'intercalar', 'cmpId',
+  'prioridade', 'fila', 'apportion', 'cmpId',
   'indexarRequisitos', 'topicoAberto', 'subtopicoAberto',
   'requisitosPendentes', 'requisitosPendentesSub', 'baseDominada',
   'grauDe', 'grauLiberado', 'grauAberto', 'menorGrauExistente', 'limparCacheGrau',
   'profundidadeTopico', 'profundidadeSubtopico', 'porDesbloqueio', 'porDesbloqueioSub',
-  'blocosDaMeta', 'revisaoPendenteDaMateria', 'progressoDoDia', 'progressoPorBloco',
+  'blocosDaMeta', 'progressoDoDia', 'progressoPorBloco',
   'feitasHoje', 'montarLoteSessao', 'agendarRepeticao', 'resumoDoBanco',
   'materiasInscritas', 'provaMaisProxima', 'blocoDe', 'embaralhaOrdem',
   'revisoesPorDia', 'aplicarFoco', 'carregarConfig', 'carregarBancoParcial',

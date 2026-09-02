@@ -40,26 +40,43 @@ const META_MATERIA_AVULSA = 20;
    subconjunto do outro, então escolher "o maior" perderia conteúdo que cai
    numa das provas. Bloco sem `topicos` declarado significa matéria inteira,
    e nesse caso a união também é a matéria inteira. */
-/* Quantos cartões da matéria (dentro do escopo de tópicos, quando existe)
-   já estão vencidos agora — blocosDaMeta() soma isto à cota de novos do
-   dia. Não filtra por trava de degrau/pré-requisito: revisão vencida nunca
-   é travada (ver grauAberto), e a mesma regra vale aqui — cartão que a
-   pessoa já viu conta na cota mesmo que o tópico dele tenha fechado depois
-   por algum motivo. */
-function revisaoPendenteDaMateria(m, topicos){
-  const h = hoje();
-  let n = 0;
-  for(const id in E.cartoes){
-    const x = porId[id];
-    if(!x || x.m !== m) continue;
-    if(topicos && topicos.indexOf(x.t) < 0) continue;
-    if(E.cartoes[id].prox <= h) n++;
-  }
-  return n;
+/* A meta diária é fixa — sempre META_DIARIA questões, não importa quantos
+   concursos ou matérias avulsas a conta segue. Antes a meta era a SOMA das
+   cotas do edital (podia ser 20, podia ser 90, crescia a cada concurso
+   novo seguido); agora esse número vira só um PESO relativo, e
+   blocosDaMeta() rateia META_DIARIA entre as matérias proporcionalmente a
+   ele — ver apportion() logo abaixo. Substitui SESSAO_SEM_CONCURSO (não
+   existe mais "tamanho de sessão menor por não ter prova nenhuma atrás":
+   a meta é sempre esta, com ou sem concurso seguido). */
+const META_DIARIA = 50;
+
+/* Rateio proporcional de `total` (inteiro) entre `pesos`, sem perder nem
+   sobrar unidade — método do maior resto (Hamilton): cada peso recebe o
+   piso da parte exata que lhe cabe, e as unidades que sobraram (por causa
+   do arredondamento) vão, uma a uma, para quem tem a MAIOR parte
+   fracionária perdida. Empate desempata pela posição em `pesos` — nunca
+   Math.random() (a mesma regra de determinismo de cmpId/embaralhaOrdem):
+   apportion() roda de novo a cada boot/troca de foco, e um empate que
+   sorteasse mudaria a cota de um dia pro outro sem a pessoa ter feito
+   nada diferente. Peso 0 sempre fica com cota 0 — não participa da
+   sobra. */
+function apportion(pesos, total){
+  const soma = pesos.reduce((a,b)=>a+b, 0);
+  if(soma <= 0) return pesos.map(()=>0);
+  const exato = pesos.map(p => total * p / soma);
+  const piso = exato.map(Math.floor);
+  const falta = total - piso.reduce((a,b)=>a+b, 0);
+  const restos = exato
+    .map((v,i)=> ({i, frac: v - piso[i]}))
+    .filter(r=> pesos[r.i] > 0)
+    .sort((a,b)=> b.frac - a.frac || a.i - b.i);
+  const resultado = piso.slice();
+  for(let k=0; k<falta; k++) resultado[restos[k].i]++;
+  return resultado;
 }
 
 function blocosDaMeta(lista){
-  const porMateria = {};                       // matéria -> bloco vencedor
+  const porMateria = {};                       // matéria -> bloco vencedor (peso = cota do edital/avulsa)
   const escopo = {};                           // matéria -> Set de tópicos, ou null = tudo
   const fonte = (lista && lista.length) ? lista
               : (INSCRITOS.length ? INSCRITOS : (CONCURSO ? [CONCURSO] : []));
@@ -78,14 +95,13 @@ function blocosDaMeta(lista){
       });
     });
   });
-  /* Matéria avulsa entra como se fosse o próprio bloco de um concurso: cota
-     fixa de META_MATERIA_AVULSA por matéria, contando na meta do dia e na
-     sessão normal como qualquer bloco — antes avulsa só aparecia como
+  /* Matéria avulsa entra como se fosse o próprio bloco de um concurso: peso
+     fixo de META_MATERIA_AVULSA por matéria — antes avulsa só aparecia como
      contagem bruta, sem cota nenhuma ("sem contar pra meta"); virou bloco de
      verdade porque a pessoa marcou aquilo para estudar TODO dia, não só como
      sobra depois de fechar a cota do concurso.
-     Se a matéria já tem bloco de algum concurso seguido, fica valendo a
-     MAIOR cota entre o bloco do concurso e a cota fixa da avulsa — mesma
+     Se a matéria já tem bloco de algum concurso seguido, fica valendo o
+     MAIOR peso entre o bloco do concurso e o peso fixo da avulsa — mesma
      regra de "matéria repetida não soma" que já vale entre concursos, agora
      estendida à avulsa. Escopo de tópicos sempre abre a matéria inteira:
      avulsa não tem edital nenhum limitando o que cai, então não faz sentido
@@ -98,36 +114,36 @@ function blocosDaMeta(lista){
     }
     escopo[m] = null;
   });
+  if(!Object.keys(porMateria).length) return [];   // nada seguido: nenhum peso pra ratear
   /* ORDEM_MATERIAS só decide a ORDEM de exibição — nunca quais matérias
      entram. Antes esta linha era `ORDEM_MATERIAS.filter(...)`, e quando a
      função rodava com a lista ainda vazia (o boot chamava aplicarFoco antes
      de carregar materias.json) o resultado era [] e a meta caía no fallback
      do concurso em foco, sem erro nenhum na tela. Matéria fora de
-     ORDEM_MATERIAS agora vai para o fim em vez de sumir. */
+     ORDEM_MATERIAS agora vai para o fim em vez de sumir. A MESMA ordem
+     também é o desempate de apportion() — deterministo dos dois lados. */
   const ordenadas = Object.keys(porMateria).sort((a,b)=>{
     const ia = ORDEM_MATERIAS.indexOf(a), ib = ORDEM_MATERIAS.indexOf(b);
     return (ia < 0 ? Infinity : ia) - (ib < 0 ? Infinity : ib);
   });
-  return ordenadas.map(m=>{
+  const cotas = apportion(ordenadas.map(m=> porMateria[m].questoes), META_DIARIA);
+  return ordenadas.map((m,i)=>{
     const bl = porMateria[m];
     const topicos = escopo[m] ? Array.from(escopo[m]) : null;
-    /* cota do dia = novos (a cota do edital, como sempre foi) + revisão
-       pendente daquela matéria — teto de 2x os novos, pra um backlog
-       grande (dias sem estudar) não inflar a sessão de um dia só. O
-       excedente do teto continua vencido, só sai do NÚMERO da meta: ele
-       aparece antes de qualquer cartão novo assim que a pessoa bate a meta
-       e continua estudando (ver o fallback em iniciarSessao). `novos` e
-       `revisao` ficam expostos à parte porque iniciarSessao() precisa dos
-       dois separados pra intercalar de verdade, não só de `questoes`
-       (a soma) — ver comentário lá. */
-    const novos = bl.questoes;
-    const revisao = Math.min(revisaoPendenteDaMateria(m, topicos), novos * 2);
-    /* nome da MATÉRIA, não do bloco: "Conhecimentos específicos" é o nome de
-       três blocos diferentes (um por concurso), cada um cobrindo uma matéria
-       diferente — usar bl.nome fazia a meta do dia mostrar três linhas
-       idênticas e impossíveis de distinguir. MATERIAS[m].nome é sempre único. */
+    /* `questoes` é a fatia renormalizada de META_DIARIA — não soma mais
+       revisão pendente (isso virou ordem de apresentação dentro da cota,
+       não quantidade a mais; ver montarLoteSessao). `peso` é o valor de
+       ANTES do rateio (a cota do edital/avulsa, já com a regra de "matéria
+       repetida não soma, vale a maior" aplicada) — exposto à parte porque é
+       ele quem carrega essa regra; `questoes` sozinho não permite mais
+       provar isso, já que dois pesos diferentes na mesma chamada podem virar
+       a mesma cota final por causa do arredondamento. nome da MATÉRIA, não
+       do bloco: "Conhecimentos específicos" é o nome de três blocos
+       diferentes (um por concurso), cada um cobrindo uma matéria diferente —
+       usar bl.nome fazia a meta do dia mostrar três linhas idênticas e
+       impossíveis de distinguir. MATERIAS[m].nome é sempre único. */
     return {id: bl.id+"@"+m, nome: (MATERIAS[m] && MATERIAS[m].nome) || bl.nome,
-            questoes: novos + revisao, novos, revisao, materias: [m], topicos};
+            questoes: cotas[i], peso: bl.questoes, materias: [m], topicos};
   });
 }
 
@@ -153,13 +169,6 @@ function provaMaisProxima(){
    CLAUDE.md. Simulado e a pergunta "quantos dias faltam" ficam indisponíveis
    nesse estado (ver pintarInicio); "Estudar agora" continua funcionando,
    porque fila() só depende do banco carregado, não de CONCURSO. */
-/* último recurso: só entra em uso quando BLOCOS_META fica vazio mesmo assim
-   (nem concurso, nem matéria avulsa — ver META_MATERIA_AVULSA, que agora dá
-   um bloco de verdade pra cada avulsa, então esse caso normalmente só
-   acontece em estado transitório do boot, não no dia a dia de quem já tem
-   alguma coisa seguida). */
-const SESSAO_SEM_CONCURSO = 20;   // tamanho de sessão quando não há meta de prova nenhuma atrás
-
 /* Achata REQ_MATERIA num mapa de consulta direta, uma vez no boot, porque
    topicoAberto() é chamado a cada montagem de fila e varrer o JSON aninhado
    a cada cartão seria desperdício.
@@ -481,28 +490,6 @@ function fila(){
   return {revisar, novas};
 }
 
-/* Entrelaça duas listas já escolhidas, preservando a ordem INTERNA de cada
-   uma (revisão continua saindo por prioridade; novas continuam saindo na
-   ordem do banco) — só decide em que POSIÇÃO da sessão cada lista aparece.
-
-   Sem isto, iniciarSessao concatenava as listas (rev.concat(nov)): a sessão
-   virava um bloco inteiro de revisão seguido de um bloco inteiro de cartão
-   novo, o que dá a sensação de "só fica repetindo o que falta aprender"
-   quando a fila de revisão é grande. Espalha cada lista pela proporção que
-   ela representa do total, tipo Bresenham: length 7 e 3 não vira 7 seguidos
-   de 3, vira algo como A A B A A B A A A B. */
-function intercalar(a, b){
-  const out = [];
-  let i = 0, j = 0;
-  while(i < a.length || j < b.length){
-    const fa = a.length ? i / a.length : 1;
-    const fb = b.length ? j / b.length : 1;
-    if(i < a.length && (fa <= fb || j >= b.length)) out.push(a[i++]);
-    else out.push(b[j++]);
-  }
-  return out;
-}
-
 /* Quanto do dia conta para a meta. Duas regras:
 
    1. Matéria fora de todos os blocos da meta não conta — senão quem segue
@@ -697,7 +684,9 @@ function montarLoteSessao(modo, filtro, excluir){
     });
     rev.sort((a,b)=> prioridade(a) - prioridade(b) || cmpId(a,b));   // mesma ordem do estudo normal
     nov.sort(cmpId);
-    lista = intercalar(rev, nov).slice(0, E.meta);
+    // revisão primeiro, cartão novo só se sobrar espaço — ver o comentário
+    // no modo normal, mais abaixo, sobre a troca de intercalar() por isto
+    lista = rev.concat(nov).slice(0, E.meta);
   } else {
     /* Monta a sessão RESPEITANDO A COTA DE CADA BLOCO DA META — a união dos
        concursos inscritos, não só o que está em foco. Antes isto seguia o
@@ -709,9 +698,9 @@ function montarLoteSessao(modo, filtro, excluir){
        Máquinas não pede regência nem colocação pronominal). Sem `topicos`
        declarado, a matéria entra inteira.
 
-       Cada bloco entra com o que ainda falta para fechar a cota dele, na
-       mesma ordem de sempre (vencido primeiro, depois nunca visto). A cota
-       (`bl.questoes`) já é novos + revisão pendente — ver blocosDaMeta(). */
+       Cada bloco entra com o que ainda falta para fechar a cota dele. A
+       cota (`bl.questoes`) é a fatia renormalizada da meta fixa — ver
+       blocosDaMeta(). */
     const h = hoje();
     const porBloco = progressoPorBloco(h);
     lista = [];
@@ -725,22 +714,27 @@ function montarLoteSessao(modo, filtro, excluir){
       };
       const rev = q.revisar.filter(daArea);
       const nov = q.novas.filter(daArea);
-      /* revisão entra até a cota do dia (bl.revisao, calculada em
-         blocosDaMeta — já é o real, não mais um corte fixo de metade), novo
-         completa o resto de `falta`. rev.length já reflete só o que ainda
-         está pendente NESTA chamada (responder um cartão hoje tira ele
-         daqui), então limitar por bl.revisao aqui é o bastante — não
-         precisa saber quanto de `falta` já foi revisão antes. Os dois
-         entram intercalados, não bloco de revisão seguido de bloco de
-         novo — é o que evita a sessão ficar maçante.
+      /* Revisão primeiro, cartão novo só se sobrar espaço na cota — não
+         mais intercalado. Decisão de propósito: a pessoa quer zerar o que
+         já viu antes de avançar, mesmo que isso signifique um dia inteiro
+         de uma matéria sem cartão novo nenhum quando o atrasado é grande.
+         (Isto reverte a razão original de existir do intercalar() — ver
+         HISTORICO.md — mas agora é o comportamento pedido, não um bug.)
 
-         Se isso ainda ficar abaixo de `falta` (trava de degrau, tópico
-         recém-aberto com pouco cartão), o bloco simplesmente entra com
-         menos que a cota — não completa com nada que ainda não venceu. A
-         sessão contínua reabastece de outra matéria/tópico depois; não
-         precisa fingir que esta cota fechou hoje. */
-      const parte = rev.slice(0, Math.min(bl.revisao, falta));
-      const bloco = intercalar(parte, nov.slice(0, falta - parte.length));
+         `rev` já reflete só o que está pendente NESTA chamada (responder um
+         cartão hoje tira ele daqui), então limitar por `falta` aqui já
+         garante que a revisão sozinha nunca estoura a cota do bloco — não
+         precisa mais do teto de 2x novos que blocosDaMeta() tinha antes:
+         aqui a concatenação já é auto-limitante.
+
+         Se isso ainda ficar abaixo de `falta` (pouca revisão pendente E
+         trava de degrau ou tópico recém-aberto com pouco cartão novo), o
+         bloco simplesmente entra com menos que a cota — não completa com
+         nada que ainda não venceu nem abriu. A sessão contínua reabastece
+         de outra matéria/tópico depois; não precisa fingir que esta cota
+         fechou hoje. */
+      const parte = rev.slice(0, falta);
+      const bloco = parte.concat(nov.slice(0, falta - parte.length));
       lista = lista.concat(bloco);
     });
     /* nenhuma cota aberta (meta do dia já fechada) ou nada nas matérias da

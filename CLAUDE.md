@@ -511,30 +511,43 @@ mesmo tipo de trabalho.
 
 ## Meta e progresso do dia
 
-A meta diária **não é configurável** — é a soma das cotas dos concursos que
-o escopo alcança, mais a cota de cada matéria avulsa seguida
-(`blocosDaMeta()` → `BLOCOS_META`, recalculado em `aplicarFoco()`): todos os
-inscritos por padrão, ou um só quando `E.escopoEstudo` aponta para um —
-matéria avulsa entra **sempre**, não depende do escopo (ver
-`E.materiasAvulsas` acima).
+A meta diária **é fixa em `META_DIARIA` (50) questões**, sempre — não
+configurável pela pessoa, e também não é mais a soma das cotas dos
+concursos seguidos (regra anterior; virou peso, não quantidade — ver
+abaixo). Seguir mais um concurso ou mais uma matéria avulsa muda a
+**divisão** de META_DIARIA entre matérias, nunca o total: `E.meta` é sempre
+`META_DIARIA` (`aplicarFoco()`), com um concurso seguido ou com dez, com
+escopo restrito a um só ou com todos.
 
-- **Matéria repetida não soma, vale a maior cota.** Português cai nos quatro
-  concursos cadastrados; somar daria 40 questões/dia da mesma matéria.
-  Estudar 10 de Português serve para as quatro provas ao mesmo tempo. A mesma
-  regra vale entre bloco de concurso e matéria avulsa: se a mesma matéria
-  aparece nos dois, fica a maior cota, nunca a soma.
-- **A cota de cada bloco é novos + revisão pendente, não só o número do
-  edital.** `blocosDaMeta()` soma à cota de novos (a do edital, como sempre
-  foi) quantos cartões daquela matéria já estão vencidos agora — capado em
-  **2× a cota de novos**, pra um backlog grande (dias sem estudar) não
-  inflar a sessão de um dia só. O excedente do teto continua vencido, só
-  sai do número da meta: `iniciarSessao("normal")` intercala revisão e
-  cartão novo dentro da cota (proporção real, não mais um corte fixo de
-  metade), e quem bate a meta e continua estudando recebe esse excedente
-  **inteiro, antes de qualquer cartão novo** — só volta a oferecer novo
-  depois de esvaziar o atrasado. A cota fica congelada no mesmo momento em
-  que `BLOCOS_META` já era recalculado (boot, troca de dia, troca de foco),
-  não a cada resposta — vira alvo móvel senão.
+- **A divisão entre matérias segue o peso do edital, quando disponível.**
+  `blocosDaMeta()` monta, para cada matéria, o mesmo "peso vencedor" de
+  sempre (a cota do bloco do edital, ou `META_MATERIA_AVULSA` para matéria
+  avulsa) e depois **rateia META_DIARIA proporcionalmente a esses pesos** —
+  `apportion()`, método do maior resto (Hamilton): cada matéria recebe o
+  piso da fração exata que lhe cabe, e as unidades que sobram por
+  arredondamento vão para quem tem a maior parte fracionária perdida,
+  desempatando pela mesma ordem de `ORDEM_MATERIAS` (determinístico, nunca
+  `Math.random()`). O peso pré-rateio fica exposto em `bl.peso` — é ele, não
+  `bl.questoes` (a cota já rateada), quem prova a regra abaixo.
+- **Matéria repetida não soma, vale o maior PESO.** Português cai nos quatro
+  concursos cadastrados; somar o peso inflaria a fatia dele às custas das
+  outras matérias. Estudar a cota de Português no dia serve para as quatro
+  provas ao mesmo tempo. A mesma regra vale entre bloco de concurso e
+  matéria avulsa: se a mesma matéria aparece nos dois, fica o maior peso,
+  nunca a soma.
+- **Revisão primeiro; cartão novo só se não sobrar revisão pendente na
+  cota do dia.** Decisão de propósito, e uma reversão deliberada do que
+  valia antes (`intercalar()`, removida — ver HISTORICO.md): dentro da cota
+  de cada bloco, `montarLoteSessao("normal")` concatena — toda a revisão
+  vencida daquela matéria que couber na cota entra primeiro, cartão novo só
+  completa o que sobrar. Não existe mais teto de "2× a cota" separado: a
+  concatenação já é auto-limitante (revisão sozinha nunca passa da cota do
+  bloco), e revisão que exceder a cota do dia simplesmente fica pendente
+  para depois — inclusive para o "continuar estudando depois de bater a
+  meta" (`iniciarSessao`), que já entrega esse excedente **antes de
+  qualquer cartão novo**, mesma lógica de sempre. A cota fica congelada no
+  mesmo momento em que `BLOCOS_META` já era recalculado (boot, troca de
+  dia, troca de foco), não a cada resposta — vira alvo móvel senão.
 - **`BLOCOS` ≠ `BLOCOS_META`.** `BLOCOS` é da prova (`CONCURSO`) e manda no
   simulado, na contagem regressiva, na regra de aprovação e em
   `blocoDaMateria` (peso usado por `prioridade()`). `BLOCOS_META` manda só na
@@ -775,12 +788,17 @@ Três respostas possíveis: "Sabia" sobe uma caixa; "Chutei" e "Errei" voltam
 para a caixa 1. O botão "Chutei" é central — não removê-lo nem transformá-lo
 em acerto.
 
-**A sessão intercala revisão e cartão novo, não concatena.** `intercalar()`
-espalha as duas listas já escolhidas pela sessão (proporção de cada uma no
-total, tipo Bresenham) — sem isso, uma fila de revisão grande engolia o
-`E.meta` inteiro da sessão e cartão novo nunca aparecia enquanto o backlog
-não zerasse. Só muda a ORDEM de apresentação; quem entra na sessão continua
-decidido por fora (cota do bloco, escada de pré-requisito).
+**A sessão concatena revisão e cartão novo — revisão primeiro.** Dentro da
+cota de cada bloco, `montarLoteSessao("normal")` entrega toda a revisão
+vencida daquela matéria que couber na cota antes de qualquer cartão novo
+(ver "Meta e progresso do dia"). **Isto é uma reversão de propósito**: até
+agosto/2026 existia `intercalar()`, que espalhava as duas listas (proporção
+de cada uma no total, tipo Bresenham) para exatamente evitar isto — uma fila
+de revisão grande engolindo `E.meta` inteiro e cartão novo nunca aparecendo
+enquanto o backlog não zerasse. Passou a ser o comportamento **pedido**: o
+foco é esvaziar revisão antes de avançar. Só decide a ORDEM de apresentação
+dentro da cota; quem entra na sessão continua decidido por fora (cota do
+bloco, escada de pré-requisito).
 
 **A ordem dentro do que já venceu** é decidida por `prioridade()`: caixa,
 taxa de erro da questão e peso do bloco na prova. Os pesos são calibrados

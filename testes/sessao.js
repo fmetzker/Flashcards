@@ -53,6 +53,34 @@ module.exports = function (APP, t) {
     }
   });
 
+  t.teste('dentro de cada bloco, revisão pendente vem antes de cartão novo', async () => {
+    /* Trilha B do plano de revisão da meta: revisão primeiro, cartão novo só
+       entra se sobrar espaço na cota — troca de propósito do intercalar()
+       (que espalhava as duas) por concatenação simples (ver o comentário em
+       montarLoteSessao()). */
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const hoje = APP.hoje();
+    const b = APP.BLOCOS_META.find(x => x.materias.includes('matematica'));
+    t.ok(b.questoes >= 4, 'preciso de cota >= 4 para caber revisão e novo no mesmo bloco');
+    const daMateria = APP.BANCO.filter(q => q.m === 'matematica'
+      && (!b.topicos || b.topicos.includes(q.t)) && APP.grauAberto(q));
+    t.ok(daMateria.length >= 4, 'preciso de pelo menos 4 cartões abertos de matemática');
+    // marca 2 como revisão vencida hoje; o resto continua "nunca visto"
+    daMateria.slice(0, 2).forEach(q => {
+      APP.E.cartoes[q.id] = { caixa: 1, acertos: 0, erros: 1, prox: hoje };
+    });
+    const revIds = new Set(daMateria.slice(0, 2).map(q => q.id));
+    const lote = APP.montarLoteSessao('normal', null, new Set());
+    const daArea = lote.filter(id => APP.porId[id].m === 'matematica');
+    const posRev = daArea.map((id, i) => revIds.has(id) ? i : -1).filter(i => i >= 0);
+    const posNov = daArea.map((id, i) => !revIds.has(id) ? i : -1).filter(i => i >= 0);
+    t.ok(posRev.length > 0, 'a revisão marcada devia aparecer no lote');
+    if (posNov.length > 0) {
+      t.ok(Math.max(...posRev) < Math.min(...posNov),
+        'revisão precisa vir toda antes do primeiro cartão novo dentro do bloco: ' + daArea.join(','));
+    }
+  });
+
   t.grupo('sessão contínua — sem adiantamento');
 
   t.teste('nada vencido e nada novo: o lote vem VAZIO, não adiantado', async () => {

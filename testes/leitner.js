@@ -134,33 +134,4 @@ module.exports = function (APP, t) {
     delete APP.porId.novo; delete APP.porId.velho;
   });
 
-  t.grupo('intercalar');
-
-  t.teste('espalha as duas listas em vez de concatenar', () => {
-    /* Sem isso, uma fila de revisão grande engolia a sessão inteira e
-       cartão novo nunca aparecia. */
-    const r = APP.intercalar(['r1', 'r2', 'r3', 'r4'], ['n1', 'n2']);
-    t.igual(r.length, 6);
-    t.ok(r.indexOf('n1') < 4, 'a primeira nova não pode ficar para o fim: ' + r.join(','));
-  });
-
-  t.teste('preserva a ordem interna de cada lista', () => {
-    const r = APP.intercalar(['r1', 'r2', 'r3'], ['n1', 'n2']);
-    t.ok(r.indexOf('r1') < r.indexOf('r2'), 'ordem da revisão trocou');
-    t.ok(r.indexOf('r2') < r.indexOf('r3'), 'ordem da revisão trocou');
-    t.ok(r.indexOf('n1') < r.indexOf('n2'), 'ordem das novas trocou');
-  });
-
-  t.teste('lista vazia de um lado devolve a outra intacta', () => {
-    t.igual(APP.intercalar([], ['n1', 'n2']), ['n1', 'n2']);
-    t.igual(APP.intercalar(['r1', 'r2'], []), ['r1', 'r2']);
-    t.igual(APP.intercalar([], []), []);
-  });
-
-  t.teste('não perde nem duplica cartão', () => {
-    const a = ['a1', 'a2', 'a3', 'a4', 'a5'], b = ['b1', 'b2'];
-    const r = APP.intercalar(a, b);
-    t.igual(r.length, a.length + b.length);
-    t.igual(new Set(r).size, a.length + b.length, 'duplicou alguma coisa');
-  });
 };
