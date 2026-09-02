@@ -504,6 +504,10 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
 
   <div style="margin-top:28px" class="rotulo">Zona de risco</div>
   <button class="pequeno fantasma" style="margin-top:10px;color:var(--coral);border-color:#E9C4C1" onclick="zerar()">Apagar todo o progresso</button>
+  <div style="display:flex;gap:9px;margin-top:9px;align-items:center;flex-wrap:wrap">
+    <select id="zerar-materia-sel" style="flex:1 1 auto;min-width:160px"></select>
+    <button class="pequeno fantasma" style="color:var(--coral);border-color:#E9C4C1" onclick="zerarMateria(document.getElementById('zerar-materia-sel').value)">Apagar progresso desta matéria</button>
+  </div>
 </div>
 
 <!-- ============ PROPOR QUESTÃO ============ -->
@@ -4232,6 +4236,14 @@ function alternarMateriaAvulsa(id, checkbox){
 function pintarAjustes(){
   pintarConcursos();
   pintarConta();
+  const selZerar = document.getElementById("zerar-materia-sel");
+  selZerar.innerHTML = "";
+  materiasInscritas().forEach(m=>{
+    const op = document.createElement("option");
+    op.value = m;
+    op.textContent = (MATERIAS[m] && MATERIAS[m].nome) || m;
+    selZerar.appendChild(op);
+  });
   let grava=true; try{ localStorage.setItem("t","1"); localStorage.removeItem("t"); }catch(e){ grava=false; }
   document.getElementById("ajustes-msg").textContent = grava
     ? "O progresso está sendo salvo neste aparelho."
@@ -4356,6 +4368,41 @@ function zerar(){
     sincronizar();   // manda o marco pro servidor (com retentativa — ver sincronizarMateriasAtivas)
     ir("inicio");
   }
+}
+
+/* Redefine só UMA matéria, em vez de tudo — variante mais leve do zerar()
+   acima, pra quem quer treinar uma matéria do zero sem perder o resto
+   (Trilha C do plano; escolhida a variante SIMPLES, não a completa —
+   ver a conversa que gerou este recurso).
+
+   Só local, SEM marco no servidor (diferente de zerar()): puxarEventos()
+   só busca eventos com `criado_em` depois do cursor já salvo — nunca
+   replaya o que já foi consumido —, então apagar cartão aqui não volta
+   sozinho num pull seguinte; o reset "pega" neste aparelho sem precisar
+   de um marco equivalente a `progressoZeradoEm`. A lacuna aceita de
+   propósito: um SEGUNDO aparelho da mesma conta continua mostrando o
+   progresso antigo até estudar de novo, e o Painel de desempenho do
+   aprovador não sabe que esta matéria foi zerada — a mesma lacuna que o
+   zerar() geral tinha antes de `progressoZeradoEm` existir (HISTORICO.md).
+   Se um dia isso incomodar, o caminho é uma coluna `materias_zeradas`
+   (jsonb) em `perfis`, no mesmo espírito.
+
+   Não mexe em E.dias/E.diasTotal/E.diasCertas (contagem agregada de TODOS
+   os dias, não quebrada por matéria de forma reversível) nem em
+   E.diasMateria de dias passados — a Sequência de estudo e "quanto você
+   estudou" continuam intactos; só o que a pessoa SABE desta matéria
+   reinicia (os cartões voltam a "nunca visto"), não o fato de ter
+   estudado. */
+function zerarMateria(m){
+  if(!m) return;
+  const nome = (MATERIAS[m] && MATERIAS[m].nome) || m;
+  if(!confirm("Apagar o progresso de "+nome+"? Os cartões dela voltam a \"nunca visto\". Não tem volta.")) return;
+  Object.keys(E.cartoes).forEach(id=>{
+    const q = porId[id];
+    if(q && q.m === m) delete E.cartoes[id];
+  });
+  salvar();
+  ir("inicio");
 }
 
 /* Guarda o app no aparelho para funcionar sem internet — e se atualiza

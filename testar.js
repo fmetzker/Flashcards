@@ -63,7 +63,7 @@ const FUNCOES = [
   'revisoesPorDia', 'aplicarFoco', 'carregarConfig', 'carregarBancoParcial',
   /* não são motor puro (tocam localStorage), mas o teste precisa alcançá-las */
   'salvar', 'podarEventosProprios', 'renovarSessao', 'chamarAuth',
-  'sincronizarMateriasAtivas',
+  'sincronizarMateriasAtivas', 'zerar', 'zerarMateria',
 ];
 
 function lerDados() {
