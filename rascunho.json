@@ -1,2 +1,1034 @@
 [
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Interjeição",
+  "n": 2,
+  "q": "Em \"Ai, o enfermeiro chegou tarde ao plantão porque o ônibus atrasou trinta minutos\", a palavra \"Ai\" é:",
+  "o": [
+   "Advérbio",
+   "Interjeição",
+   "Conjunção",
+   "Pronome",
+   "Substantivo"
+  ],
+  "c": 1,
+  "e": "Interjeição exprime emoção e forma, sozinha, um enunciado completo. 'Ai' expressa uma reação de impaciência e não se liga gramaticalmente a nenhuma outra palavra da frase — nem modifica o verbo (não é advérbio), nem liga duas partes da oração (não é conjunção): sozinha, já forma um enunciado completo.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: advérbio modificaria o verbo ou outra palavra da frase; 'Ai' não modifica nada, é independente.",
+   "Correta: interjeição, expressa a reação de impaciência e forma sozinha um enunciado completo.",
+   "Errada: conjunção liga duas orações ou termos; 'Ai' não liga 'o enfermeiro chegou tarde' a mais nada.",
+   "Errada: pronome substituiria ou acompanharia um substantivo; 'Ai' não faz isso.",
+   "Errada: substantivo nomearia um ser ou uma ideia; 'Ai' é só uma exclamação."
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Artigo",
+  "n": 2,
+  "q": "Em \"Ai, o enfermeiro chegou tarde ao plantão porque o ônibus atrasou trinta minutos\", a palavra \"o\" é:",
+  "o": [
+   "Pronome",
+   "Numeral",
+   "Artigo",
+   "Preposição",
+   "Interjeição"
+  ],
+  "c": 2,
+  "e": "Artigo antecede o substantivo, definindo-o ou generalizando-o. Em 'o enfermeiro', 'o' antecede o substantivo 'enfermeiro', definindo-o (um enfermeiro específico, já identificado) — por isso é artigo definido, e não pronome oblíquo (que substituiria o substantivo, como em 'chamei-o').",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: 'o' também pode ser pronome oblíquo quando substitui um substantivo já citado ('chamei-o'), mas aqui ele vem ANTES do substantivo 'enfermeiro' e o acompanha, não o substitui.",
+   "Errada: numeral indicaria quantidade ou ordem ('um enfermeiro', 'o primeiro enfermeiro'); 'o' não conta nada, só define.",
+   "Correta: artigo definido, antecede 'enfermeiro' e o define como um ser já conhecido no contexto.",
+   "Errada: preposição ligaria dois termos ('do enfermeiro'); sozinho, 'o' não liga nada.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Advérbio",
+  "n": 2,
+  "q": "Em \"Ai, o enfermeiro chegou tarde ao plantão porque o ônibus atrasou trinta minutos\", a palavra \"tarde\" é:",
+  "o": [
+   "Substantivo",
+   "Adjetivo",
+   "Advérbio",
+   "Verbo",
+   "Conjunção"
+  ],
+  "c": 2,
+  "e": "Advérbio modifica o verbo, o adjetivo ou outro advérbio, indicando circunstância. Em 'chegou tarde', 'tarde' modifica o verbo 'chegou', indicando a circunstância de tempo — por isso é advérbio, e não substantivo, sentido que a mesma palavra tem em 'a tarde estava quente' (ali, precedida de artigo, nomeando o período do dia).",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: 'tarde' É substantivo em contextos como 'a tarde estava quente' — mas aqui, sem artigo e modificando um verbo, é advérbio.",
+   "Errada: adjetivo caracterizaria um substantivo ('reunião tardia'); 'tarde' aqui está ligado ao verbo, não a um substantivo.",
+   "Correta: advérbio de tempo, modifica o verbo 'chegou'.",
+   "Errada: 'chegou' é o verbo da oração; 'tarde' apenas modifica esse verbo, não é ele.",
+   "Errada: conjunção ligaria duas orações; 'porque', mais adiante na mesma frase, é quem faz esse papel."
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Conjunção",
+  "n": 2,
+  "q": "Em \"Ai, o enfermeiro chegou tarde ao plantão porque o ônibus atrasou trinta minutos\", a palavra \"porque\" é:",
+  "o": [
+   "Preposição",
+   "Advérbio",
+   "Pronome",
+   "Conjunção",
+   "Artigo"
+  ],
+  "c": 3,
+  "e": "Conjunção liga orações ou termos de mesma função, marcando a relação entre eles. 'Porque' liga a oração 'o ônibus atrasou trinta minutos' à primeira, estabelecendo uma relação de causa — é conjunção subordinativa causal.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: preposição ligaria um termo a outro dentro da mesma oração ('por causa de'); 'porque' liga duas orações inteiras.",
+   "Errada: advérbio modificaria um verbo ou adjetivo isolado; 'porque' não modifica, liga.",
+   "Errada: pronome substituiria ou acompanharia um substantivo; não é o caso.",
+   "Correta: conjunção subordinativa causal, liga as duas orações explicando o motivo do atraso.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Numeral",
+  "n": 2,
+  "q": "Em \"Ai, o enfermeiro chegou tarde ao plantão porque o ônibus atrasou trinta minutos\", a palavra \"trinta\" é:",
+  "o": [
+   "Pronome",
+   "Numeral",
+   "Adjetivo",
+   "Substantivo",
+   "Interjeição"
+  ],
+  "c": 1,
+  "e": "Numeral indica quantidade, ordem, multiplicação ou fração de seres. 'Trinta' indica a quantidade exata de minutos do atraso — numeral cardinal, diferente de um pronome indefinido ('vários minutos'), que indicaria quantidade imprecisa.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: pronome indefinido indicaria quantidade IMPRECISA ('vários minutos'); 'trinta' é uma contagem exata.",
+   "Correta: numeral cardinal, indica a quantidade exata de minutos.",
+   "Errada: adjetivo atribuiria uma qualidade a 'minutos' (ex. 'minutos longos'), não uma contagem.",
+   "Errada: substantivo nomearia o próprio ser; 'trinta' acompanha e quantifica o substantivo 'minutos'.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Verbo",
+  "n": 2,
+  "q": "Em \"Ai, o enfermeiro chegou tarde ao plantão porque o ônibus atrasou trinta minutos\", a palavra \"chegou\" é:",
+  "o": [
+   "Substantivo",
+   "Adjetivo",
+   "Verbo",
+   "Advérbio",
+   "Preposição"
+  ],
+  "c": 2,
+  "e": "Verbo indica ação, estado ou fenômeno e se conjuga, variando em tempo, modo, número e pessoa. 'Chegou' indica a ação praticada pelo enfermeiro e se conjuga (chego, chegava, chegará...) — é verbo, a única classe com essa flexão de tempo, modo, número e pessoa.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: substantivo (ex. 'a chegada') nomeia a ação como um fato; 'chegou' é a própria ação, conjugada.",
+   "Errada: adjetivo caracterizaria um substantivo; 'chegou' não caracteriza ninguém, indica uma ação.",
+   "Correta: verbo, indica a ação de chegar e se conjuga em tempo, modo, número e pessoa.",
+   "Errada: advérbio modificaria o verbo; 'tarde', na mesma frase, é quem faz esse papel — 'chegou' é o próprio verbo.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Adjetivo",
+  "n": 2,
+  "q": "Em \"A embarcação avariada seguia lentamente rumo ao porto, mas o comandante permaneceu confiante\", a palavra \"avariada\" é:",
+  "o": [
+   "Verbo",
+   "Substantivo",
+   "Adjetivo",
+   "Advérbio",
+   "Numeral"
+  ],
+  "c": 2,
+  "e": "Adjetivo atribui qualidade, estado ou característica a um substantivo. 'Avariada' atribui um estado à 'embarcação' — está danificada — concordando com ela em gênero e número. É particípio empregado como adjetivo, não como verbo, porque aqui não indica uma ação sendo praticada, e sim uma característica do substantivo.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: particípios podem funcionar como verbo em locuções ('tinha avariado'), mas aqui 'avariada' está sozinha, caracterizando 'embarcação' — é adjetivo.",
+   "Errada: substantivo nomearia o próprio ser ('a avaria'); 'avariada' caracteriza o substantivo 'embarcação', não é ele.",
+   "Correta: adjetivo, atribui a característica de estar danificada à embarcação.",
+   "Errada: advérbio modificaria um verbo, adjetivo ou outro advérbio; 'avariada' modifica diretamente o substantivo 'embarcação'.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Verbo",
+  "n": 2,
+  "q": "Em \"A embarcação avariada seguia lentamente rumo ao porto, mas o comandante permaneceu confiante\", a palavra \"seguia\" é:",
+  "o": [
+   "Adjetivo",
+   "Verbo",
+   "Substantivo",
+   "Preposição",
+   "Pronome"
+  ],
+  "c": 1,
+  "e": "Verbo indica ação, estado ou fenômeno e se conjuga, variando em tempo, modo, número e pessoa. 'Seguia' indica a ação da embarcação e está conjugado no pretérito imperfeito — é verbo.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: adjetivo caracterizaria um substantivo; 'seguia' indica uma ação, não uma qualidade.",
+   "Correta: verbo, indica a ação de seguir, conjugado no pretérito imperfeito.",
+   "Errada: substantivo (ex. 'o seguimento') nomearia a ação como um fato; 'seguia' é a ação conjugada.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Advérbio",
+  "n": 2,
+  "q": "Em \"A embarcação avariada seguia lentamente rumo ao porto, mas o comandante permaneceu confiante\", a palavra \"lentamente\" é:",
+  "o": [
+   "Adjetivo",
+   "Substantivo",
+   "Numeral",
+   "Advérbio",
+   "Conjunção"
+  ],
+  "c": 3,
+  "e": "Advérbio modifica o verbo, o adjetivo ou outro advérbio, indicando circunstância. 'Lentamente' modifica o verbo 'seguia', indicando o modo como a embarcação se movia — advérbio de modo, reconhecível pelo sufixo -mente, que só existe nessa classe.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: adjetivo caracterizaria um substantivo ('embarcação lenta'); 'lentamente' está ligado ao verbo 'seguia', não a um substantivo.",
+   "",
+   "",
+   "Correta: advérbio de modo, formado com o sufixo -mente, modifica o verbo 'seguia'.",
+   "Errada: conjunção ligaria duas orações; 'mas', mais adiante, é quem faz esse papel na frase."
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Substantivo",
+  "n": 2,
+  "q": "Em \"A embarcação avariada seguia lentamente rumo ao porto, mas o comandante permaneceu confiante\", a palavra \"comandante\" é:",
+  "o": [
+   "Adjetivo",
+   "Pronome",
+   "Substantivo",
+   "Verbo",
+   "Artigo"
+  ],
+  "c": 2,
+  "e": "Substantivo nomeia seres, objetos, lugares, sentimentos e ideias. 'Comandante' nomeia o ser de quem se fala na segunda parte da frase — substantivo, antecedido pelo artigo 'o' que o define.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: 'comandante' pode funcionar como adjetivo em outros contextos ('atitude comandante'), mas aqui está sendo antecedido por artigo e nomeando um ser — é substantivo.",
+   "Errada: pronome substituiria 'comandante' em vez de nomeá-lo (ex. 'ele permaneceu confiante').",
+   "Correta: substantivo, nomeia o ser que permaneceu confiante.",
+   "",
+   "Errada: 'o', que vem antes de 'comandante', é o artigo desta frase — 'comandante' é o substantivo que ele antecede."
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Conjunção",
+  "n": 2,
+  "q": "Em \"A embarcação avariada seguia lentamente rumo ao porto, mas o comandante permaneceu confiante\", a palavra \"mas\" é:",
+  "o": [
+   "Preposição",
+   "Interjeição",
+   "Advérbio",
+   "Conjunção",
+   "Pronome"
+  ],
+  "c": 3,
+  "e": "Conjunção liga orações ou termos de mesma função, marcando a relação entre eles. 'Mas' liga as duas orações da frase marcando uma relação de contraste (a embarcação estava avariada, MAS o comandante permaneceu confiante) — conjunção coordenativa adversativa.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: preposição subordinaria um termo a outro dentro da mesma oração; 'mas' liga duas orações inteiras, em pé de igualdade.",
+   "",
+   "Errada: advérbio modificaria um verbo, adjetivo ou outro advérbio; 'mas' não modifica nada, liga duas orações.",
+   "Correta: conjunção coordenativa adversativa, marca o contraste entre as duas orações.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Pronome",
+  "n": 2,
+  "q": "Em \"Nenhum motor daquele turno apresentou falha, pois a equipe havia revisado tudo na véspera\", a palavra \"Nenhum\" é:",
+  "o": [
+   "Numeral",
+   "Adjetivo",
+   "Pronome",
+   "Artigo",
+   "Advérbio"
+  ],
+  "c": 2,
+  "e": "Pronome substitui ou acompanha o substantivo, situando-o nas pessoas do discurso. 'Nenhum' acompanha o substantivo 'motor', situando-o de forma indefinida (nenhum entre os motores daquele turno) — pronome indefinido, e não numeral, porque não indica uma contagem exata, e sim ausência.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: numeral indicaria uma quantidade EXATA ('um motor', 'dois motores'); 'nenhum' indica ausência, quantidade indefinida — é pronome indefinido.",
+   "Errada: adjetivo atribuiria uma qualidade ao motor; 'nenhum' não descreve como o motor é, situa quantos motores existem.",
+   "Correta: pronome indefinido, acompanha 'motor' indicando ausência de qualquer unidade com falha.",
+   "Errada: artigo definiria ou generalizaria o substantivo sem negar sua existência; 'nenhum' nega a existência de qualquer motor com falha.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Conjunção",
+  "n": 2,
+  "q": "Em \"Nenhum motor daquele turno apresentou falha, pois a equipe havia revisado tudo na véspera\", a palavra \"pois\" é:",
+  "o": [
+   "Preposição",
+   "Conjunção",
+   "Pronome",
+   "Advérbio",
+   "Interjeição"
+  ],
+  "c": 1,
+  "e": "Conjunção liga orações ou termos de mesma função, marcando a relação entre eles. 'Pois', aqui, liga a segunda oração à primeira explicando o motivo de nenhum motor ter apresentado falha — conjunção subordinativa causal (equivale a 'porque').",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: preposição ligaria termos, não orações inteiras com sentido de causa.",
+   "Correta: conjunção subordinativa causal, explica por que nenhum motor falhou.",
+   "",
+   "Errada: 'pois' também existe como advérbio em construções como 'sim, pois não', mas aqui ele liga duas orações — é conjunção.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Substantivo",
+  "n": 2,
+  "q": "Em \"Nenhum motor daquele turno apresentou falha, pois a equipe havia revisado tudo na véspera\", a palavra \"equipe\" é:",
+  "o": [
+   "Pronome",
+   "Substantivo",
+   "Adjetivo",
+   "Numeral",
+   "Preposição"
+  ],
+  "c": 1,
+  "e": "Substantivo nomeia seres, objetos, lugares, sentimentos e ideias. 'Equipe' nomeia o grupo de pessoas responsável pela revisão — substantivo, antecedido pelo artigo 'a'.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "Correta: substantivo, nomeia o grupo que revisou os motores.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Verbo",
+  "n": 2,
+  "q": "Em \"Nenhum motor daquele turno apresentou falha, pois a equipe havia revisado tudo na véspera\", a palavra \"havia\" é:",
+  "o": [
+   "Substantivo",
+   "Verbo",
+   "Adjetivo",
+   "Conjunção",
+   "Pronome"
+  ],
+  "c": 1,
+  "e": "Verbo indica ação, estado ou fenômeno e se conjuga, variando em tempo, modo, número e pessoa. 'Havia' é o verbo auxiliar (haver) da locução 'havia revisado', indicando que a ação foi concluída antes de outro momento passado — verbo, porque se conjuga (há, havia, houvera...).",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: 'haver' também existe como substantivo em expressões como 'o haver e o dever' (contabilidade), mas aqui está conjugado, ligado a 'revisado' — é verbo auxiliar.",
+   "Correta: verbo auxiliar, forma com 'revisado' o pretérito mais-que-perfeito composto.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Pronome",
+  "n": 2,
+  "q": "Em \"Poucos candidatos responderam corretamente à quinta questão da prova, que exigia atenção redobrada\", a palavra \"Poucos\" é:",
+  "o": [
+   "Numeral",
+   "Pronome",
+   "Adjetivo",
+   "Artigo",
+   "Substantivo"
+  ],
+  "c": 1,
+  "e": "Pronome substitui ou acompanha o substantivo, situando-o nas pessoas do discurso. 'Poucos' acompanha 'candidatos', situando-os em quantidade imprecisa e pequena — pronome indefinido, diferente de um numeral, que precisaria dizer exatamente quantos ('três candidatos').",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: numeral diria uma quantidade EXATA ('três candidatos'); 'poucos' só indica que a quantidade foi pequena, sem precisar o número — é pronome indefinido.",
+   "Correta: pronome indefinido, indica quantidade pequena e imprecisa de candidatos.",
+   "Errada: adjetivo atribuiria uma característica aos candidatos (como eles são), não quantos eles são.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Numeral",
+  "n": 2,
+  "q": "Em \"Poucos candidatos responderam corretamente à quinta questão da prova, que exigia atenção redobrada\", a palavra \"quinta\" é:",
+  "o": [
+   "Pronome",
+   "Adjetivo",
+   "Numeral",
+   "Substantivo",
+   "Preposição"
+  ],
+  "c": 2,
+  "e": "Numeral indica quantidade, ordem, multiplicação ou fração de seres. 'Quinta' indica a posição exata da questão na prova — numeral ordinal, diferente de 'poucos', na mesma frase, que só dá uma ideia aproximada de quantidade.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: pronome indefinido indicaria quantidade imprecisa (como 'poucos', na mesma frase); 'quinta' indica uma posição exata.",
+   "Errada: adjetivo atribuiria uma qualidade à questão, não sua posição na sequência.",
+   "Correta: numeral ordinal, indica a posição exata da questão na prova.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Advérbio",
+  "n": 2,
+  "q": "Em \"Poucos candidatos responderam corretamente à quinta questão da prova, que exigia atenção redobrada\", a palavra \"corretamente\" é:",
+  "o": [
+   "Adjetivo",
+   "Substantivo",
+   "Conjunção",
+   "Advérbio",
+   "Numeral"
+  ],
+  "c": 3,
+  "e": "Advérbio modifica o verbo, o adjetivo ou outro advérbio, indicando circunstância. 'Corretamente' modifica o verbo 'responderam', indicando o modo como os candidatos responderam — advérbio de modo, formado com o sufixo -mente.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: adjetivo caracterizaria um substantivo ('resposta correta'); 'corretamente' está ligado ao verbo 'responderam'.",
+   "",
+   "",
+   "Correta: advérbio de modo, modifica o verbo 'responderam'.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Substantivo",
+  "n": 2,
+  "q": "Em \"Poucos candidatos responderam corretamente à quinta questão da prova, que exigia atenção redobrada\", a palavra \"questão\" é:",
+  "o": [
+   "Adjetivo",
+   "Verbo",
+   "Substantivo",
+   "Pronome",
+   "Interjeição"
+  ],
+  "c": 2,
+  "e": "Substantivo nomeia seres, objetos, lugares, sentimentos e ideias. 'Questão' nomeia o item da prova a que os candidatos responderam — substantivo, antecedido pelo numeral ordinal 'quinta' e pelo artigo 'a'.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: substantivo, nomeia o item da prova.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Adjetivo",
+  "n": 2,
+  "q": "Em \"Poucos candidatos responderam corretamente à quinta questão da prova, que exigia atenção redobrada\", a palavra \"redobrada\" é:",
+  "o": [
+   "Verbo",
+   "Substantivo",
+   "Advérbio",
+   "Adjetivo",
+   "Numeral"
+  ],
+  "c": 3,
+  "e": "Adjetivo atribui qualidade, estado ou característica a um substantivo. 'Redobrada' atribui uma característica ao substantivo 'atenção' — o quanto de atenção era exigido — concordando com ele em gênero e número. É particípio empregado como adjetivo, e não como verbo, porque não indica aqui uma ação sendo praticada.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: particípios podem funcionar como verbo em locuções ('tinha redobrado'); aqui 'redobrada' caracteriza diretamente o substantivo 'atenção' — é adjetivo.",
+   "Errada: substantivo nomearia o próprio ser; 'redobrada' caracteriza o substantivo 'atenção', não é ele.",
+   "",
+   "Correta: adjetivo, atribui a característica de intensidade à 'atenção' exigida.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Pronome",
+  "n": 2,
+  "q": "Em \"Várias equipes de saúde participaram do mutirão, porém apenas duas conseguiram atender toda a demanda\", a palavra \"Várias\" é:",
+  "o": [
+   "Numeral",
+   "Adjetivo",
+   "Pronome",
+   "Artigo",
+   "Verbo"
+  ],
+  "c": 2,
+  "e": "Pronome substitui ou acompanha o substantivo, situando-o nas pessoas do discurso. 'Várias' acompanha 'equipes', situando-as em quantidade imprecisa — pronome indefinido, diferente de 'duas', mais adiante na mesma frase, que dá uma contagem exata.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: numeral diria uma quantidade EXATA (como 'duas', mais adiante nesta mesma frase); 'várias' só indica número impreciso, mas alto.",
+   "Errada: adjetivo atribuiria uma qualidade às equipes, não quantas elas são.",
+   "Correta: pronome indefinido, indica quantidade imprecisa (mas numerosa) de equipes.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Preposição",
+  "n": 2,
+  "q": "Em \"Várias equipes de saúde participaram do mutirão, porém apenas duas conseguiram atender toda a demanda\", a palavra \"de\" é:",
+  "o": [
+   "Conjunção",
+   "Preposição",
+   "Artigo",
+   "Pronome",
+   "Advérbio"
+  ],
+  "c": 1,
+  "e": "Preposição liga dois termos, subordinando o segundo ao primeiro. 'De' liga 'equipes' a 'saúde', subordinando o segundo termo ao primeiro e indicando a área de atuação das equipes — preposição.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: conjunção ligaria duas orações inteiras; 'de' liga apenas dois termos dentro da mesma oração.",
+   "Correta: preposição, liga 'equipes' a 'saúde', subordinando um termo ao outro.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Conjunção",
+  "n": 2,
+  "q": "Em \"Várias equipes de saúde participaram do mutirão, porém apenas duas conseguiram atender toda a demanda\", a palavra \"porém\" é:",
+  "o": [
+   "Preposição",
+   "Advérbio",
+   "Conjunção",
+   "Pronome",
+   "Interjeição"
+  ],
+  "c": 2,
+  "e": "Conjunção liga orações ou termos de mesma função, marcando a relação entre eles. 'Porém' liga as duas orações da frase marcando contraste (várias equipes participaram, PORÉM só duas atenderam a demanda toda) — conjunção coordenativa adversativa, equivalente a 'mas'.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "Errada: advérbio modificaria um verbo, adjetivo ou outro advérbio; 'porém' liga duas orações, não modifica nada.",
+   "Correta: conjunção coordenativa adversativa, equivale a 'mas' e marca o contraste entre as orações.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Numeral",
+  "n": 2,
+  "q": "Em \"Várias equipes de saúde participaram do mutirão, porém apenas duas conseguiram atender toda a demanda\", a palavra \"duas\" é:",
+  "o": [
+   "Pronome",
+   "Numeral",
+   "Substantivo",
+   "Adjetivo",
+   "Artigo"
+  ],
+  "c": 1,
+  "e": "Numeral indica quantidade, ordem, multiplicação ou fração de seres. 'Duas' indica a quantidade exata de equipes que conseguiram atender toda a demanda — numeral cardinal, diferente de 'várias', no início da mesma frase, que só dá uma ideia aproximada.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: pronome indefinido indicaria quantidade imprecisa (como 'várias', no início desta mesma frase); 'duas' é uma contagem exata.",
+   "Correta: numeral cardinal, indica a quantidade exata de equipes.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Substantivo",
+  "n": 2,
+  "q": "Em \"Várias equipes de saúde participaram do mutirão, porém apenas duas conseguiram atender toda a demanda\", a palavra \"demanda\" é:",
+  "o": [
+   "Verbo",
+   "Adjetivo",
+   "Pronome",
+   "Substantivo",
+   "Conjunção"
+  ],
+  "c": 3,
+  "e": "Substantivo nomeia seres, objetos, lugares, sentimentos e ideias. 'Demanda' nomeia aquilo que as equipes precisavam atender — substantivo, antecedido pelo artigo 'a' e pelo pronome indefinido 'toda'.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: 'demandar' é verbo em 'a equipe demanda apoio', mas aqui 'demanda' está antecedida de artigo e pronome, nomeando algo — é substantivo.",
+   "",
+   "",
+   "Correta: substantivo, nomeia aquilo que precisava ser atendido.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Interjeição",
+  "n": 2,
+  "q": "Em \"Socorro! O paciente caiu da maca e ninguém percebeu na hora\", a palavra \"Socorro\" é:",
+  "o": [
+   "Substantivo",
+   "Interjeição",
+   "Verbo",
+   "Advérbio",
+   "Conjunção"
+  ],
+  "c": 1,
+  "e": "Interjeição exprime emoção e forma, sozinha, um enunciado completo. 'Socorro!' expressa uma reação de emergência e forma sozinha um enunciado completo, sem sujeito nem verbo — interjeição. Em outro contexto ('pediu socorro'), a mesma palavra seria substantivo; aqui, isolada e exclamativa, não é.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: 'socorro' É substantivo em 'pediu socorro à equipe' — mas aqui, sozinha e exclamativa, sem se ligar a nenhum verbo, é interjeição.",
+   "Correta: interjeição, expressa a reação de emergência e forma sozinha um enunciado completo.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Conjunção",
+  "n": 2,
+  "q": "Em \"Socorro! O paciente caiu da maca e ninguém percebeu na hora\", a palavra \"e\" é:",
+  "o": [
+   "Preposição",
+   "Pronome",
+   "Conjunção",
+   "Advérbio",
+   "Artigo"
+  ],
+  "c": 2,
+  "e": "Conjunção liga orações ou termos de mesma função, marcando a relação entre eles. 'E' liga as duas orações da frase ('o paciente caiu' e 'ninguém percebeu'), somando os dois fatos — conjunção coordenativa aditiva.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: conjunção coordenativa aditiva, soma as duas orações da frase.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Pronome",
+  "n": 2,
+  "q": "Em \"Socorro! O paciente caiu da maca e ninguém percebeu na hora\", a palavra \"ninguém\" é:",
+  "o": [
+   "Numeral",
+   "Substantivo",
+   "Adjetivo",
+   "Pronome",
+   "Advérbio"
+  ],
+  "c": 3,
+  "e": "Pronome substitui ou acompanha o substantivo, situando-o nas pessoas do discurso. 'Ninguém' substitui a ideia de pessoa, situando-a de forma indefinida — pronome indefinido, sujeito da segunda oração, indicando ausência de qualquer pessoa que tenha percebido a queda.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: numeral indicaria uma quantidade exata; 'ninguém' indica ausência de qualquer pessoa, não uma contagem.",
+   "Errada: 'ninguém' não nomeia um ser específico, ele SUBSTITUI a ideia de pessoa — por isso é pronome, não substantivo.",
+   "",
+   "Correta: pronome indefinido, substitui a ideia de 'nenhuma pessoa'.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Substantivo",
+  "n": 2,
+  "q": "Em \"Socorro! O paciente caiu da maca e ninguém percebeu na hora\", a palavra \"paciente\" é:",
+  "o": [
+   "Adjetivo",
+   "Substantivo",
+   "Verbo",
+   "Pronome",
+   "Numeral"
+  ],
+  "c": 1,
+  "e": "Substantivo nomeia seres, objetos, lugares, sentimentos e ideias. 'Paciente' nomeia o ser que caiu da maca — substantivo, antecedido pelo artigo 'o'. A mesma palavra é adjetivo em 'um enfermeiro paciente' (que tem paciência); aqui ela nomeia a pessoa, não a caracteriza.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: 'paciente' É adjetivo em 'um enfermeiro paciente' (que tem paciência) — mas aqui, antecedida de artigo e nomeando quem caiu, é substantivo.",
+   "Correta: substantivo, nomeia a pessoa que caiu da maca.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Artigo",
+  "n": 2,
+  "q": "Em \"Os motores da embarcação foram revisados por técnicos experientes antes da viagem\", a palavra \"Os\" é:",
+  "o": [
+   "Numeral",
+   "Artigo",
+   "Pronome",
+   "Preposição",
+   "Substantivo"
+  ],
+  "c": 1,
+  "e": "Artigo antecede o substantivo, definindo-o ou generalizando-o. 'Os' antecede o substantivo 'motores', definindo-os (motores já identificados, os da embarcação) — artigo definido masculino plural.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: numeral indicaria uma quantidade exata de motores; 'os' apenas define quais motores, sem contá-los.",
+   "Correta: artigo definido, antecede e define o substantivo 'motores'.",
+   "Errada: 'os' também pode ser pronome oblíquo, substituindo um substantivo já citado ('revisaram-os'); mas aqui vem ANTES de 'motores' e o acompanha, não o substitui.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Preposição",
+  "n": 2,
+  "q": "Em \"Os motores da embarcação foram revisados por técnicos experientes antes da viagem\", a palavra \"por\" é:",
+  "o": [
+   "Conjunção",
+   "Advérbio",
+   "Preposição",
+   "Pronome",
+   "Artigo"
+  ],
+  "c": 2,
+  "e": "Preposição liga dois termos, subordinando o segundo ao primeiro. 'Por' liga 'revisados' a 'técnicos experientes', introduzindo o agente da ação (quem revisou os motores) — preposição.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: conjunção ligaria duas orações; 'por' liga apenas dois termos, introduzindo o agente da passiva.",
+   "",
+   "Correta: preposição, introduz o agente da passiva ('por técnicos experientes').",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Adjetivo",
+  "n": 2,
+  "q": "Em \"Os motores da embarcação foram revisados por técnicos experientes antes da viagem\", a palavra \"experientes\" é:",
+  "o": [
+   "Substantivo",
+   "Verbo",
+   "Adjetivo",
+   "Numeral",
+   "Interjeição"
+  ],
+  "c": 2,
+  "e": "Adjetivo atribui qualidade, estado ou característica a um substantivo. 'Experientes' atribui uma característica ao substantivo 'técnicos', concordando com ele em número — adjetivo.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: adjetivo, atribui a característica de experiência aos técnicos.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Artigo",
+  "n": 2,
+  "q": "Em \"As duas equipes concorreram pela mesma vaga durante a seletiva realizada em julho\", a palavra \"As\" é:",
+  "o": [
+   "Pronome",
+   "Numeral",
+   "Artigo",
+   "Preposição",
+   "Adjetivo"
+  ],
+  "c": 2,
+  "e": "Artigo antecede o substantivo, definindo-o ou generalizando-o. 'As' antecede o substantivo 'equipes', definindo-as (equipes já identificadas) — artigo definido feminino plural, diferente do numeral 'duas', logo em seguida, que conta quantas equipes são.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: 'as' também pode ser pronome oblíquo, substituindo um substantivo já citado; mas aqui vem ANTES de 'equipes' e o acompanha, não o substitui.",
+   "Errada: numeral seria 'duas', logo depois, que conta as equipes; 'as' só define, não conta.",
+   "Correta: artigo definido, antecede e define o substantivo 'equipes'.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Preposição",
+  "n": 2,
+  "q": "Em \"As duas equipes concorreram pela mesma vaga durante a seletiva realizada em julho\", a palavra \"durante\" é:",
+  "o": [
+   "Conjunção",
+   "Preposição",
+   "Advérbio",
+   "Pronome",
+   "Artigo"
+  ],
+  "c": 1,
+  "e": "Preposição liga dois termos, subordinando o segundo ao primeiro. 'Durante' liga 'concorreram' a 'a seletiva', indicando o período em que a disputa ocorreu — preposição, e não conjunção, porque não liga duas orações: liga um termo a outro dentro da mesma oração.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: conjunção ligaria duas orações inteiras (como 'enquanto a seletiva acontecia'); 'durante' liga um termo a outro dentro da mesma oração.",
+   "Correta: preposição, indica o período em que a disputa pela vaga ocorreu.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Pronome",
+  "n": 2,
+  "q": "Em \"As duas equipes concorreram pela mesma vaga durante a seletiva realizada em julho\", a palavra \"mesma\" é:",
+  "o": [
+   "Numeral",
+   "Adjetivo",
+   "Pronome",
+   "Artigo",
+   "Substantivo"
+  ],
+  "c": 2,
+  "e": "Pronome substitui ou acompanha o substantivo, situando-o nas pessoas do discurso. 'Mesma' acompanha o substantivo 'vaga', indicando identidade (a mesma vaga, e não vagas diferentes) — pronome demonstrativo, diferente de 'duas', no início da mesma frase, que é numeral e conta as equipes.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: numeral indicaria quantidade ('duas', no início desta mesma frase); 'mesma' não conta nada, indica identidade.",
+   "Errada: adjetivo atribuiria uma qualidade à vaga; 'mesma' não diz como a vaga é, indica que é uma só, a mesma para as duas equipes.",
+   "Correta: pronome demonstrativo, indica identidade — a mesma vaga para as duas equipes.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Interjeição",
+  "n": 2,
+  "q": "Em \"Puxa! O resultado da segunda etapa do concurso saiu antes do prazo previsto no edital\", a palavra \"Puxa\" é:",
+  "o": [
+   "Substantivo",
+   "Verbo",
+   "Interjeição",
+   "Advérbio",
+   "Preposição"
+  ],
+  "c": 2,
+  "e": "Interjeição exprime emoção e forma, sozinha, um enunciado completo. 'Puxa!' expressa uma reação de surpresa e forma sozinha um enunciado completo, sem sujeito nem verbo — interjeição.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "Errada: 'puxa' também existe como forma do verbo 'puxar' ('ele puxa a corda'), mas aqui, isolada e exclamativa, é interjeição.",
+   "Correta: interjeição, expressa a reação de surpresa.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Artigo",
+  "n": 2,
+  "q": "Em \"Puxa! O resultado da segunda etapa do concurso saiu antes do prazo previsto no edital\", a palavra \"O\" é:",
+  "o": [
+   "Pronome",
+   "Artigo",
+   "Numeral",
+   "Conjunção",
+   "Advérbio"
+  ],
+  "c": 1,
+  "e": "Artigo antecede o substantivo, definindo-o ou generalizando-o. 'O' antecede o substantivo 'resultado', definindo-o — artigo definido masculino singular.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "Correta: artigo definido, antecede e define o substantivo 'resultado'.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Numeral",
+  "n": 2,
+  "q": "Em \"Puxa! O resultado da segunda etapa do concurso saiu antes do prazo previsto no edital\", a palavra \"segunda\" é:",
+  "o": [
+   "Pronome",
+   "Adjetivo",
+   "Substantivo",
+   "Numeral",
+   "Preposição"
+  ],
+  "c": 3,
+  "e": "Numeral indica quantidade, ordem, multiplicação ou fração de seres. 'Segunda' indica a posição exata da etapa do concurso — numeral ordinal.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "",
+   "Correta: numeral ordinal, indica a posição exata da etapa.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Advérbio",
+  "n": 2,
+  "q": "Em \"Puxa! O resultado da segunda etapa do concurso saiu antes do prazo previsto no edital\", a palavra \"antes\" é:",
+  "o": [
+   "Preposição",
+   "Advérbio",
+   "Conjunção",
+   "Substantivo",
+   "Pronome"
+  ],
+  "c": 1,
+  "e": "Advérbio modifica o verbo, o adjetivo ou outro advérbio, indicando circunstância. 'Antes' modifica o verbo 'saiu', indicando a circunstância de tempo — advérbio, e não preposição, porque aqui não liga 'saiu' a 'do prazo': quem faz essa ligação é a contração 'do' (de + o); 'antes' sozinho já indica a antecipação.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: em 'antes do prazo', quem liga os termos é a contração 'do' (preposição 'de' + artigo 'o'); 'antes' sozinho modifica o verbo 'saiu', é advérbio.",
+   "Correta: advérbio de tempo, modifica o verbo 'saiu', indicando antecipação.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Interjeição",
+  "n": 2,
+  "q": "Em \"Nossa! A tripulação concluiu a manobra em tempo recorde\", a palavra \"Nossa\" é:",
+  "o": [
+   "Pronome",
+   "Interjeição",
+   "Substantivo",
+   "Adjetivo",
+   "Verbo"
+  ],
+  "c": 1,
+  "e": "Interjeição exprime emoção e forma, sozinha, um enunciado completo. 'Nossa!' expressa uma reação de espanto e forma sozinha um enunciado completo — interjeição. É a mesma palavra do pronome possessivo ('nossa equipe'), mas aqui, isolada e exclamativa, sem acompanhar nenhum substantivo, não pode ser pronome.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: 'nossa' É pronome possessivo em 'nossa equipe cumpriu a meta' — mas aqui, sozinha e exclamativa, sem acompanhar nenhum substantivo, é interjeição.",
+   "Correta: interjeição, expressa espanto e forma sozinha um enunciado completo.",
+   "",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Artigo",
+  "n": 2,
+  "q": "Em \"Nossa! A tripulação concluiu a manobra em tempo recorde\", a palavra \"A\" é:",
+  "o": [
+   "Preposição",
+   "Numeral",
+   "Artigo",
+   "Pronome",
+   "Conjunção"
+  ],
+  "c": 2,
+  "e": "Artigo antecede o substantivo, definindo-o ou generalizando-o. 'A' antecede o substantivo 'tripulação', definindo-a — artigo definido feminino singular.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: artigo definido, antecede e define o substantivo 'tripulação'.",
+   "Errada: 'a' também pode ser pronome oblíquo, substituindo um substantivo já citado ('viu-a'); mas aqui vem ANTES de 'tripulação' e o acompanha.",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Verbo",
+  "n": 2,
+  "q": "Em \"Nossa! A tripulação concluiu a manobra em tempo recorde\", a palavra \"concluiu\" é:",
+  "o": [
+   "Substantivo",
+   "Adjetivo",
+   "Verbo",
+   "Advérbio",
+   "Pronome"
+  ],
+  "c": 2,
+  "e": "Verbo indica ação, estado ou fenômeno e se conjuga, variando em tempo, modo, número e pessoa. 'Concluiu' indica a ação praticada pela tripulação e se conjuga (concluo, concluía, concluirá...) — verbo.",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "",
+   "",
+   "Correta: verbo, indica a ação de concluir a manobra.",
+   "",
+   ""
+  ]
+ },
+ {
+  "m": "portugues",
+  "t": "Classes de palavras",
+  "s": "Adjetivo",
+  "n": 2,
+  "q": "Em \"Nossa! A tripulação concluiu a manobra em tempo recorde\", a palavra \"recorde\" é:",
+  "o": [
+   "Substantivo",
+   "Numeral",
+   "Adjetivo",
+   "Verbo",
+   "Advérbio"
+  ],
+  "c": 2,
+  "e": "Adjetivo atribui qualidade, estado ou característica a um substantivo. 'Recorde', em 'tempo recorde', atribui uma característica ao substantivo 'tempo' — um tempo excepcionalmente curto — e não flexiona em gênero/número, como costuma acontecer com esse adjetivo emprestado do vocabulário esportivo. É adjetivo, diferente do substantivo 'recorde' em 'bateu o recorde' (onde 'recorde' é o próprio feito nomeado).",
+  "f": "Anexo I — Classes de palavras",
+  "eo": [
+   "Errada: 'recorde' É substantivo em 'bateu o recorde' — mas aqui caracteriza o substantivo 'tempo' ('tempo recorde' = tempo excepcionalmente curto), funcionando como adjetivo.",
+   "",
+   "Correta: adjetivo, caracteriza 'tempo' como excepcionalmente curto.",
+   "",
+   ""
+  ]
+ }
 ]
