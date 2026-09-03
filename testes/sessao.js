@@ -57,7 +57,7 @@ module.exports = function (APP, t) {
     /* Trilha B do plano de revisão da meta: revisão primeiro, cartão novo só
        entra se sobrar espaço na cota — troca de propósito do intercalar()
        (que espalhava as duas) por concatenação simples (ver o comentário em
-       montarLoteSessao()). */
+       montarLoteSessao()). Caso mais fraco do teste global logo abaixo. */
     await APP.montar({ concursos: ['transpetro-mec'] });
     const hoje = APP.hoje();
     const b = APP.BLOCOS_META.find(x => x.materias.includes('matematica'));
@@ -78,6 +78,57 @@ module.exports = function (APP, t) {
     if (posNov.length > 0) {
       t.ok(Math.max(...posRev) < Math.min(...posNov),
         'revisão precisa vir toda antes do primeiro cartão novo dentro do bloco: ' + daArea.join(','));
+    }
+  });
+
+  t.teste('revisão de QUALQUER matéria vem antes de cartão novo de QUALQUER outra', async () => {
+    /* A ordem de BLOCOS_META não pode passar na frente da revisão: antes, a
+       sessão saía [LP: rev,novo][Mat: rev,novo]..., e cartão NOVO da primeira
+       matéria aparecia antes de revisão PENDENTE da segunda. O pedido é
+       "conteúdo novo só se não tiver revisão pendente" — global, não por
+       matéria. */
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const hoje = APP.hoje();
+    /* vence 1 cartão SÓ na última matéria de BLOCOS_META, e deixa as
+       anteriores inteiras de cartão novo — é a situação em que o bug
+       aparecia: os novos das primeiras matérias vinham antes dessa revisão */
+    const ultimo = APP.BLOCOS_META[APP.BLOCOS_META.length - 1];
+    const m = ultimo.materias[0];
+    const alvo = APP.BANCO.find(q => q.m === m
+      && (!ultimo.topicos || ultimo.topicos.includes(q.t)) && APP.grauAberto(q));
+    t.ok(alvo, `preciso de um cartão aberto de ${m}`);
+    APP.E.cartoes[alvo.id] = { caixa: 1, acertos: 0, erros: 1, prox: hoje };
+
+    const lote = APP.montarLoteSessao('normal', null, new Set());
+    const iRev = lote.indexOf(alvo.id);
+    t.ok(iRev >= 0, 'a revisão vencida tinha que entrar no lote');
+    t.igual(iRev, 0, 'a única revisão pendente tinha que ser o PRIMEIRO cartão da sessão, '
+      + `mas veio na posição ${iRev} (matérias antes dela: `
+      + lote.slice(0, iRev).map(id => APP.porId[id].m).join(',') + ')');
+  });
+
+  t.teste('com revisão em várias matérias, nenhum cartão novo aparece antes da última revisão', async () => {
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const hoje = APP.hoje();
+    const revIds = new Set();
+    APP.BLOCOS_META.forEach(bl => {
+      const m = bl.materias[0];
+      const q = APP.BANCO.find(x => x.m === m
+        && (!bl.topicos || bl.topicos.includes(x.t)) && APP.grauAberto(x) && !revIds.has(x.id));
+      if (!q) return;
+      APP.E.cartoes[q.id] = { caixa: 1, acertos: 0, erros: 1, prox: hoje };
+      revIds.add(q.id);
+    });
+    t.ok(revIds.size >= 2, 'preciso de revisão pendente em pelo menos 2 matérias');
+
+    const lote = APP.montarLoteSessao('normal', null, new Set());
+    const posRev = [], posNov = [];
+    lote.forEach((id, i) => (revIds.has(id) ? posRev : posNov).push(i));
+    t.igual(posRev.length, revIds.size, 'todas as revisões pendentes tinham que entrar');
+    if (posNov.length > 0) {
+      t.ok(Math.max(...posRev) < Math.min(...posNov),
+        'cartão novo apareceu antes de uma revisão pendente de outra matéria: '
+        + lote.map(id => (revIds.has(id) ? 'REV' : 'novo') + ':' + APP.porId[id].m).join(' '));
     }
   });
 

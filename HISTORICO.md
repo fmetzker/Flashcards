@@ -207,6 +207,17 @@ efeito — foco em zerar revisão antes de avançar — e `intercalar()` foi
 removida outra vez, desta vez como decisão consciente, não como bug: ver
 "Meta e progresso do dia" no `CLAUDE.md`.
 
+**E a primeira versão dessa reversão só valia DENTRO de cada matéria.** O
+pedido era "conteúdo novo apenas se não tiver revisão pendente", global; a
+implementação concatenava bloco a bloco (`[LP: rev,novo][SUS: rev,novo]…`),
+então cartão novo da primeira matéria aparecia antes de revisão pendente da
+segunda. A suposição "o corte é por matéria, não global" chegou a ser
+escrita no plano e passou batida na aprovação — o relato de uso veio depois:
+2 atrasadas, 34 revisões do dia, e cartão novo aparecendo mesmo assim.
+Corrigido acumulando revisão e novo em listas separadas e concatenando só no
+fim, com as revisões reordenadas por `prioridade()` entre as matérias. A
+cota por bloco continua decidindo QUEM entra — mudou só a ordem.
+
 **Cartela de 100 dias.** Havia uma grade 10×10 colorida por meta batida no
 lugar da contagem de dias seguidos. Era cara de carregar e pintar e não dizia
 nada que a contagem simples não dissesse.

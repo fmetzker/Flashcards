@@ -703,7 +703,22 @@ function montarLoteSessao(modo, filtro, excluir){
        blocosDaMeta(). */
     const h = hoje();
     const porBloco = progressoPorBloco(h);
-    lista = [];
+    /* Revisão vem antes de cartão novo em TODA a sessão, não só dentro de
+       cada matéria. Por isso os dois lados são acumulados em listas
+       separadas aqui e só concatenados no fim: antes, cada bloco entrava
+       inteiro (`[revisões dele][novos dele]`) e a sessão saía
+       `[LP: rev,novo][SUS: rev,novo][Enf: rev,novo]` — cartão NOVO de
+       Português aparecia antes de revisão PENDENTE de Enfermagem, que é
+       exatamente o que "conteúdo novo só se não tiver revisão pendente"
+       não quer.
+
+       QUEM ENTRA continua decidido pela cota de cada bloco (`falta`),
+       igual a antes: isto muda só a ORDEM de apresentação. É o que mantém
+       a meta honesta — tudo que entra na sessão conta em progressoDoDia(),
+       que capa por bloco do mesmo jeito. Revisão que passa da cota da
+       própria matéria continua esperando (e volta no fallback pós-meta,
+       logo abaixo, que também serve revisão primeiro). */
+    const revs = [], novs = [];
     BLOCOS_META.forEach((bl,i)=>{
       const falta = Math.max(0, bl.questoes - Math.min(porBloco[i].feitas, bl.questoes));
       if(!falta) return;
@@ -714,18 +729,10 @@ function montarLoteSessao(modo, filtro, excluir){
       };
       const rev = q.revisar.filter(daArea);
       const nov = q.novas.filter(daArea);
-      /* Revisão primeiro, cartão novo só se sobrar espaço na cota — não
-         mais intercalado. Decisão de propósito: a pessoa quer zerar o que
-         já viu antes de avançar, mesmo que isso signifique um dia inteiro
-         de uma matéria sem cartão novo nenhum quando o atrasado é grande.
-         (Isto reverte a razão original de existir do intercalar() — ver
-         HISTORICO.md — mas agora é o comportamento pedido, não um bug.)
-
-         `rev` já reflete só o que está pendente NESTA chamada (responder um
+      /* `rev` já reflete só o que está pendente NESTA chamada (responder um
          cartão hoje tira ele daqui), então limitar por `falta` aqui já
          garante que a revisão sozinha nunca estoura a cota do bloco — não
-         precisa mais do teto de 2x novos que blocosDaMeta() tinha antes:
-         aqui a concatenação já é auto-limitante.
+         precisa do teto de 2x novos que blocosDaMeta() tinha antes.
 
          Se isso ainda ficar abaixo de `falta` (pouca revisão pendente E
          trava de degrau ou tópico recém-aberto com pouco cartão novo), o
@@ -734,9 +741,18 @@ function montarLoteSessao(modo, filtro, excluir){
          de outra matéria/tópico depois; não precisa fingir que esta cota
          fechou hoje. */
       const parte = rev.slice(0, falta);
-      const bloco = parte.concat(nov.slice(0, falta - parte.length));
-      lista = lista.concat(bloco);
+      revs.push.apply(revs, parte);
+      novs.push.apply(novs, nov.slice(0, falta - parte.length));
     });
+    /* As revisões saem reordenadas por prioridade() ENTRE as matérias, não
+       agrupadas por matéria: uma vez que a fatia de cada bloco já foi
+       escolhida, quem vem primeiro é quem prioridade() diz (caixa, taxa de
+       erro, peso do bloco), como já valia dentro de cada matéria. Os novos
+       continuam agrupados por matéria, na ordem de BLOCOS_META — ali não
+       há urgência a comparar entre matérias, e agrupar mantém o estudo de
+       conteúdo novo coeso. */
+    revs.sort((a,b)=> prioridade(a) - prioridade(b) || cmpId(a,b));
+    lista = revs.concat(novs);
     /* nenhuma cota aberta (meta do dia já fechada) ou nada nas matérias da
        prova: sobra tudo que a pessoa segue e ainda está vencido ou liberado,
        sem respeitar cota de bloco nenhuma — é o "continuar estudando depois

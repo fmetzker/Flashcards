@@ -535,19 +535,30 @@ escopo restrito a um só ou com todos.
   provas ao mesmo tempo. A mesma regra vale entre bloco de concurso e
   matéria avulsa: se a mesma matéria aparece nos dois, fica o maior peso,
   nunca a soma.
-- **Revisão primeiro; cartão novo só se não sobrar revisão pendente na
-  cota do dia.** Decisão de propósito, e uma reversão deliberada do que
-  valia antes (`intercalar()`, removida — ver HISTORICO.md): dentro da cota
-  de cada bloco, `montarLoteSessao("normal")` concatena — toda a revisão
-  vencida daquela matéria que couber na cota entra primeiro, cartão novo só
-  completa o que sobrar. Não existe mais teto de "2× a cota" separado: a
-  concatenação já é auto-limitante (revisão sozinha nunca passa da cota do
-  bloco), e revisão que exceder a cota do dia simplesmente fica pendente
-  para depois — inclusive para o "continuar estudando depois de bater a
-  meta" (`iniciarSessao`), que já entrega esse excedente **antes de
-  qualquer cartão novo**, mesma lógica de sempre. A cota fica congelada no
-  mesmo momento em que `BLOCOS_META` já era recalculado (boot, troca de
-  dia, troca de foco), não a cada resposta — vira alvo móvel senão.
+- **Revisão primeiro em TODA a sessão, não só dentro de cada matéria.**
+  Decisão de propósito, e uma reversão deliberada do que valia antes
+  (`intercalar()`, removida — ver HISTORICO.md). `montarLoteSessao("normal")`
+  acumula revisão e cartão novo em duas listas separadas ao varrer os blocos,
+  e só concatena no fim: **nenhum cartão novo, de matéria nenhuma, aparece
+  antes de uma revisão pendente de qualquer outra**. A primeira versão disto
+  concatenava bloco a bloco (`[LP: rev,novo][SUS: rev,novo]…`), e o cartão
+  novo da primeira matéria vinha antes da revisão pendente da segunda — a
+  ordem de `BLOCOS_META` passava na frente da urgência (`HISTORICO.md`).
+  - **Quem ENTRA continua decidido pela cota de cada bloco** (`falta`) —
+    isto muda só a ORDEM. É o que mantém a meta honesta: tudo que entra
+    conta em `progressoDoDia()`, que capa por bloco do mesmo jeito.
+  - As revisões saem reordenadas por `prioridade()` **entre** as matérias
+    (caixa, taxa de erro, peso do bloco), não agrupadas por matéria. Os
+    cartões novos continuam agrupados por matéria, na ordem de
+    `BLOCOS_META` — ali não há urgência a comparar entre matérias.
+  - Não existe teto de "2× a cota" separado: a concatenação já é
+    auto-limitante (revisão sozinha nunca passa da cota do bloco), e
+    revisão que exceder a cota do dia fica pendente para depois — inclusive
+    para o "continuar estudando depois de bater a meta" (`iniciarSessao`),
+    que já entrega esse excedente **antes de qualquer cartão novo**.
+  - A cota fica congelada no mesmo momento em que `BLOCOS_META` já era
+    recalculado (boot, troca de dia, troca de foco), não a cada resposta —
+    vira alvo móvel senão.
 - **`BLOCOS` ≠ `BLOCOS_META`.** `BLOCOS` é da prova (`CONCURSO`) e manda no
   simulado, na contagem regressiva, na regra de aprovação e em
   `blocoDaMateria` (peso usado por `prioridade()`). `BLOCOS_META` manda só na
@@ -788,16 +799,16 @@ Três respostas possíveis: "Sabia" sobe uma caixa; "Chutei" e "Errei" voltam
 para a caixa 1. O botão "Chutei" é central — não removê-lo nem transformá-lo
 em acerto.
 
-**A sessão concatena revisão e cartão novo — revisão primeiro.** Dentro da
-cota de cada bloco, `montarLoteSessao("normal")` entrega toda a revisão
-vencida daquela matéria que couber na cota antes de qualquer cartão novo
-(ver "Meta e progresso do dia"). **Isto é uma reversão de propósito**: até
-agosto/2026 existia `intercalar()`, que espalhava as duas listas (proporção
-de cada uma no total, tipo Bresenham) para exatamente evitar isto — uma fila
-de revisão grande engolindo `E.meta` inteiro e cartão novo nunca aparecendo
-enquanto o backlog não zerasse. Passou a ser o comportamento **pedido**: o
-foco é esvaziar revisão antes de avançar. Só decide a ORDEM de apresentação
-dentro da cota; quem entra na sessão continua decidido por fora (cota do
+**A sessão concatena revisão e cartão novo — revisão primeiro, em toda a
+sessão.** `montarLoteSessao("normal")` entrega toda a revisão vencida que
+couber nas cotas do dia — de QUALQUER matéria — antes de qualquer cartão
+novo (ver "Meta e progresso do dia"). **Isto é uma reversão de propósito**:
+até agosto/2026 existia `intercalar()`, que espalhava as duas listas
+(proporção de cada uma no total, tipo Bresenham) para exatamente evitar isto
+— uma fila de revisão grande engolindo `E.meta` inteiro e cartão novo nunca
+aparecendo enquanto o backlog não zerasse. Passou a ser o comportamento
+**pedido**: o foco é esvaziar revisão antes de avançar. Só decide a ORDEM de
+apresentação; quem entra na sessão continua decidido por fora (cota do
 bloco, escada de pré-requisito).
 
 **A ordem dentro do que já venceu** é decidida por `prioridade()`: caixa,
