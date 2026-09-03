@@ -320,6 +320,34 @@ alter table public.perfis add column if not exists progresso_zerado_em timestamp
 
 
 -- ----------------------------------------------------------------------------
+-- 2.4 Marcos de reset POR MATÉRIA — Painel de desempenho
+--
+-- `{"manutencao-mecanica": "2026-09-03T09:12:00.000Z", ...}` — instante do
+-- último zerarMateria() de cada matéria (index.html). Mesma ideia do
+-- progresso_zerado_em (2.3), um nível mais fino: lá o corte vale para a conta
+-- inteira, aqui vale só para os cartões daquela matéria.
+--
+-- Por que precisa existir: zerarMateria() nasceu só local (apaga as entradas
+-- de E.cartoes daquele aparelho e pronto). eventos_resposta é append-only, e
+-- sem marco nenhum aqui o painel continuava derivando do log e contando como
+-- ATRASADO um cartão que a pessoa zerou de propósito — 8 no painel contra 3
+-- na tela Estatísticas da mesma conta, o mesmo tipo de descompasso que o
+-- progresso_zerado_em resolveu para o reset geral (HISTORICO.md).
+--
+-- Corte por INSTANTE, não delete: o log fica inteiro. Um evento daquela
+-- matéria anterior ao marco não conta mais; um POSTERIOR conta normalmente —
+-- é isso que faz o número voltar a crescer sozinho quando a pessoa recomeça a
+-- estudar a matéria, em vez de congelar.
+--
+-- Escrita cai na policy "perfil próprio: atualizar" (seção 2) — não precisa
+-- de policy nova, e o gatilho proteger_status_perfil só congela status/email.
+-- Sincronizado por sincronizarMateriasAtivas() (index.html), junto de
+-- materias_ativas e progresso_zerado_em.
+-- ----------------------------------------------------------------------------
+alter table public.perfis add column if not exists materias_zeradas jsonb not null default '{}'::jsonb;
+
+
+-- ----------------------------------------------------------------------------
 -- 3. Eventos de resposta — o log append-only
 --
 -- Cada resposta vira um evento. Duas decisões que valem explicação:

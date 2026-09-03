@@ -1070,6 +1070,13 @@ async function sincronizarMateriasAtivas(){
     const corpo = {};
     if(ativas.length) corpo.materias_ativas = ativas;
     if(E.progressoZeradoEm) corpo.progresso_zerado_em = E.progressoZeradoEm;
+    /* Objeto VAZIO não é mandado, pela mesma razão da lista vazia acima:
+       num PATCH ele apagaria os marcos já gravados por outro aparelho. Só
+       vai quando este aparelho tem marco de verdade pra somar — e o merge
+       do lado de lá é feito na leitura (verificarSituacao), não aqui. */
+    if(E.materiasZeradas && Object.keys(E.materiasZeradas).length){
+      corpo.materias_zeradas = E.materiasZeradas;
+    }
     if(!Object.keys(corpo).length) return;   // nada de verdade pra gravar
     const r = await chamarRest("perfis?id=eq."+CONTA_ID, {
       method: "PATCH",
@@ -1315,6 +1322,17 @@ const padrao = {
      agregada (resumo_desempenho). Sincronizado pra perfis.progresso_zerado_em
      junto de materias_ativas (ver sincronizarMateriasAtivas). */
   progressoZeradoEm: null,
+  /* {materia: ISO} — instante do último zerarMateria() de cada matéria.
+     Mesma ideia do progressoZeradoEm acima, um nível mais fino: lá o corte
+     vale pra conta inteira, aqui só pros cartões daquela matéria.
+
+     Existe por causa do Painel de desempenho, não da tela local: aqui o
+     zerarMateria() já apagou as entradas de E.cartoes, então localmente não
+     há o que cortar. É o painel que deriva do log (append-only, nunca
+     esquece) e precisa saber o que ignorar — sem isto ele contava como
+     atrasado um cartão zerado de propósito. Sincronizado pra
+     perfis.materias_zeradas (schema.sql §2.4) junto de materias_ativas. */
+  materiasZeradas: {},
   /* Avisos de "meta batida" já mostrados, por DIA — não por sessão. Cada
      "Estudar agora" cria uma sessão (S) nova; se o controle ficasse em S
      (como era antes), bater a meta, sair e voltar a estudar no mesmo dia
@@ -1478,7 +1496,7 @@ async function verificarSituacao(){
   SITUACAO = null;
   if(!supaConfigurado() || !SESSAO || !CONTA_ID) return;
   try{
-    const r = await chamarRest("perfis?select=status,progresso_zerado_em&id=eq."+encodeURIComponent(CONTA_ID));
+    const r = await chamarRest("perfis?select=status,progresso_zerado_em,materias_zeradas&id=eq."+encodeURIComponent(CONTA_ID));
     if(r.ok){
       const linhas = await r.json();
       if(linhas && linhas.length){
@@ -1498,10 +1516,31 @@ async function verificarSituacao(){
         const remoto = linhas[0].progresso_zerado_em;
         const instante = v => { const d = Date.parse(v); return isNaN(d) ? null : d; };
         const tRemoto = instante(remoto), tLocal = instante(E.progressoZeradoEm);
+        let mudou = false;
         if(remoto && tRemoto !== null && (tLocal === null || tRemoto > tLocal)){
           E.progressoZeradoEm = remoto;
-          salvar();
+          mudou = true;
         }
+        /* Mesma regra "só avança", agora POR MATÉRIA: une o que o servidor
+           tem com o que este aparelho tem, ficando com o instante mais
+           recente de cada uma. É o que faz zerarMateria() num aparelho valer
+           nos outros — e o que conserta a gravação, que é last-writer-wins:
+           o PATCH manda o objeto inteiro (PostgREST não faz merge de jsonb),
+           então um aparelho que zerou sem ter lido o marco do outro pode
+           sobrescrevê-lo. Como todo aparelho relê e reenvia no boot, o marco
+           volta sozinho enquanto qualquer um deles ainda o tiver. */
+        const zeradasRemotas = linhas[0].materias_zeradas;
+        if(zeradasRemotas && typeof zeradasRemotas === "object"){
+          E.materiasZeradas = E.materiasZeradas || {};
+          Object.keys(zeradasRemotas).forEach(m=>{
+            const tR = instante(zeradasRemotas[m]), tL = instante(E.materiasZeradas[m]);
+            if(tR !== null && (tL === null || tR > tL)){
+              E.materiasZeradas[m] = zeradasRemotas[m];
+              mudou = true;
+            }
+          });
+        }
+        if(mudou) salvar();
       }
     }
   }catch(e){ /* offline: segue com null, ver comentário acima */ }
@@ -3935,7 +3974,7 @@ async function pintarPainel(){
        linha podia sumir (caiu entre duas páginas) ou vir duas vezes. */
     const janela = new Date(Date.now() - 8*86400000).toISOString();
     const [p, r, e, ec, indice, mapa] = await Promise.all([
-      buscarTudo("perfis?status=eq.aprovado&select=id,nome,email,materias_ativas,progresso_zerado_em&order=nome.asc,id.asc"),
+      buscarTudo("perfis?status=eq.aprovado&select=id,nome,email,materias_ativas,progresso_zerado_em,materias_zeradas&order=nome.asc,id.asc"),
       buscarTudo("resumo_desempenho?select=usuario_id,respostas_total,acertos_total,ultima_atividade&order=usuario_id.asc"),
       buscarTudo("eventos_resposta?select=usuario_id,ts&ts=gte."+encodeURIComponent(janela)+"&order=usuario_id.asc,criado_em.asc"),
       buscarTudo("estado_cartao?select=usuario_id,questao_id,prox,ts&order=usuario_id.asc,questao_id.asc"),
@@ -3962,6 +4001,34 @@ async function pintarPainel(){
   const zeradoEm = {};
   perfis.forEach(p=>{ if(p.progresso_zerado_em) zeradoEm[p.id] = p.progresso_zerado_em; });
   const antesDoReset = (uid, ts) => zeradoEm[uid] && (ts||"") <= zeradoEm[uid];
+
+  /* corte por MATÉRIA: instante do último zerarMateria() de cada uma
+     (perfis.materias_zeradas, schema.sql §2.4). Mesma ideia do corte por
+     conta acima, um nível mais fino — sem ele, o painel contava como
+     atrasado o cartão que a pessoa zerou de propósito, e a conta divergia
+     da própria tela Estatísticas dela (8 contra 3, relatado em uso).
+
+     Compara por INSTANTE, não por string: os dois lados chegam em formatos
+     diferentes (PostgREST devolve "…+00:00", o cliente grava toISOString()
+     "…Z") e o mesmo momento pode parecer mais antigo de um lado — o mesmo
+     cuidado que verificarSituacao() já documenta. */
+  const zeradasPorConta = {};
+  perfis.forEach(p=>{
+    const z = p.materias_zeradas;
+    if(!z || typeof z !== "object") return;
+    const porMateria = {};
+    Object.keys(z).forEach(m=>{
+      const t = Date.parse(z[m]);
+      if(!isNaN(t)) porMateria[m] = t;
+    });
+    if(Object.keys(porMateria).length) zeradasPorConta[p.id] = porMateria;
+  });
+  const antesDoResetDaMateria = (uid, materia, ts)=>{
+    const marco = zeradasPorConta[uid] && zeradasPorConta[uid][materia];
+    if(marco === undefined) return false;
+    const t = Date.parse(ts);
+    return !isNaN(t) && t <= marco;
+  };
 
   const h = hoje(), seteDiasAtras = somarDias(h, -6);
   const hojeCont = {}, seteDiasCont = {};
@@ -4007,6 +4074,11 @@ async function pintarPainel(){
     if(antesDoReset(e2.usuario_id, e2.ts)) return;
     const qid = resolverReescrita(mapaReesc, e2.questao_id);
     if(!indiceBanco[qid]) return;
+    /* nem resposta anterior ao zerarMateria() DAQUELA matéria — o cartão
+       voltou a "nunca visto" pra pessoa, então não é atrasado nem estudado.
+       Resposta POSTERIOR ao marco conta normalmente: é o que faz o número
+       voltar a crescer quando ela recomeça a matéria. */
+    if(antesDoResetDaMateria(e2.usuario_id, indiceBanco[qid], e2.ts)) return;
     const porCartao = porCartaoPorAluno[e2.usuario_id] = porCartaoPorAluno[e2.usuario_id] || {};
     const atual = porCartao[qid];
     if(!atual || (e2.ts||"") > (atual.ts||"")) porCartao[qid] = {prox: e2.prox, ts: e2.ts};
@@ -4421,7 +4493,15 @@ function zerarMateria(m){
     const q = porId[id];
     if(q && q.m === m) delete E.cartoes[id];
   });
+  /* MARCO, não delete — igual ao zerar() geral: o log no servidor fica
+     inteiro (eventos_resposta é append-only, sem policy de delete), e é este
+     instante que diz ao Painel de desempenho "evento desta matéria anterior
+     a isto não conta mais". Evento POSTERIOR conta normalmente, então o
+     número volta a crescer sozinho quando a pessoa recomeçar a matéria. */
+  E.materiasZeradas = E.materiasZeradas || {};
+  E.materiasZeradas[m] = new Date().toISOString();
   salvar();
+  sincronizar();   // manda o marco pro servidor (com retentativa — ver sincronizarMateriasAtivas)
   ir("inicio");
 }
 

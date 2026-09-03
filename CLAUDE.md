@@ -488,6 +488,31 @@ duas perguntas parecidas já produziu um número errado (ver `HISTORICO.md`):
   - **`verificarSituacao()` lê o marco de volta no boot** e adota o do
     servidor quando é mais novo. Só avança, nunca retrocede — é o que faz
     `zerar()` num aparelho valer nos outros.
+- **`zerarMateria()` marca `materias_zeradas`, e o painel corta por ela
+  também.** Mesma ideia do `progresso_zerado_em`, um nível mais fino:
+  `{matéria: instante}` (schema.sql §2.4), e o painel ignora o evento
+  daquela matéria anterior ao marco. Sem isso o painel derivava do log
+  (append-only, nunca esquece) e contava como atrasado o cartão que a
+  pessoa zerou de propósito — 8 no painel contra 3 na tela Estatísticas da
+  mesma conta, o mesmo descompasso que o marco de conta inteira já tinha
+  resolvido uma vez (`HISTORICO.md`).
+  - **Evento POSTERIOR ao marco conta normalmente.** É o que faz o número
+    voltar a crescer sozinho quando a pessoa recomeça a matéria, em vez de
+    congelar — a razão de o painel DERIVAR do log em vez de exibir um
+    número publicado pelo cliente: "atrasadas" precisa crescer mesmo com a
+    pessoa sem abrir o app, senão esconde justamente quem está ficando pra
+    trás.
+  - **Objeto vazio não é mandado no PATCH**, mesma razão do
+    `progresso_zerado_em: null` acima — `{}` apagaria os marcos que outro
+    aparelho gravou.
+  - **A gravação é last-writer-wins** (PostgREST manda o jsonb inteiro, não
+    faz merge). `verificarSituacao()` une servidor e local por matéria,
+    ficando com o instante mais recente de cada uma, e reenvia no boot —
+    então um marco sobrescrito volta sozinho enquanto qualquer aparelho
+    ainda o tiver.
+  - **Compara por INSTANTE (`Date.parse`), não por string.** O PostgREST
+    devolve `…+00:00` e o cliente grava `toISOString()` (`…Z`): como texto,
+    o mesmo momento parece mais antigo de um lado.
 - **Toda consulta usa `buscarTudo()`, nunca `chamarRest()` direto.** O
   PostgREST corta a resposta num teto de linhas sem errar — só devolve menos
   do que existe. Perigoso em `estado_cartao`/`eventos_resposta` sem filtro de

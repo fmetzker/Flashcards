@@ -38,6 +38,22 @@ dizendo qual valia.
   `zerar()` limpa o `E` local, mas não tem como apagar o log no servidor. Daí
   `progresso_zerado_em`: o reset virou um MARCO no tempo, e tudo antes dele
   deixa de contar. O log continua inteiro — é corte, não delete.
+- **8 atrasadas no painel contra 3 na tela Estatísticas da mesma conta —
+  o mesmo erro, um nível mais fino.** `zerarMateria()` (o "Apagar progresso
+  desta matéria") nasceu só local, de propósito: eu tinha levantado a lacuna
+  ao construí-lo e ela foi aceita como risco. O relato de uso veio depois, e
+  era exatamente ela. Consertado do mesmo jeito que o reset geral, com
+  `materias_zeradas` (`{matéria: instante}`) — a diferença é que aqui o corte
+  é por matéria, então evento posterior ao marco volta a contar e o número
+  cresce de novo quando a pessoa recomeça aquela matéria.
+
+  **Chegou a ser considerado publicar o número pronto** (o cliente já calcula
+  em `revisoesPorDia()`; o painel só exibiria, e a concordância seria exata
+  por construção). Descartado: "atrasadas" precisa CRESCER com o tempo mesmo
+  sem a pessoa abrir o app — um número publicado congelaria na última
+  sincronização e esconderia justamente quem está ficando para trás. Por isso
+  o painel continua derivando do log, e o que se dá a ele é a informação que
+  faltava, não o resultado.
 
 **O PATCH que apagava o próprio marco.** A correção acima pareceu não
 funcionar por um detalhe: `null` num PATCH do PostgREST não é "não mexe", é
