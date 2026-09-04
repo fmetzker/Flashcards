@@ -1679,10 +1679,19 @@ function aplicarEventoRemoto(ev, proprios){
        outro aparelho encheria o total do dia mas não a cota do bloco, e a
        meta nunca fecharia direito para quem estuda em dois aparelhos.
        porId só tem as matérias dos concursos inscritos AQUI — evento de
-       matéria não carregada é ignorado, e volta a valer se ela entrar. */
+       matéria não carregada não soma em NENHUM bloco, e volta a valer se
+       ela entrar. O objeto do dia, porém, é criado sempre (mesmo vazio):
+       é o que diferencia "hoje, sem nada de matéria carregada" de "dia
+       legado, anterior a diasMateria existir" para progressoDoDia() — sem
+       isso, um pull de eventos todo de matéria não carregada (ex.: conta
+       zerou/trocou de concurso e o histórico antigo ainda chega no pull)
+       deixava diasMateria[dia] inteiramente ausente, e progressoDoDia()
+       caía no fallback do "dia legado" e devolvia E.dias[dia] bruto —
+       inflando a meta do dia com um número que os blocos individuais
+       mostravam como zero. */
+    E.diasMateria[dia] = E.diasMateria[dia] || {};
     const qRemota = porId[ev.questao_id];
     if(qRemota){
-      E.diasMateria[dia] = E.diasMateria[dia] || {};
       E.diasMateria[dia][qRemota.m] = (E.diasMateria[dia][qRemota.m]||0) + 1;
     }
   }
@@ -2670,10 +2679,15 @@ function registrar(id, resultado){
   if(resultado === "sabia") E.diasCertas[h] = (E.diasCertas[h]||0)+1;
   /* grava a matéria SEM filtrar pelo foco atual: quem segue dois concursos
      alterna o foco, e o histórico precisa continuar certo para os dois. O
-     filtro é na leitura (progressoDoDia), não aqui. */
+     filtro é na leitura (progressoDoDia), não aqui. O objeto do dia é
+     criado sempre, mesmo sem matéria correspondente — mesmo raciocínio de
+     aplicarEventoRemoto() logo acima: é o que marca "hoje já é um dia sob
+     o sistema novo" para progressoDoDia() não cair no fallback do dia
+     legado. Praticamente nunca dispara aqui (id sempre vem de um cartão do
+     BANCO carregado), mas é a mesma invariante das duas funções. */
+  E.diasMateria[h] = E.diasMateria[h] || {};
   const q0 = porId[id];
   if(q0){
-    E.diasMateria[h] = E.diasMateria[h] || {};
     E.diasMateria[h][q0.m] = (E.diasMateria[h][q0.m]||0) + 1;
   }
 

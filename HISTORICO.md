@@ -302,6 +302,31 @@ chamava a sincronização à parte, tentava uma vez e desistia em silêncio. Foi
 que causou as 95 atrasadas fantasma. Passou a rodar dentro de `sincronizar()`,
 reaproveitando a malha de retentativa que já existia.
 
+**Meta do dia mostrando "224/50" no topo com cada matéria em "0/25" — de
+verdade, não caixa registradora do usuário.** Reportado em setembro/2026 por
+alguém que não abria o app fazia dois dias. `progressoDoDia()` tem um
+fallback documentado — "cai no `E.dias` bruto quando `E.diasMateria[dia]` não
+existe" — pensado só para dia LEGADO, anterior ao campo `diasMateria` existir.
+O problema: `aplicarEventoRemoto()` e `registrar()` só criavam
+`E.diasMateria[dia]` DENTRO do `if(qRemota)`/`if(q0)` — ou seja, só quando a
+questão do evento batia com uma matéria carregada no momento. Um pull trazendo
+histórico de uma matéria que a conta não segue mais (ex.: trocou de foco,
+desseguiu um concurso) incrementava `E.dias[dia]` (correto — é o gráfico bruto
+"quanto você estudou", de propósito sem filtro) mas NUNCA criava
+`E.diasMateria[dia]`. Se TODOS os eventos de "hoje" fossem dessa matéria
+descarregada, `E.diasMateria[hoje]` ficava inteiramente ausente e
+`progressoDoDia()` não tinha como distinguir isso de "dia anterior ao recurso
+existir" — caía no mesmo fallback, e a meta do topo virava o total bruto do
+dia (que não respeita cota de bloco nenhuma), enquanto `progressoPorBloco()`
+(usa `E.diasMateria[dia] || {}`, nunca cai em fallback nenhum) mostrava 0 em
+cada matéria. Dois números de fontes com premissas diferentes para a mesma
+pergunta — a mesma família de bug do painel-vs-estatísticas acima, um nível
+mais alto. Correção: as duas funções agora criam `E.diasMateria[dia] = ... ||
+{}` incondicionalmente, ANTES de checar se a matéria do evento foi
+encontrada — o objeto (mesmo vazio) é o que marca "este dia já é rastreado
+pelo sistema novo", e é isso que `progressoDoDia()` precisa para não
+confundir "hoje, zero de matéria carregada" com "dia legado, sem o campo".
+
 ---
 
 ## Auditoria de código — agosto/2026

@@ -189,6 +189,47 @@ module.exports = function (APP, t) {
     });
   });
 
+  t.grupo('meta — evento de matéria não carregada não pode inflar o total do dia');
+
+  t.teste('aplicarEventoRemoto: dia fica com diasMateria (mesmo vazio) mesmo sem achar a matéria', async () => {
+    /* Sem isso, progressoDoDia() não consegue distinguir "hoje, sem nada
+       de matéria carregada" de "dia legado, anterior a diasMateria
+       existir" — e cai no fallback errado. Ver o comentário da própria
+       aplicarEventoRemoto(). */
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const h = APP.hoje();
+    t.igual(APP.E.diasMateria[h], undefined, 'pré-condição: dia começa sem diasMateria');
+
+    APP.aplicarEventoRemoto({
+      id: 'ev-1', questao_id: 'id-de-questao-que-nao-existe-no-banco-carregado',
+      ts: new Date().toISOString(), resultado: 'sabia', caixa_depois: 2, prox: h,
+    }, new Set());
+
+    t.ok(APP.E.diasMateria[h], 'diasMateria[hoje] tinha que existir depois do evento, mesmo vazio');
+  });
+
+  t.teste('evento remoto de matéria não carregada soma no gráfico bruto mas NÃO na meta do dia', async () => {
+    /* Reproduz o sintoma relatado: painel mostra "224/50" no topo (bruto)
+       enquanto cada bloco individual mostra "0/25" — sintoma de conta que
+       trocou/desseguiu um concurso e o pull ainda traz histórico antigo
+       daquela matéria. E.dias precisa continuar contando (é o gráfico
+       "quanto você estudou", de propósito bruto — CLAUDE.md), mas
+       progressoDoDia() (a META) não pode usar esse número. */
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const h = APP.hoje();
+    for (let i = 0; i < 5; i++) {
+      APP.aplicarEventoRemoto({
+        id: 'ev-' + i, questao_id: 'id-inexistente-' + i,
+        ts: new Date().toISOString(), resultado: 'sabia', caixa_depois: 2, prox: h,
+      }, new Set());
+    }
+    t.igual(APP.E.dias[h], 5, 'o gráfico bruto "quanto você estudou" precisa continuar contando');
+    t.igual(APP.progressoDoDia(h), 0, 'sem matéria carregada correspondente, a meta não pode usar o bruto');
+
+    const porBloco = APP.progressoPorBloco(h).reduce((s, b) => s + Math.min(b.feitas, b.cota), 0);
+    t.igual(APP.progressoDoDia(h), porBloco, 'topo da meta e soma dos blocos individuais têm que bater');
+  });
+
   t.grupo('aviso de meta batida — uma vez por DIA, não por sessão');
 
   const avisos = () => { const a = []; APP.__ctx.mostrarToast = m => a.push(m); return a; };

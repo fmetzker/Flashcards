@@ -64,6 +64,7 @@ const FUNCOES = [
   /* não são motor puro (tocam localStorage), mas o teste precisa alcançá-las */
   'salvar', 'podarEventosProprios', 'renovarSessao', 'chamarAuth',
   'sincronizarMateriasAtivas', 'zerar', 'zerarMateria', 'checarMetasBatidas',
+  'registrar', 'aplicarEventoRemoto',
 ];
 
 function lerDados() {
