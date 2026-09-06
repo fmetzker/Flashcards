@@ -148,6 +148,8 @@ Migrações que rodam no boot: `migrarSessaoDoPerfil`, `migrarEstadoDoPerfil`,
 | Função | Papel |
 |---|---|
 | `proximaData` | Leitner: caixas 1–8, intervalos 1/3/7/14/30/60/120, teto por proximidade da prova |
+| `caixaDepois` | caixa resultante de uma resposta: `sabia` sobe um degrau, `chutei`/`errei` voltam à 1 — usada por `registrar()` **e** pela previsão do botão |
+| `previsaoRevisao` | `{caixa, data, dias}` se a resposta for X — alimenta o rótulo "volta em N dias" de cada botão (`textoPrevisao`, no `index.html`) |
 | `prioridade` | ordena **vencidas**: caixa, taxa de erro, peso do bloco |
 | `cmpId` | desempate final em toda fila — ordenar pelo `id` (SHA-1 do enunciado) É embaralhar, sem sorteio |
 | `grauDe` | nível do cartão; ausente = 1 |

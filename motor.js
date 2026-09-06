@@ -412,6 +412,30 @@ function proximaData(caixa){
   return somarDias(hoje(), inter);
 }
 
+/* Em que caixa o cartão CAI depois de uma resposta: "sabia" sobe um degrau
+   (até CAIXA_MAX), "chutei" e "errei" voltam para a 1.
+
+   É função separada, e não uma linha dentro de registrar(), porque a tela
+   mostra a data da próxima revisão no próprio botão, ANTES de a pessoa
+   escolher. Duas contas paralelas da mesma coisa divergiriam sem ninguém
+   perceber — e o teto dinâmico de proximaData() já muda essa data sozinho a
+   cada dia que passa, então a divergência apareceria justamente perto da
+   prova, quando errar de data importa mais. Uma função, os dois caminhos. */
+function caixaDepois(caixa, resultado){
+  return resultado === "sabia" ? Math.min(CAIXA_MAX, caixa+1) : 1;
+}
+
+/* Quando este cartão volta, se a resposta for `resultado` — a previsão que a
+   tela mostra em cada botão. Cartão nunca respondido parte da caixa 1, o
+   mesmo default de registrar(). `dias` é a distância até a data (0 = hoje),
+   pronta para virar texto sem a tela ter que refazer conta de fuso. */
+function previsaoRevisao(id, resultado){
+  const c = E.cartoes[id];
+  const caixa = caixaDepois(c ? c.caixa : 1, resultado);
+  const data = proximaData(caixa);
+  return {caixa, data, dias: Math.round((diaUTC(data) - diaUTC(hoje()))/86400000)};
+}
+
 /* Prioridade dentro do que JÁ VENCEU (PADRAO-DOS-CARTOES.md, seção 4.2).
 
    Nada aqui adianta revisão: o espaçamento continua mandando em QUANDO o

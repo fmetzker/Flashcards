@@ -145,6 +145,9 @@ button.verde{background:var(--verde)}
 button.ambar{background:var(--ambar)}
 button.fantasma{background:transparent;color:var(--tinta2);border:1px solid var(--traco);font-weight:500}
 button.pequeno{font-size:15px;padding:11px 12px}
+/* previsão de revisão dentro do botão de resposta — segunda linha, discreta:
+   informa sem competir com o rótulo que a pessoa está procurando */
+button .previsao{display:block;font-size:11.5px;font-weight:500;opacity:.82;margin-top:3px}
 button:focus-visible{outline:3px solid var(--tinta);outline-offset:2px}
 
 /* menu */
@@ -2603,6 +2606,31 @@ function mostrarQuestao(){
   document.getElementById("acoes").classList.remove("ativa");
 }
 
+/* "volta em 7 dias · 13/09" — o que cada botão promete, escrito com a data
+   que registrar() vai gravar de verdade (previsaoRevisao usa a mesma
+   caixaDepois() e o mesmo proximaData(), teto dinâmico incluído).
+
+   Serve para tornar visível o que o motor faz em silêncio: perto da prova o
+   teto comprime os intervalos, e um cartão bem sabido volta em 1 dia em vez
+   de 120 — a pessoa via os cartões voltando mais rápido sem saber por quê
+   (mesma preocupação do aviso de D-10 em pintarInicio()).
+
+   "e nesta sessão" não é enfeite: chutei/errei também ganham repetição 5 a
+   10 cartões à frente (agendarRepeticao), e as duas condições aqui são as
+   MESMAS de lá — dizer só "volta hoje" esconderia o retorno mais próximo,
+   que é o que a pessoa vai encontrar primeiro. */
+function textoPrevisao(id, resultado){
+  const p = previsaoRevisao(id, resultado);
+  const quando = p.dias <= 0 ? "hoje"
+    : p.dias === 1 ? "amanhã"
+    /* dia/mês sem o ano, ao contrário do resto do app: o intervalo mais
+       longo do Leitner é 120 dias, então o ano nunca desambigua nada aqui —
+       só ocupa um botão que divide a largura da tela com outro */
+    : "em "+p.dias+" dias · "+p.data.slice(5).split("-").reverse().join("/");
+  const repete = resultado !== "sabia" && S && S.modo !== "erros";
+  return "volta "+quando+(repete ? " e nesta sessão" : "");
+}
+
 function responder(escolha){
   if(S.respondida) return;
   S.respondida = true;
@@ -2652,12 +2680,20 @@ function responder(escolha){
 
   const alvo = document.getElementById("acoes-interno"); alvo.innerHTML="";
   document.getElementById("acoes").classList.add("ativa");
-  const b=(txt,fn,cls)=>{const x=document.createElement("button");x.textContent=txt;x.onclick=fn;if(cls)x.className=cls;alvo.appendChild(x);};
+  const b=(txt,resultado,cls)=>{
+    const x=document.createElement("button");
+    x.innerHTML='<span></span><small class="previsao"></small>';
+    x.children[0].textContent = txt;
+    x.children[1].textContent = textoPrevisao(id, resultado);
+    x.onclick=()=>registrar(id,resultado);
+    if(cls)x.className=cls;
+    alvo.appendChild(x);
+  };
   if(certo){
-    b("Chutei", ()=>registrar(id,"chutei"), "ambar");
-    b("Sabia", ()=>registrar(id,"sabia"), "verde");
+    b("Chutei", "chutei", "ambar");
+    b("Sabia", "sabia", "verde");
   } else {
-    b("Entendi, seguir", ()=>registrar(id,"errei"));
+    b("Entendi, seguir", "errei");
   }
   ex.scrollIntoView({behavior:"smooth", block:"nearest"});
 }
@@ -2667,8 +2703,10 @@ function responder(escolha){
    colapsava chutei/errei no mesmo caso; agora o motivo real chega ao evento. */
 function registrar(id, resultado){
   const c = E.cartoes[id] || {caixa:1, acertos:0, erros:0, prox:hoje(), ts:null};
-  if(resultado === "sabia"){ c.caixa = Math.min(CAIXA_MAX, c.caixa+1); c.acertos++; }
-  else { c.caixa = 1; c.erros++; }
+  /* caixaDepois() é a MESMA função que previsaoRevisao() usa para escrever a
+     data no botão — não duplicar a regra aqui (motor.js) */
+  c.caixa = caixaDepois(c.caixa, resultado);
+  if(resultado === "sabia") c.acertos++; else c.erros++;
   const agora = new Date().toISOString();
   c.prox = proximaData(c.caixa);
   c.ts = agora;

@@ -90,6 +90,47 @@ module.exports = function (APP, t) {
     t.igual(APP.proximaData(8), APP.somarDias(APP.hoje(), 1));
   });
 
+  t.grupo('previsão de revisão');
+
+  /* O botão de resposta mostra quando o cartão volta ANTES de a pessoa
+     escolher. Se a previsão e a gravação divergirem, o app mente — e mente
+     justamente perto da prova, que é quando o teto dinâmico entra. */
+
+  t.teste('sabia sobe um degrau; chutei e errei voltam para a caixa 1', () => {
+    t.igual(APP.caixaDepois(1, 'sabia'), 2);
+    t.igual(APP.caixaDepois(5, 'sabia'), 6);
+    t.igual(APP.caixaDepois(4, 'chutei'), 1, 'chutei não é acerto');
+    t.igual(APP.caixaDepois(4, 'errei'), 1);
+    t.igual(APP.caixaDepois(APP.CAIXA_MAX, 'sabia'), APP.CAIXA_MAX, 'não passa da caixa mais alta');
+  });
+
+  t.teste('a previsão bate com a data que registrar() grava', () => {
+    APP.INSCRITOS = [];
+    APP.E.cartoes = { x: { caixa: 3, acertos: 2, erros: 0, prox: '2020-01-01' } };
+    t.igual(APP.previsaoRevisao('x', 'sabia').data, APP.proximaData(4), 'caixa 3 + sabia = caixa 4');
+    t.igual(APP.previsaoRevisao('x', 'sabia').dias, 7);
+    t.igual(APP.previsaoRevisao('x', 'errei').data, APP.hoje(), 'caixa 1 vence hoje');
+    t.igual(APP.previsaoRevisao('x', 'errei').dias, 0);
+    t.igual(APP.previsaoRevisao('x', 'chutei').dias, 0);
+  });
+
+  t.teste('cartão nunca respondido parte da caixa 1, igual a registrar()', () => {
+    APP.INSCRITOS = [];
+    APP.E.cartoes = {};
+    t.igual(APP.previsaoRevisao('inedito', 'sabia').caixa, 2);
+    t.igual(APP.previsaoRevisao('inedito', 'sabia').dias, 1, 'primeira vez que acerta: volta amanhã');
+  });
+
+  t.teste('a previsão obedece ao teto dinâmico, não ao intervalo nominal', () => {
+    /* é o principal motivo de mostrar isto: perto da prova o cartão bem
+       sabido volta em 1 dia, e antes disso ninguém tinha como saber. */
+    APP.E.cartoes = { x: { caixa: 7, acertos: 9, erros: 0, prox: '2020-01-01' } };
+    provaEm(5);
+    t.igual(APP.previsaoRevisao('x', 'sabia').dias, 1, 'D-5: caixa 8 comprimida em 1 dia');
+    provaEm(900);
+    t.igual(APP.previsaoRevisao('x', 'sabia').dias, 120, 'prova longe: intervalo cheio');
+  });
+
   t.grupo('prioridade');
 
   t.teste('caixa baixa vem antes de caixa alta, sempre', () => {
