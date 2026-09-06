@@ -632,6 +632,27 @@ def valida_motor():
         print("  " + ultima[-1].strip())
 
 
+# Enunciado que aponta para "a palavra/termo citado" pressupõe que ALGUMA
+# alternativa (ou o próprio enunciado) nomeia essa palavra isolada — senão
+# ninguém tem como saber qual é. É a mesma classe de bug do 318e2b6619 e do
+# d9b183b33d/afd023d7c0 (CLAUDE.md, "Não inventar conteúdo de edital" não se
+# aplica aqui — o defeito é formatação de destaque perdida na transcrição,
+# não conteúdo inventado): a prova impressa sublinhava/grifava a palavra, e
+# a marcação não sobrevive ao texto plano. "a seguir"/"acima" ficam de fora
+# do gatilho de propósito — aí a lista de palavras já vem explícita, sem
+# referência a destaque nenhum (ex.: "Das palavras a seguir, qual é..." com
+# as próprias palavras como alternativas).
+_GATILHO_PALAVRA_CITADA = re.compile(
+    r'(palavra|termo|vocábulo|expressão)s?\s+(citad|indicad|destacad|grifad|sublinhad)[oa]s?\b',
+    re.IGNORECASE)
+# span curto entre aspas — um span aspas-a-aspas de até 30 caracteres é
+# plausivelmente UMA palavra/expressão isolada nomeada (ex.: 'devagar'), não
+# um trecho inteiro citado (esses passam de 30 na prática, ver PADRAO-DOS-
+# CARTOES.md). Presença em QUALQUER alternativa OU no próprio enunciado já
+# resolve — ambos são lugares válidos para nomear a palavra-alvo.
+_ASPAS_CURTAS = re.compile(r'[\'"‘’“”]([^\'"‘’“”]{1,30})[\'"‘’“”]')
+
+
 def valida_questoes(B):
     v, ids = set(), set()
     for q in B:
@@ -669,6 +690,16 @@ def valida_questoes(B):
                 avisos.append(f"[{rot}] 'eo' presente mas vazio em todas as alternativas — "
                               "ok se foi decisão consciente (ex.: memorização pura, sem erro "
                               "conceitual a explicar); revise se não foi")
+        # "a palavra citada" sem a palavra em lugar nenhum do cartão —
+        # formatação de destaque (grifo/sublinhado) que existia na prova
+        # impressa e não sobrevive à transcrição. Ver os regex acima.
+        if _GATILHO_PALAVRA_CITADA.search(q.get('q', '')):
+            textos = [q.get('q', '')] + q.get('o', [])
+            if not any(_ASPAS_CURTAS.search(t) for t in textos):
+                avisos.append(f"[{rot}] enunciado aponta para \"a palavra/termo citado\", mas "
+                              "nenhuma alternativa (nem o enunciado) nomeia uma palavra isolada "
+                              "entre aspas — sem saber QUAL palavra, a questão é inrespondível "
+                              "(ver 318e2b6619/afd023d7c0 no HISTORICO.md)")
         # 'n' é o nível do cartão DENTRO do tópico (definição → aplicação →
         # síntese), e é o que o app usa para travar o nível seguinte enquanto
         # o anterior não foi acertado. É a ÚNICA noção de nível do app: o
