@@ -103,6 +103,25 @@ $REESCRITAS = @{
     # v2: "termos destacados" citava formatação que o app não tem — corrigido.
     q = 'Leia a frase: “O projeto obteve respaldo institucional para desenvolver atividades congêneres e pertinentes à sua área de atuação, com base em conhecimentos inerentes e afins à formação da equipe.” Marque a única das opções abaixo que representa, na frase, um núcleo substantivo (as demais são adjetivos):'
   }
+  'd9b183b33d' = @{
+    # mesma classe de bug do 318e2b6619, uma família adiante: "a palavra
+    # citada em cada trecho" pressupõe destaque visual (grifo/sublinhado) que
+    # existia na prova impressa (ES CAAQ-ELT 2/2022, Q7) e não sobrevive à
+    # transcrição — sem ele, nenhuma das 5 alternativas aponta QUAL palavra
+    # analisar. Correção: cada alternativa passa a nomear a palavra, no
+    # mesmo padrão já usado pelas 4 questões irmãs desta família
+    # (415704fb56, fb6d951f5e, 56afbb04a9, d95d7ca21f) — "Em '<trecho>',
+    # '<palavra>'." c, e e eo continuam corretos, só apontavam a palavra
+    # certa sem ela aparecer isolada em lugar nenhum do cartão.
+    q = 'Assinale a opção em que a circunstância expressa pela palavra citada é diferente das demais:'
+    o = @(
+      "Em '[...] às vezes se entremeava de um sorriso [...]', 'às vezes'."
+      "Em 'Quando se retiravam, a senhora me deu um pequeno sorriso.', 'Quando'."
+      "Em 'Senti prazer em pensar que agora não haveria mais nada [...]', 'agora'."
+      "Em 'Fiquei a olhá-lo devagar, desde o ombro forte e suave [...]', 'devagar'."
+      "Em 'Depois fiquei a olhar pela janela e não via mais que nuvens, e feias.', 'Depois'."
+    )
+  }
 }
 
 # ---- aplica ------------------------------------------------------------------
@@ -137,9 +156,14 @@ foreach ($m in $materias) {
     $q.id = $idNovo
     if ($idAntigo -ne $idNovo) { $mapa[$idAntigo] = $idNovo }
 
-    # regrava na MESMA ordem de campos do banco, para o diff ficar mínimo
+    # regrava na MESMA ordem de campos do banco (ESTRUTURA.md §1), para o
+    # diff ficar mínimo
     $obj = [ordered]@{ id = $q.id; m = $q.m; t = $q.t }
     if ($q.PSObject.Properties.Name -contains 's' -and $q.s) { $obj.s = $q.s }
+    # sem isto, reescrever um cartão já classificado (campanha da escada de
+    # nível, CLAUDE.md "Ordem de aprendizado") apagava o `n` em silêncio —
+    # mesmo bug que 'eo' já tinha tido, um campo abaixo
+    if ($q.PSObject.Properties.Name -contains 'n' -and $q.n) { $obj.n = [int]$q.n }
     $obj.q = $q.q; $obj.o = @($q.o); $obj.c = [int]$q.c; $obj.e = $q.e; $obj.f = $q.f
     # sem isto, reescrever um cartão que já tinha 'eo' apagava a explicação
     # por alternativa em silêncio — o rebuild listava só os campos de sempre
