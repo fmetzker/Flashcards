@@ -22,6 +22,8 @@
   --ambar-luz:#F6EBD5;
   --coral:#BC3B34;
   --coral-luz:#F7E2E0;
+  --azul:#1D5A8C;
+  --azul-luz:#DCE7F0;
   --traco:#D8DFDA;
   /* petróleo escuro — mesma família do --verde, usado no cabeçalho e no
      cartão de sequência, não é uma cor de marca nova */
@@ -278,6 +280,9 @@ button.fechar{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;
 .estudar{flex:0 0 auto;font-size:13px;padding:6px 11px;background:transparent;color:var(--verde);
   border:1px solid var(--verde-luz);font-weight:600;border-radius:99px}
 .tag.suave{background:#EDF1EE;color:var(--tinta2)}
+/* mesma cor de "Em dia" no donut da tela inicial (arco-verde) — o cartão
+   revisão é o que já entrou na repetição espaçada, mesmo sinal */
+.tag.azul{background:var(--azul-luz);color:var(--azul)}
 .cabQ .chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex:1;min-width:0}
 
 .crono{font-family:var(--dado);font-size:15px;font-weight:600}
@@ -401,6 +406,10 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   <div class="cabQ">
     <button class="fechar" aria-label="Voltar ao início" onclick="sairDoEstudo()">✕</button>
     <span class="chips">
+      <!-- novo/revisão: não é spoiler de resposta (ao contrário de
+           matéria/tópico logo abaixo), então aparece ANTES de responder —
+           ver mostrarQuestao() -->
+      <span class="tag" id="q-origem"></span>
       <span class="tag suave" id="q-materia">–</span>
       <span class="tag" id="q-tag">–</span>
     </span>
@@ -2576,6 +2585,14 @@ function mostrarQuestao(){
   const id = S.lista[S.pos], q = porId[id];
   S.respondida = false;
   S.perm = embaralhaOrdem(q.o.length);
+  /* novo/revisão: mesma checagem que fila() usa para separar as duas listas
+     (motor.js) — E.cartoes[id] só existe se este cartão já foi respondido
+     alguma vez antes de HOJE. Não é spoiler (não entrega matéria nem
+     resposta), por isso pinta já aqui, antes de responder. */
+  const origem = document.getElementById("q-origem");
+  const revisao = !!E.cartoes[id];
+  origem.textContent = revisao ? "Revisão" : "Novo";
+  origem.classList.toggle("azul", !revisao);
   /* tópico/subtópico só aparecem DEPOIS de responder (ver responder()) —
      antes disso, o próprio rótulo pode entregar a resposta: em "Classes de
      palavras", por exemplo, o subtópico "Verbo" já diz qual é a classe
