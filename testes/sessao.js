@@ -132,6 +132,84 @@ module.exports = function (APP, t) {
     }
   });
 
+  t.teste('revisão que estoura a cota da própria matéria toma o lugar de cartão novo de outra', async () => {
+    /* O bug relatado: um bloco com fila de revisão MAIOR que a própria cota
+       cedia lugar a cartão novo de um bloco vizinho com fila curta — a
+       pessoa via revisão atrasada de uma matéria enquanto o app oferecia
+       conteúdo inédito de outra (ver HISTORICO.md). A revisão sozinha tinha
+       espaço na CAPACIDADE DO DIA (a soma de todos os blocos), só não tinha
+       espaço na cota do PRÓPRIO bloco — e é essa fronteira que devia ter
+       deixado de valer para revisão. */
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const hoje = APP.hoje();
+    // matemática: fila de pré-requisito curta o bastante para abrir muito
+    // cartão já na largada (diferente de português, cujo início da fila
+    // fica fora do escopo deste concurso — ver o teste logo abaixo)
+    const cheio = APP.BLOCOS_META.find(b => b.materias.includes('matematica'));
+    const excedente = cheio.questoes + 5;
+    const cartoes = APP.BANCO.filter(q => q.m === cheio.materias[0]
+      && (!cheio.topicos || cheio.topicos.includes(q.t)) && APP.grauAberto(q));
+    t.ok(cartoes.length >= excedente,
+      `preciso de ${excedente} cartões abertos de ${cheio.materias[0]}, só achei ${cartoes.length}`);
+    cartoes.slice(0, excedente).forEach(q => {
+      APP.E.cartoes[q.id] = { caixa: 1, acertos: 0, erros: 1, prox: hoje };
+    });
+
+    const lote = APP.montarLoteSessao('normal', null, new Set());
+    const revsDoCheio = lote.filter(id => APP.porId[id].m === cheio.materias[0] && APP.E.cartoes[id]);
+    t.igual(revsDoCheio.length, excedente,
+      `as ${excedente} revisões de ${cheio.materias[0]} tinham que entrar todas (cota do bloco é só `
+      + `${cheio.questoes}), vieram ${revsDoCheio.length}`);
+  });
+
+  t.teste('revisão de UMA matéria, sozinha, pode consumir a capacidade inteira e travar cartão novo de TODAS', async () => {
+    /* Caso extremo do mesmo bug, e o que de fato distingue esta correção da
+       anterior: aqui só matemática tem revisão pendente — português e
+       especificos ficam intocados, com cartão novo disponível à vontade.
+       Pelo código antigo, cada bloco decidia sozinho (falta[bloco] versus a
+       própria fila), então especificos e português continuariam recebendo
+       cartão novo até fechar a PRÓPRIA cota, mesmo com a capacidade do dia
+       inteira consumida por matemática — é exatamente a divisão que este
+       teste teria deixado passar batido (ver HISTORICO.md). */
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const hoje = APP.hoje();
+    const porBloco = APP.progressoPorBloco(hoje);
+    const capacidade = APP.BLOCOS_META.reduce((n, bl, i) =>
+      n + Math.max(0, bl.questoes - Math.min(porBloco[i].feitas, bl.questoes)), 0);
+    const mat = APP.BLOCOS_META.find(b => b.materias.includes('matematica'));
+    const cartoes = APP.BANCO.filter(q => q.m === mat.materias[0]
+      && (!mat.topicos || mat.topicos.includes(q.t)) && APP.grauAberto(q));
+    t.ok(cartoes.length >= capacidade,
+      `preciso de ${capacidade} cartões abertos de matemática (capacidade do dia), só achei ${cartoes.length}`);
+    cartoes.slice(0, capacidade).forEach(q => {
+      APP.E.cartoes[q.id] = { caixa: 1, acertos: 0, erros: 1, prox: hoje };
+    });
+
+    const lote = APP.montarLoteSessao('normal', null, new Set());
+    const novos = lote.filter(id => !APP.E.cartoes[id]);
+    t.igual(novos, [], 'cartão novo não devia entrar de matéria NENHUMA: ' + novos.map(id => APP.porId[id].m).join(','));
+  });
+
+  t.teste('a sessão nunca passa da capacidade do dia', async () => {
+    /* Guarda contra o efeito colateral que a correção do bug acima podia
+       introduzir: deixar revisão atravessar a fronteira do bloco não pode
+       inflar o TOTAL da sessão além da meta — cartão novo continua
+       descontando o que a revisão emprestou, não somando por cima. */
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const hoje = APP.hoje();
+    const porBloco = APP.progressoPorBloco(hoje);
+    const capacidade = APP.BLOCOS_META.reduce((n, bl, i) =>
+      n + Math.max(0, bl.questoes - Math.min(porBloco[i].feitas, bl.questoes)), 0);
+    const cheio = APP.BLOCOS_META.find(b => b.materias.includes('matematica'));
+    APP.BANCO.filter(q => q.m === cheio.materias[0]
+      && (!cheio.topicos || cheio.topicos.includes(q.t)) && APP.grauAberto(q))
+      .forEach(q => { APP.E.cartoes[q.id] = { caixa: 1, acertos: 0, erros: 1, prox: hoje }; });
+
+    const lote = APP.montarLoteSessao('normal', null, new Set());
+    t.ok(lote.length <= capacidade,
+      `sessão veio com ${lote.length} cartões, capacidade do dia é só ${capacidade}`);
+  });
+
   t.grupo('sessão contínua — sem adiantamento');
 
   t.teste('nada vencido e nada novo: o lote vem VAZIO, não adiantado', async () => {

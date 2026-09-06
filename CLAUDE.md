@@ -560,27 +560,40 @@ escopo restrito a um só ou com todos.
   provas ao mesmo tempo. A mesma regra vale entre bloco de concurso e
   matéria avulsa: se a mesma matéria aparece nos dois, fica o maior peso,
   nunca a soma.
-- **Revisão primeiro em TODA a sessão, não só dentro de cada matéria.**
-  Decisão de propósito, e uma reversão deliberada do que valia antes
-  (`intercalar()`, removida — ver HISTORICO.md). `montarLoteSessao("normal")`
-  acumula revisão e cartão novo em duas listas separadas ao varrer os blocos,
-  e só concatena no fim: **nenhum cartão novo, de matéria nenhuma, aparece
-  antes de uma revisão pendente de qualquer outra**. A primeira versão disto
-  concatenava bloco a bloco (`[LP: rev,novo][SUS: rev,novo]…`), e o cartão
-  novo da primeira matéria vinha antes da revisão pendente da segunda — a
-  ordem de `BLOCOS_META` passava na frente da urgência (`HISTORICO.md`).
-  - **Quem ENTRA continua decidido pela cota de cada bloco** (`falta`) —
-    isto muda só a ORDEM. É o que mantém a meta honesta: tudo que entra
-    conta em `progressoDoDia()`, que capa por bloco do mesmo jeito.
+- **Revisão primeiro em TODA a sessão, não só dentro de cada matéria — e a
+  revisão atravessa a fronteira do BLOCO, o cartão novo não.**
+  `montarLoteSessao("normal")` soma o que falta em cada bloco numa
+  **capacidade do dia** só (a mesma soma de sempre, `Σ falta`). Toda revisão
+  vencida, de QUALQUER bloco com cota aberta, concorre por essa capacidade
+  ANTES de qualquer cartão novo — inclusive além da própria cota do bloco
+  dela, se sobrar espaço de outro bloco com fila curta. Cartão novo continua
+  limitado à cota de CADA bloco, individualmente, só que agora descontando
+  o que a revisão daquele bloco já tomou (e nunca além do que resta da
+  capacidade do dia, pra revisão não conseguir emprestar de um lado e o
+  cartão novo, sem saber disso, gastar de novo o mesmo espaço).
+
+  Duas versões anteriores, as duas corrigidas por serem parciais demais —
+  ver HISTORICO.md: a primeira concatenava bloco a bloco
+  (`[LP: rev,novo][SUS: rev,novo]…`), e cartão novo da primeira matéria
+  vinha antes da revisão pendente da segunda. A segunda (`falta` decidindo
+  quem entra, só a ORDEM mudando) corrigiu a ordem mas manteve a fronteira
+  do bloco para REVISÃO também: um bloco com fila de revisão maior que a
+  própria cota cedia lugar a cartão novo de um vizinho com fila curta,
+  porque o excedente de revisão simplesmente não entrava — não ficava
+  atrás do cartão novo, ficava de fora do lote inteiro.
   - As revisões saem reordenadas por `prioridade()` **entre** as matérias
     (caixa, taxa de erro, peso do bloco), não agrupadas por matéria. Os
     cartões novos continuam agrupados por matéria, na ordem de
     `BLOCOS_META` — ali não há urgência a comparar entre matérias.
-  - Não existe teto de "2× a cota" separado: a concatenação já é
-    auto-limitante (revisão sozinha nunca passa da cota do bloco), e
-    revisão que exceder a cota do dia fica pendente para depois — inclusive
-    para o "continuar estudando depois de bater a meta" (`iniciarSessao`),
-    que já entrega esse excedente **antes de qualquer cartão novo**.
+  - A meta continua honesta: tudo que entra na sessão conta em
+    `progressoDoDia()`, que capa por bloco do mesmo jeito de sempre —
+    estudar 40 revisões atrasadas de uma matéria com cota 7 move a barra
+    só 7. O que muda é só que o app agora DEIXA estudar as 40 na mesma
+    sessão, em vez de escondê-las atrás de cartão novo de outra matéria.
+  - Revisão que ainda exceder a CAPACIDADE DO DIA inteira (não só a cota do
+    próprio bloco) continua pendente para depois — inclusive para o
+    "continuar estudando depois de bater a meta" (`iniciarSessao`), que já
+    entrega esse excedente **antes de qualquer cartão novo**.
   - A cota fica congelada no mesmo momento em que `BLOCOS_META` já era
     recalculado (boot, troca de dia, troca de foco), não a cada resposta —
     vira alvo móvel senão.

@@ -234,6 +234,30 @@ Corrigido acumulando revisão e novo em listas separadas e concatenando só no
 fim, com as revisões reordenadas por `prioridade()` entre as matérias. A
 cota por bloco continua decidindo QUEM entra — mudou só a ordem.
 
+**E essa correção ainda deixava a fronteira do BLOCO valer para revisão —
+setembro/2026.** A ordem global (revisão antes de novo) já estava certa; o
+defeito era em quem ENTRAVA: cada bloco só trazia revisão até a própria cota
+(`falta`), e o excedente — revisão de UMA matéria além da cota dela — não
+ficava atrás na fila, ficava de fora do lote inteiro, enquanto um bloco
+vizinho com fila de revisão curta preenchia a cota dele com cartão novo à
+vontade. Relatado em uso: cartão novo de Português (7/50, revisão
+supostamente batida) enquanto ~40 revisões de Português continuavam
+atrasadas — a pessoa via conteúdo inédito com a própria matéria em dia só na
+aparência. `montarLoteSessao("normal")` passou a somar uma CAPACIDADE DO DIA
+só (`Σ falta`, o mesmo número de sempre) e deixar revisão de qualquer bloco
+competir por ela inteira antes de cartão novo de qualquer bloco — cartão
+novo continua limitado à cota de cada bloco, descontado o que a revisão
+daquele bloco específico já tomou. Ver CLAUDE.md, "Meta e progresso do dia".
+
+De quebra, um bug real e independente achado no `reescrever-questoes.ps1`
+nessa mesma sessão de trabalho: o rebuild do objeto ao reescrever um cartão
+não levava o campo `n` (nível dentro do tópico) — qualquer cartão já
+classificado que passasse por reescrita perdia a classificação em silêncio,
+mesmo defeito que `eo` já teve um campo acima (regra 5 do CLAUDE.md). Achado
+ao reescrever `d9b183b33d` → `afd023d7c0` (cartão que citava "a palavra"
+sem trazê-la — formatação de destaque que existia na prova impressa e não
+sobrevive à transcrição, mesma classe do `318e2b6619`).
+
 **Cartela de 100 dias.** Havia uma grade 10×10 colorida por meta batida no
 lugar da contagem de dias seguidos. Era cara de carregar e pintar e não dizia
 nada que a contagem simples não dissesse.

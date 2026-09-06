@@ -727,55 +727,66 @@ function montarLoteSessao(modo, filtro, excluir){
        blocosDaMeta(). */
     const h = hoje();
     const porBloco = progressoPorBloco(h);
-    /* Revisão vem antes de cartão novo em TODA a sessão, não só dentro de
-       cada matéria. Por isso os dois lados são acumulados em listas
-       separadas aqui e só concatenados no fim: antes, cada bloco entrava
-       inteiro (`[revisões dele][novos dele]`) e a sessão saía
-       `[LP: rev,novo][SUS: rev,novo][Enf: rev,novo]` — cartão NOVO de
-       Português aparecia antes de revisão PENDENTE de Enfermagem, que é
-       exatamente o que "conteúdo novo só se não tiver revisão pendente"
-       não quer.
-
-       QUEM ENTRA continua decidido pela cota de cada bloco (`falta`),
-       igual a antes: isto muda só a ORDEM de apresentação. É o que mantém
-       a meta honesta — tudo que entra na sessão conta em progressoDoDia(),
-       que capa por bloco do mesmo jeito. Revisão que passa da cota da
-       própria matéria continua esperando (e volta no fallback pós-meta,
-       logo abaixo, que também serve revisão primeiro). */
-    const revs = [], novs = [];
-    BLOCOS_META.forEach((bl,i)=>{
+    /* CAPACIDADE DE HOJE é a soma do que falta em cada bloco — o mesmo
+       número de sempre, só dado um nome porque agora ele é usado duas
+       vezes: uma para REVISÃO (que enche essa capacidade inteira, de
+       QUALQUER bloco, antes de qualquer cartão novo — ver abaixo) e outra
+       para CARTÃO NOVO (que continua limitado à cota de cada bloco,
+       individualmente, como sempre foi). */
+    const areas = BLOCOS_META.map((bl,i)=>{
       const falta = Math.max(0, bl.questoes - Math.min(porBloco[i].feitas, bl.questoes));
-      if(!falta) return;
       const daArea = id => {
         const x = porId[id];
         if(!x || excluir.has(id) || bl.materias.indexOf(x.m) < 0) return false;
         return !bl.topicos || bl.topicos.indexOf(x.t) >= 0;
       };
-      const rev = q.revisar.filter(daArea);
-      const nov = q.novas.filter(daArea);
-      /* `rev` já reflete só o que está pendente NESTA chamada (responder um
-         cartão hoje tira ele daqui), então limitar por `falta` aqui já
-         garante que a revisão sozinha nunca estoura a cota do bloco — não
-         precisa do teto de 2x novos que blocosDaMeta() tinha antes.
-
-         Se isso ainda ficar abaixo de `falta` (pouca revisão pendente E
-         trava de degrau ou tópico recém-aberto com pouco cartão novo), o
-         bloco simplesmente entra com menos que a cota — não completa com
-         nada que ainda não venceu nem abriu. A sessão contínua reabastece
-         de outra matéria/tópico depois; não precisa fingir que esta cota
-         fechou hoje. */
-      const parte = rev.slice(0, falta);
-      revs.push.apply(revs, parte);
-      novs.push.apply(novs, nov.slice(0, falta - parte.length));
+      return {falta, rev: q.revisar.filter(daArea), nov: q.novas.filter(daArea)};
     });
-    /* As revisões saem reordenadas por prioridade() ENTRE as matérias, não
-       agrupadas por matéria: uma vez que a fatia de cada bloco já foi
-       escolhida, quem vem primeiro é quem prioridade() diz (caixa, taxa de
-       erro, peso do bloco), como já valia dentro de cada matéria. Os novos
-       continuam agrupados por matéria, na ordem de BLOCOS_META — ali não
-       há urgência a comparar entre matérias, e agrupar mantém o estudo de
-       conteúdo novo coeso. */
-    revs.sort((a,b)=> prioridade(a) - prioridade(b) || cmpId(a,b));
+    const capacidade = areas.reduce((n,a)=> n + a.falta, 0);
+
+    /* Revisão vem antes de cartão novo em TODA a sessão, não só dentro de
+       cada matéria — e agora "dentro de cada matéria" deixou de ser a
+       fronteira: revisão vencida de QUALQUER bloco com cota aberta entra
+       na capacidade de hoje ANTES de cartão novo de QUALQUER outro,
+       mesmo que isso tome mais espaço que a cota da PRÓPRIA matéria. Sem
+       isso, um bloco com fila de revisão maior que a cota dele (`falta`)
+       cedia lugar a cartão novo de um bloco vizinho com fila curta — a
+       pessoa via revisão atrasada de uma matéria enquanto o app já
+       oferecia conteúdo inédito de outra (ver HISTORICO.md).
+
+       `q.revisar` já vem ordenado por prioridade() (fila()); filtrar por
+       área preserva essa ordem, então juntar as áreas e ordenar de novo é
+       só reimpor a ordem GLOBAL onde a concatenação por bloco a
+       desfez. */
+    const todasRevisoes = [];
+    areas.forEach(a=>{ if(a.falta) todasRevisoes.push.apply(todasRevisoes, a.rev); });
+    todasRevisoes.sort((a,b)=> prioridade(a) - prioridade(b) || cmpId(a,b));
+    const revs = todasRevisoes.slice(0, capacidade);
+
+    /* Cartão NOVO continua com a cota de cada bloco, individualmente — é o
+       que ela existe para dividir. Só muda o quanto dela sobra: um bloco
+       cuja revisão consumiu mais que a própria cota (o "empréstimo" acima)
+       não fica com saldo negativo emprestável a outro — fica com zero.
+
+       `restante` é o que resta da CAPACIDADE DO DIA depois da revisão, e
+       cada bloco só tira dele o que ainda não tirou — sem isto, o
+       empréstimo do parágrafo anterior aconteceria só de um lado: a
+       revisão de um bloco tomaria a capacidade de outro, mas cada bloco
+       ainda ganharia cartão novo pela cota CHEIA dele, e a sessão inflaria
+       além do dia inteiro (no exemplo do bug: 40 de revisão + 7 + 36 de
+       novo = 83, quando a capacidade do dia é 50). O saldo que sobra
+       depois da revisão é rateado na ordem de BLOCOS_META — a mesma ordem
+       que já valia para agrupar cartão novo. */
+    const revsSet = new Set(revs);
+    let restante = capacidade - revs.length;
+    const novs = [];
+    areas.forEach(a=>{
+      const tomado = a.rev.reduce((n,id)=> n + (revsSet.has(id) ? 1 : 0), 0);
+      const disponivel = Math.max(0, a.falta - tomado);
+      const parte = a.nov.slice(0, Math.min(disponivel, restante));
+      novs.push.apply(novs, parte);
+      restante -= parte.length;
+    });
     lista = revs.concat(novs);
     /* nenhuma cota aberta (meta do dia já fechada) ou nada nas matérias da
        prova: sobra tudo que a pessoa segue e ainda está vencido ou liberado,
