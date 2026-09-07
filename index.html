@@ -30,7 +30,6 @@
   --escuro:#0B2E28;
   --escuro2:#154A3F;
   --verde-brilho:#7FE0C2;
-  --neutro:#7C8F87;
   --display:ui-rounded,"SF Pro Rounded",system-ui,sans-serif;
   --corpo:-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",sans-serif;
   --dado:ui-monospace,"SF Mono",Menlo,monospace;
@@ -118,7 +117,7 @@ h2{font-size:19px;font-weight:600}
 .donut-linha svg{flex:0 0 auto}
 .arco-verde{stroke:var(--verde)}
 .arco-ambar{stroke:var(--ambar)}
-.arco-neutro{stroke:var(--neutro)}
+.arco-azul{stroke:var(--azul)}
 .arco-travada{stroke:var(--tinta2)}
 .donut-legenda{flex:1;display:flex;flex-direction:column;gap:7px;font-size:13px;min-width:0}
 .donut-legenda .legenda-linha{display:flex;align-items:center;gap:7px}
@@ -2208,7 +2207,7 @@ function pintarGraficos(){
   const segmentos = [
     {rotulo:"Em dia",        n:emDia,    classe:"arco-verde"},
     {rotulo:"Para revisar",  n:revisar,  classe:"arco-ambar"},
-    {rotulo:"Novas",         n:novas,    classe:"arco-neutro"},
+    {rotulo:"Novas",         n:novas,    classe:"arco-azul"},
     {rotulo:"Travadas",      n:travadas, classe:"arco-travada"}
   ];
   const raio = 32, cx = 40, cy = 40, circ = 2*Math.PI*raio;
@@ -2223,7 +2222,7 @@ function pintarGraficos(){
   }).join("");
 
   const leg = document.getElementById("grafico-legenda"); leg.innerHTML = "";
-  const corDe = {"arco-verde":"var(--verde)", "arco-ambar":"var(--ambar)", "arco-neutro":"var(--neutro)", "arco-travada":"var(--tinta2)"};
+  const corDe = {"arco-verde":"var(--verde)", "arco-ambar":"var(--ambar)", "arco-azul":"var(--azul)", "arco-travada":"var(--tinta2)"};
   segmentos.forEach(s=>{
     const linha = document.createElement("span"); linha.className = "legenda-linha";
     const i = document.createElement("i"); i.style.background = corDe[s.classe];
