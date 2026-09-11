@@ -306,6 +306,48 @@ encolhe. Um cartão de regra de três inversa continua testando
 proporcionalidade inversa — só não obriga a dividir 8.472 por 132 pra provar
 que a pessoa entendeu a proporção.
 
+### 1.7 Enunciado de no máximo 300 caracteres, em linguagem simples
+
+O 1.6 diz para não herdar a demora de uma questão adaptada. Este põe o
+número, e vale para **todo** cartão — adaptado ou escrito do zero:
+
+**O campo `q` tem no máximo 300 caracteres.** São cerca de 50 palavras: espaço
+de sobra para uma pergunta direta, inclusive para problema de várias etapas.
+O limite mede o enunciado, não as alternativas (essas têm a regra de viés de
+comprimento, 1.3) nem a explicação (que só aparece depois da resposta, uma vez,
+e pode ensinar com calma).
+
+**E o texto é o mais simples que sustente a pergunta.** Jargão que É o objeto
+do cartão fica — "cianose", "avaria no eixo propulsor", "metonímia" são o
+conteúdo. O que sai é o cenário técnico decorativo em volta dele: o cartão não
+fica mais rigoroso por ambientar uma regra de três num convés de 80 × 30
+metros da Marinha Mercante.
+
+O que cortar, em ordem:
+
+1. **Cenário decorativo** — quem é a pessoa, onde trabalha, por que precisa da
+   conta, se o valor está em conformidade com a norma tal.
+2. **A repetição da pergunta no fim** ("Com base nas informações acima, a
+   quantidade de tinta necessária, em litros, para pintar a área correspondente
+   a 30% do convés superior será:" → "quantos litros são necessários?").
+3. **Texto transcrito inteiro** — o parágrafo (ou os quatro) copiado da prova
+   quando a pergunta se sustenta em uma frase. Ver 1.6.
+
+O que **não** cortar: as etapas do método, os dados de que a resposta depende,
+nem o fato testado.
+
+- ✅ "Um convés retangular de 80 m × 30 m será pintado em 30% da área. Se 1
+  litro de tinta cobre 3 m², quantos litros são necessários?" (139 chars — as
+  mesmas três etapas do original de 508.)
+- ❌ O mesmo problema abrindo com "Em um navio da Marinha Mercante, o convés
+  superior, que é a área de circulação, tem o formato de um retângulo, com...".
+
+**Se não couber em 300 sem descaracterizar o que se testa, o caminho não é
+espremer — é trocar o texto-base** por outro, mais simples, que teste o mesmo
+fato (regra 11: o substituto também precisa de fonte real no `f`). Enunciado
+espremido até virar charada mede leitura, não conteúdo — é o oposto do que o
+limite existe para conseguir.
+
 ---
 
 ## 2. O que não fazer
@@ -318,6 +360,7 @@ que a pessoa entendeu a proporção.
 | Enunciado que cita formatação ("o trecho **destacado**") | O app mostra texto puro — o `validar.py` já barra isso. |
 | Alternativa certa visivelmente mais longa | Deixa acertar sem saber. Já resolvido no banco; não reintroduzir. |
 | Pegadinha de leitura ("não é incorreto afirmar que não...") | Mede desatenção, não preparo. |
+| Enunciado acima de 300 caracteres, ou ambientado em jargão que o cartão não testa | O cartão é relido dezenas de vezes; o texto da prova, uma. Ver 1.7. |
 | Dois cartões de definição com a mesma resposta certa para o mesmo fato | Interferência: gasta duas revisões para fixar uma informação. Ver 1.5. (Exercício aplicando o mesmo método a dado novo é exceção — ver 1.5.2.) |
 
 ---
@@ -614,6 +657,8 @@ para evitar:
 Antes de dar o cartão por pronto:
 
 - [ ] O enunciado é uma pergunta respondível **sem** ler as alternativas?
+- [ ] O enunciado cabe em **300 caracteres**, sem cenário nem jargão que o
+      cartão não testa? Ver 1.7.
 - [ ] Testa **um** fato só?
 - [ ] **Já existe cartão cobrando este mesmo fato?** (Se a resposta certa
       repete a de outro cartão do tópico, provavelmente sim — ver 1.5. Para

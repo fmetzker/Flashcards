@@ -38,89 +38,120 @@ function Id-Questao([string]$enunciado) {
 # preservado automaticamente — só é sobrescrito se a entrada do lote trouxer
 # 'eo'.
 #
-# Este lote conserta o bug do "texto ausente": cartões de Português (a maioria
-# de provas reais do CAAQ-ELT/CAAQ-MFL, transcritas de PROVAS ANTIGAS/) que
-# diziam "no texto..." ou "de acordo com o texto..." sem que o texto estivesse
-# em lugar nenhum do cartão — inrespondível para quem não tinha a prova
-# original na mão. As alternativas, a correta (`c`) e a explicação (`e`) já
-# estavam certas (conferidas contra o PDF real da prova, em PROVAS ANTIGAS/);
-# só faltava o enunciado trazer o texto consigo. Os textos abaixo são versões
-# adaptadas (não cópia literal) dos originais jornalísticos — PADRAO-DOS-
-# CARTOES.md §1.6 pede exatamente isso: reduzir/reescrever, nunca copiar um
-# texto inteiro para o cartão. A lenda do girassol é exceção: autoria popular,
-# tradição oral, sem direito autoral — reproduzida na íntegra.
-
-$textoCaaqElt = 'Leia o trecho a seguir (adaptado de um comunicado sobre inscrições para o CAAQ-ELT): “1º§ — Entre hoje e o dia 14 de janeiro, a Marinha do Brasil, pela Diretoria de Portos e Costas (DPC), recebe inscrições para o processo seletivo público destinado a trabalhadores interessados em cursos de adaptação para aquaviários, como o módulo específico para marítimos da seção de máquinas, o CAAQ-ELT, que terá 30 vagas disponíveis. 2º§ — Com início previsto para 5 de maio, o curso será realizado no Centro de Instrução Almirante Graça Aranha (CIAGA). Podem participar do processo seletivo brasileiros, natos ou naturalizados, de ambos os sexos, com idade mínima de 18 anos. 3º§ — Além disso, é preciso ter formação técnica de nível médio reconhecida pelo Ministério da Educação, estar em dia com as obrigações da Justiça Eleitoral e do Serviço Militar em caso de candidatos do sexo masculino, entre outras exigências. 4º§ — A taxa de inscrição custa R$ 8,00. Saiba mais no edital publicado pela Autoridade Marítima.”'
-
-$textoAmamentacao = 'Leia o trecho, adaptado de uma reportagem sobre um relatório da OMS e do Unicef sobre amamentação: “O relatório alerta que a desinformação, o isolamento da pandemia e o marketing abusivo têm incentivado a substituição do leite materno. Segundo a professora Flávia Gomes-Sponholz, da USP, "no peito o bebê tem tudo que ele precisa, não somente o alimento, mas também o aconchego, o calor e o olhar da mãe". A amamentação deve ser uma escolha da mulher, não uma prática imposta — os substitutos devem ser usados só quando a mãe não pode amamentar: "é uma decisão que, embora difícil de ser tomada, é muito fácil o acesso aos produtos que substituem o leite." A OMS destaca que bebês que não são amamentados têm até 14 vezes mais chances de morrer. A recomendação é peito exclusivo até os seis meses e, depois, complementado com outros alimentos até os dois anos ou mais.”'
+# Este lote aplica o limite de 300 caracteres no enunciado (PADRAO-DOS-
+# CARTOES.md §1.7): 22 cartões de Português passavam disso, com enunciados de
+# até 1.307 caracteres — texto que a pessoa releria inteiro a cada revisão
+# espaçada.
+#
+# A maioria deles ficou longa pelo LOTE ANTERIOR, que consertou o bug oposto
+# (cartão que dizia "de acordo com o texto" sem o texto estar no cartão)
+# colando a passagem inteira da prova. A correção de lá estava certa; o
+# tamanho é que passou do ponto. Então este lote NÃO volta atrás: ele separa
+# dois casos que aquele lote tratou igual.
+#
+#   1. Texto DECORATIVO (6 cartões) — a pergunta é de classe de palavra ou de
+#      morfema, respondível sem trecho nenhum: "Qual destes termos NÃO é
+#      substantivo?" não precisa de um comunicado de 900 caracteres atrás.
+#      O texto sai inteiro, e as alternativas perdem os marcadores "(1º§)",
+#      que só faziam sentido com ele.
+#   2. Texto NECESSÁRIO (16 cartões) — correferência, uso das aspas,
+#      interpretação: sem trecho a questão volta a ser inrespondível. Aqui o
+#      texto fica, reduzido a uma ou duas frases que sozinhas sustentam a
+#      pergunta, preservando cada termo que os distratores e o `eo` citam.
+#
+# Fora deste lote, por não serem problema de tamanho: 8ffa1e3d3a, 2727068f49,
+# b9ae6e00ea e 62bfda28ba — "julgue os itens I a VI", 4 a 6 fatos num cartão
+# só (viola §1.2), e dois deles ainda citam um texto ausente.
 
 $REESCRITAS = @{
-  '4683677563' = @{
-    q = 'Leia o trecho, adaptado de uma notícia sobre vagas na Marinha Mercante: “A Marinha Mercante tem vagas nos Cursos de Adaptação para Aquaviários do 1º Grupo-Marítimos. São 30 oportunidades para condutores de máquinas e 30 chances para eletricistas, para os cursos técnicos listados a seguir, entre eles o de eletromecânica e o de mecatrônica — todos requerem o ensino médio técnico. Os interessados pagam uma taxa a partir de guia emitida no site da Marinha, confirmando o interesse no CIAGA.” Assinale a opção em que todos os termos abaixo, retirados do trecho, são formados pela inclusão de um elemento mórfico (morfema) na mesma posição:'
+  'b336e58002' = @{
+    q = 'Marque a opção em que todas as palavras são formadas pela inclusão de um elemento mórfico (morfema) na mesma posição:'
   }
-  '97d372f5f5' = @{
-    q = 'Leia o trecho a seguir, adaptado de uma notícia sobre vagas na Marinha Mercante, com a paragrafação preservada — subtítulo/lide: “Inscrições em seleções custam apenas R$ 8”; 1º§: “A Marinha Mercante tem vagas abertas nos Cursos de Adaptação para Aquaviários. São 30 oportunidades para condutores de máquinas e 30 chances para eletricistas.”; 3º§: “Os selecionados farão curso de formação; precisam ter idade mínima de 18 anos até o início da formação. Se aprovado, o aluno será declarado condutor de máquinas e eletricista.” Qual desses termos do trecho deve ser classificado morfologicamente como advérbio?'
-  }
-  '0da7dcfb1f' = @{
-    q = $textoCaaqElt + ' Marque a opção em que todas as palavras, encontradas no trecho, são formadas pela inclusão de um elemento mórfico (morfema) na mesma posição:'
-  }
-  'f419c2270e' = @{
-    q = $textoCaaqElt + ' Qual desses termos do trecho NÃO é substantivo?'
-  }
-  'd4d12f7b23' = @{
-    q = $textoCaaqElt + ' Qual desses termos do trecho é um substantivo abstrato, que dá nome a uma ação ou processo?'
-  }
-  'c9b888624a' = @{
-    q = $textoCaaqElt + ' A leitura atenta do primeiro parágrafo do trecho permite interpretar que:'
-  }
-  'c2c2f74d94' = @{
-    q = $textoCaaqElt + ' A leitura atenta do trecho permite compreender que há uma mudança de perspectiva em determinado ponto, no sentido de que o texto deixa de ser meramente informativo e passa a assumir uma característica mais instrutiva/injuntiva/sugestiva. Isso ocorre:'
-  }
-  '1e5a949b67' = @{
-    q = $textoCaaqElt + ' No trecho, há duas expressões diretamente relacionadas, correferentes, equivalentes:'
-  }
-  '059e24e886' = @{
-    q = $textoAmamentacao + ' De acordo com o trecho acima, podemos afirmar que:'
-  }
-  '5f993f2886' = @{
-    q = $textoAmamentacao + ' Observando a utilização das aspas no trecho acima (que reproduz falas da professora Flávia Gomes-Sponholz), podemos afirmar que elas:'
-  }
-  '4f2076294b' = @{
-    q = 'Leia o trecho, adaptado de uma notícia da Marinha sobre a campanha “Na Paz ou Na Guerra”, em homenagem aos 217 anos do Corpo de Fuzileiros Navais: “Em poucos segundos, o público pode notar, no vídeo institucional da campanha, que a seriedade de um combatente não se separa da emoção do servir. O vídeo mostra momentos de combate, treinamentos e formações, mostrando que, há 217 anos, o Brasil conta com os Fuzileiros Navais prontos para responder de imediato, em qualquer lugar e a qualquer hora.” De acordo com o trecho, o que o vídeo institucional da campanha transmite ao público?'
-  }
-  'fc118517b9' = @{
-    q = 'Leia o trecho, adaptado de uma notícia da Marinha sobre a Soldado Fuzileiro Naval Fabiana Damasceno, primeira mulher qualificada em Operações no Cerrado: “Os momentos mais desafiadores para mim, sem dúvidas, foram as etapas que envolviam água. Antes de começar o curso, eu não conseguia fazer nem cinco minutos de permanência com o fuzil a tiracolo. Então, durante esse período, percebi que, com muito esforço, dedicação e vibração, nós podemos superar todos os nossos limites, avalia a Soldado.” Segundo o trecho, como ela descreveu sua experiência com a água durante o estágio?'
-  }
-  'b5b64d4a35' = @{
-    q = 'Leia a lenda a seguir (autoria popular, tradição oral): “A LENDA DO GIRASSOL — Dizem que existia no céu uma estrelinha tão apaixonada pelo Sol que era a primeira a aparecer de tardinha, antes que ele se escondesse. E toda vez que o Sol se punha ela chorava lágrimas de chuva. A Lua falava com a estrelinha que assim não podia ser. Que a estrela nasceu para brilhar à noite e que não tinha sentido esse amor. Mas a estrelinha amava cada raio de sol como se fosse a única luz de sua vida. Esquecia até sua própria luzinha. Um dia ela foi falar com o Rei dos Ventos para pedir a sua ajuda, pois queria ficar olhando o Sol, sentindo o seu calor eternamente. O Rei dos Ventos disse que seu sonho era impossível, a não ser que ela abandonasse o céu e fosse morar na Terra, deixando de ser estrela. A estrelinha não pensou duas vezes: virou uma estrela cadente e caiu na Terra em forma de semente. O Rei dos Ventos plantou esta sementinha com muito carinho e regou com as mais lindas chuvas. A sementinha virou planta. As suas pétalas foram se abrindo, girando devagarinho, seguindo o giro do Sol no céu. É por isso que os girassóis até hoje explodem seu amor em lindas pétalas amarelas.” Na lenda do girassol, a transformação da estrelinha em girassol pode ser interpretada, no contexto do texto, como símbolo de:'
-  }
-  '318e2b6619' = @{
-    # fonte original ("Anexo I") não foi localizada em PROVAS ANTIGAS/ — troca
-    # de texto autorizada pelo usuário (mesma situação gramatical: núcleo
-    # substantivo entre quatro adjetivos). A frase nova reaproveita os pares
-    # exatos já citados na explicação existente ("atividades congêneres/
-    # pertinentes", "respaldo institucional", "conhecimentos inerentes/afins").
-    # v2: "termos destacados" citava formatação que o app não tem — corrigido.
-    q = 'Leia a frase: “O projeto obteve respaldo institucional para desenvolver atividades congêneres e pertinentes à sua área de atuação, com base em conhecimentos inerentes e afins à formação da equipe.” Marque a única das opções abaixo que representa, na frase, um núcleo substantivo (as demais são adjetivos):'
-  }
-  'd9b183b33d' = @{
-    # mesma classe de bug do 318e2b6619, uma família adiante: "a palavra
-    # citada em cada trecho" pressupõe destaque visual (grifo/sublinhado) que
-    # existia na prova impressa (ES CAAQ-ELT 2/2022, Q7) e não sobrevive à
-    # transcrição — sem ele, nenhuma das 5 alternativas aponta QUAL palavra
-    # analisar. Correção: cada alternativa passa a nomear a palavra, no
-    # mesmo padrão já usado pelas 4 questões irmãs desta família
-    # (415704fb56, fb6d951f5e, 56afbb04a9, d95d7ca21f) — "Em '<trecho>',
-    # '<palavra>'." c, e e eo continuam corretos, só apontavam a palavra
-    # certa sem ela aparecer isolada em lugar nenhum do cartão.
-    q = 'Assinale a opção em que a circunstância expressa pela palavra citada é diferente das demais:'
+  'c5c801015c' = @{
+    q = 'Qual destes termos é um substantivo abstrato, que dá nome a uma ação ou processo?'
     o = @(
-      "Em '[...] às vezes se entremeava de um sorriso [...]', 'às vezes'."
-      "Em 'Quando se retiravam, a senhora me deu um pequeno sorriso.', 'Quando'."
-      "Em 'Senti prazer em pensar que agora não haveria mais nada [...]', 'agora'."
-      "Em 'Fiquei a olhá-lo devagar, desde o ombro forte e suave [...]', 'devagar'."
-      "Em 'Depois fiquei a olhar pela janela e não via mais que nuvens, e feias.', 'Depois'."
+      'edital.'
+      'nível.'
+      'adaptação.'
+      'máquinas.'
+      'trabalhadores.'
     )
+  }
+  '0dca7c8473' = @{
+    q = 'Qual destes termos NÃO é substantivo?'
+    o = @(
+      'processo.'
+      'maio.'
+      'formação.'
+      'custa.'
+      'edital.'
+    )
+  }
+  '5085f4c907' = @{
+    q = 'Assinale a opção em que todos os termos são formados pela inclusão de um elemento mórfico (morfema) na mesma posição:'
+  }
+  '7062598e2b' = @{
+    q = 'Qual destes termos deve ser classificado morfologicamente como advérbio?'
+    o = @(
+      'início.'
+      'apenas.'
+      'seleções.'
+      'oportunidades.'
+      'eletricista.'
+    )
+  }
+  'ba697ac65b' = @{
+    q = 'Em qual destes trechos o verbo NÃO é verbo de ligação?'
+  }
+  'd265277903' = @{
+    q = 'Na lenda do girassol, uma estrelinha apaixonada pelo Sol aceita deixar o céu e virar semente na Terra para poder segui-lo para sempre. Essa transformação pode ser interpretada como símbolo de:'
+  }
+  '9579c48d83' = @{
+    q = 'Um comunicado tem quatro parágrafos: 1º, o prazo de inscrição; 2º, a data e o local do curso; 3º, as exigências de formação; 4º, o valor da taxa, terminando com “Saiba mais no edital”. O texto deixa de ser apenas informativo e passa a instruir o leitor:'
+  }
+  '34717880cc' = @{
+    q = 'Leia: “A Marinha recebe inscrições para o processo seletivo do módulo para marítimos da seção de máquinas, o CAAQ-ELT, que terá 30 vagas. O curso começa em 5 de maio, no CIAGA.” Que duas expressões do trecho são correferentes, isto é, apontam para a mesma coisa?'
+  }
+  '91f509c668' = @{
+    q = 'Leia: “A Marinha do Brasil recebe inscrições para cursos de adaptação para aquaviários, como o módulo específico para marítimos da seção de máquinas, o CAAQ-ELT.” Do trecho, interpreta-se que:'
+  }
+  '2f8120a0c3' = @{
+    q = 'Leia: “Segundo a professora Flávia Gomes-Sponholz, da USP, "no peito o bebê tem tudo que ele precisa, não somente o alimento, mas também o aconchego e o calor da mãe".” Sobre o emprego das aspas nesse trecho, podemos afirmar que elas:'
+    e = 'As aspas reproduzem literalmente a fala da entrevistada (“no peito o bebê tem tudo que ele precisa…”) — marca própria do discurso direto, que transcreve a fala tal como foi dita.'
+  }
+  '4203c47831' = @{
+    q = 'Leia: “A pandemia e o marketing abusivo incentivaram a substituição do leite materno, e é muito fácil o acesso aos substitutos. Amamentar é escolha da mulher, não imposição. Bebês não amamentados têm até 14 vezes mais chances de morrer. Recomenda-se peito exclusivo até os 6 meses.” Segundo o trecho:'
+    e = 'O texto afirma diretamente que bebês não amamentados têm até 14 vezes mais chances de morrer. As demais alternativas invertem o que o texto diz: a pandemia PREJUDICOU a amamentação; o peito exclusivo vai até os SEIS MESES, não dois; amamentar deve ser ESCOLHA, não obrigação; e o acesso aos substitutos é FÁCIL, não difícil.'
+  }
+  '9dcb8682c3' = @{
+    q = 'Leia: “No vídeo institucional da campanha, o público nota que a seriedade de um combatente não se separa da emoção do servir.” De acordo com o trecho, o que o vídeo transmite ao público?'
+  }
+  '3d30bb09e2' = @{
+    q = 'Leia o relato da primeira mulher qualificada em Operações no Cerrado: “Os momentos mais desafiadores foram as etapas que envolviam água. Antes do curso, eu não conseguia ficar nem cinco minutos com o fuzil a tiracolo.” Segundo o trecho, como foi a experiência dela com a água?'
+  }
+  '527a84e5e2' = @{
+    q = 'Numa tirinha: 1º quadrinho — “Aonde você vai?” / “À praia! Vou ver a Crase.”; 2º — “Ao campo eu não vou!”; 3º — “A crase me quer à meia-noite, em frente à orla, para um bife à parmegiana.”; 4º — “Às vezes as crases são exigentes!”. Sobre o acento grave nesses quadrinhos, é correto afirmar que ele:'
+  }
+  '40dd28d479' = @{
+    q = 'Analise os fragmentos: I) “estava à espera de ordem para pousar”; II) “meu lugar junto à janela”; III) “o ressentimento com que reagia às suas palavras”. Assinale a opção correta quanto ao emprego do acento grave indicativo de crase:'
+  }
+  '2e61e1e751' = @{
+    q = 'Em “Ele integra a Frente Parlamentar, grupo que já fez um diagnóstico do setor e previu que a marinha mercante sofrerá com a falta de pessoal qualificado”, as orações “que já fez um diagnóstico do setor” e “que a marinha mercante sofrerá…” têm função sintática, respectivamente, de:'
+  }
+  '49cb059b04' = @{
+    q = 'Assinale a reescrita de “Segundo a Itaipu Binacional, o barco é resultado da experiência de mais de 10 anos de produção de hidrogênio verde do Itaipu Parquetec, um centro de pesquisa em tecnologias sustentáveis, em Foz do Iguaçu, no Paraná” que respeita a pontuação e não altera o sentido:'
+  }
+  'e0e97f8c82' = @{
+    q = 'Em “Os submarinos nucleares são uma vantagem naval. Eles vão mais fundo e navegam mais rápido. Essas qualidades se mostraram óbvias em 1939, quando Ross Gunn idealizou a primeira embarcação do tipo”, há verbos no:'
+  }
+  '6efa448982' = @{
+    q = 'Em “A Marinha do Brasil, por meio da Diretoria de Portos e Costas, vai receber inscrições”, o sujeito está separado do verbo por vírgula, o que em geral contraria a norma-padrão. Aqui o emprego está correto porque:'
+  }
+  'e0c5c4f986' = @{
+    q = '“Íntegra” (substantivo) perde o acento e vira “integra” (verbo): muda de classe gramatical. Em qual destas palavras a retirada do acento NÃO muda a classe gramatical?'
+  }
+  'de58e0f4fe' = @{
+    q = 'Leia: “O projeto obteve respaldo institucional para desenvolver atividades congêneres e pertinentes à sua área, com base em conhecimentos inerentes e afins à formação da equipe.” Qual destas palavras é, na frase, um substantivo (as demais são adjetivos)?'
   }
 }
 
