@@ -306,24 +306,35 @@ encolhe. Um cartão de regra de três inversa continua testando
 proporcionalidade inversa — só não obriga a dividir 8.472 por 132 pra provar
 que a pessoa entendeu a proporção.
 
-### 1.7 Em Português, enunciado de no máximo 300 caracteres
+### 1.7 Enunciado de no máximo 300 caracteres
 
-O 1.6 diz para não herdar a demora de uma questão adaptada, e vale para o
-banco inteiro. Este põe um número, e vale **só para Português** — adaptado ou
-escrito do zero:
+O 1.6 diz para não herdar a demora de uma questão adaptada. Este põe o
+número, e vale para **todo** cartão, de qualquer matéria — adaptado ou escrito
+do zero:
 
-**Em `portugues`, o campo `q` tem no máximo 300 caracteres.** São cerca de 50
-palavras: espaço de sobra para uma pergunta direta. O limite mede o enunciado,
-não as alternativas (essas têm a regra de viés de comprimento, 1.3) nem a
-explicação (que só aparece depois da resposta, uma vez, e pode ensinar com
-calma).
+**O campo `q` tem no máximo 300 caracteres.** São cerca de 50 palavras: espaço
+de sobra para uma pergunta direta. O limite mede o enunciado, não as
+alternativas (essas têm a regra de viés de comprimento, 1.3) nem a explicação
+(que só aparece depois da resposta, uma vez, e pode ensinar com calma).
 
-**Por que só Português.** É lá que o enunciado carrega texto *transcrito* —
-a crônica, a notícia, o comunicado inteiro copiado da prova — e onde ele
-chegou a 1.307 caracteres. Nas outras matérias o enunciado longo costuma
-carregar **dados de que a resposta depende**, e cortar por número viraria
-cortar conteúdo. Lá continua valendo o critério do 1.6, que é de tempo de
-resposta, não de tamanho: respondível em segundos por quem domina o método.
+**Quando o enunciado carrega dados, e não texto.** Em Português o que estoura
+o limite é texto *transcrito* — a crônica, o comunicado inteiro copiado da
+prova. Em Matemática é outra coisa: o enunciado carrega os números de que a
+resposta depende, e aí o limite parece que vai cortar conteúdo. Não corta,
+porque o que ocupa o espaço quase nunca são os dados:
+
+- **Comprima a notação, não os dados.** "I) quadrada, lado 11 cm, R$ 0,45/cm²"
+  vira "I) 11×11 cm, R$ 0,45/cm²" — cinco opções assim economizam 80
+  caracteres sem perder um número.
+- **Se ainda não couber, o problema não é o limite — é o cartão.** Um
+  enunciado que só se sustenta com mais de 300 caracteres de dados é o caso
+  que o 1.6 já descreve: adapte os números, divida em cartões menores, ou
+  aceite que aquilo é material de simulado, não de revisão diária.
+
+**Onde o limite aperta primeiro:** caso clínico em Enfermagem, que precisa de
+idade, sinais vitais e exames antes de perguntar. Hoje o maior deles tem 264
+caracteres — cabe, com pouca folga. Se um caso novo não couber, a saída é a
+mesma de cima: só os dados que a resposta usa entram; os outros são cenário.
 
 **E o texto é o mais simples que sustente a pergunta.** Jargão que É o objeto
 do cartão fica — "cianose", "avaria no eixo propulsor", "metonímia" são o
@@ -368,7 +379,7 @@ limite existe para conseguir.
 | Enunciado que cita formatação ("o trecho **destacado**") | O app mostra texto puro — o `validar.py` já barra isso. |
 | Alternativa certa visivelmente mais longa | Deixa acertar sem saber. Já resolvido no banco; não reintroduzir. |
 | Pegadinha de leitura ("não é incorreto afirmar que não...") | Mede desatenção, não preparo. |
-| Em Português, enunciado acima de 300 caracteres; em qualquer matéria, jargão ou cenário que o cartão não testa | O cartão é relido dezenas de vezes; o texto da prova, uma. Ver 1.7. |
+| Enunciado acima de 300 caracteres, ou jargão e cenário que o cartão não testa | O cartão é relido dezenas de vezes; o texto da prova, uma. Ver 1.7. |
 | Dois cartões de definição com a mesma resposta certa para o mesmo fato | Interferência: gasta duas revisões para fixar uma informação. Ver 1.5. (Exercício aplicando o mesmo método a dado novo é exceção — ver 1.5.2.) |
 
 ---
@@ -665,9 +676,8 @@ para evitar:
 Antes de dar o cartão por pronto:
 
 - [ ] O enunciado é uma pergunta respondível **sem** ler as alternativas?
-- [ ] Se for de Português, o enunciado cabe em **300 caracteres**? E, em
-      qualquer matéria, está sem cenário nem jargão que o cartão não testa?
-      Ver 1.7.
+- [ ] O enunciado cabe em **300 caracteres**, sem cenário nem jargão que o
+      cartão não testa? Ver 1.7.
 - [ ] Testa **um** fato só?
 - [ ] **Já existe cartão cobrando este mesmo fato?** (Se a resposta certa
       repete a de outro cartão do tópico, provavelmente sim — ver 1.5. Para

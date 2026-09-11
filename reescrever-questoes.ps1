@@ -38,108 +38,195 @@ function Id-Questao([string]$enunciado) {
 # preservado automaticamente — só é sobrescrito se a entrada do lote trouxer
 # 'eo'.
 #
-# Este lote quebra os quatro cartões "julgue os itens I a VI" de Português —
-# 4 a 6 fatos num cartão só, o que o §1.2 proíbe: errar não diz QUAL dos
-# seis a pessoa não sabia, e o Leitner devolve os seis para a caixa 1. Dois
-# deles ainda citavam "o texto" sem que texto nenhum estivesse no cartão.
+# Este lote leva o limite de 300 caracteres (PADRAO-DOS-CARTOES.md §1.7) para
+# MATEMÁTICA, a única matéria que ainda tinha enunciado acima disso: 51 de
+# 942, de 301 a 508 caracteres. Só o enunciado muda — alternativas, correta,
+# explicação e `eo` ficam como estavam, então nem o viés de comprimento nem
+# a explicação por alternativa se mexem.
 #
-# Cada original é reescrito aqui como o PRIMEIRO fato da família (preserva o
-# progresso de quem já estudou, regra 5); os demais fatos entram como cartões
-# novos por rascunho.json + incorporar-rascunho.ps1. O `t` de cada um é o que
-# já era: este script não troca matéria nem tópico.
+# O que foi cortado, e por que não é conteúdo:
+#   - CENÁRIO. "Em um navio da Marinha Mercante, o convés superior, que é a
+#     área de circulação, tem o formato de um retângulo, com 80 metros de
+#     comprimento e 30 metros de largura" vira "Um convés retangular mede
+#     80 m por 30 m". A conta é a mesma; o que sai é a ambientação naval.
+#   - A PERGUNTA REPETIDA NO FIM. "Com base nas informações acima, a
+#     quantidade de tinta necessária, em litros, para pintar a área
+#     correspondente a 30% do convés superior será" vira "Quantos litros de
+#     tinta são necessários?".
+#   - NOTAÇÃO, não dado: "quadrada, lado 11 cm, R$0,45/cm²" vira "11×11 cm,
+#     R$ 0,45/cm²"; cinco opções assim economizam 80 caracteres sem perder
+#     um número.
 #
-# Cinco itens dos originais foram DESCARTADOS em vez de virarem cartão, por
-# não serem defensáveis com a fonte em mãos:
-#   - 8ffa1e3d3a IV ("fabricação/manutenção/construção/participação são
-#     substantivos abstratos") — a própria explicação do cartão dizia que a
-#     classificação era "imprecisa"; cartão não se escreve sobre dúvida.
-#   - 8ffa1e3d3a V ("interesse" por derivação regressiva) — a etimologia é
-#     disputada, e a fonte não resolve a disputa.
-#   - 2727068f49 V ("cinco das palavras citadas são substantivos") — contar
-#     palavras não é fato de língua, é aritmética sobre o enunciado.
-#   - b9ae6e00ea B ("uma vez que" com valor de tempo) — com o verbo no
-#     subjuntivo ("entre em vigor"), a leitura temporal/condicional é a
-#     natural; afirmar que só a causal vale seria ensinar errado.
-#   - b9ae6e00ea C ("caso" como conjunção condicional em "Caso pertinente")
-#     — ali "caso" lê-se como substantivo ("caso pertinente"), e o cartão
-#     dependeria de um texto que não foi localizado.
+# Nenhum número, etapa ou condição saiu. O gerador conferiu cada enunciado
+# número a número contra o original, e as 14 diferenças que restaram foram
+# revisadas uma a uma: são número por extenso virando dígito ("12
+# marinheiros" <-> "Doze marinheiros"), formato de moeda ("R$50,00" ->
+# "R$ 50"), e dado que a resposta não usa (o ano "2024", o comprimento da
+# pista numa questão de MMC, os 42 km do maratonista grego numa questão que
+# só compara 60 cm com 420 km).
+#
+# Três enunciados ganharam texto em vez de perder, porque encurtar tinha
+# deixado implícita uma condição de que a resposta depende:
+#   - 0225a815c8: "desligado NO INSTANTE t = 0" — sem a âncora, "tempo
+#     mínimo de espera" não tem de quando contar.
+#   - a558269d85: "PARTE NA MARÉ ENCHENTE E O RESTANTE NA VAZANTE" — sem
+#     isso o trajeto não tem as duas fases que o sistema de equações usa.
+#   - 36c8fe4949: "E, EM CASO AFIRMATIVO, POR QUAL MARGEM" — as cinco
+#     alternativas dão a margem, então o enunciado tem de pedi-la.
 
 $REESCRITAS = @{
-  '62bfda28ba' = @{
-    q = 'Em “E toda vez que o Sol se punha ela chorava lágrimas de chuva”, a pontuação está incompleta. O que falta?'
-    o = @(
-      'Vírgula depois de “punha”, isolando a oração adverbial deslocada.'
-      'Vírgula depois de “E”, isolando o conectivo no início do período.'
-      'Vírgula depois de “chorava”, separando o verbo do seu complemento.'
-      'Ponto e vírgula depois de “punha”, por serem orações coordenadas.'
-      'Nada falta: oração adverbial antes da principal dispensa vírgula.'
-    )
-    c = 0
-    e = 'A oração adverbial temporal “toda vez que o Sol se punha” vem antes da principal e, deslocada, precisa ser isolada por vírgula: “…o Sol se punha, ela chorava…”.'
-    eo = @(
-      'Correta: oração adverbial deslocada para antes da principal pede vírgula.'
-      'Errada: o “E” inicial é conectivo aditivo e não se isola por vírgula.'
-      'Errada: nunca se separa o verbo do seu complemento por vírgula.'
-      'Errada: não são coordenadas — a primeira é subordinada adverbial da segunda.'
-      'Errada: é justamente o contrário — deslocada para antes da principal, ela exige a vírgula.'
-    )
+  '9e86b152f6' = @{
+    q = 'Um convés retangular mede 80 m por 30 m. Será pintada 30% da área, e 1 litro de tinta cobre 3 m². Quantos litros de tinta são necessários?'
   }
-  'b9ae6e00ea' = @{
-    q = 'Em “Uma vez que a Convenção entre em vigor, os desafios surgirão”, o trecho iniciado por “Uma vez que” é uma oração subordinada:'
-    o = @(
-      'Adverbial.'
-      'Substantiva subjetiva.'
-      'Substantiva objetiva direta.'
-      'Adjetiva restritiva.'
-      'Adjetiva explicativa.'
-    )
-    c = 0
-    e = '“Uma vez que…” é introduzida por locução conjuntiva e modifica a oração principal inteira, indicando a circunstância em que os desafios surgirão — oração subordinada adverbial.'
-    eo = @(
-      'Correta: introduzida por locução conjuntiva, modifica a oração principal como um adjunto adverbial.'
-      'Errada: não exerce função de sujeito de nenhum verbo da principal.'
-      'Errada: não completa verbo algum — “surgirão” não é transitivo aqui.'
-      'Errada: oração adjetiva se liga a um substantivo antecedente, por pronome relativo.'
-      'Errada: além de não ser adjetiva, não há antecedente nem vírgula isolando termo explicativo.'
-    )
+  'eb048f2895' = @{
+    q = 'Dos 52 equipamentos de um navio, 20 têm defeito no áudio e 12 têm defeito no áudio e no vídeo. O número com defeito apenas no vídeo é 3 vezes o número sem defeito algum. Quantos NÃO apresentam defeito no vídeo?'
   }
-  '2727068f49' = @{
-    q = 'Em “A pesquisa confirma o risco de paralisações futuras na navegação marítima por falta de tripulação”, qual é o núcleo do sujeito de “confirma”?'
-    o = @(
-      'pesquisa'
-      'risco'
-      'paralisações'
-      'navegação'
-      'tripulação'
-    )
-    c = 0
-    e = 'Quem confirma? “A pesquisa”. O núcleo desse sujeito é o substantivo “pesquisa”; os demais termos estão dentro do objeto ou de adjuntos.'
-    eo = @(
-      'Correta: “a pesquisa” é o sujeito de “confirma”, e seu núcleo é “pesquisa”.'
-      'Errada: “risco” é o núcleo do objeto direto, não do sujeito.'
-      'Errada: “paralisações” está dentro do adjunto adnominal de “risco”.'
-      'Errada: “navegação” está no adjunto adverbial de lugar.'
-      'Errada: “tripulação” está no adjunto adverbial de causa introduzido por “por”.'
-    )
+  'a8d02917d9' = @{
+    q = 'Pela fórmula de Young, a dose infantil é [idade / (idade + 12)] × dose do adulto. Uma criança de idade desconhecida recebeu corretamente 14 mg do remédio Y, de dose adulta 42 mg. Que dose do remédio X, de dose adulta 60 mg, ela deve receber, em mg?'
   }
-  '8ffa1e3d3a' = @{
-    q = 'Um texto em prosa informa que a Marinha Mercante abriu vagas em cursos de adaptação, trazendo número de vagas, requisitos e valor da taxa. Esse texto pertence a que gênero?'
-    o = @(
-      'Notícia.'
-      'Crônica.'
-      'Editorial.'
-      'Resenha crítica.'
-      'Conto.'
-    )
-    c = 0
-    e = 'Relatar um fato recente de interesse público, com dados objetivos e sem opinião do autor, é o que define a notícia.'
-    eo = @(
-      'Correta: relato objetivo de fato recente e de interesse público — notícia.'
-      'Errada: a crônica parte do cotidiano para um texto literário e subjetivo.'
-      'Errada: o editorial defende a opinião do veículo, e aqui não há opinião.'
-      'Errada: a resenha avalia uma obra; não há obra avaliada.'
-      'Errada: o conto é ficcional e narra história inventada.'
-    )
+  '2ae9dee69a' = @{
+    q = 'Uma pista reta de 60 cm desenhada na lousa representa os 420 km corridos por um ultramaratonista. Qual é a escala desse desenho?'
+  }
+  'a558269d85' = @{
+    q = 'Um barco percorre 40 km entre 8h e 14h, parte na maré enchente e o restante na vazante. Sua velocidade em água parada é 8 km/h, e a corrente de 2 km/h soma na enchente e subtrai na vazante. A diferença entre o tempo navegado na enchente e o navegado na vazante, em horas, é:'
+  }
+  '6a90f5bf03' = @{
+    q = 'Os lados de uma placa triangular são números inteiros consecutivos, em dm. O perímetro em cm excede o dobro do menor lado, também em cm, em 160. Aplica-se selante de 0,5 kg por metro de perímetro. Qual a massa total necessária, em gramas?'
+  }
+  '36c8fe4949' = @{
+    q = 'Três sensores de um motor marcam 185 °F, 333,15 K e 95 °C. O limite de segurança é ultrapassado quando a média dessas temperaturas, em Celsius, passa de 75,5 °C. Qual é a média em Celsius, o limite foi ultrapassado e, em caso afirmativo, por qual margem?'
+  }
+  'b7cf87d9a4' = @{
+    q = 'Numa avaliação de nota máxima 7, Alexandre tirou 5,6; em outra, de nota máxima 3, tirou 2,4. Se as duas valessem 10, quais seriam suas notas, na mesma ordem, mantida a proporção de acerto?'
+  }
+  '17d76f003c' = @{
+    q = 'Das 60 crianças, 40 gostam de futebol, 30 de basquete e 20 de vôlei. Entre as de futebol, 10 não gostam de nenhum outro esporte, 3 gostam dos três e 14 gostam também de basquete mas não de vôlei. Só 1 gosta de basquete e vôlei sem gostar de futebol. Quantas não gostam de nenhum?'
+  }
+  '8363f06f81' = @{
+    q = 'Um cabo de aço liga o topo de um prédio de 25 m ao topo de outro de 10 m, separados por 20 m na horizontal. Qual o comprimento mínimo do cabo?'
+  }
+  '72e490d411' = @{
+    q = 'Alex tem R$ 36,00 em moedas de 5, 10, 25 e 50 centavos. Aumentando em 30% a quantidade das de 10, 25 e 50, passa a ter R$ 46,65. Aumentando em 50% a das de 5, 10 e 25, passa a ter R$ 44,00. Quantas moedas de 50 centavos ele passou a ter?'
+  }
+  '20dfd007e9' = @{
+    q = 'Um compartimento é formado por um retângulo de 2 m por 3 m, outro retângulo de 2 m por 2 m e um triângulo de base 1 m e altura 2 m. Qual é a área total?'
+  }
+  'f809bf6d3f' = @{
+    q = 'Galões de óleo de R$ 5, R$ 10, R$ 25 e R$ 50 somam R$ 3.600,00 em estoque. Aumentando em 30% a quantidade dos de R$ 10, R$ 25 e R$ 50, o total vai a R$ 4.665,00. Aumentando em 50% a dos de R$ 5, R$ 10 e R$ 25, vai a R$ 4.400,00. Quantos galões de R$ 50 havia no início?'
+  }
+  'ae3b877a78' = @{
+    q = 'Três cabos de 180, 240 e 300 m são cortados em pedaços iguais, do maior tamanho possível e sem sobras. Depois, 25% dos pedaços são descartados por avaria, e 1/3 dos restantes é enviado a uma corveta. Quantos pedaços foram enviados?'
+  }
+  '1176d448ef' = @{
+    q = 'Uma camisa custa R$ 30,00 para produzir, e o preço de venda é o custo mais 60%. Na promoção dá-se 20% de desconto sobre esse preço, e a plataforma cobra 10% do valor pago pelo cliente. Qual o lucro líquido por camisa?'
+  }
+  '935647b8fc' = @{
+    q = 'Um lote de 5,75 toneladas de fertilizante será posto em recipientes de 450 kg, preenchidos até no máximo 4/5 da capacidade. Quantos recipientes ficam totalmente preenchidos e quantos quilos sobram?'
+  }
+  'bee2c20d9a' = @{
+    q = 'Alguém comprou 200 ações a R$ 50,00 cada. Depois de um ano a ação subiu 40%; ele vendeu metade por um preço 20% abaixo do valor atual e o restante pelo valor atual. Qual foi o lucro total, em reais?'
+  }
+  'e31d27cec2' = @{
+    q = 'Um guindaste opera 43 horas e 45 minutos por semana, divididas igualmente em 6 dias. O motor consome 0,005 grama de aditivo por segundo de operação. Qual a massa de aditivo, em kg, consumida em um dia?'
+  }
+  'bde9a865d2' = @{
+    q = 'Entre N oficiais, 42 têm certificação em Automação, 38 em Motores Diesel, 30 em Refrigeração, 12 em Automação e Refrigeração, e 15 em Diesel e Refrigeração. Ninguém tem Automação e Diesel juntas, e todos têm ao menos uma. Quanto vale N?'
+  }
+  '5c9f72bb41' = @{
+    q = 'Vinte marinheiros treinaram Navegação, 15 treinaram Segurança e 10 treinaram Manutenção. Desses, 5 fizeram Navegação e Segurança, 4 fizeram Segurança e Manutenção, 3 fizeram Navegação e Manutenção, e 2 fizeram os três. Quantos fizeram pelo menos um treinamento?'
+  }
+  '4ea016b6a8' = @{
+    q = 'Numa pista circular, um carrinho completa uma volta a cada 90 segundos e outro a cada 75 segundos. Partindo juntos do mesmo ponto, quantas voltas terá dado o mais rápido quando os dois se reencontrarem na partida?'
+  }
+  '76a398934c' = @{
+    q = 'Uma empresa tem X funcionários: um gerente, que recebe R$ 900,00 por semana, e diaristas, que trabalham 3 dias por semana e recebem R$ 70,00 por dia. O gasto semanal Y com todos eles é dado por:'
+  }
+  '2f8a2176a9' = @{
+    q = 'Um aluno copiou errado o termo constante de uma equação do 2º grau e achou as raízes −3 e −2, acertando o coeficiente do 1º grau. Outro errou esse coeficiente e achou as raízes 1 e 4, acertando o termo constante. Qual a diferença positiva entre as raízes da equação correta?'
+  }
+  'ce042b8b2a' = @{
+    q = 'Numa escola, 180 alunos leem pelo menos um livro: 50 leem somente A, 30 somente B, 40 somente C, 25 leem A e C, 40 leem A e B, e 25 leem B e C. Quantos leem A, B e C?'
+  }
+  '796ef7e7ff' = @{
+    q = 'Em 60 extintores, 36 têm irregularidade no lacre e 10 têm irregularidade no lacre e no manômetro. O número com irregularidade apenas no manômetro é igual ao número sem irregularidade alguma. Quantos não têm defeito no lacre?'
+  }
+  'de72c221a8' = @{
+    q = 'Um técnico cumpre 36 horas semanais em 6 dias iguais, com dois intervalos diários de 12 minutos que não contam como trabalho. Quantos segundos de trabalho efetivo ele cumpre por dia?'
+  }
+  '115c360e1b' = @{
+    q = 'Sejam u, v, w vetores não nulos de ℝ³. I) Se u·v=0 e v·w=0, então u e w são necessariamente ortogonais. II) Se u×v=0, todo vetor ortogonal a u também é ortogonal a v. III) Se o produto misto [u,v,w]=0, então u, v e w são linearmente dependentes. Assinale a alternativa correta:'
+  }
+  'cd3400bfd8' = @{
+    q = 'Entre 800 famílias, 30% produzem apenas o suficiente para o próprio consumo, 22% produzem o suficiente e vendem o excedente, 33% não produzem nem o bastante para a família, e o restante nada produz. Quantas produzem, no mínimo, o suficiente para o consumo?'
+  }
+  'f86e7abd39' = @{
+    q = 'Inquéritos sobre acidentes de navegação em 2023, por Distrito Naval: 1DN=22, 2DN=8, 3DN=6, 4DN=10, 5DN=5, 6DN=1, 7DN=1, 8DN=7, 9DN=12. Que porcentagem do total ocorreu no 4DN?'
+  }
+  '7d05f58fe3' = @{
+    q = 'Um painel solar retangular gera 5 MWh por metro quadrado. Ele tem 3 m de largura e 6 m de comprimento, que é fixo. Para gerar no mínimo 150 MWh, qual o aumento mínimo de largura, em metros?'
+  }
+  '0225a815c8' = @{
+    q = 'A temperatura de um forno desligado no instante t = 0 segue T(t) = −t²/4 + 400, com T em °C e t em minutos. Por segurança, a porta só pode ser aberta a 39 °C. Qual o tempo mínimo de espera, em minutos?'
+  }
+  '23fde60c91' = @{
+    q = 'A eficiência A/E (cestas certas por erradas) classifica o jogador: EXCELENTE se A/E≥7; MUITO BOM se 5,5≤A/E<7; BOM se 3,7<A/E<5,5; REGULAR se 2,5≤A/E≤3,7; RUIM se A/E<2,5. Com 230 cestas certas e 67 erradas, a classificação é:'
+  }
+  '964f939f7f' = @{
+    q = 'Na moeda "flor", que vale 1 real, os preços saem com desconto: um item de R$ 0,20 custa 0,15 flor, e outro de R$ 2,00 custa 1,50 flor. Qual o desconto de quem compra 5 unidades do primeiro e 3 do segundo pagando em flor?'
+  }
+  '2f18e5b690' = @{
+    q = 'Foram distribuídos 144 cadernos, 192 lápis e 216 borrachas entre o maior número possível de famílias, todas recebendo a mesma quantidade de cada material, sem sobra. Quantos cadernos cada família recebeu?'
+  }
+  '2de99f40b6' = @{
+    q = 'O mesmo celular custa R$ 800,00 com 15% de desconto na loja A, R$ 750,00 com 8% de desconto na loja B e R$ 850,00 com 20% de desconto na loja C. Em qual loja é mais vantajoso comprar?'
+  }
+  '5a3b3f8384' = @{
+    q = 'Numa turma, 23 alunos torcem pelo Grêmio, 23 pelo Corinthians e 15 pelo Internacional; 6 torcem por Grêmio e Internacional, 5 por Internacional e Corinthians, e nenhum torce por Grêmio e Corinthians ao mesmo tempo. Quantos alunos há na turma?'
+  }
+  'db88237b4c' = @{
+    q = 'Sessenta empregados fizeram pelo menos um de dois cursos. Dos que fizeram Cuidados Médicos, 75% também fizeram Segurança; dos que fizeram Segurança, 60% também fizeram Cuidados Médicos. Quantos fizeram os dois cursos?'
+  }
+  'b3e8597f4f' = @{
+    q = 'O Terminal A carrega um navio a cada 40 minutos, e o Terminal B, a cada 50 minutos. Começando juntos, quantos navios o Terminal B terá carregado quando os dois voltarem a iniciar um carregamento ao mesmo tempo?'
+  }
+  '55aa2a91f0' = @{
+    q = 'Produção diária de lixo, em kg. Rebocador 1 — 2ª:2, 3ª:5, 4ª:9, 5ª:6, 6ª:3, sáb:7, dom:10. Rebocador 2 — 2ª:1, 3ª:1, 4ª:3, 5ª:1, 6ª:2, sáb:3, dom:10. Em que dia da semana as duas produções foram iguais?'
+  }
+  'db890c498f' = @{
+    q = 'Com 240 m de cerca, cerca-se um campo retangular à margem de um rio reto, sem cercar o lado do rio: dois lados de medida x, perpendiculares ao rio, e um lado y, paralelo a ele. Se a área é 7.000 m², quais são x e y?'
+  }
+  '295d55bba9' = @{
+    q = 'Numa escola, 200 estudantes leram pelo menos um livro: 60 leram somente X, 35 somente Y, 45 somente Z, 30 leram X e Z, 50 leram X e Y, e 30 leram Y e Z. Quantos leram X, Y e Z?'
+  }
+  'a44bc541cb' = @{
+    q = 'Ontem, 4 caixas de leite e 6 pães custaram R$ 12,00. Hoje, com o leite em promoção e o pão pelo mesmo preço, 8 caixas e 12 pães custaram R$ 20,00. De quanto foi o desconto em cada caixa de leite?'
+  }
+  '7beef5381f' = @{
+    q = 'A temperatura do ar no equador é 30 °C e diminui 2,5% a cada 100 milhas náuticas em direção aos polos. Qual a temperatura aproximada a 200 milhas náuticas do equador?'
+  }
+  '6114895765' = @{
+    q = 'Numa pesquisa, 3/8 das 240 mulheres entrevistadas usaram transporte público na última semana. Esse número é 30% do número de homens entrevistados que fizeram o mesmo. Quantos homens usaram transporte público?'
+  }
+  'f47b8e1e93' = @{
+    q = 'Um reservatório de 40 cm por 25 cm por 20 cm, já com água, recebe 500 cubos metálicos idênticos totalmente submersos. O volume não ocupado pelos cubos passa a ser 16 dm³. Qual o volume de cada cubo, em cm³?'
+  }
+  'f9c0cc629a' = @{
+    q = 'Numa pista circular, três corredores completam uma volta em 80, 96 e 120 segundos. Partindo juntos, após quantos segundos estarão novamente alinhados na linha de partida?'
+  }
+  '02d622733d' = @{
+    q = 'O cabo de uma âncora, totalmente esticado, tem 60 m e vai do navio até o fundo, a 48 m de profundidade, formando um triângulo retângulo. Qual a distância horizontal entre o navio e a âncora?'
+  }
+  '9ee7358d72' = @{
+    q = 'Um produto vendido a R$ 26,00 dá ao vendedor 30% de lucro sobre o custo. Ele quer manter no mínimo 15% de lucro sobre o custo. Qual o maior desconto inteiro, em porcentagem sobre os R$ 26,00, que ele pode dar?'
+  }
+  '1e1c626eaa' = @{
+    q = 'Uma confeitaria quer uma caixa com base de no mínimo 120 cm², ao menor custo. Opções: I) 11×11 cm, R$ 0,45/cm²; II) 13×8 cm, R$ 0,40/cm²; III) 12×10 cm, R$ 0,38/cm²; IV) 10,5×10,5 cm, R$ 0,42/cm²; V) 16×7,5 cm, R$ 0,39/cm². Qual escolher?'
+  }
+  '1d080a4fc8' = @{
+    q = 'Doze marinheiros reparam uma seção do navio em 15 dias, trabalhando 7 horas por dia. Para fazer o mesmo trabalho em 10 dias, mantida a jornada diária, quantos marinheiros são necessários?'
+  }
+  'ed6bcac26a' = @{
+    q = 'Todos os 67 alunos de uma turma participam de Música, de Xadrez ou dos dois. 52 participam de Música. O número dos que participam dos DOIS é igual ao dos que participam APENAS de Xadrez. Quantos participam SOMENTE de Música?'
   }
 }
 
