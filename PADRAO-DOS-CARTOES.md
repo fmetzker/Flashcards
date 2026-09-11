@@ -306,16 +306,24 @@ encolhe. Um cartão de regra de três inversa continua testando
 proporcionalidade inversa — só não obriga a dividir 8.472 por 132 pra provar
 que a pessoa entendeu a proporção.
 
-### 1.7 Enunciado de no máximo 300 caracteres, em linguagem simples
+### 1.7 Em Português, enunciado de no máximo 300 caracteres
 
-O 1.6 diz para não herdar a demora de uma questão adaptada. Este põe o
-número, e vale para **todo** cartão — adaptado ou escrito do zero:
+O 1.6 diz para não herdar a demora de uma questão adaptada, e vale para o
+banco inteiro. Este põe um número, e vale **só para Português** — adaptado ou
+escrito do zero:
 
-**O campo `q` tem no máximo 300 caracteres.** São cerca de 50 palavras: espaço
-de sobra para uma pergunta direta, inclusive para problema de várias etapas.
-O limite mede o enunciado, não as alternativas (essas têm a regra de viés de
-comprimento, 1.3) nem a explicação (que só aparece depois da resposta, uma vez,
-e pode ensinar com calma).
+**Em `portugues`, o campo `q` tem no máximo 300 caracteres.** São cerca de 50
+palavras: espaço de sobra para uma pergunta direta. O limite mede o enunciado,
+não as alternativas (essas têm a regra de viés de comprimento, 1.3) nem a
+explicação (que só aparece depois da resposta, uma vez, e pode ensinar com
+calma).
+
+**Por que só Português.** É lá que o enunciado carrega texto *transcrito* —
+a crônica, a notícia, o comunicado inteiro copiado da prova — e onde ele
+chegou a 1.307 caracteres. Nas outras matérias o enunciado longo costuma
+carregar **dados de que a resposta depende**, e cortar por número viraria
+cortar conteúdo. Lá continua valendo o critério do 1.6, que é de tempo de
+resposta, não de tamanho: respondível em segundos por quem domina o método.
 
 **E o texto é o mais simples que sustente a pergunta.** Jargão que É o objeto
 do cartão fica — "cianose", "avaria no eixo propulsor", "metonímia" são o
@@ -360,7 +368,7 @@ limite existe para conseguir.
 | Enunciado que cita formatação ("o trecho **destacado**") | O app mostra texto puro — o `validar.py` já barra isso. |
 | Alternativa certa visivelmente mais longa | Deixa acertar sem saber. Já resolvido no banco; não reintroduzir. |
 | Pegadinha de leitura ("não é incorreto afirmar que não...") | Mede desatenção, não preparo. |
-| Enunciado acima de 300 caracteres, ou ambientado em jargão que o cartão não testa | O cartão é relido dezenas de vezes; o texto da prova, uma. Ver 1.7. |
+| Em Português, enunciado acima de 300 caracteres; em qualquer matéria, jargão ou cenário que o cartão não testa | O cartão é relido dezenas de vezes; o texto da prova, uma. Ver 1.7. |
 | Dois cartões de definição com a mesma resposta certa para o mesmo fato | Interferência: gasta duas revisões para fixar uma informação. Ver 1.5. (Exercício aplicando o mesmo método a dado novo é exceção — ver 1.5.2.) |
 
 ---
@@ -657,8 +665,9 @@ para evitar:
 Antes de dar o cartão por pronto:
 
 - [ ] O enunciado é uma pergunta respondível **sem** ler as alternativas?
-- [ ] O enunciado cabe em **300 caracteres**, sem cenário nem jargão que o
-      cartão não testa? Ver 1.7.
+- [ ] Se for de Português, o enunciado cabe em **300 caracteres**? E, em
+      qualquer matéria, está sem cenário nem jargão que o cartão não testa?
+      Ver 1.7.
 - [ ] Testa **um** fato só?
 - [ ] **Já existe cartão cobrando este mesmo fato?** (Se a resposta certa
       repete a de outro cartão do tópico, provavelmente sim — ver 1.5. Para

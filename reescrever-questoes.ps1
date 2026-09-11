@@ -38,120 +38,108 @@ function Id-Questao([string]$enunciado) {
 # preservado automaticamente — só é sobrescrito se a entrada do lote trouxer
 # 'eo'.
 #
-# Este lote aplica o limite de 300 caracteres no enunciado (PADRAO-DOS-
-# CARTOES.md §1.7): 22 cartões de Português passavam disso, com enunciados de
-# até 1.307 caracteres — texto que a pessoa releria inteiro a cada revisão
-# espaçada.
+# Este lote quebra os quatro cartões "julgue os itens I a VI" de Português —
+# 4 a 6 fatos num cartão só, o que o §1.2 proíbe: errar não diz QUAL dos
+# seis a pessoa não sabia, e o Leitner devolve os seis para a caixa 1. Dois
+# deles ainda citavam "o texto" sem que texto nenhum estivesse no cartão.
 #
-# A maioria deles ficou longa pelo LOTE ANTERIOR, que consertou o bug oposto
-# (cartão que dizia "de acordo com o texto" sem o texto estar no cartão)
-# colando a passagem inteira da prova. A correção de lá estava certa; o
-# tamanho é que passou do ponto. Então este lote NÃO volta atrás: ele separa
-# dois casos que aquele lote tratou igual.
+# Cada original é reescrito aqui como o PRIMEIRO fato da família (preserva o
+# progresso de quem já estudou, regra 5); os demais fatos entram como cartões
+# novos por rascunho.json + incorporar-rascunho.ps1. O `t` de cada um é o que
+# já era: este script não troca matéria nem tópico.
 #
-#   1. Texto DECORATIVO (6 cartões) — a pergunta é de classe de palavra ou de
-#      morfema, respondível sem trecho nenhum: "Qual destes termos NÃO é
-#      substantivo?" não precisa de um comunicado de 900 caracteres atrás.
-#      O texto sai inteiro, e as alternativas perdem os marcadores "(1º§)",
-#      que só faziam sentido com ele.
-#   2. Texto NECESSÁRIO (16 cartões) — correferência, uso das aspas,
-#      interpretação: sem trecho a questão volta a ser inrespondível. Aqui o
-#      texto fica, reduzido a uma ou duas frases que sozinhas sustentam a
-#      pergunta, preservando cada termo que os distratores e o `eo` citam.
-#
-# Fora deste lote, por não serem problema de tamanho: 8ffa1e3d3a, 2727068f49,
-# b9ae6e00ea e 62bfda28ba — "julgue os itens I a VI", 4 a 6 fatos num cartão
-# só (viola §1.2), e dois deles ainda citam um texto ausente.
+# Cinco itens dos originais foram DESCARTADOS em vez de virarem cartão, por
+# não serem defensáveis com a fonte em mãos:
+#   - 8ffa1e3d3a IV ("fabricação/manutenção/construção/participação são
+#     substantivos abstratos") — a própria explicação do cartão dizia que a
+#     classificação era "imprecisa"; cartão não se escreve sobre dúvida.
+#   - 8ffa1e3d3a V ("interesse" por derivação regressiva) — a etimologia é
+#     disputada, e a fonte não resolve a disputa.
+#   - 2727068f49 V ("cinco das palavras citadas são substantivos") — contar
+#     palavras não é fato de língua, é aritmética sobre o enunciado.
+#   - b9ae6e00ea B ("uma vez que" com valor de tempo) — com o verbo no
+#     subjuntivo ("entre em vigor"), a leitura temporal/condicional é a
+#     natural; afirmar que só a causal vale seria ensinar errado.
+#   - b9ae6e00ea C ("caso" como conjunção condicional em "Caso pertinente")
+#     — ali "caso" lê-se como substantivo ("caso pertinente"), e o cartão
+#     dependeria de um texto que não foi localizado.
 
 $REESCRITAS = @{
-  'b336e58002' = @{
-    q = 'Marque a opção em que todas as palavras são formadas pela inclusão de um elemento mórfico (morfema) na mesma posição:'
-  }
-  'c5c801015c' = @{
-    q = 'Qual destes termos é um substantivo abstrato, que dá nome a uma ação ou processo?'
+  '62bfda28ba' = @{
+    q = 'Em “E toda vez que o Sol se punha ela chorava lágrimas de chuva”, a pontuação está incompleta. O que falta?'
     o = @(
-      'edital.'
-      'nível.'
-      'adaptação.'
-      'máquinas.'
-      'trabalhadores.'
+      'Vírgula depois de “punha”, isolando a oração adverbial deslocada.'
+      'Vírgula depois de “E”, isolando o conectivo no início do período.'
+      'Vírgula depois de “chorava”, separando o verbo do seu complemento.'
+      'Ponto e vírgula depois de “punha”, por serem orações coordenadas.'
+      'Nada falta: oração adverbial antes da principal dispensa vírgula.'
+    )
+    c = 0
+    e = 'A oração adverbial temporal “toda vez que o Sol se punha” vem antes da principal e, deslocada, precisa ser isolada por vírgula: “…o Sol se punha, ela chorava…”.'
+    eo = @(
+      'Correta: oração adverbial deslocada para antes da principal pede vírgula.'
+      'Errada: o “E” inicial é conectivo aditivo e não se isola por vírgula.'
+      'Errada: nunca se separa o verbo do seu complemento por vírgula.'
+      'Errada: não são coordenadas — a primeira é subordinada adverbial da segunda.'
+      'Errada: é justamente o contrário — deslocada para antes da principal, ela exige a vírgula.'
     )
   }
-  '0dca7c8473' = @{
-    q = 'Qual destes termos NÃO é substantivo?'
+  'b9ae6e00ea' = @{
+    q = 'Em “Uma vez que a Convenção entre em vigor, os desafios surgirão”, o trecho iniciado por “Uma vez que” é uma oração subordinada:'
     o = @(
-      'processo.'
-      'maio.'
-      'formação.'
-      'custa.'
-      'edital.'
+      'Adverbial.'
+      'Substantiva subjetiva.'
+      'Substantiva objetiva direta.'
+      'Adjetiva restritiva.'
+      'Adjetiva explicativa.'
+    )
+    c = 0
+    e = '“Uma vez que…” é introduzida por locução conjuntiva e modifica a oração principal inteira, indicando a circunstância em que os desafios surgirão — oração subordinada adverbial.'
+    eo = @(
+      'Correta: introduzida por locução conjuntiva, modifica a oração principal como um adjunto adverbial.'
+      'Errada: não exerce função de sujeito de nenhum verbo da principal.'
+      'Errada: não completa verbo algum — “surgirão” não é transitivo aqui.'
+      'Errada: oração adjetiva se liga a um substantivo antecedente, por pronome relativo.'
+      'Errada: além de não ser adjetiva, não há antecedente nem vírgula isolando termo explicativo.'
     )
   }
-  '5085f4c907' = @{
-    q = 'Assinale a opção em que todos os termos são formados pela inclusão de um elemento mórfico (morfema) na mesma posição:'
-  }
-  '7062598e2b' = @{
-    q = 'Qual destes termos deve ser classificado morfologicamente como advérbio?'
+  '2727068f49' = @{
+    q = 'Em “A pesquisa confirma o risco de paralisações futuras na navegação marítima por falta de tripulação”, qual é o núcleo do sujeito de “confirma”?'
     o = @(
-      'início.'
-      'apenas.'
-      'seleções.'
-      'oportunidades.'
-      'eletricista.'
+      'pesquisa'
+      'risco'
+      'paralisações'
+      'navegação'
+      'tripulação'
+    )
+    c = 0
+    e = 'Quem confirma? “A pesquisa”. O núcleo desse sujeito é o substantivo “pesquisa”; os demais termos estão dentro do objeto ou de adjuntos.'
+    eo = @(
+      'Correta: “a pesquisa” é o sujeito de “confirma”, e seu núcleo é “pesquisa”.'
+      'Errada: “risco” é o núcleo do objeto direto, não do sujeito.'
+      'Errada: “paralisações” está dentro do adjunto adnominal de “risco”.'
+      'Errada: “navegação” está no adjunto adverbial de lugar.'
+      'Errada: “tripulação” está no adjunto adverbial de causa introduzido por “por”.'
     )
   }
-  'ba697ac65b' = @{
-    q = 'Em qual destes trechos o verbo NÃO é verbo de ligação?'
-  }
-  'd265277903' = @{
-    q = 'Na lenda do girassol, uma estrelinha apaixonada pelo Sol aceita deixar o céu e virar semente na Terra para poder segui-lo para sempre. Essa transformação pode ser interpretada como símbolo de:'
-  }
-  '9579c48d83' = @{
-    q = 'Um comunicado tem quatro parágrafos: 1º, o prazo de inscrição; 2º, a data e o local do curso; 3º, as exigências de formação; 4º, o valor da taxa, terminando com “Saiba mais no edital”. O texto deixa de ser apenas informativo e passa a instruir o leitor:'
-  }
-  '34717880cc' = @{
-    q = 'Leia: “A Marinha recebe inscrições para o processo seletivo do módulo para marítimos da seção de máquinas, o CAAQ-ELT, que terá 30 vagas. O curso começa em 5 de maio, no CIAGA.” Que duas expressões do trecho são correferentes, isto é, apontam para a mesma coisa?'
-  }
-  '91f509c668' = @{
-    q = 'Leia: “A Marinha do Brasil recebe inscrições para cursos de adaptação para aquaviários, como o módulo específico para marítimos da seção de máquinas, o CAAQ-ELT.” Do trecho, interpreta-se que:'
-  }
-  '2f8120a0c3' = @{
-    q = 'Leia: “Segundo a professora Flávia Gomes-Sponholz, da USP, "no peito o bebê tem tudo que ele precisa, não somente o alimento, mas também o aconchego e o calor da mãe".” Sobre o emprego das aspas nesse trecho, podemos afirmar que elas:'
-    e = 'As aspas reproduzem literalmente a fala da entrevistada (“no peito o bebê tem tudo que ele precisa…”) — marca própria do discurso direto, que transcreve a fala tal como foi dita.'
-  }
-  '4203c47831' = @{
-    q = 'Leia: “A pandemia e o marketing abusivo incentivaram a substituição do leite materno, e é muito fácil o acesso aos substitutos. Amamentar é escolha da mulher, não imposição. Bebês não amamentados têm até 14 vezes mais chances de morrer. Recomenda-se peito exclusivo até os 6 meses.” Segundo o trecho:'
-    e = 'O texto afirma diretamente que bebês não amamentados têm até 14 vezes mais chances de morrer. As demais alternativas invertem o que o texto diz: a pandemia PREJUDICOU a amamentação; o peito exclusivo vai até os SEIS MESES, não dois; amamentar deve ser ESCOLHA, não obrigação; e o acesso aos substitutos é FÁCIL, não difícil.'
-  }
-  '9dcb8682c3' = @{
-    q = 'Leia: “No vídeo institucional da campanha, o público nota que a seriedade de um combatente não se separa da emoção do servir.” De acordo com o trecho, o que o vídeo transmite ao público?'
-  }
-  '3d30bb09e2' = @{
-    q = 'Leia o relato da primeira mulher qualificada em Operações no Cerrado: “Os momentos mais desafiadores foram as etapas que envolviam água. Antes do curso, eu não conseguia ficar nem cinco minutos com o fuzil a tiracolo.” Segundo o trecho, como foi a experiência dela com a água?'
-  }
-  '527a84e5e2' = @{
-    q = 'Numa tirinha: 1º quadrinho — “Aonde você vai?” / “À praia! Vou ver a Crase.”; 2º — “Ao campo eu não vou!”; 3º — “A crase me quer à meia-noite, em frente à orla, para um bife à parmegiana.”; 4º — “Às vezes as crases são exigentes!”. Sobre o acento grave nesses quadrinhos, é correto afirmar que ele:'
-  }
-  '40dd28d479' = @{
-    q = 'Analise os fragmentos: I) “estava à espera de ordem para pousar”; II) “meu lugar junto à janela”; III) “o ressentimento com que reagia às suas palavras”. Assinale a opção correta quanto ao emprego do acento grave indicativo de crase:'
-  }
-  '2e61e1e751' = @{
-    q = 'Em “Ele integra a Frente Parlamentar, grupo que já fez um diagnóstico do setor e previu que a marinha mercante sofrerá com a falta de pessoal qualificado”, as orações “que já fez um diagnóstico do setor” e “que a marinha mercante sofrerá…” têm função sintática, respectivamente, de:'
-  }
-  '49cb059b04' = @{
-    q = 'Assinale a reescrita de “Segundo a Itaipu Binacional, o barco é resultado da experiência de mais de 10 anos de produção de hidrogênio verde do Itaipu Parquetec, um centro de pesquisa em tecnologias sustentáveis, em Foz do Iguaçu, no Paraná” que respeita a pontuação e não altera o sentido:'
-  }
-  'e0e97f8c82' = @{
-    q = 'Em “Os submarinos nucleares são uma vantagem naval. Eles vão mais fundo e navegam mais rápido. Essas qualidades se mostraram óbvias em 1939, quando Ross Gunn idealizou a primeira embarcação do tipo”, há verbos no:'
-  }
-  '6efa448982' = @{
-    q = 'Em “A Marinha do Brasil, por meio da Diretoria de Portos e Costas, vai receber inscrições”, o sujeito está separado do verbo por vírgula, o que em geral contraria a norma-padrão. Aqui o emprego está correto porque:'
-  }
-  'e0c5c4f986' = @{
-    q = '“Íntegra” (substantivo) perde o acento e vira “integra” (verbo): muda de classe gramatical. Em qual destas palavras a retirada do acento NÃO muda a classe gramatical?'
-  }
-  'de58e0f4fe' = @{
-    q = 'Leia: “O projeto obteve respaldo institucional para desenvolver atividades congêneres e pertinentes à sua área, com base em conhecimentos inerentes e afins à formação da equipe.” Qual destas palavras é, na frase, um substantivo (as demais são adjetivos)?'
+  '8ffa1e3d3a' = @{
+    q = 'Um texto em prosa informa que a Marinha Mercante abriu vagas em cursos de adaptação, trazendo número de vagas, requisitos e valor da taxa. Esse texto pertence a que gênero?'
+    o = @(
+      'Notícia.'
+      'Crônica.'
+      'Editorial.'
+      'Resenha crítica.'
+      'Conto.'
+    )
+    c = 0
+    e = 'Relatar um fato recente de interesse público, com dados objetivos e sem opinião do autor, é o que define a notícia.'
+    eo = @(
+      'Correta: relato objetivo de fato recente e de interesse público — notícia.'
+      'Errada: a crônica parte do cotidiano para um texto literário e subjetivo.'
+      'Errada: o editorial defende a opinião do veículo, e aqui não há opinião.'
+      'Errada: a resenha avalia uma obra; não há obra avaliada.'
+      'Errada: o conto é ficcional e narra história inventada.'
+    )
   }
 }
 
