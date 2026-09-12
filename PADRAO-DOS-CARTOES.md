@@ -498,9 +498,9 @@ o segundo pede conserto (seção 5).
 
 ## 4. Metodologia de revisão
 
-A repetição espaçada já está implementada (Leitner de 5 caixas, intervalos 1,
-3, 7 e 14 dias, com teto dinâmico conforme a proximidade da prova). O que este
-documento acrescenta é **como escolher a ordem** dentro do que está vencido.
+A repetição espaçada já está implementada (Leitner de 8 caixas, intervalos 1,
+3, 7, 14, 30, 60 e 120 dias). O que este documento acrescenta é **como
+escolher a ordem** dentro do que está vencido.
 
 ### 4.1 O que já vale
 
@@ -508,8 +508,10 @@ documento acrescenta é **como escolher a ordem** dentro do que está vencido.
   é o que faz o sistema funcionar: acerto por sorte volta para a caixa 1, como
   erro. Marcar "Sabia" no que se chutou é a forma mais rápida de chegar na
   prova achando que domina o que não domina.
-- **Teto dinâmico.** Nenhum intervalo passa de ⅓ dos dias restantes até a
-  prova; a partir de D-10, tudo vira revisão diária.
+- **O intervalo depende só da caixa.** A prova chegando perto não o encurta:
+  já houve teto dinâmico e ele foi removido, porque na reta final o gargalo é
+  a capacidade do dia, e re-mostrar o que já se sabe sai de cartão nunca visto
+  (CLAUDE.md, "Motor de repetição espaçada").
 - **Cota por área.** A sessão diária respeita a composição da prova (ver
   `progressoDoDia`/`iniciarSessao`): não adianta fechar a meta só na matéria
   preferida.

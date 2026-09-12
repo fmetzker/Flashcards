@@ -2,8 +2,9 @@
 module.exports = function (APP, t) {
   t.grupo('leitner');
 
-  /* Fixa a prova a N dias de hoje, que é o que manda no teto dinâmico
-     (proximaData -> diasAteMaisProxima -> INSCRITOS). */
+  /* Fixa a prova a N dias de hoje. O intervalo do Leitner NÃO depende
+     disto (ver os testes abaixo) — o que depende é diasAteMaisProxima(),
+     que hoje serve só à tela. */
   function provaEm(dias) {
     APP.INSCRITOS = [{ id: 'teste', data: APP.somarDias(APP.hoje(), dias), blocos: [] }];
   }
@@ -33,7 +34,7 @@ module.exports = function (APP, t) {
     t.igual(APP.proximaData(1), APP.hoje());
   });
 
-  t.teste('sem prova nenhuma, os intervalos valem sem teto', () => {
+  t.teste('sem prova nenhuma, cada caixa vale o intervalo dela', () => {
     APP.INSCRITOS = [];
     const esperado = [0, 1, 3, 7, 14, 30, 60, 120];
     for (let caixa = 1; caixa <= APP.CAIXA_MAX; caixa++) {
@@ -42,28 +43,26 @@ module.exports = function (APP, t) {
     }
   });
 
-  t.teste('teto dinâmico: nenhum intervalo passa de 1/3 dos dias restantes', () => {
-    provaEm(90);   // teto = 30
-    t.igual(APP.proximaData(8), APP.somarDias(APP.hoje(), 30), 'caixa 8 cortada em 30');
-    t.igual(APP.proximaData(7), APP.somarDias(APP.hoje(), 30), 'caixa 7 cortada em 30');
-    t.igual(APP.proximaData(6), APP.somarDias(APP.hoje(), 30), 'caixa 6 já vale 30');
-    t.igual(APP.proximaData(4), APP.somarDias(APP.hoje(), 7), 'abaixo do teto, intacta');
-  });
-
-  t.teste('a partir de D-10 toda caixa acima da 1 vira revisão diária', () => {
-    for (const d of [10, 5, 1, 0]) {
+  t.teste('a proximidade da prova NÃO encurta intervalo nenhum', () => {
+    /* O invariante central desta tela do motor: não existe teto dinâmico.
+       Comprimir revisão na reta final só ajudaria quem tem capacidade
+       sobrando, e aqui o gargalo é a capacidade (meta de 50/dia contra
+       milhares de cartões) — cada slot gasto no que a pessoa já acertou
+       4 ou 5 vezes sai de cartão nunca visto. Ver INTERVALOS e
+       HISTORICO.md. */
+    const esperado = [0, 1, 3, 7, 14, 30, 60, 120];
+    for (const d of [0, 1, 2, 3, 5, 9, 10, 30, 90, 100, 900]) {
       provaEm(d);
-      for (let caixa = 2; caixa <= APP.CAIXA_MAX; caixa++) {
-        t.igual(APP.proximaData(caixa), APP.somarDias(APP.hoje(), 1),
-          `prova em ${d} dias, caixa ${caixa} deveria ser diária`);
+      for (let caixa = 1; caixa <= APP.CAIXA_MAX; caixa++) {
+        t.igual(APP.proximaData(caixa), APP.somarDias(APP.hoje(), esperado[caixa - 1]),
+          `prova em ${d} dias, caixa ${caixa} deveria valer ${esperado[caixa - 1]} dias`);
       }
-      t.igual(APP.proximaData(1), APP.hoje(), `prova em ${d} dias, caixa 1 segue no mesmo dia`);
     }
   });
 
-  t.teste('o teto nunca zera um intervalo que não era zero', () => {
-    /* teto tem Math.max(1, ...): mesmo com a prova amanhã, caixa 2+ cai em
-       1 dia, nunca em 0 — senão o cartão voltaria para sempre no mesmo dia. */
+  t.teste('nenhuma caixa acima da 1 vence no mesmo dia', () => {
+    /* Só a caixa 1 devolve HOJE. Se qualquer outra caísse em 0, o cartão
+       voltaria para sempre no mesmo dia e a sessão nunca andaria. */
     for (const d of [0, 1, 2, 3, 10, 30, 100, 900]) {
       provaEm(d);
       for (let caixa = 2; caixa <= APP.CAIXA_MAX; caixa++) {
@@ -73,28 +72,29 @@ module.exports = function (APP, t) {
     }
   });
 
-  t.teste('a prova mais próxima é que manda, não a mais distante', () => {
-    /* "seguir um concurso distante não pode afrouxar a revisão por causa de
-       outro que é semana que vem" */
+  t.teste('diasAteMaisProxima é a prova mais próxima, não a mais distante', () => {
+    /* Quem pergunta é a tela: contagem regressiva e o aviso de backlog vs.
+       tempo restante. Vale a mais próxima porque é a que aperta primeiro. */
     APP.INSCRITOS = [
       { id: 'longe', data: APP.somarDias(APP.hoje(), 900), blocos: [] },
       { id: 'perto', data: APP.somarDias(APP.hoje(), 9), blocos: [] },
     ];
     t.igual(APP.diasAteMaisProxima(), 9);
-    t.igual(APP.proximaData(8), APP.somarDias(APP.hoje(), 1), 'D-9 deveria ser diária');
+    t.igual(APP.proximaData(8), APP.somarDias(APP.hoje(), 120),
+      'a prova perto não pode mexer no intervalo');
   });
 
-  t.teste('prova já passada não gera intervalo negativo', () => {
+  t.teste('prova já passada não gera número negativo', () => {
     provaEm(-30);
     t.igual(APP.diasAteMaisProxima(), 0);
-    t.igual(APP.proximaData(8), APP.somarDias(APP.hoje(), 1));
+    t.igual(APP.proximaData(8), APP.somarDias(APP.hoje(), 120));
   });
 
   t.grupo('previsão de revisão');
 
   /* O botão de resposta mostra quando o cartão volta ANTES de a pessoa
-     escolher. Se a previsão e a gravação divergirem, o app mente — e mente
-     justamente perto da prova, que é quando o teto dinâmico entra. */
+     escolher. Se a previsão e a gravação divergirem, o app mente no próprio
+     botão que ela aperta. */
 
   t.teste('sabia sobe um degrau; chutei e errei voltam para a caixa 1', () => {
     t.igual(APP.caixaDepois(1, 'sabia'), 2);
@@ -121,12 +121,12 @@ module.exports = function (APP, t) {
     t.igual(APP.previsaoRevisao('inedito', 'sabia').dias, 1, 'primeira vez que acerta: volta amanhã');
   });
 
-  t.teste('a previsão obedece ao teto dinâmico, não ao intervalo nominal', () => {
-    /* é o principal motivo de mostrar isto: perto da prova o cartão bem
-       sabido volta em 1 dia, e antes disso ninguém tinha como saber. */
+  t.teste('a previsão não muda com a prova chegando perto', () => {
+    /* mesma regra de proximaData(), pelo caminho que a tela usa: o botão
+       promete 120 dias e são 120 dias, com a prova em 5 ou em 900. */
     APP.E.cartoes = { x: { caixa: 7, acertos: 9, erros: 0, prox: '2020-01-01' } };
     provaEm(5);
-    t.igual(APP.previsaoRevisao('x', 'sabia').dias, 1, 'D-5: caixa 8 comprimida em 1 dia');
+    t.igual(APP.previsaoRevisao('x', 'sabia').dias, 120, 'D-5: intervalo cheio mesmo assim');
     provaEm(900);
     t.igual(APP.previsaoRevisao('x', 'sabia').dias, 120, 'prova longe: intervalo cheio');
   });

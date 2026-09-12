@@ -765,9 +765,8 @@ async function pega(caminho){
    diferentes, e confundi-las é o erro fácil aqui:
 
    INSCRITOS — todos os concursos que o perfil estuda. Define o BANCO (união
-     das matérias de todos) e o teto do Leitner (a prova mais próxima entre
-     eles). É o que dá sentido a "estudar para dois": o conteúdo dos dois
-     entra na fila.
+     das matérias de todos). É o que dá sentido a "estudar para dois": o
+     conteúdo dos dois entra na fila.
 
    CONCURSO — apenas o que está EM FOCO na tela: cabeçalho, contagem
      regressiva, cartela, simulado, alerta de bloco fraco. Trocar o foco não
@@ -2123,33 +2122,21 @@ function pintarInicio(){
       }
     });
 
-    /* teto dinâmico do Leitner (proximaData()) comprime os intervalos perto
-       da prova, e isso é invisível: a pessoa vê os cartões voltando mais
-       rápido sem saber por quê. Mesmos limiares que o motor já usa —
-       dTeto<=10 é o ponto em que TUDO vira revisão diária (teto=1);
-       dTeto<90 já corta a caixa mais alta (120 dias) pra menos de um mês
-       (Math.floor(dTeto/3)<30), o que muda o ritmo de verdade. Acima disso
-       o teto não aperta nada que importe, e não há o que avisar. Pula o dia
-       da prova em si (dTeto===0): o cabeçalho já grita "a prova é hoje". */
-    const dTeto = diasAteMaisProxima();
-    if(dTeto >= 1 && dTeto !== Infinity){
-      const d4 = document.createElement("div"); d4.className = "alerta";
-      const rotuloD = dTeto===1 ? "Falta 1 dia" : "Faltam "+dTeto+" dias";
-      if(dTeto <= 10){
-        d4.textContent = rotuloD+" — toda revisão volta todo dia até a prova.";
-        box.appendChild(d4);
-      } else if(Math.floor(dTeto/3) < 30){
-        d4.textContent = rotuloD+" — os intervalos de revisão estão limitados a "+Math.floor(dTeto/3)+" dias por causa da prova.";
-        box.appendChild(d4);
-      }
+    /* Backlog vs. tempo restante. Não há aviso sobre ritmo de revisão perto
+       da prova porque não há mais nada a avisar: o intervalo do Leitner
+       depende só da caixa, a prova chegando não o encurta (motor.js,
+       INTERVALOS). Ficou só este, que é sobre a pessoa, não sobre o motor.
 
-      /* backlog vs. tempo restante: cruza revisoesPorDia() (o "Atrasadas")
-         com dTeto. Limiar é matemático, não arbitrário — mesmo estudando a
-         meta inteira TODO dia até a prova, sem nunca folgar, não daria pra
-         zerar esse tanto de revisão vencida. */
+       O limiar é matemático, não arbitrário: mesmo estudando a meta inteira
+       TODO dia até a prova, sem nunca folgar, não daria pra zerar esse tanto
+       de revisão vencida. Pula o dia da prova em si (dRestante===0) — o
+       cabeçalho já grita "a prova é hoje". */
+    const dRestante = diasAteMaisProxima();
+    if(dRestante >= 1 && dRestante !== Infinity){
+      const rotuloD = dRestante===1 ? "Falta 1 dia" : "Faltam "+dRestante+" dias";
       const atrasadasInfo = revisoesPorDia().find(x=>x.rotulo==="Atrasadas");
       const atrasadas = atrasadasInfo ? atrasadasInfo.n : 0;
-      if(atrasadas > 0 && E.meta > 0 && atrasadas > E.meta * dTeto){
+      if(atrasadas > 0 && E.meta > 0 && atrasadas > E.meta * dRestante){
         const d5 = document.createElement("div"); d5.className = "alerta";
         d5.textContent = "Você tem "+atrasadas+" revisões atrasadas e "+rotuloD.toLowerCase()+
           " para a prova — no ritmo da meta de hoje ("+E.meta+"/dia), não dá tempo de zerar isso antes dela.";
@@ -2624,12 +2611,11 @@ function mostrarQuestao(){
 
 /* "volta em 7 dias · 13/09" — o que cada botão promete, escrito com a data
    que registrar() vai gravar de verdade (previsaoRevisao usa a mesma
-   caixaDepois() e o mesmo proximaData(), teto dinâmico incluído).
+   caixaDepois() e o mesmo proximaData()).
 
-   Serve para tornar visível o que o motor faz em silêncio: perto da prova o
-   teto comprime os intervalos, e um cartão bem sabido volta em 1 dia em vez
-   de 120 — a pessoa via os cartões voltando mais rápido sem saber por quê
-   (mesma preocupação do aviso de D-10 em pintarInicio()).
+   Serve para tornar visível o que o motor faz em silêncio: o espaçamento
+   cresce a cada acerto e desaba para hoje a cada erro, e sem isto a pessoa
+   só descobria o preço do "chutei" depois de apertar.
 
    "e nesta sessão" não é enfeite: chutei/errei também ganham repetição 5 a
    10 cartões à frente (agendarRepeticao), e as duas condições aqui são as

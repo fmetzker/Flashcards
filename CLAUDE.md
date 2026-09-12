@@ -322,9 +322,8 @@ que não podem ser confundidas:
 
 - `INSCRITOS` / `E.concursos` — todos os que a conta estuda. Definem o
   **banco carregado** (união das matérias de todos, via
-  `materiasInscritas()`) e o **teto do Leitner**, que usa
-  `diasAteMaisProxima()`: seguir um concurso distante não pode afrouxar a
-  revisão por causa de outro que é semana que vem.
+  `materiasInscritas()`). Não definem ritmo de revisão nenhum: o intervalo do
+  Leitner depende só da caixa do cartão (ver "Motor de repetição espaçada").
 - `E.escopoEstudo` — **o que conta hoje**: `null` estuda para todos (meta
   somada, o padrão) e um id estuda só para aquele concurso, encolhendo a meta
   para a dele. É o seletor da tela inicial, que só aparece com mais de um
@@ -373,11 +372,12 @@ art. 37, II); **processo seletivo** é o termo que empresa de economia mista
 (Transpetro) ou a Marinha já usam no nome oficial do próprio edital
 ("PS"/"PSP") — não é rótulo nosso.
 
-O teto do Leitner continua em `diasAteMaisProxima()` sobre **todos** os
-inscritos, mesmo com escopo restrito: estudar só para um concurso hoje não
-adia a prova do outro. Sem concurso nenhum inscrito, `INSCRITOS` fica vazio
-e a função devolve `Infinity` — sem prova nenhuma apertando, os intervalos
-do Leitner (1/3/7/14 dias) valem sem teto.
+`diasAteMaisProxima()` olha **todos** os inscritos, mesmo com escopo
+restrito — a prova que aperta primeiro é a mais próxima, e estudar só para um
+concurso hoje não adia a do outro. Mas ela não decide nada do motor: só
+alimenta a contagem regressiva e o aviso de backlog na tela. Sem concurso
+nenhum inscrito, `INSCRITOS` fica vazio e ela devolve `Infinity`, e a tela
+simplesmente não tem o que contar.
 
 Quem entra sem nenhum concurso escolhido (primeira vez, ou o que seguia
 sumiu de `concursos.json`) cai em `tela-escolher-concurso`
@@ -811,27 +811,39 @@ O campo `n` é gravado pelos caminhos de sempre — `incorporar-rascunho.ps1` e
 
 ## Motor de repetição espaçada
 
-Leitner de 8 caixas, intervalos 1, 3, 7, 14, 30, 60 e 120 dias, com **teto
-dinâmico**: nenhum intervalo pode passar de ⅓ dos dias restantes até a
-prova, e a partir de D-10 tudo vira revisão diária. Ver `proximaData()`.
-`CAIXA_MAX` (hoje 8) e o `check (caixa_depois between 1 and 8)` de
-`eventos_resposta` em `supabase/schema.sql` precisam concordar — nada os
-liga automaticamente, e o Postgres rejeita o evento se `index.html` gravar
-caixa mais alta do que o banco aceita.
+Leitner de 8 caixas, intervalos 1, 3, 7, 14, 30, 60 e 120 dias.
+`proximaData()` **depende só da caixa** — a proximidade da prova não encurta
+intervalo nenhum, e não existe teto dinâmico. `CAIXA_MAX` (hoje 8) e o
+`check (caixa_depois between 1 and 8)` de `eventos_resposta` em
+`supabase/schema.sql` precisam concordar — nada os liga automaticamente, e o
+Postgres rejeita o evento se `index.html` gravar caixa mais alta do que o
+banco aceita.
 
-**O teto dinâmico é invisível por padrão** — a pessoa vê os cartões
-voltando mais rápido perto da prova sem saber por quê. `pintarInicio()`
-torna isso visível com três coisas: contagem regressiva no cabeçalho
-(`#cabecalho-contagem`, `diaUTC(CONCURSO.data) - diaUTC(hoje())` — a mesma
-conta de `diasAteMaisProxima()`); e, em `#alerta-area`, um aviso quando o
-teto está de fato apertando (D-10, ou `Math.floor(dias/3) < 30` — os mesmos
-limiares que `proximaData()` já usa, não números novos) seguido de um
-aviso de **backlog vs. tempo restante**, cruzando `revisoesPorDia()` com
-`diasAteMaisProxima()` — só dispara quando o atrasado é matematicamente
-maior que `E.meta × dias restantes`, ou seja, quando nem estudando a meta
-inteira todo santo dia até a prova daria pra zerar. Limiar matemático de
-propósito, não estimativa arbitrária (mesmo espírito da regra 11: não
-inventar números como se fossem certeza).
+**Não reintroduzir aceleração perto da prova.** Já existiu (⅓ dos dias
+restantes, e tudo diário a partir de D-10) e foi removida de propósito —
+`testes/leitner.js` reprova quem trouxer de volta. Comprimir revisão na reta
+final só ajuda quem tem capacidade sobrando; aqui o gargalo **é** a
+capacidade: meta de 50 por dia contra banco de milhares de cartões (o
+Enfermeiro/VR sozinho tem 1987). Achatando todas as caixas num intervalo só,
+o teto colocava o cartão mais sabido na fila junto com o menos sabido, e como
+revisão vem antes de cartão novo, expulsava a cobertura do edital da sessão —
+bastava ter respondido 51 cartões distintos para o app parar de mostrar
+cartão inédito até a prova. O que se perde sem ele é pequeno e dá pra medir:
+caixas 1 a 4 (1, 3, 7 e 14 dias) devolvem o cartão dentro de qualquer reta
+final sozinhas, e o que deixa de voltar é caixa 5+, que exige 4 acertos
+seguidos ao longo de no mínimo 11 dias. Ver `HISTORICO.md`.
+
+**A reta final continua visível na tela**, só não mexe mais no motor:
+contagem regressiva no cabeçalho (`#cabecalho-contagem`,
+`diaUTC(CONCURSO.data) - diaUTC(hoje())` — a mesma conta de
+`diasAteMaisProxima()`) e, em `#alerta-area`, o aviso de **backlog vs. tempo
+restante**, cruzando `revisoesPorDia()` com `diasAteMaisProxima()`: só
+dispara quando o atrasado é matematicamente maior que `E.meta × dias
+restantes`, ou seja, quando nem estudando a meta inteira todo santo dia até a
+prova daria pra zerar. Limiar matemático de propósito, não estimativa
+arbitrária (mesmo espírito da regra 11: não inventar números como se fossem
+certeza) — e agora ele é sinal de verdade: com o teto, ele acendia sozinho a
+partir de D-10, porque o atrasado tendia ao total já estudado.
 
 Três respostas possíveis: "Sabia" sobe uma caixa; "Chutei" e "Errei" voltam
 para a caixa 1. O botão "Chutei" é central — não removê-lo nem transformá-lo
@@ -894,9 +906,9 @@ por aí, não média do que passou. Os baldes (Atrasadas, Hoje, Amanhã, 2 a 7
 dias, 8 a 30, 31 a 120) não são cortes redondos escolhidos à toa: são os
 próprios intervalos do Leitner (`INTERVALOS`) — cada fronteira é onde uma
 caixa nova passa a vencer. Exclusivos, não cumulativos, e contam a data
-**real** de vencimento (`prox`), não a caixa nominal — perto da prova o
-teto dinâmico comprime intervalos que seriam maiores, e os baldes devem
-refletir essa pressão de verdade, não a promessa que o teto vai quebrar.
+**real** de vencimento (`prox`), não a caixa nominal — é `prox` que `fila()`
+lê, e o progresso gravado antes de o teto dinâmico ser removido tem cartão de
+caixa alta com data curta.
 
 ## Viés de comprimento e de posição
 

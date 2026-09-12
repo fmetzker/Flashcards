@@ -267,6 +267,70 @@ para servir de sinal — um mês de acerto quase não se move com um erro isolad
 No lugar entraram as revisões pendentes, que são contagem do que vem por aí,
 não média do que passou.
 
+**O teto dinâmico do Leitner — a aceleração de revisão perto da prova.**
+Existiu até setembro/2026 e foi removido inteiro. A regra era: nenhum
+intervalo passa de ⅓ dos dias restantes até a prova, e a partir de D-10 tudo
+vira revisão diária. A ideia parecia óbvia — prova chegando, revisa mais.
+
+O relato veio em 12/09/2026, a oito dias da prova do Enfermeiro/VR: "tem
+muitas questões e não daria para estudar tudo". Estava certo, e era pior do
+que parecia. Com `d = 8`, o teto era 1 dia **para toda caixa**: caixa 1
+("errei ontem") e caixa 8 ("acertei sete vezes seguidas") recebiam a mesma
+data. Como `montarLoteSessao()` enche a capacidade do dia com revisão antes de
+qualquer cartão novo, e com teto 1 todo cartão já respondido vence todo dia,
+bastava ter respondido **51 cartões distintos na vida** para `restante` zerar
+e o app parar de mostrar cartão inédito até a prova. O banco do VR tem 1987
+cartões; o que não tivesse sido visto até D-10 não seria visto.
+
+O erro de projeto: a regra tratava "falta pouco tempo" como se a solução fosse
+mais frequência, quando a restrição real da reta final é **capacidade** — 50
+por dia × 8 dias = 400 exposições, e ponto. O teto gastava essas 400
+preferencialmente no que a pessoa já sabia e cobrava isso em cartão nunca
+visto, que na prova é questão perdida na certa. Comprimir revisão perto do
+exame é técnica de quem tem capacidade sobrando; não era o caso.
+
+Foram consideradas três alternativas mais brandas — teto por caixa (comprimir
+proporcional ao domínio), reservar cota de cartão novo na reta final, e só
+apagar a regra do D-10. A remoção total ganhou porque as três remendam o
+sintoma: o que se perde sem teto nenhum é pequeno e dá pra medir. As caixas 1
+a 4 (1, 3, 7 e 14 dias) devolvem o cartão dentro de qualquer reta final
+sozinhas — quem errou recentemente continua vendo de novo. O que deixa de
+voltar é caixa 5+, e para estar na caixa 5 são quatro acertos seguidos ao
+longo de no mínimo 11 dias. Como efeito colateral, a alternativa de "reservar
+cartão novo" deixou de ser necessária: sem o teto o volume de revisão despenca
+sozinho, e a regra *revisão primeiro em TODA a sessão* ficou intacta.
+
+Medido depois, simulando os 8 dias finais contra o banco real do VR (1987
+cartões, meta 50/dia, respondendo "sabia" em tudo), em cartões DIFERENTES
+alcançados no período:
+
+| histórico ao entrar na reta final | com teto | sem teto |
+|---|---|---|
+| 800 cartões já estudados | 227 | 227 |
+| 400 | 178 | 275 |
+| 200 | 131 (0 inéditos) | 256 (57 inéditos) |
+
+Com backlog grande o bastante (800), tanto faz — há fila de caixa baixa
+sobrando nos dois casos, e `prioridade()` escolhe os mesmos cartões. A
+diferença aparece quando a revisão NÃO satura o dia, que é a situação de
+quem ainda não cobriu o edital: aí o teto inventa saturação, repetindo os
+mesmos 131 cartões 400 vezes. Inédito foi **zero com teto nos três
+cenários**.
+
+Dois ganhos de tabela. O **aviso de backlog** voltou a ser sinal: com o teto,
+o atrasado tendia ao total já estudado, então `atrasadas > meta × dias`
+acendia por construção a partir de D-10 — um alerta que sempre acende não
+avisa nada. E `diasAteMaisProxima()` deixou de ter papel no motor; sobrou
+como insumo de tela (contagem regressiva e esse aviso), o que desfez o
+acoplamento estranho em que **seguir mais um concurso mudava o ritmo de
+revisão de todos os outros**.
+
+O que ficou de dívida: o progresso já gravado tem cartão de caixa alta com
+data curta, escrita sob a regra antiga. Não há migração, e não precisa — esses
+cartões vencem uma vez mais cedo e daí em diante recebem o intervalo cheio.
+É por isso que os baldes de `revisoesPorDia()` contam `prox` e não a caixa
+nominal, e o teste que trava isso continua no `testes/motor.js`.
+
 ---
 
 ## Datas

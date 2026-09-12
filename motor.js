@@ -159,10 +159,6 @@ function provaMaisProxima(){
    O banco carregado NÃO muda (isso é E.concursos, via materiasInscritas), só
    o que conta no dia — por isso trocar o escopo repinta em vez de recarregar.
 
-   O teto do Leitner segue em diasAteMaisProxima(), sobre TODOS os inscritos,
-   de propósito: estudar só para um concurso hoje não adia a prova do outro,
-   e os cartões precisam continuar prontos para ela.
-
    Sem NENHUM concurso/processo seletivo seguido (só matéria avulsa, ou nada
    ainda) CONCURSO fica null — não existe prova nenhuma pra responder "qual
    prova?", e inventar uma (data, regra de aprovação) violaria a regra 11 do
@@ -380,9 +376,12 @@ function somarDias(dataYMD, n){
   return d.toISOString().slice(0,10);
 }
 
-/* dias até a prova MAIS PRÓXIMA entre todos os inscritos. É este que manda no
-   teto do Leitner: seguir um concurso distante não pode afrouxar a revisão
-   por causa de outro que é semana que vem. */
+/* dias até a prova MAIS PRÓXIMA entre todos os inscritos — a que aperta
+   primeiro, e por isso a que responde "quanto tempo ainda tenho".
+
+   NENHUMA decisão do motor depende disto: o intervalo do Leitner é só a
+   caixa (ver INTERVALOS). Quem usa é a tela — contagem regressiva no
+   cabeçalho e o aviso de backlog vs. tempo restante. */
 function diasAteMaisProxima(){
   return INSCRITOS.reduce((menor,c)=>{
     const d = Math.max(0, Math.ceil((diaUTC(c.data) - diaUTC(hoje()))/86400000));
@@ -390,26 +389,30 @@ function diasAteMaisProxima(){
   }, Infinity);
 }
 
-/* Leitner com teto: nenhum intervalo passa de 1/3 dos dias restantes.
+/* Leitner puro: o intervalo depende SÓ da caixa, e a proximidade da prova
+   não o encurta.
 
    8 caixas — eram 5, com o intervalo travado em 14 dias pra sempre depois
    disso: quem acertava um cartão 10 vezes seguidas continuava revisando a
    cada 14 dias, sem o espaçamento crescer com o domínio. As 3 caixas novas
    (30/60/120 dias) dão o que fazer pro cartão bem sabido, e a distância
-   praticamente dobra a cada caixa, igual a curva de esquecimento pede. O
-   teto de 1/3 dos dias até a prova continua cortando essas caixas mais
-   longas sozinho perto do exame — nada aqui precisou mudar pra isso valer:
-   prova a 90 dias já limita a 30, então 60/120 só valem de verdade quando a
-   prova está bem longe. */
+   praticamente dobra a cada caixa, igual a curva de esquecimento pede.
+
+   Consequência assumida: na reta final, cartão de caixa 5+ pode não voltar
+   antes da prova. É de propósito. Comprimir revisão perto do exame só ajuda
+   quem tem capacidade sobrando, e aqui o gargalo É a capacidade — meta de 50
+   por dia contra banco de milhares de cartões. Cada slot gasto re-mostrando
+   o que a pessoa acertou 4 ou 5 vezes seguidas (o mínimo para chegar na
+   caixa 5) sai de cartão nunca visto, que na prova é questão perdida na
+   certa. E as caixas 1 a 4 (1, 3, 7 e 14 dias) devolvem o cartão dentro de
+   qualquer reta final sozinhas: quem errou recentemente continua vendo de
+   novo, sem teto nenhum. Ver HISTORICO.md. */
 const INTERVALOS = [0,1,3,7,14,30,60,120];
 
 const CAIXA_MAX = INTERVALOS.length;   // caixa mais alta que existe
 
 function proximaData(caixa){
-  const d = diasAteMaisProxima();
-  const teto = d<=10 ? 1 : Math.max(1, Math.floor(d/3));
-  const inter = Math.min(INTERVALOS[Math.max(0,Math.min(CAIXA_MAX-1,caixa-1))], teto);
-  return somarDias(hoje(), inter);
+  return somarDias(hoje(), INTERVALOS[Math.max(0,Math.min(CAIXA_MAX-1,caixa-1))]);
 }
 
 /* Em que caixa o cartão CAI depois de uma resposta: "sabia" sobe um degrau
@@ -418,9 +421,8 @@ function proximaData(caixa){
    É função separada, e não uma linha dentro de registrar(), porque a tela
    mostra a data da próxima revisão no próprio botão, ANTES de a pessoa
    escolher. Duas contas paralelas da mesma coisa divergiriam sem ninguém
-   perceber — e o teto dinâmico de proximaData() já muda essa data sozinho a
-   cada dia que passa, então a divergência apareceria justamente perto da
-   prova, quando errar de data importa mais. Uma função, os dois caminhos. */
+   perceber, e a data errada apareceria no botão que a pessoa aperta. Uma
+   função, os dois caminhos. */
 function caixaDepois(caixa, resultado){
   return resultado === "sabia" ? Math.min(CAIXA_MAX, caixa+1) : 1;
 }
@@ -833,11 +835,10 @@ function embaralhaOrdem(n){
    (cada cartão entra em um só), não cumulativos — um "em 8 a 30 dias"
    somado ao "hoje" daria a falsa impressão de que um inclui o outro.
 
-   Perto da prova, o teto dinâmico (proximaData()) comprime intervalos que
-   nominalmente seriam maiores — um cartão de caixa 7 (60 dias) pode vencer
-   em 10 dias se a prova está logo ali. Isso é o comportamento CERTO: os
-   baldes contam a data real (`prox`), não a caixa nominal, então mostram a
-   pressão de verdade, não uma promessa que o teto vai quebrar depois. */
+   Os baldes contam a data real de vencimento (`prox`), não a caixa nominal.
+   Hoje as duas coincidem — nada comprime intervalo —, mas `prox` é o que
+   fila() lê para decidir o que vence, e o forecast tem que dizer o que a
+   fila vai fazer, não o que a tabela de intervalos promete. */
 function revisoesPorDia(){
   const inscritas = materiasInscritas();
   const h = diaUTC(hoje());

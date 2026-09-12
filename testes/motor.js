@@ -96,8 +96,9 @@ module.exports = function (APP, t) {
   });
 
   t.teste('conta a data real de vencimento, não a caixa nominal', async () => {
-    /* "perto da prova o teto dinâmico comprime intervalos que seriam
-       maiores, e os baldes devem refletir essa pressão de verdade" */
+    /* O balde é a data em `prox`, nunca a caixa. Vale para o progresso
+       gravado antes de o teto dinâmico ser removido, que tem cartão de
+       caixa alta com data curta — e é `prox` que fila() lê. */
     await APP.montar({ concursos: ['transpetro-mec'] });
     const hoje = APP.hoje();
     const q = APP.BANCO[0];
