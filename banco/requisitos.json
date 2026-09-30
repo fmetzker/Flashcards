@@ -3819,6 +3819,162 @@
           "Serviço de Quarto de Máquinas de Apoio"
         ]
       }
+    },
+    "comandos-eletricos": {
+      "criterio": "A fila segue a própria sequência da apostila do curso (SENAI-DN, Comandos Elétricos, 2013): primeiro ler o desenho, depois conhecer os dispositivos, depois montar o circuito. (1) Simbologia e leitura de diagramas — contato NA/NF, numeração de terminais, símbolos e letras, sem os quais nenhum diagrama se lê. (2) Dispositivos de proteção (cap. 3) e (3) Dispositivos de comando (cap. 4), na ordem da apostila. (4) Partida direta (cap. 8), o primeiro circuito completo, que junta tudo. As demais partidas, sensores e acionamentos eletrônicos entram depois, cada uma em seu lote.",
+      "requisitos": {
+        "Dispositivos de proteção": [
+          "Simbologia e leitura de diagramas"
+        ],
+        "Dispositivos de comando": [
+          "Dispositivos de proteção"
+        ],
+        "Partida direta": [
+          "Dispositivos de comando"
+        ]
+      },
+      "criterio_conceitual": "Dispositivos de comando exige Simbologia porque contator, botão e temporizador são descritos pelos seus contatos NA/NF e pela numeração dos terminais. Partida direta exige os três: o circuito é lido pela simbologia e montado com os dispositivos de proteção (fusível, relé térmico, disjuntor) e de comando (contator, botões, sinalizador). Dispositivos de proteção não exige nada conceitualmente: fusível e disjuntor se entendem sem diagrama; na fila vem depois da Simbologia só por ordem de ensino.",
+      "requisitos_conceituais": {
+        "Dispositivos de comando": [
+          "Simbologia e leitura de diagramas"
+        ],
+        "Partida direta": [
+          "Simbologia e leitura de diagramas",
+          "Dispositivos de proteção",
+          "Dispositivos de comando"
+        ]
+      },
+      "criterio_subtopicos": "Dentro de cada tópico, a ordem da apostila, do elemento mais simples ao composto. Simbologia: contato NA/NF → numeração (que diz se é NA ou NF) → símbolos → letras → força e comando (que exige saber ler todos os anteriores). Proteção: fusível → disjuntor → DR (um disjuntor com mais uma função) → relé térmico → disjuntor-motor (que junta disjuntor e relé térmico). Comando: seccionadora → botões e fins de curso → contatores → relés e temporizadores → relés de proteção → sinalizadores. Partida direta: funcionamento antes do diagnóstico, porque só se acha o defeito de um circuito que se sabe como funciona.",
+      "requisitos_subtopicos": {
+        "Simbologia e leitura de diagramas|Numeração de terminais": [
+          {
+            "t": "Simbologia e leitura de diagramas",
+            "s": "Contatos NA e NF"
+          }
+        ],
+        "Simbologia e leitura de diagramas|Símbolos gráficos": [
+          {
+            "t": "Simbologia e leitura de diagramas",
+            "s": "Numeração de terminais"
+          }
+        ],
+        "Simbologia e leitura de diagramas|Letras de identificação": [
+          {
+            "t": "Simbologia e leitura de diagramas",
+            "s": "Símbolos gráficos"
+          }
+        ],
+        "Simbologia e leitura de diagramas|Força e comando": [
+          {
+            "t": "Simbologia e leitura de diagramas",
+            "s": "Letras de identificação"
+          }
+        ],
+        "Dispositivos de proteção|Disjuntor termomagnético": [
+          {
+            "t": "Dispositivos de proteção",
+            "s": "Fusíveis"
+          }
+        ],
+        "Dispositivos de proteção|Disjuntor DR": [
+          {
+            "t": "Dispositivos de proteção",
+            "s": "Disjuntor termomagnético"
+          }
+        ],
+        "Dispositivos de proteção|Relé térmico": [
+          {
+            "t": "Dispositivos de proteção",
+            "s": "Disjuntor DR"
+          }
+        ],
+        "Dispositivos de proteção|Disjuntor-motor": [
+          {
+            "t": "Dispositivos de proteção",
+            "s": "Relé térmico"
+          }
+        ],
+        "Dispositivos de comando|Botões e fins de curso": [
+          {
+            "t": "Dispositivos de comando",
+            "s": "Seccionadora"
+          }
+        ],
+        "Dispositivos de comando|Contatores": [
+          {
+            "t": "Dispositivos de comando",
+            "s": "Botões e fins de curso"
+          }
+        ],
+        "Dispositivos de comando|Relés e temporizadores": [
+          {
+            "t": "Dispositivos de comando",
+            "s": "Contatores"
+          }
+        ],
+        "Dispositivos de comando|Relés de proteção": [
+          {
+            "t": "Dispositivos de comando",
+            "s": "Relés e temporizadores"
+          }
+        ],
+        "Dispositivos de comando|Sinalizadores": [
+          {
+            "t": "Dispositivos de comando",
+            "s": "Relés de proteção"
+          }
+        ],
+        "Partida direta|Diagnóstico de defeitos": [
+          {
+            "t": "Partida direta",
+            "s": "Funcionamento"
+          }
+        ]
+      },
+      "requisitos_conceituais_subtopicos": {
+        "Simbologia e leitura de diagramas|Numeração de terminais": [
+          {
+            "t": "Simbologia e leitura de diagramas",
+            "s": "Contatos NA e NF"
+          }
+        ],
+        "Simbologia e leitura de diagramas|Força e comando": [
+          {
+            "t": "Simbologia e leitura de diagramas",
+            "s": "Letras de identificação"
+          }
+        ],
+        "Dispositivos de proteção|Disjuntor termomagnético": [
+          {
+            "t": "Dispositivos de proteção",
+            "s": "Fusíveis"
+          }
+        ],
+        "Dispositivos de proteção|Disjuntor DR": [
+          {
+            "t": "Dispositivos de proteção",
+            "s": "Disjuntor termomagnético"
+          }
+        ],
+        "Dispositivos de proteção|Relé térmico": [
+          {
+            "t": "Dispositivos de proteção",
+            "s": "Disjuntor DR"
+          }
+        ],
+        "Dispositivos de proteção|Disjuntor-motor": [
+          {
+            "t": "Dispositivos de proteção",
+            "s": "Relé térmico"
+          }
+        ],
+        "Partida direta|Diagnóstico de defeitos": [
+          {
+            "t": "Partida direta",
+            "s": "Funcionamento"
+          }
+        ]
+      }
     }
   }
 }

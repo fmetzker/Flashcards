@@ -149,7 +149,14 @@ class Desenho:
     def contato(self, x, y, tipo="na", id=None, tag=None, bornes=None,
                 atuador=None, nome=None):
         """Contato NA (fechador) ou NF (abridor), desenhado em REPOUSO.
-        atuador: None | 'botao' | 'termico' | 'mecanico' | 'disjuntor'."""
+        tipo: 'na' | 'nf' | 'comutador' (comum em cima; embaixo NF à direita
+        e NA à esquerda — bornes = (comum, NF, NA), ex. ('15', '16', '18')).
+        atuador: None | 'botao' | 'termico' | 'fimdecurso' | 'disjuntor' |
+        'temp_on' (retardo na energização) | 'temp_off' (na desenergização)
+        — os dois temporizados como no Quadro 10 da apostila SENAI: arco "("
+        para energização, ")" para desenergização."""
+        if tipo == "comutador":
+            return self._comutador(x, y, id, tag, bornes, nome)
         with self.grupo(id):
             self.linha([(x, y), (x, y + 13)])
             self.linha([(x, y + ALTURA), (x, y + 27)])
@@ -173,7 +180,8 @@ class Desenho:
                 self.linha([(x - 3, y + 16), (x + 3, y + 10)])
             elif atuador:
                 ponta, ym = x - 22, meio[1]
-                self.linha([meio, (ponta, ym)], esp=1.5, tracejado="3,3")
+                if atuador not in ("temp_on", "temp_off"):
+                    self.linha([meio, (ponta, ym)], esp=1.5, tracejado="3,3")
                 if atuador == "botao":
                     self.linha([(ponta + 4, ym - 6), (ponta, ym - 6), (ponta, ym + 6),
                                 (ponta + 4, ym + 6)])
@@ -182,10 +190,23 @@ class Desenho:
                     self.linha([(ponta, ym), (ponta, ym - 5), (ponta - 6, ym - 5),
                                 (ponta - 6, ym + 5), (ponta - 12, ym + 5), (ponta - 12, ym)])
                     esq = ponta - 16
-                elif atuador == "mecanico":
-                    self.linha([(ponta, ym - 6), (ponta - 6, ym + 6)])
-                    self.circulo(ponta - 6, ym + 6, 3)
+                elif atuador == "fimdecurso":
+                    # cunha acionada pelo came da máquina (Quadro 7 da apostila)
+                    self.linha([(ponta, ym), (ponta - 9, ym - 6), (ponta - 9, ym + 6), (ponta, ym)])
                     esq = ponta - 13
+                elif atuador in ("temp_on", "temp_off"):
+                    # duas linhas paralelas até o arco; o lado para onde o arco
+                    # abre é o que distingue energização de desenergização
+                    self.linha([meio, (ponta, ym)], esp=1.5)
+                    self.linha([(meio[0], ym + 4), (ponta, ym + 4)], esp=1.5)
+                    cx = ponta + (0 if atuador == "temp_on" else -6)
+                    if atuador == "temp_on":      # "(" : abre para o contato
+                        d_arco = f"M {_n(cx + 6)},{_n(ym - 5)} A 7 7 0 0 0 {_n(cx + 6)},{_n(ym + 9)}"
+                    else:                         # ")" : abre para fora
+                        d_arco = f"M {_n(cx)},{_n(ym - 5)} A 7 7 0 0 1 {_n(cx)},{_n(ym + 9)}"
+                    self._add(f'<path d="{d_arco}" fill="none" stroke="{{c}}" stroke-width="2"/>',
+                              [(cx - 2, ym - 5), (cx + 8, ym + 9)])
+                    esq = ponta - 6
             if bornes:
                 bx = x + (14 if tipo == "nf" else 6)
                 self.texto(bx, y + 9, bornes[0], tam=10)
@@ -194,15 +215,49 @@ class Desenho:
                 self.texto(esq, y + 24, tag, ancora="end", negrito=True)
         self._registra(id, x, y, nome)
 
-    def bobina(self, x, y, id=None, tag=None, nome=None):
+    def _comutador(self, x, y, id, tag, bornes, nome):
+        """Contato comutador (reversível), comum EM CIMA — o diagrama desce de
+        L1, então a alimentação chega pelo comum. Embaixo, NF à direita e NA à
+        esquerda. Em repouso a lâmina encosta no NF; acionado, no NA.
+        bornes = (comum, NF, NA), ex. ('15', '16', '18')."""
+        with self.grupo(id):
+            xa, xf = x - 11, x + 11
+            self.linha([(x, y), (x, y + 13)])
+            self.linha([(xf - 7, y + 27), (xf, y + 27), (xf, y + ALTURA)])
+            self.linha([(xa, y + 28), (xa, y + ALTURA)])
+            self._est = "rep"
+            self.linha([(x, y + 13), (xf + 2, y + 30)])
+            self._est = "aci"
+            self.linha([(x, y + 13), (xa, y + 28)])
+            self._est = None
+            if bornes:
+                self.texto(x + 5, y + 9, bornes[0], tam=10)
+                self.texto(xf + 4, y + 39, bornes[1], tam=10)
+                self.texto(xa - 4, y + 39, bornes[2], tam=10, ancora="end")
+            if tag:
+                self.texto(x - 8, y + 12, tag, ancora="end", negrito=True)
+        self.ancoras[id] = {"topo": (x, y), "base": (x, y + ALTURA),
+                            "nf": (xf, y + ALTURA), "na": (xa, y + ALTURA)}
+        if nome:
+            self.nomes[id] = nome
+
+    def bobina(self, x, y, id=None, tag=None, nome=None, tempo=None):
+        """tempo: None | 'on' (retardo na energização: quadrado com X) |
+        'off' (na desenergização: quadrado preto) — Quadro 10 da apostila."""
         with self.grupo(id):
             self.linha([(x, y), (x, y + 12)])
             self.retangulo(x - 13, y + 12, 26, 16)
+            if tempo:
+                self.retangulo(x - 25, y + 12, 12, 16,
+                               preench="{c}" if tempo == "off" else "none")
+                if tempo == "on":
+                    self.linha([(x - 25, y + 12), (x - 13, y + 28)])
+                    self.linha([(x - 25, y + 28), (x - 13, y + 12)])
             self.linha([(x, y + 28), (x, y + ALTURA)])
             self.texto(x + 6, y + 9, "A1", tam=10)
             self.texto(x + 6, y + 39, "A2", tam=10)
             if tag:
-                self.texto(x - 17, y + 24, tag, ancora="end", negrito=True)
+                self.texto(x - (29 if tempo else 17), y + 24, tag, ancora="end", negrito=True)
         self._registra(id, x, y, nome)
 
     def lampada(self, x, y, id=None, tag=None, nome=None):

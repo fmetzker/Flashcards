@@ -118,3 +118,79 @@ vista(M, "partida-direta-comando", "pd-comando")
 vista(M, "partida-direta-comando-selo", "pd-comando", destaque=["K1.13"])
 vista(M, "partida-direta-forca-fusivel-l2", "pd-forca",
       pontos=[("A", "F10.L2", "topo"), ("B", "F10.L2", "base")])
+
+
+# ---- galeria de símbolos: um circuito, um cartão por destaque ----------------
+# Ids G1..G12, sem letra nem número visíveis além dos bornes que o próprio
+# símbolo traz — o cartão pergunta "o símbolo destacado representa..."
+
+@circuito("galeria")
+def galeria():
+    d = Desenho(300, 250, alt="Quadro com doze símbolos elétricos em três linhas.")
+    col = (50, 125, 200, 270)
+    y1, y2, y3 = 20, 105, 190
+    d.contato(col[0], y1, "na", id="G1", nome="contato NA")
+    d.contato(col[1], y1, "nf", id="G2", nome="contato NF")
+    d.contato(col[2], y1, "na", id="G3", atuador="botao", nome="botão NA")
+    d.contato(col[3], y1, "nf", id="G4", atuador="botao", nome="botão NF")
+    d.contato(col[0], y2, "na", id="G5", atuador="fimdecurso", nome="fim de curso NA")
+    d.contato(col[1], y2, "na", id="G6", atuador="temp_on", nome="contato NA temporizado na energização")
+    d.contato(col[2], y2, "na", id="G7", atuador="temp_off", nome="contato NA temporizado na desenergização")
+    d.contato(col[3], y2, "nf", id="G8", atuador="termico", nome="contato NF térmico")
+    d.bobina(col[0], y3, id="G9", nome="bobina")
+    d.bobina(col[1] + 6, y3, id="G10", tempo="on", nome="bobina de temporizador na energização")
+    d.fusivel(col[2], y3, id="G11", nome="fusível")
+    d.lampada(col[3], y3, id="G12", nome="sinalizador luminoso")
+    return d
+
+
+# ---- temporizador com contato comutador ------------------------------------
+
+@circuito("temporizador")
+def temporizador():
+    """KT1 (retardo na energização) comandado pela chave S1; o contato
+    comutador 15-16-18 alterna entre H1 (16, NF) e H2 (18, NA)."""
+    d = Desenho(270, 230, alt="Diagrama entre L1 e N: a chave S1 alimenta a bobina do "
+                "temporizador KT1, com retardo na energização. Ao lado, o contato comutador "
+                "de KT1: do comum 15 saem o 16, que acende H1, e o 18, que acende H2.")
+    x, xc = 80, 190
+    d.borne(x, 24, "L1", net="L1")
+    d.fio((x, 27.5), (x, 40), (xc, 40), (xc, 56), net="L1")
+    d.no(x, 40, net="L1")
+    d.fio((x, 40), (x, 56), net="L1")
+    d.contato(x, 56, id="S1", tag="S1", bornes=("13", "14"), nome="chave S1")
+    d.fio((x, 96), (x, 116), net="a")
+    d.bobina(x, 116, id="KT1.A1", tag="KT1", tempo="on", nome="bobina do temporizador KT1")
+    d.contato(xc, 56, "comutador", id="KT1.15", tag="KT1", bornes=("15", "16", "18"),
+              nome="contato comutador 15-16-18 de KT1")
+    xh1, xh2 = xc + 11, xc - 11
+    d.fio((xh1, 96), (xh1, 106), (xh1 + 30, 106), (xh1 + 30, 116), net="h1")
+    d.fio((xh2, 96), (xh2, 106), (xh2 - 30, 106), (xh2 - 30, 116), net="h2")
+    d.lampada(xh1 + 30, 116, id="H1", tag="H1", nome="lâmpada H1")
+    d.lampada(xh2 - 30, 116, id="H2", tag="H2", nome="lâmpada H2")
+    d.fio((x, 156), (x, 190), (xh1 + 30, 190), (xh1 + 30, 156), net="N")
+    d.fio((xh2 - 30, 156), (xh2 - 30, 190), net="N")
+    d.no(x, 190, net="N")
+    d.no(xh2 - 30, 190, net="N")
+    d.fio((x, 190), (x, 200), net="N")
+    d.borne(x, 203.5, "N", net="N")
+    return d
+
+
+# ---- vistas da Fase 3: simbologia, proteção e comando ------------------------
+
+for _g, _nome in [("G1", "contato-na"), ("G2", "contato-nf"), ("G3", "botao-na"),
+                  ("G4", "botao-nf"), ("G5", "fim-de-curso"), ("G6", "temporizado-energizacao"),
+                  ("G7", "temporizado-desenergizacao"),
+                  ("G9", "bobina"), ("G10", "bobina-temporizador"), ("G11", "fusivel"),
+                  ("G12", "sinalizador")]:
+    vista(M, f"galeria-{_nome}", "galeria", destaque=[_g])
+
+vista(M, "partida-direta-forca", "pd-forca")
+vista(M, "partida-direta-forca-k1-recorte", "pd-forca", recorte=["K1"])
+vista(M, "partida-direta-forca-f10-f7", "pd-forca", destaque=["F10", "F7"])
+vista(M, "partida-direta-comando-q11", "pd-comando", destaque=["Q11"])
+vista(M, "partida-direta-comando-f7", "pd-comando", destaque=["F7.95"])
+vista(M, "partida-direta-comando-e1", "pd-comando", destaque=["K1.23", "E1"])
+vista(M, "temporizador-comutador", "temporizador")
+vista(M, "temporizador-comutador-recorte", "temporizador", recorte=["KT1.15"], destaque=["KT1.15"])
