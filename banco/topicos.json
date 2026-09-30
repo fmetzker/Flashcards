@@ -99,6 +99,46 @@
         "Elementos de Higiene Ocupacional",
         "Sistema de Saúde Brasileiro"
       ]
+    },
+    "comandos-eletricos": {
+      "fonte": "Curso de Eletrotécnica Industrial (SENAI), sem edital: a árvore agrupa, sem acrescentar assunto, os sumários de SENAI-DN, Comandos Elétricos (Série Eletroeletrônica), Brasília: SENAI/DN, 2013 (caps. 2, 3, 4, 7 a 13) e de FRANCHI, C. M., Acionamentos Elétricos, 4. ed., São Paulo: Érica, 2008 (cap. 4, 5, 6 e apêndices A e B). Um tópico por capítulo, exceto 'Simbologia e leitura de diagramas', que reúne o apêndice B do Franchi e a identificação de terminais dos caps. 3 e 4 do SENAI.",
+      "topicos": [
+        "Simbologia e leitura de diagramas",
+        "Dispositivos de proteção",
+        "Dispositivos de comando",
+        "Partida direta",
+        "Partida com reversão",
+        "Partida estrela-triângulo",
+        "Partida compensadora",
+        "Comutação de velocidades",
+        "Aceleração rotórica",
+        "Sensores industriais",
+        "Soft-starter",
+        "Inversor de frequência",
+        "Infraestrutura de painel"
+      ]
+    },
+    "maquinas-eletricas": {
+      "fonte": "Curso de Eletrotécnica Industrial (SENAI), sem edital: a árvore agrupa, sem acrescentar assunto, os sumários de FRANCHI, C. M., Acionamentos Elétricos, 4. ed., São Paulo: Érica, 2008 (caps. 1 a 3) e de SENAI-DN, Comandos Elétricos (Série Eletroeletrônica), Brasília: SENAI/DN, 2013 (caps. 5 e 6).",
+      "topicos": [
+        "Princípios do motor de indução",
+        "Motores monofásicos",
+        "Ligações do motor trifásico",
+        "Características e placa do motor",
+        "Motores especiais",
+        "Potência e fator de potência",
+        "Transformadores",
+        "Motores de corrente contínua"
+      ]
+    },
+    "manutencao-eletrica": {
+      "fonte": "Curso de Eletrotécnica Industrial (SENAI), sem edital: a árvore agrupa, sem acrescentar assunto, o sumário de SENAI-DN, Comandos Elétricos (Série Eletroeletrônica), Brasília: SENAI/DN, 2013, caps. 14 e 15, mais as seções de manutenção (8.3, 9.4, 10.3, 11.3, 12.4, 13.4) no que elas têm de método geral; o que é específico de cada partida fica em Comandos Elétricos.",
+      "topicos": [
+        "Segurança na manutenção",
+        "Instrumentos e medições",
+        "Diagnóstico de falhas",
+        "Manutenção preventiva e preditiva"
+      ]
     }
   }
 }

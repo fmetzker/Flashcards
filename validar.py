@@ -723,7 +723,11 @@ def valida_questoes(B):
         ids.add(q.get('id'))
         texto = (q.get('q', '') + ' '.join(q.get('o', [])) + q.get('e', '')
                   + ' '.join(x for x in q.get('eo', []) if isinstance(x, str)))
-        if re.search(r'destacad|grifad|sublinhad|em negrito', texto, re.I):
+        # "destacado" é legítimo em cartão com figura: o destaque existe, é o
+        # fundo que desenho.destaque() põe atrás do elemento (§1.8). Grifo,
+        # sublinhado e negrito continuam falando do TEXTO, que não tem nada disso.
+        proibido = r'grifad|sublinhad|em negrito' if q.get('img') else r'destacad|grifad|sublinhad|em negrito'
+        if re.search(proibido, texto, re.I):
             erros.append(f"[{rot}] refere-se a formatação que não existe no texto puro")
     return ids
 
@@ -749,6 +753,16 @@ def valida_imagens(B):
         texto = open(os.path.join(RAIZ, script), encoding='utf-8-sig').read()
         if '$obj.img' not in texto or '$obj.alt' not in texto:
             erros.append(f"{script} regrava o cartão sem 'img'/'alt' — a figura do enunciado sumiria")
+    # Figura gerada por código (figuras/*.py + desenho.py) não pode divergir do
+    # SVG em disco: quem corrige o símbolo no código e esquece de regerar
+    # publicaria o desenho velho sem perceber.
+    gerador = os.path.join(RAIZ, 'desenhar-figuras.py')
+    if os.path.exists(gerador):
+        r = subprocess.run([sys.executable, gerador, '--conferir'], capture_output=True,
+                           text=True, encoding='utf-8', errors='replace')
+        if r.returncode != 0:
+            for linha in (r.stdout + r.stderr).strip().splitlines()[-10:]:
+                erros.append(f"figuras: {linha}")
     usadas = set()
     for q in B:
         rot = q.get('id', '(sem id)')

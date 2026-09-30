@@ -407,6 +407,16 @@ enunciado se sustenta sem a figura, ele não leva figura.
 - **Coerente com os números.** Se a figura marca 70°, o ângulo desenhado
   parece 70°. Figura "fora de escala" só quando o próprio enunciado avisa.
 
+**Diagrama elétrico não se desenha à mão.** Os circuitos de comando e de
+força vivem em `figuras/*.py`, desenhados uma vez com os símbolos de
+`desenho.py`; a figura de cada cartão é uma linha `vista()` sobre um deles.
+Antes de desenhar um circuito novo, veja se a pergunta cabe numa vista de um
+que já existe — destacar outro elemento, recortar um pedaço, mostrar os
+contatos acionados, marcar pontos de medição. É o que mantém símbolo,
+numeração e cor iguais em todos os cartões, e o custo de cada figura em uma
+linha. A regra 11 vale para o desenho: circuito-padrão da técnica,
+redesenhado, com a nomenclatura da fonte do cartão — nunca recorte de livro.
+
 **O `alt` é obrigatório.** Descreve a figura em texto — o que o leitor de
 tela lê e o que aparece no lugar dela se não carregar. Descreve o que está
 desenhado (o que está marcado, onde), **nunca a resposta**: "o ângulo x",

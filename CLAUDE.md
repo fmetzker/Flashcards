@@ -271,7 +271,10 @@ regras que o esquema não expressa:
   único mesmo sem ela. Regras em `PADRAO-DOS-CARTOES.md` §1.8. O app busca
   `banco/`+`img` (o service worker guarda em `CACHE_BANCO` e
   `aquecerFigura()` baixa ao carregar a matéria, para funcionar sem rede);
-  o `offline.html` embute como data URI em `window.IMAGENS`.
+  o `offline.html` embute como data URI em `window.IMAGENS`. Diagrama
+  elétrico é gerado por código (`figuras/*.py` → `desenhar-figuras.py`,
+  um circuito desenhado uma vez, uma linha por figura) e nunca recortado
+  de livro: o repositório e o site são públicos.
 
 Antes de escrever qualquer cartão, ler `PADRAO-DOS-CARTOES.md`.
 

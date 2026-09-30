@@ -8,5 +8,8 @@
 {"id":"psicologia","nome":"Psicologia","avulsa":true},
 {"id":"maritimo-maquinas","nome":"Máquinas e Prática Marítima","avulsa":true},
 {"id":"manutencao-mecanica","nome":"Manutenção Mecânica"},
-{"id":"biologia-celular","nome":"Biologia Celular","avulsa":true}
+{"id":"biologia-celular","nome":"Biologia Celular","avulsa":true},
+{"id":"comandos-eletricos","nome":"Comandos Elétricos","avulsa":true},
+{"id":"maquinas-eletricas","nome":"Máquinas Elétricas","avulsa":true},
+{"id":"manutencao-eletrica","nome":"Manutenção Elétrica","avulsa":true}
 ]
