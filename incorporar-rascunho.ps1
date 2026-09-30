@@ -100,7 +100,11 @@ foreach ($m in $porMateria.Keys) {
   $linhas = foreach ($q in $porMateria[$m]) {
     $obj = [ordered]@{ id = Id-Questao $q.q; m = $q.m; t = $q.t }
     if ($q.s) { $obj.s = $q.s }
-    $obj.q = $q.q; $obj.o = $q.o; $obj.c = $q.c; $obj.e = $q.e; $obj.f = $q.f
+    $obj.q = $q.q
+    # figura do enunciado (PADRAO-DOS-CARTOES.md §1.8) logo depois do 'q',
+    # mesma posição dos outros scripts que regravam a linha
+    if ($q.PSObject.Properties.Name -contains 'img' -and $q.img) { $obj.img = $q.img; $obj.alt = $q.alt }
+    $obj.o = $q.o; $obj.c = $q.c; $obj.e = $q.e; $obj.f = $q.f
     # 'n' (nível do cartão dentro do tópico) na mesma posição em que
     # explicar-alternativas.ps1 o grava, para os dois caminhos produzirem
     # exatamente a mesma linha; sem isto, cartão escrito já com nível

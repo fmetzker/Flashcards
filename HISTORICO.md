@@ -359,6 +359,14 @@ Uma correção mirando o número do banco inteiro zerou as três. 0% também é
 viés: "a mais longa nunca é a correta" elimina uma alternativa de graça. O
 alvo é o acaso, ~20%, não o zero.
 
+**Cartão com figura (setembro/2026).** Até aqui o cartão era só texto. Entrou
+`img` + `alt`, só no enunciado — imagem nas alternativas foi descartada porque
+a checagem de viés de comprimento e de alternativa repetida mede texto. Ao
+implementar, os três scripts que regravam a linha do cartão teriam descartado
+a figura em silêncio, o mesmo bug que já tinha apagado `eo` e depois `n`
+(cada script monta o objeto campo a campo). Desta vez a lista virou checagem
+no `validar.py` em vez de lembrete.
+
 **O número agregado mente.** Já esteve em 18% — dentro do acaso — com TODA
 matéria ativa em 0% e as duas inativas em 59%. Quem estuda vê uma matéria, não
 o banco.

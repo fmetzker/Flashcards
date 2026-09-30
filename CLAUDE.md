@@ -147,7 +147,7 @@ no Safari do iPhone sem nenhuma etapa de compilação.
    `incorporar-propostas.ps1` (caixa do Supabase), `incorporar-rascunho.ps1`
    (cartão escrito localmente) e `explicar-alternativas.ps1` (altera campo
    de cartão que já existe, casando por `id` — todos os que não entram no
-   `id`: `eo`, `n`, `o`, `s`, `c`, `e`, `t`, `f`). **Não escrever script de
+   `id`: `eo`, `n`, `o`, `s`, `c`, `e`, `t`, `f`, `img`, `alt`). **Não escrever script de
    gravação por lote** — foi o que corrompeu o banco por encoding e passou
    por cima de regra que o validador reprova. Os três não se qualificam como
    isso porque nenhum reimplementa checagem: rodam `validar` de verdade
@@ -265,6 +265,13 @@ regras que o esquema não expressa:
   Sobre o que já existe sem `eo`, não é retroação automática (regra 9): há
   uma campanha em andamento, matéria por matéria, cartão revisado um a um
   via `explicar-alternativas.ps1` — ver a mesma seção pra ordem e critério.
+- **Figura só no enunciado** (`img` + `alt` obrigatório, arquivo em
+  `banco/img/<matéria>/`) e só quando a figura **é** o fato — nunca
+  decoração, nunca nas alternativas. Não entra no `id`: o `q` precisa ser
+  único mesmo sem ela. Regras em `PADRAO-DOS-CARTOES.md` §1.8. O app busca
+  `banco/`+`img` (o service worker guarda em `CACHE_BANCO` e
+  `aquecerFigura()` baixa ao carregar a matéria, para funcionar sem rede);
+  o `offline.html` embute como data URI em `window.IMAGENS`.
 
 Antes de escrever qualquer cartão, ler `PADRAO-DOS-CARTOES.md`.
 

@@ -270,7 +270,10 @@ foreach ($m in $materias) {
     # nível, CLAUDE.md "Ordem de aprendizado") apagava o `n` em silêncio —
     # mesmo bug que 'eo' já tinha tido, um campo abaixo
     if ($q.PSObject.Properties.Name -contains 'n' -and $q.n) { $obj.n = [int]$q.n }
-    $obj.q = $q.q; $obj.o = @($q.o); $obj.c = [int]$q.c; $obj.e = $q.e; $obj.f = $q.f
+    $obj.q = $q.q
+    # idem para a figura do enunciado (§1.8 do PADRAO-DOS-CARTOES.md)
+    if ($q.PSObject.Properties.Name -contains 'img' -and $q.img) { $obj.img = $q.img; $obj.alt = $q.alt }
+    $obj.o = @($q.o); $obj.c = [int]$q.c; $obj.e = $q.e; $obj.f = $q.f
     # sem isto, reescrever um cartão que já tinha 'eo' apagava a explicação
     # por alternativa em silêncio — o rebuild listava só os campos de sempre
     if ($q.PSObject.Properties.Name -contains 'eo' -and $q.eo) { $obj.eo = @($q.eo) }

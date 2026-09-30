@@ -41,6 +41,27 @@ foreach ($a in $arquivos) {
 }
 $dados = "window.DADOS={`n" + ($partes -join ",`n") + "`n};"
 
+# ---- figuras dos enunciados (campo img, PADRAO-DOS-CARTOES.md §1.8) ----------
+# Um arquivo único não pode apontar para banco/img/: cada figura entra como
+# data URI em window.IMAGENS, de onde srcFigura() a lê. A lista sai dos
+# próprios cartões — imagem sem cartão não entra, cartão sem imagem não quebra.
+$mime = @{ '.svg' = 'image/svg+xml'; '.png' = 'image/png'; '.webp' = 'image/webp' }
+$figuras = [ordered]@{}
+foreach ($m in $materias) {
+  $qs = [System.IO.File]::ReadAllText((Join-Path $dir "$($m.id).json"), [System.Text.Encoding]::UTF8) | ConvertFrom-Json
+  foreach ($q in $qs) {
+    if (-not $q.img -or $figuras.Contains($q.img)) { continue }
+    $arq = Join-Path $dir ($q.img -replace '/', '\')
+    if (-not (Test-Path $arq)) { throw "figura ausente: banco/$($q.img) (cartão $($q.id))" }
+    $ext = [System.IO.Path]::GetExtension($arq).ToLower()
+    if (-not $mime.ContainsKey($ext)) { throw "formato de figura não aceito: $($q.img)" }
+    $b64 = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes($arq))
+    $figuras[$q.img] = "data:$($mime[$ext]);base64,$b64"
+  }
+}
+$partesImg = foreach ($k in $figuras.Keys) { '"' + $k + '":"' + $figuras[$k] + '"' }
+$dados += "`nwindow.IMAGENS={" + (@($partesImg) -join ",`n") + "};"
+
 # ---- injeta no HTML ----------------------------------------------------------
 
 $fonte = [System.IO.File]::ReadAllText($html, [System.Text.Encoding]::UTF8)

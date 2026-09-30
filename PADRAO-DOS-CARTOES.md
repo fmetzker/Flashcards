@@ -367,6 +367,65 @@ fato (regra 11: o substituto também precisa de fonte real no `f`). Enunciado
 espremido até virar charada mede leitura, não conteúdo — é o oposto do que o
 limite existe para conseguir.
 
+### 1.8 Cartão com imagem
+
+Alguns fatos **são** uma figura: o ângulo entre paralelas e transversal, o
+gráfico de uma função, a vista de uma peça, um traçado de ECG. Descrever a
+figura em texto vira charada (fere 1.7) ou entrega a resposta. Para esses,
+o cartão leva uma imagem **no enunciado** — nunca nas alternativas, que
+continuam texto (é o que a checagem de viés de comprimento e de alternativa
+repetida sabem medir).
+
+```json
+{"m":"matematica","t":"Geometria","s":"Ângulos","n":2,
+ "q":"Na figura, as retas r e s são paralelas e t é uma transversal. Qual é a medida do ângulo x?",
+ "img":"img/matematica/paralelas-colaterais-internos.svg",
+ "alt":"Duas retas paralelas horizontais, r em cima e s embaixo, cortadas por uma transversal t…",
+ "o":["110°","70°","20°","290°","35°"],"c":0, "e":"…","f":"…","eo":[…]}
+```
+
+**Quando usar.** Só quando a figura é o fato, ou o dado sem o qual a pergunta
+não existe. Imagem decorativa (a foto do navio, o logotipo do SUS) não entra:
+ocupa a tela, pesa no cache de todo aparelho e não ensina nada. Se o
+enunciado se sustenta sem a figura, ele não leva figura.
+
+**O arquivo.**
+
+- Mora em `banco/img/<matéria>/<nome>.svg` (ou `.png`/`.webp`); `img` guarda
+  o caminho **relativo a `banco/`**. Nome em minúsculas, com hífen, sem
+  acento — descreve o conteúdo, não o número da questão.
+- **SVG é o preferido**: leve, nítido em qualquer tela, e dá para revisar no
+  diff. PNG/WebP só para o que não é desenho (foto, traçado escaneado).
+- **No máximo 150 KB.** Toda figura vai para o cache de todo aparelho e é
+  embutida no `offline.html`.
+- **Autossuficiente**: SVG sem `<script>`, sem evento, sem fonte ou imagem
+  externa — sem rede ela não carregaria. Fundo branco: a tela a mostra sobre
+  um cartão branco.
+- **Desenhada por nós, não recortada da prova.** A figura redesenhada segue a
+  mesma regra do enunciado adaptado (1.6): testa o mesmo fato, com o `f`
+  dizendo de onde o fato vem.
+- **Coerente com os números.** Se a figura marca 70°, o ângulo desenhado
+  parece 70°. Figura "fora de escala" só quando o próprio enunciado avisa.
+
+**O `alt` é obrigatório.** Descreve a figura em texto — o que o leitor de
+tela lê e o que aparece no lugar dela se não carregar. Descreve o que está
+desenhado (o que está marcado, onde), **nunca a resposta**: "o ângulo x",
+não "o ângulo x, colateral interno de 70°, que mede 110°".
+
+**O `id` continua sendo o SHA-1 do `q`** (regra 5). Consequências:
+
+- **O enunciado precisa ser único mesmo com figura diferente.** Dois cartões
+  "Qual é a medida do ângulo x?" com figuras diferentes colidem no `id` — o
+  validador barra. Diga no `q` o que distingue ("…paralelas e transversal…").
+- **Trocar a figura não mexe no `id`** e mantém o progresso — é correção
+  livre, como trocar distrator (via `explicar-alternativas.ps1`, campos `img`
+  e `alt`). Por isso mesmo: trocar a figura por outra que mude a resposta é
+  trocar o cartão, e isso se faz com cartão novo, não com patch.
+
+**O que o `validar` confere:** arquivo existe, caminho no formato certo e na
+pasta da própria matéria, tamanho, `alt` presente, SVG sem script nem
+referência externa. Imagem em `banco/img/` que nenhum cartão usa vira aviso.
+
 ---
 
 ## 2. O que não fazer
@@ -692,6 +751,8 @@ Antes de dar o cartão por pronto:
 - [ ] Tem fonte verificável (lei e artigo, ou manual e capítulo)?
 - [ ] O tópico e o subtópico já existem no banco (em vez de rótulo novo)?
 - [ ] O tópico ainda **pede** este cartão, ou já está saturado (ver 3.5)?
+- [ ] Se tem figura: ela é o fato (não decoração), tem `alt` que descreve
+      sem entregar a resposta, e o `q` é único sem ela? Ver 1.8.
 - [ ] Se adaptado de uma questão real: dá pra responder em **segundos**
       por quem domina o fato/método, ou ainda carrega a demora do
       original (conta longa, texto longo)? Ver 1.6.

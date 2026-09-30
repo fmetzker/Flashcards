@@ -728,6 +728,78 @@ def valida_questoes(B):
     return ids
 
 
+# Cartão com imagem (PADRAO-DOS-CARTOES.md §1.8). 'img' é o caminho RELATIVO a
+# banco/ ("img/<matéria>/<nome>.svg"), porque o app busca "banco/" + img e o
+# service worker guarda tudo debaixo de banco/ no CACHE_BANCO. 'alt' descreve
+# a figura em texto: acessibilidade, e o que aparece se a imagem não carregar.
+IMG_EXTS = ('.svg', '.png', '.webp')
+IMG_MAX_BYTES = 150 * 1024
+_IMG_CAMINHO = re.compile(r'^img/([a-z0-9-]+)/[a-z0-9][a-z0-9-]*\.(svg|png|webp)$')
+# SVG entra por <img> (no app) e por data URI (no offline.html): script não
+# roda em nenhum dos dois, mas referência externa também não carrega — e sem
+# rede, nem no PWA. A figura tem de ser autossuficiente.
+_SVG_PROIBIDO = re.compile(r"""<script|\son[a-z]+\s*=|(?:xlink:)?href\s*=\s*["'](?!#)|@import|url\((?!#)""", re.I)
+
+
+def valida_imagens(B):
+    # Os scripts que REGRAVAM a linha do cartão montam o objeto campo a campo;
+    # campo que eles não listam some em silêncio. Já apagou 'eo' e depois 'n'
+    # (HISTORICO.md) — aqui a lista é conferida, não lembrada.
+    for script in ('incorporar-rascunho.ps1', 'explicar-alternativas.ps1', 'reescrever-questoes.ps1'):
+        texto = open(os.path.join(RAIZ, script), encoding='utf-8-sig').read()
+        if '$obj.img' not in texto or '$obj.alt' not in texto:
+            erros.append(f"{script} regrava o cartão sem 'img'/'alt' — a figura do enunciado sumiria")
+    usadas = set()
+    for q in B:
+        rot = q.get('id', '(sem id)')
+        tem_img, tem_alt = 'img' in q, 'alt' in q
+        if tem_alt and not tem_img:
+            erros.append(f"[{rot}] 'alt' sem 'img' — descrição de imagem que não existe")
+        if not tem_img:
+            continue
+        img, alt = q.get('img'), q.get('alt')
+        if not isinstance(alt, str) or len(alt.strip()) < 10:
+            erros.append(f"[{rot}] 'img' exige 'alt' descrevendo a figura (10+ caracteres) — "
+                         "é o que aparece se ela não carregar, e o que o leitor de tela lê")
+        m = _IMG_CAMINHO.match(img) if isinstance(img, str) else None
+        if not m:
+            erros.append(f"[{rot}] 'img' inválido: {img!r} — formato img/<matéria>/<nome>.svg|png|webp, "
+                         "minúsculas, hífen, sem acento nem espaço")
+            continue
+        if m.group(1) != q.get('m'):
+            erros.append(f"[{rot}] 'img' está na pasta da matéria '{m.group(1)}', mas o cartão é de '{q.get('m')}'")
+        caminho = os.path.join(BANCO_DIR, *img.split('/'))
+        usadas.add(os.path.normcase(os.path.normpath(caminho)))
+        if not os.path.isfile(caminho):
+            erros.append(f"[{rot}] imagem não encontrada: banco/{img}")
+            continue
+        tam = os.path.getsize(caminho)
+        if tam > IMG_MAX_BYTES:
+            erros.append(f"[{rot}] banco/{img} tem {tam//1024} KB — limite {IMG_MAX_BYTES//1024} KB "
+                         "(vai para o cache de todo aparelho e embutido no offline.html)")
+        if img.endswith('.svg'):
+            try:
+                svg = open(caminho, encoding='utf-8').read()
+            except Exception as e:
+                erros.append(f"[{rot}] banco/{img} ilegível como UTF-8: {e}")
+                continue
+            if '<svg' not in svg:
+                erros.append(f"[{rot}] banco/{img} não parece SVG")
+            elif _SVG_PROIBIDO.search(svg):
+                erros.append(f"[{rot}] banco/{img} tem script, evento ou referência externa — "
+                             "a figura precisa ser autossuficiente (offline e sem código)")
+    # imagem que nenhum cartão usa vai para o cache de todo mundo à toa;
+    # aviso, não erro: no fluxo normal ela existe ANTES de o cartão ser incorporado
+    pasta = os.path.join(BANCO_DIR, 'img')
+    if os.path.isdir(pasta):
+        for raiz_dir, _, arquivos in os.walk(pasta):
+            for nome in arquivos:
+                c = os.path.join(raiz_dir, nome)
+                if os.path.normcase(os.path.normpath(c)) not in usadas:
+                    rel = os.path.relpath(c, BANCO_DIR).replace(os.sep, '/')
+                    avisos.append(f"banco/{rel} não é usada por nenhum cartão")
+
+
 def mede_vies(B):
     def d(q):
         c = len(q['o'][q['c']])
@@ -991,7 +1063,8 @@ def carrega_patches(B, caminho):
     """Aplica em memória, sobre cartão que JÁ EXISTE no banco, os campos que
     não entram no id: 'eo' (explicação por alternativa), 'n' (nível do cartão
     dentro do tópico), 'o' (as alternativas), 's' (subtópico), 'c' (índice da
-    correta), 'e' (explicação principal) e 't' (tópico) — usado por
+    correta), 'e' (explicação principal), 't' (tópico), 'f' (fonte) e
+    'img'/'alt' (figura do enunciado) — usado por
     explicar-alternativas.ps1.
 
     Mesmo motivo do carrega_rascunho: toda regra deste arquivo precisa
@@ -1025,7 +1098,7 @@ def carrega_patches(B, caminho):
         patches = [patches]
     por_id = {q['id']: q for q in B}
     aplicados = 0
-    campos_validos = ('eo', 'n', 'o', 's', 'c', 'e', 't', 'f')
+    campos_validos = ('eo', 'n', 'o', 's', 'c', 'e', 't', 'f', 'img', 'alt')
     for p in patches:
         pid = p.get('id')
         if not pid or pid not in por_id:
@@ -1087,6 +1160,17 @@ def carrega_patches(B, caminho):
             por_id[pid]['n'] = p.get('n')
         if 's' in p:
             por_id[pid]['s'] = p.get('s')
+        # 'img'/'alt' (§1.8): trocar a figura é correção livre, como trocar
+        # alternativa — não entra no id. 'img' vazio/null REMOVE a figura e o
+        # 'alt' junto; valida_imagens confere o resultado como qualquer cartão.
+        if 'img' in p:
+            if p.get('img'):
+                por_id[pid]['img'] = p.get('img')
+            else:
+                por_id[pid].pop('img', None)
+                por_id[pid].pop('alt', None)
+        if 'alt' in p and p.get('img', True):
+            por_id[pid]['alt'] = p.get('alt')
         aplicados += 1
     print(f"Patches: {aplicados} de {len(patches)} aplicado(s) em memória (nada foi gravado)\n")
     return B
@@ -1118,6 +1202,7 @@ def main():
     valida_js(fonte)
     valida_motor()
     ids = valida_questoes(B)
+    valida_imagens(B)
     valida_migracao(B, ids)
     valida_topicos(B, materias)
     valida_requisitos(B, materias)

@@ -30,13 +30,15 @@ desatualizado.
 | `s` | não | subtópico; não pode repetir o `t` | não |
 | `n` | não | nível do cartão dentro do tópico (1=definição). Ausente vale 1 | não |
 | `q` | sim | enunciado — **muda o `id`** | **sim** |
+| `img` | não | figura do enunciado, caminho relativo a `banco/` (`img/<matéria>/<nome>.svg`). Ver `PADRAO-DOS-CARTOES.md` §1.8 | não |
+| `alt` | com `img` | descrição da figura em texto (leitor de tela e reserva se não carregar) | não |
 | `o` | sim | exatamente 5 alternativas, sem repetir | não |
 | `c` | sim | índice da correta, 0 a 4 | não |
 | `e` | sim | explicação da questão inteira | não |
 | `f` | sim | fonte: lei e artigo, ou manual e capítulo | não |
 | `eo` | não | explicação por alternativa; tamanho igual ao de `o` | não |
 
-Só `q` entra no `id`. Por isso corrigir `o`, `e`, `f`, `n`, `eo` é barato, e
+Só `q` entra no `id`. Por isso corrigir `o`, `e`, `f`, `n`, `eo`, `img` é barato, e
 corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 
 ### Os três eixos de organização
@@ -62,16 +64,17 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 | `banco/<matéria>.json` | Questões daquela matéria, uma por linha |
 | `banco/topicos.json` | Árvore oficial do edital — mostra tópico que a prova cobra e o banco não cobre |
 | `banco/requisitos.json` | A fila de estudo (tópico e subtópico) — **trava** cartão novo até a base do anterior da fila; mais o grafo conceitual que a justifica |
+| `banco/img/<matéria>/*` | Figuras de enunciado (campo `img`). Nenhuma lista à mão: o app, o `gerar-offline.ps1` e o `validar.py` as acham pelos próprios cartões |
 | `banco/indice-legado.json` | Ids na ordem antiga do array — migra progresso pré-id estável |
 | `banco/reescritas.json` | Mapa id antigo→novo de enunciados corrigidos — preserva progresso |
 | `sw.js` | Service worker, rede-primeiro. `VERSAO` sobe a cada mudança no app |
 | `manifest.json`, `icone-*.png`, `apple-touch-icon.png` | PWA |
-| `validar.py` | Integridade do banco **e** conduta do motor (roda o `testar.js`). `--rascunho` valida candidato, `--patches` valida `eo`/`n`/`o`/`s`/`c`/`e`/`t`/`f`, nenhum dos dois grava |
+| `validar.py` | Integridade do banco **e** conduta do motor (roda o `testar.js`). `--rascunho` valida candidato, `--patches` valida `eo`/`n`/`o`/`s`/`c`/`e`/`t`/`f`/`img`/`alt`, nenhum dos dois grava |
 | `validar.ps1` | Invólucro: só chama o `validar.py` com os mesmos argumentos. Não valida nada por conta própria |
 | `testar.js` + `testes/*.js` | Conduta do **motor** (Leitner, pré-requisito, nível, meta, fuso). `node testar.js [filtro]`; o `validar.py` roda sozinho |
 | `auditar-banco.py` / `.ps1` | Mede contra o `PADRAO-DOS-CARTOES.md`. Mede, não reprova |
 | `rascunho.json` | Cartões em elaboração, sem `id`. Vazio quando não há trabalho |
-| `explicacoes.json` | Patches por `id`: `eo`, `n`, `o`, `s`, `c`, `e`, `t` e/ou `f`. Vazio quando não há trabalho |
+| `explicacoes.json` | Patches por `id`: `eo`, `n`, `o`, `s`, `c`, `e`, `t`, `f`, `img` e/ou `alt`. Vazio quando não há trabalho |
 | `servidor.ps1` | Servidor local, `http://localhost:8080` |
 | `gerar-offline.ps1` → `offline.html` | App inteiro num arquivo. **Gerado — não editar** |
 | `supabase/schema.sql` | Tabelas, RLS, triggers |
@@ -91,11 +94,16 @@ falham fechado.
 | Script | Entrada | Escreve | Uso |
 |---|---|---|---|
 | `incorporar-rascunho.ps1` | `rascunho.json` | cartão novo inteiro | cartão escrito à mão |
-| `explicar-alternativas.ps1` | `explicacoes.json`, ou `-DoSupabase` (caixa `correcoes`) | `eo`, `n`, `o`, `s`, `c`, `e`, `t` e/ou `f` por `id` | campo em cartão que já existe |
+| `explicar-alternativas.ps1` | `explicacoes.json`, ou `-DoSupabase` (caixa `correcoes`) | `eo`, `n`, `o`, `s`, `c`, `e`, `t`, `f`, `img` e/ou `alt` por `id` | campo em cartão que já existe |
 | `incorporar-propostas.ps1` | Supabase | cartão novo inteiro | caixa de entrada colaborativa |
 | `reescrever-questoes.ps1` | — | `q` + `banco/reescritas.json` | único jeito de mudar enunciado |
 
 Campo ausente no patch é **preservado**: mandar só `n` não apaga o `eo`.
+
+Os três scripts que **regravam** a linha inteira (`incorporar-rascunho`,
+`explicar-alternativas`, `reescrever-questoes`) montam o objeto campo a
+campo — campo que eles não listam some. `validar.py` confere que os três
+listam `img`/`alt`; campo novo no cartão precisa entrar nos três.
 
 `publicar-correcoes.ps1` não está nesta tabela porque **não escreve**: ele
 revisa as correções pendentes do app, chama o `explicar-alternativas.ps1`,

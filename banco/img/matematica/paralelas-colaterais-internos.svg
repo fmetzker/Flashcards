@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200" font-family="Georgia, 'Times New Roman', serif" font-size="17">
+  <g stroke="#16232E" stroke-width="2" stroke-linecap="round">
+    <line x1="20" y1="60" x2="300" y2="60"/>
+    <line x1="20" y1="150" x2="300" y2="150"/>
+    <line x1="123.6" y1="15" x2="187.3" y2="190"/>
+  </g>
+  <g fill="none" stroke="#0E7C66" stroke-width="2">
+    <path d="M 162 60 A 22 22 0 0 1 147.5 80.7"/>
+    <path d="M 190.7 150 A 18 18 0 0 0 166.5 133.1"/>
+  </g>
+  <g fill="#16232E" font-style="italic">
+    <text x="296" y="52" text-anchor="end">r</text>
+    <text x="296" y="142" text-anchor="end">s</text>
+    <text x="198" y="190">t</text>
+  </g>
+  <text x="170" y="87" fill="#0E7C66">70°</text>
+  <text x="190" y="128" fill="#0E7C66" font-style="italic" font-weight="bold">x</text>
+</svg>

@@ -170,6 +170,17 @@ button.fechar{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;
 .cantoQ #q-id{font-size:9.5px;opacity:.55;letter-spacing:.2px}
 .tag{background:var(--verde-luz);color:var(--verde);padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600}
 .enunciado{font-size:17.5px;line-height:1.5;margin-bottom:16px}
+/* figura do enunciado (campo img, PADRAO-DOS-CARTOES.md §1.8). Fundo branco
+   fixo: o desenho é feito para papel, não para o --papel da tela. Tocar
+   amplia em tela cheia; tocar de novo volta. */
+.figura{margin:12px 0 0;padding:10px;background:#fff;border:1px solid var(--traco);
+  border-radius:12px;cursor:zoom-in}
+.figura img{display:block;max-width:100%;max-height:45vh;height:auto;margin:0 auto}
+.figura.ampliada{position:fixed;inset:0;margin:0;border:0;border-radius:0;z-index:90;
+  display:flex;align-items:center;justify-content:center;cursor:zoom-out;
+  padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom))}
+.figura.ampliada img{max-height:100%;width:100%;object-fit:contain}
+.figura.sem-figura{cursor:default;font-size:14px;color:var(--tinta2);font-style:italic}
 .alt{display:flex;align-items:stretch;background:var(--card);border:1px solid var(--traco);
   border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color .15s,background .15s}
 .corpo-alt{flex:1;display:flex;gap:11px;align-items:flex-start;padding:12px;cursor:pointer;min-width:0}
@@ -754,6 +765,37 @@ async function fetchComPrazo(url, opcoes){
    fetch; na versão de arquivo único, gerada por gerar-offline.ps1, os mesmos
    dados vêm embutidos em window.DADOS e nenhuma requisição é feita — é isso
    que faz o app abrir com duplo clique, sem servidor e sem rede. */
+/* Figura do enunciado (campo img, relativo a banco/). No offline.html ela vem
+   embutida em window.IMAGENS como data URI; no app publicado, pela rede — e o
+   service worker a guarda no CACHE_BANCO como qualquer coisa debaixo de
+   banco/. Se não carregar, fica o 'alt', que o validador exige: o cartão
+   continua respondível em texto em vez de mostrar um ícone quebrado. */
+function srcFigura(img){
+  return (window.IMAGENS && IMAGENS[img]) || "banco/"+img;
+}
+function pintarEnunciado(el, q){
+  el.textContent = q.q;
+  if(!q.img) return;
+  const fig = document.createElement("figure"); fig.className = "figura";
+  const im = document.createElement("img");
+  im.alt = q.alt || ""; im.decoding = "async";
+  im.onerror = () => { fig.className = "figura sem-figura"; fig.textContent = "Figura indisponível — " + (q.alt || ""); };
+  im.src = srcFigura(q.img);
+  fig.onclick = () => { if(!fig.classList.contains("sem-figura")) fig.classList.toggle("ampliada"); };
+  fig.appendChild(im); el.appendChild(fig);
+}
+/* Baixa a figura assim que a matéria carrega, e não só quando o cartão
+   aparece: é o que garante que ela esteja no CACHE_BANCO antes de o aparelho
+   ficar sem rede. Só busca o que ainda não está em cache — o service worker
+   é rede-primeiro, e rebaixar toda figura a cada boot seria desperdício. */
+const FIGURAS_AQUECIDAS = new Set();
+function aquecerFigura(img){
+  if(window.DADOS || !("caches" in window) || FIGURAS_AQUECIDAS.has(img)) return;
+  FIGURAS_AQUECIDAS.add(img);
+  const url = "banco/"+img;
+  caches.match(url).then(r => r || fetch(url)).catch(()=>{});
+}
+
 async function pega(caminho){
   if(window.DADOS && DADOS[caminho]) return DADOS[caminho];
   const r = await fetchComPrazo(caminho);
@@ -946,7 +988,7 @@ async function carregarBancoParcial(lista, aoCadaUma){
   if(!lista.length) return;
   await Promise.all(lista.map(m => pega("banco/"+m+".json").then(qs=>{
     BANCO = BANCO.concat(qs);
-    qs.forEach(q=>{ porId[q.id] = q; });
+    qs.forEach(q=>{ porId[q.id] = q; if(q.img) aquecerFigura(q.img); });
     if(aoCadaUma) aoCadaUma(m);
   })));
 }
@@ -2589,7 +2631,7 @@ function mostrarQuestao(){
   document.getElementById("q-tag").style.display = "none";
   document.getElementById("q-contador").textContent = (S.pos+1)+"/"+S.lista.length;
   document.getElementById("q-id").textContent = q.id;
-  document.getElementById("q-enunciado").textContent = q.q;
+  pintarEnunciado(document.getElementById("q-enunciado"), q);
   document.getElementById("q-expl").innerHTML = "";
   const box = document.getElementById("q-alts"); box.innerHTML="";
   S.perm.forEach((orig,i)=>{
@@ -2821,7 +2863,7 @@ function pintarEditor(){
   const q = ED.q;
   document.getElementById("ed-sub").textContent =
     ((MATERIAS[q.m]||{}).nome || q.m) + " · " + q.id;
-  document.getElementById("ed-enunciado").textContent = q.q;
+  pintarEnunciado(document.getElementById("ed-enunciado"), q);
 
   const mot = document.getElementById("ed-motivo");
   mot.style.display = ED.motivo ? "" : "none";
@@ -3091,7 +3133,7 @@ async function pintarCorrecoes(){
 
     const enun = document.createElement("div");
     enun.style.cssText = "font-size:15px;line-height:1.45;margin:8px 0";
-    enun.textContent = q ? q.q : "id: "+cor.questao_id;
+    if(q) pintarEnunciado(enun, q); else enun.textContent = "id: "+cor.questao_id;
     card.appendChild(enun);
 
     /* antes → depois, campo a campo. Aprovar sem ver isso seria aprovar um
@@ -3237,7 +3279,7 @@ function iniciarSimulado(){
 function mostrarSim(){
   const q = porId[SIM.lista[SIM.pos]], perm = SIM.perms[SIM.pos];
   document.getElementById("s-contador").textContent = (SIM.pos+1)+"/"+SIM.lista.length;
-  document.getElementById("s-enunciado").textContent = q.q;
+  pintarEnunciado(document.getElementById("s-enunciado"), q);
   const box = document.getElementById("s-alts"); box.innerHTML="";
   perm.forEach((orig,i)=>{
     // sem o botão de eliminar (só faz sentido no estudo), mas com o mesmo
@@ -3765,7 +3807,7 @@ async function pintarReportes(){
 
     const enun = document.createElement("div");
     enun.style.cssText = "font-size:15.5px;line-height:1.5;margin:8px 0";
-    enun.textContent = q ? q.q : "Enunciado não disponível neste aparelho — a matéria dessa questão não está entre os concursos que você segue. O id abaixo identifica ela em banco/*.json.";
+    if(q) pintarEnunciado(enun, q); else enun.textContent = "Enunciado não disponível neste aparelho — a matéria dessa questão não está entre os concursos que você segue. O id abaixo identifica ela em banco/*.json.";
     card.appendChild(enun);
 
     const motivo = document.createElement("div"); motivo.className = "aviso";
