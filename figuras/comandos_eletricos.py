@@ -194,3 +194,165 @@ vista(M, "partida-direta-comando-f7", "pd-comando", destaque=["F7.95"])
 vista(M, "partida-direta-comando-e1", "pd-comando", destaque=["K1.23", "E1"])
 vista(M, "temporizador-comutador", "temporizador")
 vista(M, "temporizador-comutador-recorte", "temporizador", recorte=["KT1.15"], destaque=["KT1.15"])
+
+
+# ---- Partida direta: comando de vários pontos (Franchi, Figura A.8) ----------
+
+@circuito("varios-pontos")
+def varios_pontos():
+    """Dois postos de comando: desliga S0a e S0b em série (NF); liga S1a e
+    S1b em paralelo entre si e com o selo K1 13-14."""
+    d = Desenho(290, 350, alt="Comando de um motor por dois postos, entre L1 e L2: Q11, F7 95-96, "
+                "os botões de desligar S0a e S0b em série; depois os botões de ligar S1a e S1b "
+                "em paralelo entre si e com o contato de selo K1 13-14; por fim a bobina de K1.")
+    x, x2, x3 = 100, 160, 220
+    d.borne(x, 24, "L1", net="L1")
+    d.texto(x + 12, 28, "220 V / 60 Hz", tam=11)
+    d.fio((x, 27.5), (x, 32), net="L1")
+    d.contato(x, 32, id="Q11", tag="Q11", atuador="disjuntor", nome="disjuntor Q11")
+    d.fio((x, 72), (x, 76), net="a")
+    d.contato(x, 76, "nf", id="F7.95", tag="F7", bornes=("95", "96"), atuador="termico",
+              nome="contato 95-96 de F7")
+    d.fio((x, 116), (x, 120), net="b")
+    d.contato(x, 120, "nf", id="S0a", tag="S0a", bornes=("11", "12"), atuador="botao",
+              nome="botão desliga S0a")
+    d.fio((x, 160), (x, 164), net="c")
+    d.contato(x, 164, "nf", id="S0b", tag="S0b", bornes=("11", "12"), atuador="botao",
+              nome="botão desliga S0b")
+    n1, n2 = 214, 272
+    d.fio((x, 204), (x, n1), (x3, n1), net="N1")
+    for xx in (x, x2, x3):
+        d.fio((xx, n1), (xx, 222), net="N1")
+    d.no(x, n1, net="N1")
+    d.no(x2, n1, net="N1")
+    d.contato(x, 222, id="S1a", tag="S1a", bornes=("13", "14"), atuador="botao", nome="botão liga S1a")
+    d.contato(x2, 222, id="S1b", tag="S1b", bornes=("13", "14"), atuador="botao", nome="botão liga S1b")
+    d.contato(x3, 222, id="K1.13", tag="K1", bornes=("13", "14"), nome="contato de selo K1 13-14")
+    d.fio((x3, 262), (x3, n2), (x, n2), net="N2")
+    d.fio((x2, 262), (x2, n2), net="N2")
+    d.fio((x, 262), (x, n2), (x, 280), net="N2")
+    d.no(x, n2, net="N2")
+    d.no(x2, n2, net="N2")
+    d.bobina(x, 280, id="K1.A1", tag="K1", nome="bobina de K1")
+    d.fio((x, 320), (x, 326), net="L2")
+    d.borne(x, 329.5, "L2", net="L2")
+    return d
+
+
+# ---- Partida com reversão (apostila SENAI, cap. 9, nomenclatura da Figura 175) --
+
+@circuito("rev-comando")
+def rev_comando():
+    """Comando da reversão em 24 VCC. Coluna de K10 (x=100): S1 13-14 com o
+    selo K10 13-14 em paralelo; S2 21-22 e K20 21-22 (intertravamentos); bobina
+    K10. Coluna de K20 (x=220): o espelho. Sinalização: K10 33-34 -> E1 e
+    K20 33-34 -> E2."""
+    d = Desenho(410, 470, alt="Comando de partida com reversão em 24 VCC: F1, contato 95-96 do "
+                "disjuntor-motor Q1 e S0. Coluna de K10: S1 13-14 com o selo K10 13-14 em paralelo, "
+                "depois o NF 21-22 de S2, o NF 21-22 de K20 e a bobina de K10. Coluna de K20: S2 "
+                "13-14 com o selo K20 13-14, o NF 21-22 de S1, o NF 21-22 de K10 e a bobina de K20. "
+                "À direita, K10 33-34 acende E1 e K20 33-34 acende E2. Embaixo, F2 e 0 V.")
+    x, xa, xb, xs2, xl1, xl2 = 100, 150, 220, 270, 330, 380
+    d.borne(x, 22, "+24 VCC", net="P")
+    d.fio((x, 25.5), (x, 30), net="P")
+    d.fusivel(x, 30, id="F1", tag="F1", nome="fusível F1")
+    d.fio((x, 70), (x, 76), net="a")
+    d.contato(x, 76, "nf", id="Q1.95", tag="Q1", bornes=("95", "96"), atuador="termico",
+              nome="contato 95-96 do disjuntor-motor Q1")
+    d.fio((x, 116), (x, 122), net="b")
+    d.contato(x, 122, "nf", id="S0", tag="S0", bornes=("11", "12"), atuador="botao", nome="botão desliga S0")
+    n1 = 172
+    d.fio((x, 162), (x, n1), (xl2, n1), net="N1")
+    for xx in (x, xa, xb, xs2, xl1, xl2):
+        d.fio((xx, n1), (xx, 180), net="N1")
+    for xx in (x, xa, xb, xs2, xl1):
+        d.no(xx, n1, net="N1")
+    # coluna K10
+    d.contato(x, 180, id="S1", tag="S1", bornes=("13", "14"), atuador="botao", nome="botão S1 (13-14)")
+    d.contato(xa, 180, id="K10.13", tag="K10", bornes=("13", "14"), nome="selo K10 13-14")
+    d.fio((xa, 220), (xa, 230), (x, 230), net="A2")
+    d.fio((x, 220), (x, 236), net="A2")
+    d.no(x, 230, net="A2")
+    d.contato(x, 236, "nf", id="S2.21", tag="S2", bornes=("21", "22"), atuador="botao",
+              nome="contato NF 21-22 do botão S2")
+    d.fio((x, 276), (x, 282), net="A3")
+    d.contato(x, 282, "nf", id="K20.21", tag="K20", bornes=("21", "22"), nome="contato NF 21-22 de K20")
+    d.fio((x, 322), (x, 328), net="A4")
+    d.bobina(x, 328, id="K10.A1", tag="K10", nome="bobina de K10")
+    # coluna K20
+    d.contato(xb, 180, id="S2", tag="S2", bornes=("13", "14"), atuador="botao", nome="botão S2 (13-14)")
+    d.contato(xs2, 180, id="K20.13", tag="K20", bornes=("13", "14"), nome="selo K20 13-14")
+    d.fio((xs2, 220), (xs2, 230), (xb, 230), net="B2")
+    d.fio((xb, 220), (xb, 236), net="B2")
+    d.no(xb, 230, net="B2")
+    d.contato(xb, 236, "nf", id="S1.21", tag="S1", bornes=("21", "22"), atuador="botao",
+              nome="contato NF 21-22 do botão S1")
+    d.fio((xb, 276), (xb, 282), net="B3")
+    d.contato(xb, 282, "nf", id="K10.21", tag="K10", bornes=("21", "22"), nome="contato NF 21-22 de K10")
+    d.fio((xb, 322), (xb, 328), net="B4")
+    d.bobina(xb, 328, id="K20.A1", tag="K20", nome="bobina de K20")
+    # sinalização
+    d.contato(xl1, 180, id="K10.33", tag="K10", bornes=("33", "34"), nome="contato K10 33-34")
+    d.contato(xl2, 180, id="K20.33", tag="K20", bornes=("33", "34"), nome="contato K20 33-34")
+    d.fio((xl1, 220), (xl1, 328), net="e1")
+    d.fio((xl2, 220), (xl2, 328), net="e2")
+    d.lampada(xl1, 328, id="E1", tag="E1", nome="lâmpada E1")
+    d.lampada(xl2, 328, id="E2", tag="E2", nome="lâmpada E2")
+    col = 384
+    for xx in (x, xb, xl1, xl2):
+        d.fio((xx, 368), (xx, col), net="Z")
+    d.fio((x, col), (xl2, col), net="Z")
+    for xx in (x, xb, xl1):
+        d.no(xx, col, net="Z")
+    d.fio((x, col), (x, 392), net="Z")
+    d.fusivel(x, 392, id="F2", tag="F2", nome="fusível F2")
+    d.fio((x, 432), (x, 438), net="0V")
+    d.borne(x, 441.5, "0 V", net="0V")
+    return d
+
+
+@circuito("rev-forca")
+def rev_forca():
+    """Força da reversão: Q1 -> K10 (L1-U1, L2-V1, L3-W1) em paralelo com K20,
+    que troca L1 e L3 (L1-W1, L3-U1)."""
+    d = Desenho(310, 350, alt="Força da partida com reversão: L1, L2 e L3 passam pelo disjuntor-motor "
+                "Q1 e se dividem entre os contatores K10 e K20. K10 liga L1 ao U1, L2 ao V1 e L3 ao W1. "
+                "K20 liga L2 ao V1 e troca as outras duas: L1 vai ao W1 e L3 ao U1.")
+    xs = (100, 130, 160)
+    xr = (210, 240, 270)
+    for y, f in zip((30, 46, 62), ("L1", "L2", "L3")):
+        d.barramento(y, 50, 290, f)
+    for x, y, f in zip(xs, (30, 46, 62), ("L1", "L2", "L3")):
+        d.fio((x, y), (x, 80), net=f)
+        d.no(x, y, net=f)
+    d.tripolar(xs, 80, "contato", "Q1", tag="Q1", nome="polo do disjuntor-motor Q1", atuador="disjuntor")
+    for x, xx, y, f in zip(xs, xr, (132, 140, 148), ("L1", "L2", "L3")):
+        d.fio((x, 120), (x, 162), net=f + "q")
+        d.fio((x, y), (xx, y), (xx, 162), net=f + "q")
+        d.no(x, y, net=f + "q")
+    d.tripolar(xs, 162, "contato", "K10", tag="K10", nome="polo de K10")
+    d.tripolar(xr, 162, "contato", "K20", tag=None, nome="polo de K20")
+    with d.grupo("K20.tag"):
+        d.texto(xr[-1] + 18, 186, "K20", negrito=True)
+    ym = 268
+    for x, f in zip(xs, ("U", "V", "W")):
+        d.fio((x, 202), (x, ym), net=f)
+    # K20: L1 (210) -> W1 (160); L2 (240) -> V1 (130); L3 (270) -> U1 (100)
+    for xx, xd, y, f in zip(xr, (160, 130, 100), (230, 238, 246), ("W", "V", "U")):
+        d.fio((xx, 202), (xx, y), (xd, y), net=f)
+        d.no(xd, y, net=f)
+    d.motor3(xs, ym, tag="M1")
+    return d
+
+
+vista(M, "varios-pontos", "varios-pontos")
+vista(M, "partida-direta-comando-pontos-s1", "pd-comando", pontos=[("A", "S1", "topo"), ("B", "K1.A1", "topo", "esq")])
+vista(M, "partida-direta-comando-pontos-bobina", "pd-comando", pontos=[("A", "K1.A1", "topo", "esq"), ("B", "K1.A1", "base", "esq")])
+vista(M, "partida-direta-forca-contato-l2", "pd-forca", pontos=[("A", "K1.L2", "topo"), ("B", "K1.L2", "base")])
+vista(M, "partida-direta-forca-k1", "pd-forca", destaque=["K1.L1", "K1.L2", "K1.L3"])
+vista(M, "reversao-comando", "rev-comando")
+vista(M, "reversao-comando-k20-21", "rev-comando", destaque=["K20.21"])
+vista(M, "reversao-comando-s2-21", "rev-comando", destaque=["S2.21"])
+vista(M, "reversao-comando-pontos-k20", "rev-comando", pontos=[("A", "K20.A1", "topo", "esq"), ("B", "K20.A1", "base", "esq")])
+vista(M, "reversao-forca", "rev-forca")
+vista(M, "reversao-forca-k20", "rev-forca", destaque=["K20"])

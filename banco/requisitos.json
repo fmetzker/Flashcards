@@ -3821,7 +3821,7 @@
       }
     },
     "comandos-eletricos": {
-      "criterio": "A fila segue a própria sequência da apostila do curso (SENAI-DN, Comandos Elétricos, 2013): primeiro ler o desenho, depois conhecer os dispositivos, depois montar o circuito. (1) Simbologia e leitura de diagramas — contato NA/NF, numeração de terminais, símbolos e letras, sem os quais nenhum diagrama se lê. (2) Dispositivos de proteção (cap. 3) e (3) Dispositivos de comando (cap. 4), na ordem da apostila. (4) Partida direta (cap. 8), o primeiro circuito completo, que junta tudo. As demais partidas, sensores e acionamentos eletrônicos entram depois, cada uma em seu lote.",
+      "criterio": "A fila segue a sequência da apostila do curso (SENAI-DN, Comandos Elétricos, 2013): primeiro ler o desenho, depois conhecer os dispositivos, depois montar os circuitos, do mais simples ao mais complexo. (1) Simbologia e leitura de diagramas. (2) Dispositivos de proteção (cap. 3) e (3) de comando (cap. 4). (4) Partida direta (cap. 8), o primeiro circuito completo. (5) Reversão (cap. 9), que são duas partidas diretas com intertravamento. (6-9) As partidas com tensão reduzida ou velocidade variável, na ordem da apostila: estrela-triângulo, compensadora, comutação de velocidades, aceleração rotórica (caps. 10-13). (10) Sensores (cap. 7), que a apostila apresenta antes mas que os circuitos só usam depois. (11-12) Soft-starter e inversor (Franchi cap. 6). (13) Infraestrutura de painel (cap. 2), montagem física, por último.",
       "requisitos": {
         "Dispositivos de proteção": [
           "Simbologia e leitura de diagramas"
@@ -3831,9 +3831,12 @@
         ],
         "Partida direta": [
           "Dispositivos de comando"
+        ],
+        "Partida com reversão": [
+          "Partida direta"
         ]
       },
-      "criterio_conceitual": "Dispositivos de comando exige Simbologia porque contator, botão e temporizador são descritos pelos seus contatos NA/NF e pela numeração dos terminais. Partida direta exige os três: o circuito é lido pela simbologia e montado com os dispositivos de proteção (fusível, relé térmico, disjuntor) e de comando (contator, botões, sinalizador). Dispositivos de proteção não exige nada conceitualmente: fusível e disjuntor se entendem sem diagrama; na fila vem depois da Simbologia só por ordem de ensino.",
+      "criterio_conceitual": "Comando exige Simbologia (dispositivos descritos por contatos e terminais). Partida direta exige Simbologia, Proteção e Comando: é o circuito que junta tudo. Toda outra partida (reversão, estrela-triângulo, compensadora, comutação, rotórica) exige Partida direta, porque reaproveita o seu circuito de comando (selo, proteção, sinalização) e só acrescenta contatores e temporização. Soft-starter e inversor exigem Partida direta porque substituem as chaves eletromecânicas e só se entendem por comparação a elas. Sensores e Infraestrutura exigem os Dispositivos de comando (o sensor entra no lugar de um botão; o painel abriga os dispositivos).",
       "requisitos_conceituais": {
         "Dispositivos de comando": [
           "Simbologia e leitura de diagramas"
@@ -3842,9 +3845,12 @@
           "Simbologia e leitura de diagramas",
           "Dispositivos de proteção",
           "Dispositivos de comando"
+        ],
+        "Partida com reversão": [
+          "Partida direta"
         ]
       },
-      "criterio_subtopicos": "Dentro de cada tópico, a ordem da apostila, do elemento mais simples ao composto. Simbologia: contato NA/NF → numeração (que diz se é NA ou NF) → símbolos → letras → força e comando (que exige saber ler todos os anteriores). Proteção: fusível → disjuntor → DR (um disjuntor com mais uma função) → relé térmico → disjuntor-motor (que junta disjuntor e relé térmico). Comando: seccionadora → botões e fins de curso → contatores → relés e temporizadores → relés de proteção → sinalizadores. Partida direta: funcionamento antes do diagnóstico, porque só se acha o defeito de um circuito que se sabe como funciona.",
+      "criterio_subtopicos": "Dentro de cada tópico, do elemento ao conjunto, e o funcionamento antes do diagnóstico: só se acha o defeito de um circuito que se sabe como funciona. Nas partidas, a ordem é funcionamento → cálculo ou dimensionamento → diagnóstico de defeitos; na reversão, o intertravamento vem entre o funcionamento e o diagnóstico porque é o que a distingue de duas partidas diretas soltas.",
       "requisitos_subtopicos": {
         "Simbologia e leitura de diagramas|Numeração de terminais": [
           {
@@ -3924,10 +3930,28 @@
             "s": "Relés de proteção"
           }
         ],
-        "Partida direta|Diagnóstico de defeitos": [
+        "Partida direta|Aplicação e dimensionamento": [
           {
             "t": "Partida direta",
             "s": "Funcionamento"
+          }
+        ],
+        "Partida direta|Diagnóstico de defeitos": [
+          {
+            "t": "Partida direta",
+            "s": "Aplicação e dimensionamento"
+          }
+        ],
+        "Partida com reversão|Intertravamento": [
+          {
+            "t": "Partida com reversão",
+            "s": "Funcionamento"
+          }
+        ],
+        "Partida com reversão|Diagnóstico de defeitos": [
+          {
+            "t": "Partida com reversão",
+            "s": "Intertravamento"
           }
         ]
       },
@@ -3936,6 +3960,18 @@
           {
             "t": "Simbologia e leitura de diagramas",
             "s": "Contatos NA e NF"
+          }
+        ],
+        "Simbologia e leitura de diagramas|Símbolos gráficos": [
+          {
+            "t": "Simbologia e leitura de diagramas",
+            "s": "Numeração de terminais"
+          }
+        ],
+        "Simbologia e leitura de diagramas|Letras de identificação": [
+          {
+            "t": "Simbologia e leitura de diagramas",
+            "s": "Símbolos gráficos"
           }
         ],
         "Simbologia e leitura de diagramas|Força e comando": [
@@ -3968,10 +4004,58 @@
             "s": "Relé térmico"
           }
         ],
-        "Partida direta|Diagnóstico de defeitos": [
+        "Dispositivos de comando|Botões e fins de curso": [
+          {
+            "t": "Dispositivos de comando",
+            "s": "Seccionadora"
+          }
+        ],
+        "Dispositivos de comando|Contatores": [
+          {
+            "t": "Dispositivos de comando",
+            "s": "Botões e fins de curso"
+          }
+        ],
+        "Dispositivos de comando|Relés e temporizadores": [
+          {
+            "t": "Dispositivos de comando",
+            "s": "Contatores"
+          }
+        ],
+        "Dispositivos de comando|Relés de proteção": [
+          {
+            "t": "Dispositivos de comando",
+            "s": "Relés e temporizadores"
+          }
+        ],
+        "Dispositivos de comando|Sinalizadores": [
+          {
+            "t": "Dispositivos de comando",
+            "s": "Relés de proteção"
+          }
+        ],
+        "Partida direta|Aplicação e dimensionamento": [
           {
             "t": "Partida direta",
             "s": "Funcionamento"
+          }
+        ],
+        "Partida direta|Diagnóstico de defeitos": [
+          {
+            "t": "Partida direta",
+            "s": "Aplicação e dimensionamento"
+          }
+        ],
+        "Partida com reversão|Intertravamento": [
+          {
+            "t": "Partida com reversão",
+            "s": "Funcionamento"
+          }
+        ],
+        "Partida com reversão|Diagnóstico de defeitos": [
+          {
+            "t": "Partida com reversão",
+            "s": "Intertravamento"
           }
         ]
       }

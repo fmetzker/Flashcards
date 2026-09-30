@@ -296,7 +296,7 @@ class Desenho:
 
     # ---- grupos de potência ------------------------------------------------
     def tripolar(self, xs, y, simbolo, dispositivo, tag=None, bornes=("1", "2", "3", "4", "5", "6"),
-                 fases=("L1", "L2", "L3"), nome=None):
+                 fases=("L1", "L2", "L3"), nome=None, atuador=None):
         """O mesmo símbolo nas três fases. Ids: '<dispositivo>.<fase>' —
         'K1.L2' é o polo de K1 na fase L2; 'K1' é o contator inteiro."""
         for i, (x, fase) in enumerate(zip(xs, fases)):
@@ -304,7 +304,7 @@ class Desenho:
             pid = f"{dispositivo}.{fase}"
             pn = f"{nome}, fase {fase}" if nome else None
             if simbolo == "contato":
-                self.contato(x, y, id=pid, bornes=b, nome=pn)
+                self.contato(x, y, id=pid, bornes=b, nome=pn, atuador=atuador)
             elif simbolo == "termico":
                 self.elemento_termico(x, y, id=pid, bornes=b, nome=pn)
             elif simbolo == "fusivel":
