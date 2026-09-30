@@ -1,0 +1,30 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'trafo4-errada'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 230" width="300" height="230" font-family="Arial, Helvetica, sans-serif">
+<rect x="0" y="0" width="300" height="230" fill="#fff"/>
+<polyline points="100,70 100,80" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="100,80 102.3,80.3 104.4,81.2 106.2,82.6 107.6,84.4 108.5,86.5 108.8,88.8 108.5,91 107.6,93.1 106.2,94.9 104.4,96.3 102.3,97.2 100,97.5 100,97.5 102.3,97.8 104.4,98.7 106.2,100.1 107.6,101.9 108.5,104 108.8,106.2 108.5,108.5 107.6,110.6 106.2,112.4 104.4,113.8 102.3,114.7 100,115 100,115 102.3,115.3 104.4,116.2 106.2,117.6 107.6,119.4 108.5,121.5 108.8,123.8 108.5,126 107.6,128.1 106.2,129.9 104.4,131.3 102.3,132.2 100,132.5 100,132.5 102.3,132.8 104.4,133.7 106.2,135.1 107.6,136.9 108.5,139 108.8,141.2 108.5,143.5 107.6,145.6 106.2,147.4 104.4,148.8 102.3,149.7 100,150" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="100,150 100,160" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="100" cy="70" r="3" fill="#16232E"/>
+<text x="114" y="66" font-size="11" fill="#16232E" text-anchor="middle" font-weight="bold">I1</text>
+<circle cx="100" cy="160" r="3" fill="#16232E"/>
+<text x="114" y="172" font-size="11" fill="#16232E" text-anchor="middle" font-weight="bold">F1</text>
+<polyline points="160,70 160,80" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="160,80 162.3,80.3 164.4,81.2 166.2,82.6 167.6,84.4 168.5,86.5 168.8,88.8 168.5,91 167.6,93.1 166.2,94.9 164.4,96.3 162.3,97.2 160,97.5 160,97.5 162.3,97.8 164.4,98.7 166.2,100.1 167.6,101.9 168.5,104 168.8,106.2 168.5,108.5 167.6,110.6 166.2,112.4 164.4,113.8 162.3,114.7 160,115 160,115 162.3,115.3 164.4,116.2 166.2,117.6 167.6,119.4 168.5,121.5 168.8,123.8 168.5,126 167.6,128.1 166.2,129.9 164.4,131.3 162.3,132.2 160,132.5 160,132.5 162.3,132.8 164.4,133.7 166.2,135.1 167.6,136.9 168.5,139 168.8,141.2 168.5,143.5 167.6,145.6 166.2,147.4 164.4,148.8 162.3,149.7 160,150" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="160,150 160,160" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="160" cy="70" r="3" fill="#16232E"/>
+<text x="174" y="66" font-size="11" fill="#16232E" text-anchor="middle" font-weight="bold">I2</text>
+<circle cx="160" cy="160" r="3" fill="#16232E"/>
+<text x="174" y="172" font-size="11" fill="#16232E" text-anchor="middle" font-weight="bold">F2</text>
+<polyline points="196,60 196,170" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="204,60 204,170" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="250,70 250,80" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="250,80 247.7,80.3 245.6,81.2 243.8,82.6 242.4,84.4 241.5,86.5 241.2,88.8 241.5,91 242.4,93.1 243.8,94.9 245.6,96.3 247.7,97.2 250,97.5 250,97.5 247.7,97.8 245.6,98.7 243.8,100.1 242.4,101.9 241.5,104 241.2,106.2 241.5,108.5 242.4,110.6 243.8,112.4 245.6,113.8 247.7,114.7 250,115 250,115 247.7,115.3 245.6,116.2 243.8,117.6 242.4,119.4 241.5,121.5 241.2,123.8 241.5,126 242.4,128.1 243.8,129.9 245.6,131.3 247.7,132.2 250,132.5 250,132.5 247.7,132.8 245.6,133.7 243.8,135.1 242.4,136.9 241.5,139 241.2,141.2 241.5,143.5 242.4,145.6 243.8,147.4 245.6,148.8 247.7,149.7 250,150" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="250,150 250,160" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="250,70 280,70" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="250,160 280,160" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="250" y="196" font-size="12" fill="#16232E" text-anchor="middle">saída</text>
+<text x="30" y="20" font-size="12" fill="#16232E" text-anchor="start">entrada</text>
+<polyline points="100,160 100,185 160,185 160,160" fill="none" stroke="#16232E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="30,30 100,30 100,70" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="30,210 180,210 180,56 160,56 160,70" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

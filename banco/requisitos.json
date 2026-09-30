@@ -4265,7 +4265,7 @@
       }
     },
     "maquinas-eletricas": {
-      "criterio": "A fila segue a ordem dos dois livros do curso: primeiro o princípio comum a todo motor de indução, depois os tipos. (1) Princípios do motor de indução — constituição, campo girante, velocidade síncrona e escorregamento, que todos os outros tópicos usam. (2) Motores monofásicos — Franchi cap. 1 e SENAI 6.1.1 vêm antes do trifásico. (3) Ligações do motor trifásico — estrela, triângulo e os fechamentos de 6, 9 e 12 pontas. (4) Características e placa do motor — só se lê a placa inteira depois de saber o que é polo, escorregamento e fechamento.",
+      "criterio": "A fila segue a ordem dos dois livros do curso: primeiro o princípio comum a todo motor de indução, depois os tipos, e por fim as outras máquinas. (1) Princípios do motor de indução — constituição, campo girante, velocidade síncrona e escorregamento, que todos os outros tópicos usam. (2) Motores monofásicos — Franchi cap. 1 e SENAI 6.1.1 vêm antes do trifásico. (3) Ligações do motor trifásico — estrela, triângulo e os fechamentos de 6, 9 e 12 pontas. (4) Características e placa do motor — só se lê a placa inteira depois de saber o que é polo, escorregamento e fechamento. (5) Motores especiais — rotor bobinado, motofreio e alto rendimento (Franchi 2.2-2.4, 2.6.1, 2.7), variações do motor já estudado. (6) Potência e fator de potência (Franchi cap. 3), que usa cos φ e rendimento da placa. (7) Transformadores (SENAI cap. 5). (8) Motores de corrente contínua (SENAI 6.2), por último, como na apostila.",
       "requisitos": {
         "Motores monofásicos": [
           "Princípios do motor de indução"
@@ -4275,9 +4275,21 @@
         ],
         "Características e placa do motor": [
           "Ligações do motor trifásico"
+        ],
+        "Motores especiais": [
+          "Características e placa do motor"
+        ],
+        "Potência e fator de potência": [
+          "Motores especiais"
+        ],
+        "Transformadores": [
+          "Potência e fator de potência"
+        ],
+        "Motores de corrente contínua": [
+          "Transformadores"
         ]
       },
-      "criterio_conceitual": "Monofásicos exige Princípios porque o problema do motor monofásico (campo pulsante, sem torque de partida) só se entende sabendo o que é campo girante. Ligações exige Princípios porque o fechamento serve para dar a cada bobina sua tensão de projeto dentro de um motor trifásico. Características e placa exige Princípios (polos, escorregamento, corrente de partida) e Ligações (a placa indica o fechamento de cada tensão). Monofásicos não é base de Ligações; na fila vem antes só pela ordem dos livros.",
+      "criterio_conceitual": "Monofásicos exige Princípios porque o problema do motor monofásico (campo pulsante, sem torque de partida) só se entende sabendo o que é campo girante. Ligações exige Princípios porque o fechamento serve para dar a cada bobina sua tensão de projeto dentro de um motor trifásico. Características e placa exige Princípios (polos, escorregamento, corrente de partida) e Ligações (a placa indica o fechamento de cada tensão). Motores especiais exige Princípios (escorregamento no rotor bobinado) e Características (rendimento e fator de serviço). Potência exige Características, onde aparecem cos φ e rendimento. Transformadores exige Ligações, porque os fechamentos Δ/Y e a relação √3 são os mesmos. Motor CC exige Princípios (rotor, estator, escovas e anéis já vistos no motor de indução). Monofásicos não é base de Ligações; na fila vem antes só pela ordem dos livros.",
       "requisitos_conceituais": {
         "Motores monofásicos": [
           "Princípios do motor de indução"
@@ -4288,9 +4300,22 @@
         "Características e placa do motor": [
           "Princípios do motor de indução",
           "Ligações do motor trifásico"
+        ],
+        "Motores especiais": [
+          "Princípios do motor de indução",
+          "Características e placa do motor"
+        ],
+        "Potência e fator de potência": [
+          "Características e placa do motor"
+        ],
+        "Transformadores": [
+          "Ligações do motor trifásico"
+        ],
+        "Motores de corrente contínua": [
+          "Princípios do motor de indução"
         ]
       },
-      "criterio_subtopicos": "Dentro de cada tópico, do conceito ao exercício. Princípios: constituição → campo girante e velocidade → escorregamento (que é a diferença entre as duas velocidades). Monofásicos: tipos → ligação e inversão. Ligações: estrela e triângulo (a relação √3) → 6 pontas → 9 e 12 pontas (a mesma ideia com bobinas em série ou paralelo) → identificação dos terminais → sentido de rotação. Placa: grau de proteção, isolamento e categoria, cada um sozinho, antes da leitura da placa inteira, que junta todos.",
+      "criterio_subtopicos": "Dentro de cada tópico, do conceito ao exercício. Princípios: constituição → campo girante e velocidade → escorregamento (que é a diferença entre as duas velocidades). Monofásicos: tipos → ligação e inversão. Ligações: estrela e triângulo (a relação √3) → 6 pontas → 9 e 12 pontas (a mesma ideia com bobinas em série ou paralelo) → identificação dos terminais → sentido de rotação. Placa: grau de proteção, isolamento e categoria, cada um sozinho, antes da leitura da placa inteira, que junta todos. Motores especiais: rotor bobinado → motofreio → rendimento e perdas. Potência: as três potências → fator de potência (a razão entre elas) → correção com capacitores → potência do motor (a conta completa). Transformadores: constituição e tipos → monofásico → trifásico. Motor CC: constituição → ligações do campo.",
       "requisitos_subtopicos": {
         "Princípios do motor de indução|Campo girante e velocidade": [
           {
@@ -4351,6 +4376,54 @@
             "t": "Características e placa do motor",
             "s": "Categoria e regime"
           }
+        ],
+        "Motores especiais|Motofreio": [
+          {
+            "t": "Motores especiais",
+            "s": "Rotor bobinado"
+          }
+        ],
+        "Motores especiais|Rendimento e perdas": [
+          {
+            "t": "Motores especiais",
+            "s": "Motofreio"
+          }
+        ],
+        "Potência e fator de potência|Fator de potência": [
+          {
+            "t": "Potência e fator de potência",
+            "s": "Potência ativa, reativa e aparente"
+          }
+        ],
+        "Potência e fator de potência|Correção com capacitores": [
+          {
+            "t": "Potência e fator de potência",
+            "s": "Fator de potência"
+          }
+        ],
+        "Potência e fator de potência|Potência do motor": [
+          {
+            "t": "Potência e fator de potência",
+            "s": "Correção com capacitores"
+          }
+        ],
+        "Transformadores|Transformador monofásico": [
+          {
+            "t": "Transformadores",
+            "s": "Constituição e tipos"
+          }
+        ],
+        "Transformadores|Transformador trifásico": [
+          {
+            "t": "Transformadores",
+            "s": "Transformador monofásico"
+          }
+        ],
+        "Motores de corrente contínua|Ligações do campo": [
+          {
+            "t": "Motores de corrente contínua",
+            "s": "Constituição"
+          }
         ]
       },
       "requisitos_conceituais_subtopicos": {
@@ -4376,6 +4449,36 @@
           {
             "t": "Características e placa do motor",
             "s": "Categoria e regime"
+          }
+        ],
+        "Potência e fator de potência|Fator de potência": [
+          {
+            "t": "Potência e fator de potência",
+            "s": "Potência ativa, reativa e aparente"
+          }
+        ],
+        "Potência e fator de potência|Correção com capacitores": [
+          {
+            "t": "Potência e fator de potência",
+            "s": "Fator de potência"
+          }
+        ],
+        "Potência e fator de potência|Potência do motor": [
+          {
+            "t": "Potência e fator de potência",
+            "s": "Correção com capacitores"
+          }
+        ],
+        "Transformadores|Transformador trifásico": [
+          {
+            "t": "Transformadores",
+            "s": "Transformador monofásico"
+          }
+        ],
+        "Motores de corrente contínua|Ligações do campo": [
+          {
+            "t": "Motores de corrente contínua",
+            "s": "Constituição"
           }
         ]
       }

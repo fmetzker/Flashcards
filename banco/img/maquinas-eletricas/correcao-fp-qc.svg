@@ -1,0 +1,19 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'correcao-fp'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="300" height="200" font-family="Arial, Helvetica, sans-serif">
+<rect x="0" y="0" width="300" height="200" fill="#fff"/>
+<rect x="234" y="36" width="35.6" height="78" rx="6" fill="#DCE7F0"/>
+<polyline points="40,170 240,170" fill="none" stroke="#16232E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="140" y="190" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">P (kW)</text>
+<polyline points="240,170 240,110" fill="none" stroke="#16232E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="248" y="146" font-size="13" fill="#16232E" text-anchor="start" font-weight="bold">Q2</text>
+<polyline points="240,110 240,40" fill="none" stroke="#1D5A8C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<text x="248" y="80" font-size="13" fill="#1D5A8C" text-anchor="start" font-weight="bold">Qc</text>
+<polyline points="40,170 240,40" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="112" y="90" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">S1</text>
+<polyline points="40,170 240,110" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="172" y="142" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">S2</text>
+<polyline points="100,170 99.9,166.5 99.6,163.1 99.1,159.7 98.4,156.3 97.5,152.9 96.4,149.7 95.2,146.4 93.7,143.3 92.1,140.3 90.3,137.3" fill="none" stroke="#16232E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="106" y="144" font-size="12" fill="#16232E" text-anchor="middle" font-weight="bold">φ1</text>
+<polyline points="76,170 76,169 75.9,167.9 75.9,166.9 75.8,165.8 75.6,164.8 75.5,163.7 75.3,162.7 75,161.7 74.8,160.7 74.5,159.7" fill="none" stroke="#16232E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="86" y="164" font-size="12" fill="#16232E" text-anchor="middle" font-weight="bold">φ2</text>
+</svg>
