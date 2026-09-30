@@ -3834,6 +3834,12 @@
         ],
         "Partida com reversão": [
           "Partida direta"
+        ],
+        "Partida estrela-triângulo": [
+          "Partida com reversão"
+        ],
+        "Partida compensadora": [
+          "Partida estrela-triângulo"
         ]
       },
       "criterio_conceitual": "Comando exige Simbologia (dispositivos descritos por contatos e terminais). Partida direta exige Simbologia, Proteção e Comando: é o circuito que junta tudo. Toda outra partida (reversão, estrela-triângulo, compensadora, comutação, rotórica) exige Partida direta, porque reaproveita o seu circuito de comando (selo, proteção, sinalização) e só acrescenta contatores e temporização. Soft-starter e inversor exigem Partida direta porque substituem as chaves eletromecânicas e só se entendem por comparação a elas. Sensores e Infraestrutura exigem os Dispositivos de comando (o sensor entra no lugar de um botão; o painel abriga os dispositivos).",
@@ -3847,6 +3853,12 @@
           "Dispositivos de comando"
         ],
         "Partida com reversão": [
+          "Partida direta"
+        ],
+        "Partida estrela-triângulo": [
+          "Partida direta"
+        ],
+        "Partida compensadora": [
           "Partida direta"
         ]
       },
@@ -3953,6 +3965,30 @@
             "t": "Partida com reversão",
             "s": "Intertravamento"
           }
+        ],
+        "Partida estrela-triângulo|Cálculo": [
+          {
+            "t": "Partida estrela-triângulo",
+            "s": "Funcionamento"
+          }
+        ],
+        "Partida estrela-triângulo|Diagnóstico de defeitos": [
+          {
+            "t": "Partida estrela-triângulo",
+            "s": "Cálculo"
+          }
+        ],
+        "Partida compensadora|Cálculo": [
+          {
+            "t": "Partida compensadora",
+            "s": "Funcionamento"
+          }
+        ],
+        "Partida compensadora|Diagnóstico de defeitos": [
+          {
+            "t": "Partida compensadora",
+            "s": "Cálculo"
+          }
         ]
       },
       "requisitos_conceituais_subtopicos": {
@@ -4056,6 +4092,30 @@
           {
             "t": "Partida com reversão",
             "s": "Intertravamento"
+          }
+        ],
+        "Partida estrela-triângulo|Cálculo": [
+          {
+            "t": "Partida estrela-triângulo",
+            "s": "Funcionamento"
+          }
+        ],
+        "Partida estrela-triângulo|Diagnóstico de defeitos": [
+          {
+            "t": "Partida estrela-triângulo",
+            "s": "Cálculo"
+          }
+        ],
+        "Partida compensadora|Cálculo": [
+          {
+            "t": "Partida compensadora",
+            "s": "Funcionamento"
+          }
+        ],
+        "Partida compensadora|Diagnóstico de defeitos": [
+          {
+            "t": "Partida compensadora",
+            "s": "Cálculo"
           }
         ]
       }

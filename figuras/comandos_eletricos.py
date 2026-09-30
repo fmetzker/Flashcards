@@ -354,5 +354,202 @@ vista(M, "reversao-comando", "rev-comando")
 vista(M, "reversao-comando-k20-21", "rev-comando", destaque=["K20.21"])
 vista(M, "reversao-comando-s2-21", "rev-comando", destaque=["S2.21"])
 vista(M, "reversao-comando-pontos-k20", "rev-comando", pontos=[("A", "K20.A1", "topo", "esq"), ("B", "K20.A1", "base", "esq")])
-vista(M, "reversao-forca", "rev-forca")
 vista(M, "reversao-forca-k20", "rev-forca", destaque=["K20"])
+
+
+# ---- Partida estrela-triângulo (apostila cap. 10: K1 linha, K2 estrela, K3 triângulo) --
+
+def _motor6(d, xs, y, cx=None):
+    """Motor com seis terminais: 1, 2 e 3 chegam por cima (como no motor3);
+    6, 4 e 5 saem pela direita, na altura devolvida em 'direita'."""
+    import math
+    cx = cx or xs[1]
+    r = 28
+    cy = y + 30 + r
+    direita = {}
+    with d.grupo("M1"):
+        for x, rot, ang in zip(xs, ("1", "2", "3"), (-40, 0, 40)):
+            a = math.radians(ang)
+            d.linha([(x, y), (x, y + 14), (cx + r * math.sin(a), cy - r * math.cos(a))])
+            d.texto(x + 4, y + 11, rot, tam=10)
+        d.circulo(cx, cy, r)
+        d.texto(cx, cy - 2, "M", tam=15, ancora="middle", negrito=True)
+        d.texto(cx, cy + 14, "3~", ancora="middle")
+        d.texto(xs[0] - 16, cy + 4, "M1", ancora="end", negrito=True)
+        for rot, dy in (("6", -16), ("4", 0), ("5", 16)):
+            xe = cx + math.sqrt(r * r - dy * dy)
+            direita[rot] = (xe, cy + dy)
+            d.texto(xe + 3, cy + dy - 3, rot, tam=10)
+    return direita
+
+
+@circuito("yd-forca")
+def yd_forca():
+    d = Desenho(400, 400, alt="Força da partida estrela-triângulo: L1, L2 e L3 passam pelos fusíveis F10. "
+                "K1 e o relé térmico F7 levam as fases aos terminais 1, 2 e 3 do motor. K3 liga L1 ao "
+                "terminal 6, L2 ao 4 e L3 ao 5 (triângulo). K2 tem as entradas unidas entre si e as saídas "
+                "nos terminais 6, 4 e 5 (fecha a estrela).")
+    xs, x3, x2 = (90, 116, 142), (200, 226, 252), (300, 326, 352)
+    for y, f in zip((30, 46, 62), ("L1", "L2", "L3")):
+        d.barramento(y, 50, 380, f)
+    for x, y, f in zip(xs, (30, 46, 62), ("L1", "L2", "L3")):
+        d.fio((x, y), (x, 80), net=f)
+        d.no(x, y, net=f)
+    d.tripolar(xs, 80, "fusivel", "F10", tag="F10", bornes=None, nome="fusível F10")
+    for x, xx, y, f in zip(xs, x3, (132, 140, 148), ("L1", "L2", "L3")):
+        d.fio((x, 120), (x, 164), net=f + "f")
+        d.fio((x, y), (xx, y), (xx, 164), net=f + "f")
+        d.no(x, y, net=f + "f")
+    d.tripolar(xs, 164, "contato", "K1", tag="K1", nome="polo de K1")
+    d.tripolar(x3, 164, "contato", "K3", tag="K3", nome="polo de K3")
+    with d.grupo("K2.ponte"):
+        d.linha([(x2[0], 156), (x2[-1], 156)])
+        for x in x2:
+            d.linha([(x, 156), (x, 164)])
+        d.no(x2[1], 156)
+    d.tripolar(x2, 164, "contato", "K2", tag="K2", nome="polo de K2")
+    for x in xs:
+        d.fio((x, 204), (x, 214))
+    d.tripolar(xs, 214, "termico", "F7", tag="F7", nome="elemento térmico de F7")
+    dire = _motor6(d, xs, 262)
+    # terminais 6, 4, 5 levados para a direita até as saídas de K3 e K2
+    for rot, xk3, xk2 in (("6", x3[0], x2[0]), ("4", x3[1], x2[1]), ("5", x3[2], x2[2])):
+        xe, ye = dire[rot]
+        with d.grupo("~T" + rot):
+            d.linha([(xe, ye), (x2[-1] + 14, ye)])
+            d.linha([(xk2, 204), (xk2, ye)])
+        with d.grupo("~K3T" + rot):          # perna de K3: sem corrente na estrela
+            d.linha([(xk3, 204), (xk3, ye)])
+        d.no(xk3, ye, net="T" + rot)
+        d.no(xk2, ye, net="T" + rot)
+    return d
+
+
+@circuito("yd-comando")
+def yd_comando():
+    """Comando da estrela-triângulo com temporizador de contato comutador:
+    S1 energiza K1 (selo) e KT; o comum 15 de KT alimenta K2 (estrela) pelo 16
+    e, passado o tempo, K3 (triângulo) pelo 18. K3 21-22 e K2 21-22 fazem o
+    intertravamento entre estrela e triângulo."""
+    d = Desenho(360, 480, alt="Comando da partida estrela-triângulo entre L1 e L2: Q11, F7 95-96, S0, "
+                "e S1 com o selo K1 13-14 em paralelo. Depois do selo: a bobina de K1; o contato comutador "
+                "15-16-18 do temporizador KT, cujo 16 alimenta a bobina de K2 através do NF 21-22 de K3 e "
+                "cujo 18 alimenta a bobina de K3 através do NF 21-22 de K2; e a bobina do temporizador KT, "
+                "com retardo na energização.")
+    x, xs_, xt, xk3, xk2, xkt = 100, 150, 205, 170, 250, 320
+    d.borne(x, 24, "L1", net="L1")
+    d.texto(x + 12, 28, "220 V / 60 Hz", tam=11)
+    d.fio((x, 27.5), (x, 32), net="L1")
+    d.contato(x, 32, id="Q11", tag="Q11", atuador="disjuntor", nome="disjuntor Q11")
+    d.fio((x, 72), (x, 78), net="a")
+    d.contato(x, 78, "nf", id="F7.95", tag="F7", bornes=("95", "96"), atuador="termico", nome="contato 95-96 de F7")
+    d.fio((x, 118), (x, 124), net="b")
+    d.contato(x, 124, "nf", id="S0", tag="S0", bornes=("11", "12"), atuador="botao", nome="botão desliga S0")
+    n1, n2 = 174, 234
+    d.fio((x, 164), (x, n1), (xs_, n1), (xs_, 182), net="N1")
+    d.fio((x, n1), (x, 182), net="N1")
+    d.no(x, n1, net="N1")
+    d.contato(x, 182, id="S1", tag="S1", bornes=("13", "14"), atuador="botao", nome="botão liga S1")
+    d.contato(xs_, 182, id="K1.13", tag="K1", bornes=("13", "14"), nome="selo K1 13-14")
+    d.fio((xs_, 222), (xs_, n2), net="N2")
+    d.fio((x, 222), (x, n2), (xkt, n2), net="N2")
+    for xx in (x, xs_, xt):
+        d.no(xx, n2, net="N2")
+    d.fio((x, n2), (x, 348), net="N2")
+    d.bobina(x, 348, id="K1.A1", tag="K1", nome="bobina de K1")
+    d.fio((xt, n2), (xt, 244), net="N2")
+    d.contato(xt, 244, "comutador", id="KT.15", tag="KT", bornes=("15", "16", "18"),
+              nome="contato comutador 15-16-18 de KT")
+    # 16 (NF, direita) → K3 21-22 → bobina K2 (estrela)
+    d.fio((xt + 11, 284), (xt + 11, 292), (xk2, 292), (xk2, 300), net="e16")
+    d.contato(xk2, 300, "nf", id="K3.21", tag="K3", bornes=("21", "22"), nome="NF 21-22 de K3")
+    d.fio((xk2, 340), (xk2, 348), net="e16b")
+    d.bobina(xk2, 348, id="K2.A1", tag="K2", nome="bobina de K2 (estrela)")
+    # 18 (NA, esquerda) → K2 21-22 → bobina K3 (triângulo)
+    d.fio((xt - 11, 284), (xt - 11, 292), (xk3, 292), (xk3, 300), net="e18")
+    d.contato(xk3, 300, "nf", id="K2.21", tag="K2", bornes=("21", "22"), nome="NF 21-22 de K2")
+    d.fio((xk3, 340), (xk3, 348), net="e18b")
+    d.bobina(xk3, 348, id="K3.A1", tag="K3", nome="bobina de K3 (triângulo)")
+    d.fio((xkt, n2), (xkt, 348), net="N2")
+    d.bobina(xkt, 348, id="KT.A1", tag="KT", tempo="on", nome="bobina do temporizador KT")
+    col = 402
+    for xx in (x, xk3, xk2, xkt):
+        d.fio((xx, 388), (xx, col), net="Z")
+    d.fio((x, col), (xkt, col), net="Z")
+    for xx in (x, xk3, xk2):
+        d.no(xx, col, net="Z")
+    d.fio((x, col), (x, 410), net="Z")
+    d.contato(x, 410, id="Q12", tag="Q12", atuador="disjuntor", nome="disjuntor Q12")
+    d.fio((x, 450), (x, 456), net="L2")
+    d.borne(x, 459.5, "L2", net="L2")
+    return d
+
+
+# ---- Partida compensadora (K1 tensão plena, K2 liga o autotransformador à rede,
+#      K3 fecha a estrela do autotransformador — apostila 11.2 e Franchi 5.3.2) --
+
+@circuito("comp-forca")
+def comp_forca():
+    d = Desenho(360, 440, alt="Força da partida compensadora: L1, L2 e L3 passam pelos fusíveis F10. "
+                "K1, seguido do relé térmico F7, liga o motor direto à rede. K2 liga a rede às três bobinas "
+                "do autotransformador T1; as pontas de baixo das bobinas são unidas por K3 (estrela). Do tap "
+                "de 80% de cada bobina sai um fio para o terminal correspondente do motor.")
+    xs, x2, x3 = (90, 116, 142), (220, 250, 280), (220, 250, 280)
+    for y, f in zip((30, 46, 62), ("L1", "L2", "L3")):
+        d.barramento(y, 50, 330, f)
+    for x, y, f in zip(xs, (30, 46, 62), ("L1", "L2", "L3")):
+        d.fio((x, y), (x, 80), net=f)
+        d.no(x, y, net=f)
+    d.tripolar(xs, 80, "fusivel", "F10", tag="F10", bornes=None, nome="fusível F10")
+    for x, xx, y, f in zip(xs, x2, (132, 140, 148), ("L1", "L2", "L3")):
+        d.fio((x, 120), (x, 164), net=f + "f")
+        d.fio((x, y), (xx, y), (xx, 164), net=f + "f")
+        d.no(x, y, net=f + "f")
+    d.tripolar(xs, 164, "contato", "K1", tag="K1", nome="polo de K1")
+    d.tripolar(x2, 164, "contato", "K2", tag=None, nome="polo de K2")
+    with d.grupo("K2.tag"):
+        d.texto(x2[-1] + 18, 188, "K2", negrito=True)
+    for x in xs:
+        d.fio((x, 204), (x, 214))
+    d.tripolar(xs, 214, "termico", "F7", tag="F7", nome="elemento térmico de F7")
+    # autotransformador: três bobinas, tap de 80% a 1/5 da altura a partir de cima... (80% da tensão
+    # fica entre o tap e o ponto de estrela, embaixo)
+    yb0, yb1 = 214, 294
+    with d.grupo("T1"):
+        for x in x2:
+            d.linha([(x, 204), (x, yb0)])
+            d.retangulo(x - 6, yb0, 12, yb1 - yb0, preench="#fff")
+            d.linha([(x, yb1), (x, 310)])
+        d.texto(x2[-1] + 16, yb0 + 34, "T1", negrito=True)
+        d.texto(x2[-1] + 16, yb0 + 50, "80%", tam=10)
+    ytap = yb0 + (yb1 - yb0) * 0.2
+    d.tripolar(x3, 318, "contato", "K3", tag=None, nome="polo de K3")
+    with d.grupo("K3.tag"):
+        d.texto(x3[-1] + 18, 342, "K3", negrito=True)
+    with d.grupo("K3.estrela"):
+        d.linha([(x3[0], 358), (x3[0], 368), (x3[-1], 368), (x3[-1], 358)])
+        d.linha([(x3[1], 358), (x3[1], 368)])
+        d.no(x3[1], 368)
+    for x in x2:
+        d.fio((x, 310), (x, 318))
+    ym = 320
+    for x in xs:
+        d.fio((x, 254), (x, ym))
+    # taps de 80%: descem pelo vão à esquerda de cada bobina e seguem por baixo
+    # delas até o motor; a bobina mais à esquerda usa a linha mais alta, para
+    # nenhum tap cruzar a descida de outro
+    for xx, xd, y in zip(x2, xs, (298, 302, 306)):
+        with d.grupo("~tap"):
+            d.linha([(xx - 6, ytap), (xx - 12, ytap), (xx - 12, y), (xd, y)])
+        d.no(xd, y, net="tap")
+    d.motor3(xs, ym, tag="M1")
+    return d
+
+
+vista(M, "estrela-triangulo-forca-k2", "yd-forca", destaque=["K2"])
+vista(M, "estrela-triangulo-forca-k3", "yd-forca", destaque=["K3"])
+vista(M, "estrela-triangulo-forca-estrela", "yd-forca", acionados=["K1", "K2"],
+      energizado=["~L1", "~L2", "~L3", "F10", "~L1f", "~L2f", "~L3f", "K1", "F7", "M1", "K2", "~T6", "~T4", "~T5"])
+vista(M, "estrela-triangulo-comando", "yd-comando")
+vista(M, "estrela-triangulo-comando-intertravamento", "yd-comando", destaque=["K3.21", "K2.21"])
+vista(M, "compensadora-forca-k3", "comp-forca", destaque=["K3"])

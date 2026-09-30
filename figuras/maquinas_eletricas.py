@@ -156,5 +156,4 @@ def _inversao(troca):
 
 circuito("inversao-normal")(lambda: _inversao(False))
 circuito("inversao-trocada")(lambda: _inversao(True))
-vista(M, "inversao-normal", "inversao-normal")
 vista(M, "inversao-trocada", "inversao-trocada")
