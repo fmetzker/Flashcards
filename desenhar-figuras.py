@@ -51,7 +51,11 @@ def main():
     divergentes = []
     for chave, svg in gerar().items():
         destino = os.path.join(RAIZ, "banco", *chave.split("/"))
-        atual = open(destino, encoding="utf-8").read() if os.path.exists(destino) else None
+        # newline="" + replace: o git troca LF por CRLF no checkout do Windows,
+        # e isso não é divergência de desenho
+        atual = open(destino, encoding="utf-8", newline="").read().replace("
+", "
+")             if os.path.exists(destino) else None
         if atual == svg:
             continue
         if conferir:
