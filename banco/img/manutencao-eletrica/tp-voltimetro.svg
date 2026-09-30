@@ -1,0 +1,22 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'tp-voltimetro'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 170" width="300" height="170" font-family="Arial, Helvetica, sans-serif">
+<rect x="0" y="0" width="300" height="170" fill="#fff"/>
+<polyline points="20,30 140,30" fill="none" stroke="#16232E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="20,140 140,140" fill="none" stroke="#16232E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="20" y="22" font-size="12" fill="#16232E" text-anchor="start" font-weight="bold">L1</text>
+<text x="20" y="158" font-size="12" fill="#16232E" text-anchor="start" font-weight="bold">N</text>
+<text x="24" y="90" font-size="11" fill="#16232E" text-anchor="start">6000 V</text>
+<polyline points="110,30 110,55" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="110,55 108.1,55.3 106.2,56 104.7,57.2 103.5,58.8 102.8,60.6 102.5,62.5 102.8,64.4 103.5,66.2 104.7,67.8 106.2,69 108.1,69.7 110,70 110,70 108.1,70.3 106.2,71 104.7,72.2 103.5,73.8 102.8,75.6 102.5,77.5 102.8,79.4 103.5,81.2 104.7,82.8 106.2,84 108.1,84.7 110,85 110,85 108.1,85.3 106.2,86 104.7,87.2 103.5,88.8 102.8,90.6 102.5,92.5 102.8,94.4 103.5,96.2 104.7,97.8 106.2,99 108.1,99.7 110,100 110,100 108.1,100.3 106.2,101 104.7,102.2 103.5,103.8 102.8,105.6 102.5,107.5 102.8,109.4 103.5,111.2 104.7,112.8 106.2,114 108.1,114.7 110,115" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="110,115 110,140" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="110" cy="30" r="3" fill="#16232E"/>
+<circle cx="110" cy="140" r="3" fill="#16232E"/>
+<polyline points="132,50 132,120" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="138,50 138,120" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="160,55 161.9,55.3 163.8,56 165.3,57.2 166.5,58.8 167.2,60.6 167.5,62.5 167.2,64.4 166.5,66.2 165.3,67.8 163.8,69 161.9,69.7 160,70 160,70 161.9,70.3 163.8,71 165.3,72.2 166.5,73.8 167.2,75.6 167.5,77.5 167.2,79.4 166.5,81.2 165.3,82.8 163.8,84 161.9,84.7 160,85 160,85 161.9,85.3 163.8,86 165.3,87.2 166.5,88.8 167.2,90.6 167.5,92.5 167.2,94.4 166.5,96.2 165.3,97.8 163.8,99 161.9,99.7 160,100 160,100 161.9,100.3 163.8,101 165.3,102.2 166.5,103.8 167.2,105.6 167.5,107.5 167.2,109.4 166.5,111.2 165.3,112.8 163.8,114 161.9,114.7 160,115" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="160,55 240,55 240,66" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="160,115 240,115 240,104" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="240" cy="85" r="19" fill="none" stroke="#16232E" stroke-width="2"/>
+<text x="240" y="90" font-size="15" fill="#16232E" text-anchor="middle" font-weight="bold">V</text>
+<text x="200" y="158" font-size="12" fill="#16232E" text-anchor="middle" font-weight="bold">TP 6000/115 V</text>
+</svg>

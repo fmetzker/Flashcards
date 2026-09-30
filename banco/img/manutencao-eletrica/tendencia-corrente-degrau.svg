@@ -1,0 +1,38 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'tendencia-corrente'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 230" width="320" height="230" font-family="Arial, Helvetica, sans-serif">
+<rect x="0" y="0" width="320" height="230" fill="#fff"/>
+<rect x="44" y="42" width="190.6" height="56" rx="6" fill="#DCE7F0"/>
+<polyline points="50,24 50,190 306,190" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="46,190 50,190" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="194" font-size="10" fill="#16232E" text-anchor="end">0</text>
+<polyline points="46,150 50,150" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="154" font-size="10" fill="#16232E" text-anchor="end">5</text>
+<polyline points="46,110 50,110" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="114" font-size="10" fill="#16232E" text-anchor="end">10</text>
+<polyline points="46,70 50,70" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="74" font-size="10" fill="#16232E" text-anchor="end">15</text>
+<polyline points="46,30 50,30" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="34" font-size="10" fill="#16232E" text-anchor="end">20</text>
+<polyline points="50,190 50,194" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="50" y="206" font-size="10" fill="#16232E" text-anchor="middle">0</text>
+<polyline points="85.7,190 85.7,194" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="85.7" y="206" font-size="10" fill="#16232E" text-anchor="middle">2</text>
+<polyline points="121.4,190 121.4,194" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="121.4" y="206" font-size="10" fill="#16232E" text-anchor="middle">4</text>
+<polyline points="157.1,190 157.1,194" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="157.1" y="206" font-size="10" fill="#16232E" text-anchor="middle">6</text>
+<polyline points="192.9,190 192.9,194" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="192.9" y="206" font-size="10" fill="#16232E" text-anchor="middle">8</text>
+<polyline points="228.6,190 228.6,194" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="228.6" y="206" font-size="10" fill="#16232E" text-anchor="middle">10</text>
+<polyline points="264.3,190 264.3,194" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="264.3" y="206" font-size="10" fill="#16232E" text-anchor="middle">12</text>
+<polyline points="300,190 300,194" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="300" y="206" font-size="10" fill="#16232E" text-anchor="middle">14</text>
+<text x="175" y="224" font-size="11" fill="#16232E" text-anchor="middle">tempo (min)</text>
+<text x="40" y="18" font-size="11" fill="#16232E" text-anchor="start">corrente (A)</text>
+<polyline points="50,94 300,94" fill="none" stroke="#16232E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<text x="300" y="108" font-size="10" fill="#16232E" text-anchor="end">nominal</text>
+<polyline points="50,94 121.4,94 123.2,46 228.6,46" fill="none" stroke="#1D5A8C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="228.6,46 242.9,34 246.4,34 248.2,190 300,190" fill="none" stroke="#16232E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

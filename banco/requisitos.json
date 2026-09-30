@@ -4482,6 +4482,139 @@
           }
         ]
       }
+    },
+    "manutencao-eletrica": {
+      "criterio": "A fila segue a lógica do trabalho de manutenção e dos caps. 14 e 15 da apostila (SENAI-DN, 2013): primeiro a segurança, porque nenhum teste começa sem a instalação desenergizada; depois os instrumentos, que são a ferramenta de todo diagnóstico; depois o diagnóstico de falhas (manutenção corretiva, cap. 14); por último a preventiva e a preditiva (cap. 15), que planejam a mesma inspeção e medição para antes da falha.",
+      "requisitos": {
+        "Instrumentos e medições": [
+          "Segurança na manutenção"
+        ],
+        "Diagnóstico de falhas": [
+          "Instrumentos e medições"
+        ],
+        "Manutenção preventiva e preditiva": [
+          "Diagnóstico de falhas"
+        ]
+      },
+      "criterio_conceitual": "Instrumentos exige Segurança: continuidade e isolação só se medem com o circuito desenergizado e bloqueado. Diagnóstico exige Instrumentos: as hipóteses se comprovam por inspeção visual, continuidade e isolação. Preventiva e preditiva exige Instrumentos: a inspeção instrumental e o plano de preditiva são medições com alicate, termovisor e megômetro.",
+      "requisitos_conceituais": {
+        "Instrumentos e medições": [
+          "Segurança na manutenção"
+        ],
+        "Diagnóstico de falhas": [
+          "Instrumentos e medições"
+        ],
+        "Manutenção preventiva e preditiva": [
+          "Instrumentos e medições"
+        ]
+      },
+      "criterio_subtopicos": "Dentro de cada tópico, na ordem em que as coisas acontecem ou se apoiam. Segurança: desenergização → reenergização (que desfaz a primeira em ordem inversa) → conduta e meio ambiente. Instrumentos: multímetro e continuidade → megômetro (a mesma ideia com tensão de ensaio) → alicate e termovisor (medição com o equipamento em operação) → TC e TP (instrumentos de painel). Diagnóstico: coleta de dados e hipóteses → falhas típicas do motor e da potência → causa raiz e validação. Preventiva: os tipos de manutenção → inspeção elétrica → plano de manutenção → preditiva, a forma mais aprofundada.",
+      "requisitos_subtopicos": {
+        "Segurança na manutenção|Reenergização": [
+          {
+            "t": "Segurança na manutenção",
+            "s": "Desenergização"
+          }
+        ],
+        "Segurança na manutenção|Conduta e meio ambiente": [
+          {
+            "t": "Segurança na manutenção",
+            "s": "Reenergização"
+          }
+        ],
+        "Instrumentos e medições|Megômetro e isolação": [
+          {
+            "t": "Instrumentos e medições",
+            "s": "Multímetro e continuidade"
+          }
+        ],
+        "Instrumentos e medições|Alicate e termovisor": [
+          {
+            "t": "Instrumentos e medições",
+            "s": "Megômetro e isolação"
+          }
+        ],
+        "Instrumentos e medições|TC e TP": [
+          {
+            "t": "Instrumentos e medições",
+            "s": "Alicate e termovisor"
+          }
+        ],
+        "Diagnóstico de falhas|Falhas no motor e na potência": [
+          {
+            "t": "Diagnóstico de falhas",
+            "s": "Coleta de dados e hipóteses"
+          }
+        ],
+        "Diagnóstico de falhas|Causa raiz e validação": [
+          {
+            "t": "Diagnóstico de falhas",
+            "s": "Falhas no motor e na potência"
+          }
+        ],
+        "Manutenção preventiva e preditiva|Inspeção elétrica": [
+          {
+            "t": "Manutenção preventiva e preditiva",
+            "s": "Tipos de manutenção"
+          }
+        ],
+        "Manutenção preventiva e preditiva|Plano de manutenção": [
+          {
+            "t": "Manutenção preventiva e preditiva",
+            "s": "Inspeção elétrica"
+          }
+        ],
+        "Manutenção preventiva e preditiva|Manutenção preditiva": [
+          {
+            "t": "Manutenção preventiva e preditiva",
+            "s": "Plano de manutenção"
+          }
+        ]
+      },
+      "requisitos_conceituais_subtopicos": {
+        "Segurança na manutenção|Reenergização": [
+          {
+            "t": "Segurança na manutenção",
+            "s": "Desenergização"
+          }
+        ],
+        "Instrumentos e medições|Megômetro e isolação": [
+          {
+            "t": "Instrumentos e medições",
+            "s": "Multímetro e continuidade"
+          }
+        ],
+        "Diagnóstico de falhas|Falhas no motor e na potência": [
+          {
+            "t": "Diagnóstico de falhas",
+            "s": "Coleta de dados e hipóteses"
+          }
+        ],
+        "Diagnóstico de falhas|Causa raiz e validação": [
+          {
+            "t": "Diagnóstico de falhas",
+            "s": "Falhas no motor e na potência"
+          }
+        ],
+        "Manutenção preventiva e preditiva|Inspeção elétrica": [
+          {
+            "t": "Manutenção preventiva e preditiva",
+            "s": "Tipos de manutenção"
+          }
+        ],
+        "Manutenção preventiva e preditiva|Plano de manutenção": [
+          {
+            "t": "Manutenção preventiva e preditiva",
+            "s": "Inspeção elétrica"
+          }
+        ],
+        "Manutenção preventiva e preditiva|Manutenção preditiva": [
+          {
+            "t": "Manutenção preventiva e preditiva",
+            "s": "Plano de manutenção"
+          }
+        ]
+      }
     }
   }
 }
