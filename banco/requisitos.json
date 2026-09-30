@@ -3840,6 +3840,24 @@
         ],
         "Partida compensadora": [
           "Partida estrela-triângulo"
+        ],
+        "Comutação de velocidades": [
+          "Partida compensadora"
+        ],
+        "Aceleração rotórica": [
+          "Comutação de velocidades"
+        ],
+        "Sensores industriais": [
+          "Aceleração rotórica"
+        ],
+        "Soft-starter": [
+          "Sensores industriais"
+        ],
+        "Inversor de frequência": [
+          "Soft-starter"
+        ],
+        "Infraestrutura de painel": [
+          "Inversor de frequência"
         ]
       },
       "criterio_conceitual": "Comando exige Simbologia (dispositivos descritos por contatos e terminais). Partida direta exige Simbologia, Proteção e Comando: é o circuito que junta tudo. Toda outra partida (reversão, estrela-triângulo, compensadora, comutação, rotórica) exige Partida direta, porque reaproveita o seu circuito de comando (selo, proteção, sinalização) e só acrescenta contatores e temporização. Soft-starter e inversor exigem Partida direta porque substituem as chaves eletromecânicas e só se entendem por comparação a elas. Sensores e Infraestrutura exigem os Dispositivos de comando (o sensor entra no lugar de um botão; o painel abriga os dispositivos).",
@@ -3860,6 +3878,24 @@
         ],
         "Partida compensadora": [
           "Partida direta"
+        ],
+        "Comutação de velocidades": [
+          "Partida direta"
+        ],
+        "Aceleração rotórica": [
+          "Partida direta"
+        ],
+        "Sensores industriais": [
+          "Dispositivos de comando"
+        ],
+        "Soft-starter": [
+          "Partida direta"
+        ],
+        "Inversor de frequência": [
+          "Partida direta"
+        ],
+        "Infraestrutura de painel": [
+          "Dispositivos de comando"
         ]
       },
       "criterio_subtopicos": "Dentro de cada tópico, do elemento ao conjunto, e o funcionamento antes do diagnóstico: só se acha o defeito de um circuito que se sabe como funciona. Nas partidas, a ordem é funcionamento → cálculo ou dimensionamento → diagnóstico de defeitos; na reversão, o intertravamento vem entre o funcionamento e o diagnóstico porque é o que a distingue de duas partidas diretas soltas.",
@@ -3989,6 +4025,60 @@
             "t": "Partida compensadora",
             "s": "Cálculo"
           }
+        ],
+        "Comutação de velocidades|Diagnóstico de defeitos": [
+          {
+            "t": "Comutação de velocidades",
+            "s": "Funcionamento"
+          }
+        ],
+        "Aceleração rotórica|Diagnóstico de defeitos": [
+          {
+            "t": "Aceleração rotórica",
+            "s": "Funcionamento"
+          }
+        ],
+        "Sensores industriais|Instalação elétrica dos sensores": [
+          {
+            "t": "Sensores industriais",
+            "s": "Sensores de proximidade"
+          }
+        ],
+        "Sensores industriais|Sensores de temperatura": [
+          {
+            "t": "Sensores industriais",
+            "s": "Instalação elétrica dos sensores"
+          }
+        ],
+        "Sensores industriais|Velocidade, posição e pressão": [
+          {
+            "t": "Sensores industriais",
+            "s": "Sensores de temperatura"
+          }
+        ],
+        "Sensores industriais|Vazão e nível": [
+          {
+            "t": "Sensores industriais",
+            "s": "Velocidade, posição e pressão"
+          }
+        ],
+        "Soft-starter|Parâmetros e ligação": [
+          {
+            "t": "Soft-starter",
+            "s": "Princípio e funções"
+          }
+        ],
+        "Inversor de frequência|Controle e ligação": [
+          {
+            "t": "Inversor de frequência",
+            "s": "Princípio e blocos"
+          }
+        ],
+        "Infraestrutura de painel|Bornes e identificação": [
+          {
+            "t": "Infraestrutura de painel",
+            "s": "Painel e montagem"
+          }
         ]
       },
       "requisitos_conceituais_subtopicos": {
@@ -4116,6 +4206,60 @@
           {
             "t": "Partida compensadora",
             "s": "Cálculo"
+          }
+        ],
+        "Comutação de velocidades|Diagnóstico de defeitos": [
+          {
+            "t": "Comutação de velocidades",
+            "s": "Funcionamento"
+          }
+        ],
+        "Aceleração rotórica|Diagnóstico de defeitos": [
+          {
+            "t": "Aceleração rotórica",
+            "s": "Funcionamento"
+          }
+        ],
+        "Sensores industriais|Instalação elétrica dos sensores": [
+          {
+            "t": "Sensores industriais",
+            "s": "Sensores de proximidade"
+          }
+        ],
+        "Sensores industriais|Sensores de temperatura": [
+          {
+            "t": "Sensores industriais",
+            "s": "Instalação elétrica dos sensores"
+          }
+        ],
+        "Sensores industriais|Velocidade, posição e pressão": [
+          {
+            "t": "Sensores industriais",
+            "s": "Sensores de temperatura"
+          }
+        ],
+        "Sensores industriais|Vazão e nível": [
+          {
+            "t": "Sensores industriais",
+            "s": "Velocidade, posição e pressão"
+          }
+        ],
+        "Soft-starter|Parâmetros e ligação": [
+          {
+            "t": "Soft-starter",
+            "s": "Princípio e funções"
+          }
+        ],
+        "Inversor de frequência|Controle e ligação": [
+          {
+            "t": "Inversor de frequência",
+            "s": "Princípio e blocos"
+          }
+        ],
+        "Infraestrutura de painel|Bornes e identificação": [
+          {
+            "t": "Infraestrutura de painel",
+            "s": "Painel e montagem"
           }
         ]
       }

@@ -1,0 +1,191 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'rotorica-forca'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 540" width="330" height="540" font-family="Arial, Helvetica, sans-serif">
+<rect x="0" y="0" width="330" height="540" fill="#fff"/>
+<rect x="186.4" y="516" width="105.6" height="57" rx="6" fill="#DCE7F0"/>
+<polyline points="60,30 300,30" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="55" y="34" font-size="12" fill="#16232E" text-anchor="end" font-weight="bold">L1</text>
+<polyline points="60,46 300,46" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="55" y="50" font-size="12" fill="#16232E" text-anchor="end" font-weight="bold">L2</text>
+<polyline points="60,62 300,62" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="55" y="66" font-size="12" fill="#16232E" text-anchor="end" font-weight="bold">L3</text>
+<polyline points="110,30 110,76" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="110" cy="30" r="3" fill="#16232E"/>
+<polyline points="140,46 140,76" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="140" cy="46" r="3" fill="#16232E"/>
+<polyline points="170,62 170,76" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="62" r="3" fill="#16232E"/>
+<polyline points="110,76 110,116" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="105" y="85" width="10" height="22" fill="#fff" stroke="#16232E" stroke-width="2"/>
+<polyline points="110,85 110,107" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="140,76 140,116" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="135" y="85" width="10" height="22" fill="#fff" stroke="#16232E" stroke-width="2"/>
+<polyline points="140,85 140,107" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="170,76 170,116" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="165" y="85" width="10" height="22" fill="#fff" stroke="#16232E" stroke-width="2"/>
+<polyline points="170,85 170,107" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="94" y="100" font-size="12" fill="#16232E" text-anchor="end" font-weight="bold">F10</text>
+<polyline points="110,124 110,137" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="110,164 110,151" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="110,151 100,135" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="116" y="133" font-size="10" fill="#16232E" text-anchor="start">1</text>
+<text x="116" y="162" font-size="10" fill="#16232E" text-anchor="start">2</text>
+<polyline points="140,124 140,137" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="140,164 140,151" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="140,151 130,135" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="146" y="133" font-size="10" fill="#16232E" text-anchor="start">3</text>
+<text x="146" y="162" font-size="10" fill="#16232E" text-anchor="start">4</text>
+<polyline points="170,124 170,137" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="170,164 170,151" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="170,151 160,135" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="176" y="133" font-size="10" fill="#16232E" text-anchor="start">5</text>
+<text x="176" y="162" font-size="10" fill="#16232E" text-anchor="start">6</text>
+<polyline points="105,143 165,143" fill="none" stroke="#16232E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3,3"/>
+<text x="94" y="148" font-size="12" fill="#16232E" text-anchor="end" font-weight="bold">K1</text>
+<polyline points="110,172 110,182" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="102" y="182" width="16" height="20" fill="none" stroke="#16232E" stroke-width="2"/>
+<polyline points="110,182 110,186 106,186 106,198 110,198 110,202" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="110,202 110,212" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="121" y="181" font-size="10" fill="#16232E" text-anchor="start">1</text>
+<text x="121" y="210" font-size="10" fill="#16232E" text-anchor="start">2</text>
+<polyline points="140,172 140,182" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="132" y="182" width="16" height="20" fill="none" stroke="#16232E" stroke-width="2"/>
+<polyline points="140,182 140,186 136,186 136,198 140,198 140,202" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="140,202 140,212" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="151" y="181" font-size="10" fill="#16232E" text-anchor="start">3</text>
+<text x="151" y="210" font-size="10" fill="#16232E" text-anchor="start">4</text>
+<polyline points="170,172 170,182" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="162" y="182" width="16" height="20" fill="none" stroke="#16232E" stroke-width="2"/>
+<polyline points="170,182 170,186 166,186 166,198 170,198 170,202" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="170,202 170,212" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="181" y="181" font-size="10" fill="#16232E" text-anchor="start">5</text>
+<text x="181" y="210" font-size="10" fill="#16232E" text-anchor="start">6</text>
+<text x="94" y="196" font-size="12" fill="#16232E" text-anchor="end" font-weight="bold">F7</text>
+<polyline points="110,116 110,124" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="110,164 110,172" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="140,116 140,124" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="140,164 140,172" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="170,116 170,124" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="170,164 170,172" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="110,212 110,226 123.3,248.1" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="114" y="223" font-size="10" fill="#16232E" text-anchor="start">U1</text>
+<polyline points="140,212 140,226 140,242" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="144" y="223" font-size="10" fill="#16232E" text-anchor="start">V1</text>
+<polyline points="170,212 170,226 156.7,248.1" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="174" y="223" font-size="10" fill="#16232E" text-anchor="start">W1</text>
+<circle cx="140" cy="268" r="26" fill="none" stroke="#16232E" stroke-width="2"/>
+<text x="140" y="266" font-size="15" fill="#16232E" text-anchor="middle" font-weight="bold">M</text>
+<text x="140" y="282" font-size="12" fill="#16232E" text-anchor="middle">3~</text>
+<text x="94" y="272" font-size="12" fill="#16232E" text-anchor="end" font-weight="bold">M1</text>
+<circle cx="140" cy="268" r="19" fill="none" stroke="#16232E" stroke-width="2"/>
+<polyline points="110,288 110,302" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="114" y="300" font-size="10" fill="#16232E" text-anchor="start">K</text>
+<polyline points="140,288 140,302" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="144" y="300" font-size="10" fill="#16232E" text-anchor="start">L</text>
+<polyline points="170,288 170,302" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="174" y="300" font-size="10" fill="#16232E" text-anchor="start">M</text>
+<polyline points="110,302 110,311" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="105" y="311" width="10" height="22" fill="#fff" stroke="#16232E" stroke-width="2"/>
+<polyline points="110,333 110,342" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="140,302 140,311" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="135" y="311" width="10" height="22" fill="#fff" stroke="#16232E" stroke-width="2"/>
+<polyline points="140,333 140,342" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="170,302 170,311" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="165" y="311" width="10" height="22" fill="#fff" stroke="#16232E" stroke-width="2"/>
+<polyline points="170,333 170,342" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="110,342 110,380" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="110,346 230,346 230,364" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="110" cy="346" r="3" fill="#16232E"/>
+<polyline points="140,342 140,380" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="140,352 252,352 252,364" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="140" cy="352" r="3" fill="#16232E"/>
+<polyline points="170,342 170,380" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="170,358 274,358 274,364" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="358" r="3" fill="#16232E"/>
+<polyline points="230,364 230,377" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="230,404 230,391" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="230,391 220,375" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="236" y="373" font-size="10" fill="#16232E" text-anchor="start">1</text>
+<text x="236" y="402" font-size="10" fill="#16232E" text-anchor="start">2</text>
+<polyline points="252,364 252,377" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="252,404 252,391" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="252,391 242,375" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="258" y="373" font-size="10" fill="#16232E" text-anchor="start">3</text>
+<text x="258" y="402" font-size="10" fill="#16232E" text-anchor="start">4</text>
+<polyline points="274,364 274,377" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="274,404 274,391" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="274,391 264,375" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="280" y="373" font-size="10" fill="#16232E" text-anchor="start">5</text>
+<text x="280" y="402" font-size="10" fill="#16232E" text-anchor="start">6</text>
+<polyline points="225,383 269,383" fill="none" stroke="#16232E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3,3"/>
+<text x="214" y="388" font-size="12" fill="#16232E" text-anchor="end" font-weight="bold">K11</text>
+<polyline points="230,404 230,410 274,410 274,404" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="252,404 252,410" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="252" cy="410" r="3" fill="#16232E"/>
+<polyline points="110,380 110,389" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="105" y="389" width="10" height="22" fill="#fff" stroke="#16232E" stroke-width="2"/>
+<polyline points="110,411 110,420" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="140,380 140,389" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="135" y="389" width="10" height="22" fill="#fff" stroke="#16232E" stroke-width="2"/>
+<polyline points="140,411 140,420" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="170,380 170,389" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="165" y="389" width="10" height="22" fill="#fff" stroke="#16232E" stroke-width="2"/>
+<polyline points="170,411 170,420" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="110,420 110,458" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="110,424 230,424 230,442" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="110" cy="424" r="3" fill="#16232E"/>
+<polyline points="140,420 140,458" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="140,430 252,430 252,442" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="140" cy="430" r="3" fill="#16232E"/>
+<polyline points="170,420 170,458" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="170,436 274,436 274,442" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="436" r="3" fill="#16232E"/>
+<polyline points="230,442 230,455" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="230,482 230,469" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="230,469 220,453" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="236" y="451" font-size="10" fill="#16232E" text-anchor="start">1</text>
+<text x="236" y="480" font-size="10" fill="#16232E" text-anchor="start">2</text>
+<polyline points="252,442 252,455" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="252,482 252,469" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="252,469 242,453" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="258" y="451" font-size="10" fill="#16232E" text-anchor="start">3</text>
+<text x="258" y="480" font-size="10" fill="#16232E" text-anchor="start">4</text>
+<polyline points="274,442 274,455" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="274,482 274,469" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="274,469 264,453" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="280" y="451" font-size="10" fill="#16232E" text-anchor="start">5</text>
+<text x="280" y="480" font-size="10" fill="#16232E" text-anchor="start">6</text>
+<polyline points="225,461 269,461" fill="none" stroke="#16232E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3,3"/>
+<text x="214" y="466" font-size="12" fill="#16232E" text-anchor="end" font-weight="bold">K12</text>
+<polyline points="230,482 230,488 274,488 274,482" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="252,482 252,488" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="252" cy="488" r="3" fill="#16232E"/>
+<polyline points="110,458 110,467" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="105" y="467" width="10" height="22" fill="#fff" stroke="#16232E" stroke-width="2"/>
+<polyline points="110,489 110,498" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="140,458 140,467" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="135" y="467" width="10" height="22" fill="#fff" stroke="#16232E" stroke-width="2"/>
+<polyline points="140,489 140,498" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="170,458 170,467" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="165" y="467" width="10" height="22" fill="#fff" stroke="#16232E" stroke-width="2"/>
+<polyline points="170,489 170,498" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="110,498 110,502" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="110,502 230,502 230,520" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="110" cy="502" r="3" fill="#16232E"/>
+<polyline points="140,498 140,508" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="140,508 252,508 252,520" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="140" cy="508" r="3" fill="#16232E"/>
+<polyline points="170,498 170,514" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="170,514 274,514 274,520" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="170" cy="514" r="3" fill="#16232E"/>
+<polyline points="230,520 230,533" fill="none" stroke="#1D5A8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="230,547 220,531" fill="none" stroke="#1D5A8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="236" y="529" font-size="10" fill="#1D5A8C" text-anchor="start">1</text>
+<polyline points="252,520 252,533" fill="none" stroke="#1D5A8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="252,547 242,531" fill="none" stroke="#1D5A8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="258" y="529" font-size="10" fill="#1D5A8C" text-anchor="start">3</text>
+<polyline points="274,520 274,533" fill="none" stroke="#1D5A8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="274,547 264,531" fill="none" stroke="#1D5A8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="280" y="529" font-size="10" fill="#1D5A8C" text-anchor="start">5</text>
+<polyline points="225,539 269,539" fill="none" stroke="#1D5A8C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3,3"/>
+<text x="214" y="544" font-size="12" fill="#1D5A8C" text-anchor="end" font-weight="bold">K13</text>
+</svg>

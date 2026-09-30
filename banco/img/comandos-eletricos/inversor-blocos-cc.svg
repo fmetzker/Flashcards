@@ -1,0 +1,32 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'inversor-blocos'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 250" width="320" height="250" font-family="Arial, Helvetica, sans-serif">
+<rect x="0" y="0" width="320" height="250" fill="#fff"/>
+<rect x="124" y="56" width="82" height="48" rx="6" fill="#DCE7F0"/>
+<text x="20" y="40" font-size="11" fill="#16232E" text-anchor="start">Rede 3~</text>
+<text x="20" y="54" font-size="11" fill="#16232E" text-anchor="start">60 Hz</text>
+<polyline points="28,64 28,80 40,80" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="40" y="60" width="70" height="40" fill="#fff" stroke="#16232E" stroke-width="2"/>
+<text x="75" y="84" font-size="11" fill="#16232E" text-anchor="middle">Retificador</text>
+<polyline points="110,80 130,80" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="130" y="60" width="70" height="40" fill="#fff" stroke="#1D5A8C" stroke-width="2"/>
+<text x="165" y="77" font-size="11" fill="#1D5A8C" text-anchor="middle">Barramento</text>
+<text x="165" y="91" font-size="11" fill="#1D5A8C" text-anchor="middle">CC</text>
+<polyline points="200,80 220,80" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="220" y="60" width="70" height="40" fill="#fff" stroke="#16232E" stroke-width="2"/>
+<text x="255" y="77" font-size="11" fill="#16232E" text-anchor="middle">Inversor</text>
+<text x="255" y="91" font-size="11" fill="#16232E" text-anchor="middle">(IGBTs)</text>
+<polyline points="255,100 255,140" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="240,140 240,154 238.3,176.1" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="244" y="151" font-size="10" fill="#16232E" text-anchor="start">U1</text>
+<polyline points="255,140 255,154 255,170" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="259" y="151" font-size="10" fill="#16232E" text-anchor="start">V1</text>
+<polyline points="270,140 270,154 271.7,176.1" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="274" y="151" font-size="10" fill="#16232E" text-anchor="start">W1</text>
+<circle cx="255" cy="196" r="26" fill="none" stroke="#16232E" stroke-width="2"/>
+<text x="255" y="194" font-size="15" fill="#16232E" text-anchor="middle" font-weight="bold">M</text>
+<text x="255" y="210" font-size="12" fill="#16232E" text-anchor="middle">3~</text>
+<rect x="130" y="170" width="70" height="40" fill="#fff" stroke="#16232E" stroke-width="2"/>
+<text x="165" y="194" font-size="11" fill="#16232E" text-anchor="middle">CPU</text>
+<polyline points="200,190 225,190 225,100" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4,3"/>
+<text x="165" y="232" font-size="10" fill="#16232E" text-anchor="middle">IHM / entradas</text>
+</svg>

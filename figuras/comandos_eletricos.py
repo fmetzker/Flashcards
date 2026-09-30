@@ -553,3 +553,230 @@ vista(M, "estrela-triangulo-forca-estrela", "yd-forca", acionados=["K1", "K2"],
 vista(M, "estrela-triangulo-comando", "yd-comando")
 vista(M, "estrela-triangulo-comando-intertravamento", "yd-comando", destaque=["K3.21", "K2.21"])
 vista(M, "compensadora-forca-k3", "comp-forca", destaque=["K3"])
+
+
+# ---- Comutação de velocidades: motor Dahlander (apostila cap. 12: K2 baixa;
+#      K1 e K3 alta, com K3 unindo 1U, 1V e 1W) --------------------------------
+
+@circuito("dahl-forca")
+def dahl_forca():
+    import math
+    d = Desenho(400, 420, alt="Força de um motor Dahlander: L1, L2 e L3 passam pelos fusíveis F10. "
+                "K2, com o relé térmico F7, liga as fases aos terminais 1U, 1V e 1W (velocidade baixa). "
+                "K1, com o relé térmico F8, liga as fases aos terminais 2U, 2V e 2W (velocidade alta); K3 "
+                "tem as entradas unidas e as saídas em 1U, 1V e 1W, unindo esses três terminais.")
+    xs, x1, x3 = (90, 116, 142), (200, 226, 252), (300, 326, 352)
+    for y, f in zip((30, 46, 62), ("L1", "L2", "L3")):
+        d.barramento(y, 50, 380, f)
+    for x, y, f in zip(xs, (30, 46, 62), ("L1", "L2", "L3")):
+        d.fio((x, y), (x, 80), net=f)
+        d.no(x, y, net=f)
+    d.tripolar(xs, 80, "fusivel", "F10", tag="F10", bornes=None, nome="fusível F10")
+    for x, xx, y, f in zip(xs, x1, (132, 140, 148), ("L1", "L2", "L3")):
+        d.fio((x, 120), (x, 164), net=f + "f")
+        d.fio((x, y), (xx, y), (xx, 164), net=f + "f")
+        d.no(x, y, net=f + "f")
+    d.tripolar(xs, 164, "contato", "K2", tag="K2", nome="polo de K2")
+    d.tripolar(x1, 164, "contato", "K1", tag="K1", nome="polo de K1")
+    with d.grupo("K3.ponte"):
+        d.linha([(x3[0], 156), (x3[-1], 156)])
+        for x in x3:
+            d.linha([(x, 156), (x, 164)])
+        d.no(x3[1], 156)
+    d.tripolar(x3, 164, "contato", "K3", tag="K3", nome="polo de K3")
+    for x in xs + x1:
+        d.fio((x, 204), (x, 214))
+    d.tripolar(xs, 214, "termico", "F7", tag="F7", nome="elemento térmico de F7")
+    d.tripolar(x1, 214, "termico", "F8", tag=None, nome="elemento térmico de F8")
+    with d.grupo("F8.tag"):
+        d.texto(x1[-1] + 16, 238, "F8", negrito=True)
+    # motor: 1U 1V 1W por cima (vindos de F7); 2U 2V 2W pela direita
+    cx, r = xs[1], 28
+    cy = 262 + 56 + r
+    with d.grupo("M1"):
+        for x, rot, ang in zip(xs, ("1U", "1V", "1W"), (-40, 0, 40)):
+            a = math.radians(ang)
+            d.linha([(x, 254), (x, 300), (cx + r * math.sin(a), cy - r * math.cos(a))])
+            d.texto(x + 4, 296, rot, tam=10)
+        d.circulo(cx, cy, r)
+        d.texto(cx, cy - 2, "M", tam=15, ancora="middle", negrito=True)
+        d.texto(cx, cy + 14, "3~", ancora="middle")
+        d.texto(xs[0] - 16, cy + 4, "M1", ancora="end", negrito=True)
+    for rot, dy, xk1 in (("2U", -16, x1[0]), ("2V", 0, x1[1]), ("2W", 16, x1[2])):
+        xe = cx + math.sqrt(r * r - dy * dy)
+        with d.grupo("~" + rot):
+            d.linha([(xe, cy + dy), (xk1, cy + dy), (xk1, 254)])
+            d.texto(xe + 3, cy + dy - 3, rot, tam=10)
+    # K3: saídas em 1U, 1V, 1W (as linhas que descem de F7)
+    for xk3, xm, y in zip(x3, xs, (262, 268, 274)):
+        with d.grupo("~K3" + str(xm)):
+            d.linha([(xk3, 204), (xk3, y), (xm, y)])
+        d.no(xm, y, net="K3" + str(xm))
+    return d
+
+
+# ---- Aceleração rotórica: rotor bobinado com três estágios de resistências ---------
+
+@circuito("rotorica-forca")
+def rotorica_forca():
+    d = Desenho(330, 540, alt="Força da partida rotórica: L1, L2 e L3 passam pelos fusíveis F10, por K1 "
+                "e pelo relé térmico F7 até o estator do motor de anéis M1. Os terminais do rotor K, L e M "
+                "descem cada um por uma coluna de três resistores. K11 une as três colunas depois do "
+                "primeiro resistor, K12 depois do segundo, e K13 no fim, curto-circuitando tudo.")
+    xs = (110, 140, 170)
+    for y, f in zip((30, 46, 62), ("L1", "L2", "L3")):
+        d.barramento(y, 60, 300, f)
+    for x, y, f in zip(xs, (30, 46, 62), ("L1", "L2", "L3")):
+        d.fio((x, y), (x, 76), net=f)
+        d.no(x, y, net=f)
+    d.tripolar(xs, 76, "fusivel", "F10", tag="F10", bornes=None, nome="fusível F10")
+    d.tripolar(xs, 124, "contato", "K1", tag="K1", nome="polo de K1")
+    d.tripolar(xs, 172, "termico", "F7", tag="F7", nome="elemento térmico de F7")
+    for x in xs:
+        d.fio((x, 116), (x, 124))
+        d.fio((x, 164), (x, 172))
+    yc, r = d.motor3(xs, 212, tag="M1")
+    with d.grupo("M1"):
+        d.circulo(xs[1], yc, r - 7)            # círculo interno: rotor bobinado
+    # rotor: K, L, M saem por baixo e descem por três colunas de resistores;
+    # em cada estágio, um contator tripolar une as três colunas (estrela),
+    # tirando do circuito os resistores de baixo
+    y0 = yc + r
+    for x, rot in zip(xs, ("K", "L", "M")):
+        with d.grupo("~" + rot):
+            d.linha([(x, y0 - 6), (x, y0 + 8)])
+            d.texto(x + 4, y0 + 6, rot, tam=10)
+    passo = 78
+    xk = (230, 252, 274)
+    for i, tag in enumerate(("K11", "K12", "K13")):
+        yr = y0 + 8 + i * passo
+        for x, rot in zip(xs, ("K", "L", "M")):
+            d.resistor(x, yr, id=f"R{rot}{i + 1}", nome=f"resistor {i + 1} do terminal {rot}")
+        yl = yr + ALTURA
+        ultimo = i == 2
+        for j, (x, xx) in enumerate(zip(xs, xk)):
+            yj = yl + 4 + j * 6
+            fim = yj if ultimo else yr + passo
+            d.fio((x, yl), (x, fim))
+            d.fio((x, yj), (xx, yj), (xx, yl + 22))
+            d.no(x, yj)
+        d.tripolar(xk, yl + 22, "contato", tag, tag=tag, nome=f"polo de {tag}")
+        with d.grupo(tag + ".estrela"):
+            d.linha([(xk[0], yl + 62), (xk[0], yl + 68), (xk[-1], yl + 68), (xk[-1], yl + 62)])
+            d.linha([(xk[1], yl + 62), (xk[1], yl + 68)])
+            d.no(xk[1], yl + 68)
+    return d
+
+
+# ---- Sensores de proximidade de 3 fios: NPN e PNP (apostila 7.1.2) ----------------
+
+def _sensor3(tipo):
+    d = Desenho(300, 230, alt=(f"Sensor de proximidade de três fios, saída {tipo}, alimentado entre +24 VCC e 0 V: "
+                "fio marrom no +, azul no 0 V e preto na saída. " +
+                ("A carga (bobina de K1) fica entre o + e o fio preto." if tipo == "NPN"
+                 else "A carga (bobina de K1) fica entre o fio preto e o 0 V.")))
+    d.barramento(30, 60, 270, "+24 V", cor=None)
+    d.barramento(200, 60, 270, "0 V", cor=None)
+    xs, xk = 110, 220
+    with d.grupo("B1"):
+        d.retangulo(xs - 34, 88, 68, 50, preench="#fff")
+        d.texto(xs, 110, "B1", tam=12, ancora="middle", negrito=True)
+        d.texto(xs, 126, tipo, tam=11, ancora="middle")
+    with d.grupo("~BN"):
+        d.linha([(xs - 20, 30), (xs - 20, 88)])
+        d.texto(xs - 24, 70, "BN", tam=10, ancora="end")
+    with d.grupo("~BU"):
+        d.linha([(xs - 20, 138), (xs - 20, 200)])
+        d.texto(xs - 24, 170, "BU", tam=10, ancora="end")
+    d.no(xs - 20, 30); d.no(xs - 20, 200)
+    if tipo == "NPN":
+        with d.grupo("~BK"):
+            d.linha([(xs + 20, 138), (xs + 20, 160), (xk, 160), (xk, 108)])
+            d.texto(xs + 24, 154, "BK", tam=10)
+        d.fio((xk, 30), (xk, 68), net="pk")
+        d.no(xk, 30)
+        d.bobina(xk, 68, id="K1.A1", tag="K1", nome="bobina de K1 (carga)")
+    else:
+        with d.grupo("~BK"):
+            d.linha([(xs + 20, 138), (xs + 20, 146), (xk, 146), (xk, 152)])
+            d.texto(xs + 24, 144, "BK", tam=10)
+        d.bobina(xk, 152, id="K1.A1", tag="K1", nome="bobina de K1 (carga)")
+        d.fio((xk, 192), (xk, 200), net="nk")
+        d.no(xk, 200)
+    return d
+
+
+circuito("sensor-npn")(lambda: _sensor3("NPN"))
+circuito("sensor-pnp")(lambda: _sensor3("PNP"))
+
+
+# ---- Inversor de frequência: blocos (Franchi 6.3-6.4) -------------------------------
+
+@circuito("inversor-blocos")
+def inversor_blocos():
+    d = Desenho(320, 250, alt="Diagrama de blocos de um inversor de frequência: a rede trifásica de 60 Hz "
+                "entra no retificador; dele sai tensão contínua para o barramento CC (com capacitor de filtro); "
+                "o bloco inversor com IGBTs, comandado pela CPU, gera tensão alternada de frequência variável "
+                "para o motor.")
+    d.texto(20, 40, "Rede 3~", tam=11)
+    d.texto(20, 54, "60 Hz", tam=11)
+    d.fio((28, 64), (28, 80), (40, 80))
+    d.bloco(40, 60, 70, 40, ["Retificador"], id="RET", nome="retificador")
+    d.fio((110, 80), (130, 80))
+    d.bloco(130, 60, 70, 40, ["Barramento", "CC"], id="CC", nome="barramento CC")
+    d.fio((200, 80), (220, 80))
+    d.bloco(220, 60, 70, 40, ["Inversor", "(IGBTs)"], id="INV", nome="bloco inversor com IGBTs")
+    d.fio((255, 100), (255, 140))
+    yc, r = d.motor3((240, 255, 270), 140, id="M", tag=None, nome="motor")
+    d.bloco(130, 170, 70, 40, ["CPU"], id="CPU", nome="CPU (controle)")
+    with d.grupo("~pulsos"):
+        d.linha([(200, 190), (225, 190), (225, 100)], tracejado="4,3")
+    d.texto(165, 232, "IHM / entradas", tam=10, ancora="middle")
+    return d
+
+
+# ---- Soft-starter com contator de bypass (Franchi 6.2.3) ----------------------------
+
+@circuito("softstarter-bypass")
+def softstarter_bypass():
+    d = Desenho(300, 360, alt="Soft-starter ligada com contator de bypass: L1, L2 e L3 passam pelos fusíveis F1 "
+                "e pelo contator K1 até a soft-starter (bloco de SCRs) e daí ao motor. O contator K2 fica em "
+                "paralelo com a soft-starter, ligando a entrada direto à saída.")
+    xs = (100, 130, 160)
+    for y, f in zip((30, 46, 62), ("L1", "L2", "L3")):
+        d.barramento(y, 60, 280, f)
+    for x, y, f in zip(xs, (30, 46, 62), ("L1", "L2", "L3")):
+        d.fio((x, y), (x, 76), net=f)
+        d.no(x, y, net=f)
+    d.tripolar(xs, 76, "fusivel", "F1", tag="F1", bornes=None, nome="fusível F1")
+    d.tripolar(xs, 124, "contato", "K1", tag="K1", nome="polo de K1")
+    for x in xs:
+        d.fio((x, 116), (x, 124))
+    # derivação para o bypass
+    xb = (200, 220, 240)
+    for x, xx, y in zip(xs, xb, (172, 178, 184)):
+        d.fio((x, 164), (x, 196))
+        d.fio((x, y), (xx, y), (xx, 196))
+        d.no(x, y)
+    d.bloco(80, 196, 100, 44, ["Soft-starter", "(SCRs)"], id="SS", nome="soft-starter")
+    d.tripolar(xb, 196, "contato", "K2", tag=None, nome="polo de K2")
+    with d.grupo("K2.tag"):
+        d.texto(xb[-1] + 16, 220, "K2", negrito=True)
+    for x, xx, y in zip(xs, xb, (256, 262, 268)):
+        d.fio((x, 240), (x, 280))
+        d.fio((xx, 236), (xx, y), (x, y))
+        d.no(x, y)
+    d.motor3(xs, 280, tag="M1")
+    return d
+
+
+vista(M, "dahlander-forca", "dahl-forca")
+vista(M, "dahlander-forca-k3", "dahl-forca", destaque=["K3"])
+vista(M, "rotorica-forca", "rotorica-forca")
+vista(M, "rotorica-forca-k13", "rotorica-forca", destaque=["K13"])
+vista(M, "sensor-npn", "sensor-npn")
+vista(M, "sensor-pnp", "sensor-pnp")
+vista(M, "inversor-blocos-ret", "inversor-blocos", destaque=["RET"])
+vista(M, "inversor-blocos-cc", "inversor-blocos", destaque=["CC"])
+vista(M, "inversor-blocos-inv", "inversor-blocos", destaque=["INV"])
+vista(M, "softstarter-bypass-k2", "softstarter-bypass", destaque=["K2"])

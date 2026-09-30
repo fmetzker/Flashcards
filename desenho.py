@@ -281,6 +281,29 @@ class Desenho:
                 self.texto(x - 10, y + 24, tag, ancora="end", negrito=True)
         self._registra(id, x, y, nome)
 
+    def resistor(self, x, y, id=None, tag=None, nome=None):
+        """Resistor (IEC 60617): retângulo SEM a linha atravessando — é essa
+        linha que distingue o fusível."""
+        with self.grupo(id):
+            self.linha([(x, y), (x, y + 9)])
+            self.retangulo(x - 5, y + 9, 10, 22, preench="#fff")
+            self.linha([(x, y + 31), (x, y + ALTURA)])
+            if tag:
+                self.texto(x - 10, y + 24, tag, ancora="end", negrito=True)
+        self._registra(id, x, y, nome)
+
+    def bloco(self, x, y, w, h, linhas, id=None, nome=None):
+        """Bloco funcional (diagrama de blocos): retângulo com texto centrado."""
+        with self.grupo(id):
+            self.retangulo(x, y, w, h, preench="#fff")
+            y0 = y + h / 2 - (len(linhas) - 1) * 7 + 4
+            for i, t in enumerate(linhas):
+                self.texto(x + w / 2, y0 + i * 14, t, tam=11, ancora="middle")
+        if id:
+            self.ancoras[id] = {"topo": (x + w / 2, y), "base": (x + w / 2, y + h)}
+            if nome:
+                self.nomes[id] = nome
+
     def elemento_termico(self, x, y, id=None, bornes=None, nome=None):
         """Elemento bimetálico do relé térmico, em série com a fase."""
         with self.grupo(id):
