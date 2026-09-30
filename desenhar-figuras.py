@@ -53,9 +53,10 @@ def main():
         destino = os.path.join(RAIZ, "banco", *chave.split("/"))
         # newline="" + replace: o git troca LF por CRLF no checkout do Windows,
         # e isso não é divergência de desenho
-        atual = open(destino, encoding="utf-8", newline="").read().replace("
-", "
-")             if os.path.exists(destino) else None
+        atual = None
+        if os.path.exists(destino):
+            with open(destino, encoding="utf-8", newline="") as f:
+                atual = f.read().replace("\r\n", "\n")
         if atual == svg:
             continue
         if conferir:
