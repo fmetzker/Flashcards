@@ -3975,6 +3975,122 @@
           }
         ]
       }
+    },
+    "maquinas-eletricas": {
+      "criterio": "A fila segue a ordem dos dois livros do curso: primeiro o princípio comum a todo motor de indução, depois os tipos. (1) Princípios do motor de indução — constituição, campo girante, velocidade síncrona e escorregamento, que todos os outros tópicos usam. (2) Motores monofásicos — Franchi cap. 1 e SENAI 6.1.1 vêm antes do trifásico. (3) Ligações do motor trifásico — estrela, triângulo e os fechamentos de 6, 9 e 12 pontas. (4) Características e placa do motor — só se lê a placa inteira depois de saber o que é polo, escorregamento e fechamento.",
+      "requisitos": {
+        "Motores monofásicos": [
+          "Princípios do motor de indução"
+        ],
+        "Ligações do motor trifásico": [
+          "Motores monofásicos"
+        ],
+        "Características e placa do motor": [
+          "Ligações do motor trifásico"
+        ]
+      },
+      "criterio_conceitual": "Monofásicos exige Princípios porque o problema do motor monofásico (campo pulsante, sem torque de partida) só se entende sabendo o que é campo girante. Ligações exige Princípios porque o fechamento serve para dar a cada bobina sua tensão de projeto dentro de um motor trifásico. Características e placa exige Princípios (polos, escorregamento, corrente de partida) e Ligações (a placa indica o fechamento de cada tensão). Monofásicos não é base de Ligações; na fila vem antes só pela ordem dos livros.",
+      "requisitos_conceituais": {
+        "Motores monofásicos": [
+          "Princípios do motor de indução"
+        ],
+        "Ligações do motor trifásico": [
+          "Princípios do motor de indução"
+        ],
+        "Características e placa do motor": [
+          "Princípios do motor de indução",
+          "Ligações do motor trifásico"
+        ]
+      },
+      "criterio_subtopicos": "Dentro de cada tópico, do conceito ao exercício. Princípios: constituição → campo girante e velocidade → escorregamento (que é a diferença entre as duas velocidades). Monofásicos: tipos → ligação e inversão. Ligações: estrela e triângulo (a relação √3) → 6 pontas → 9 e 12 pontas (a mesma ideia com bobinas em série ou paralelo) → identificação dos terminais → sentido de rotação. Placa: grau de proteção, isolamento e categoria, cada um sozinho, antes da leitura da placa inteira, que junta todos.",
+      "requisitos_subtopicos": {
+        "Princípios do motor de indução|Campo girante e velocidade": [
+          {
+            "t": "Princípios do motor de indução",
+            "s": "Constituição"
+          }
+        ],
+        "Princípios do motor de indução|Escorregamento e conjugado": [
+          {
+            "t": "Princípios do motor de indução",
+            "s": "Campo girante e velocidade"
+          }
+        ],
+        "Motores monofásicos|Ligação e inversão": [
+          {
+            "t": "Motores monofásicos",
+            "s": "Tipos de motor monofásico"
+          }
+        ],
+        "Ligações do motor trifásico|Motor de 6 pontas": [
+          {
+            "t": "Ligações do motor trifásico",
+            "s": "Estrela e triângulo"
+          }
+        ],
+        "Ligações do motor trifásico|Motor de 9 e 12 pontas": [
+          {
+            "t": "Ligações do motor trifásico",
+            "s": "Motor de 6 pontas"
+          }
+        ],
+        "Ligações do motor trifásico|Identificação dos terminais": [
+          {
+            "t": "Ligações do motor trifásico",
+            "s": "Motor de 9 e 12 pontas"
+          }
+        ],
+        "Ligações do motor trifásico|Sentido de rotação": [
+          {
+            "t": "Ligações do motor trifásico",
+            "s": "Identificação dos terminais"
+          }
+        ],
+        "Características e placa do motor|Isolamento e temperatura": [
+          {
+            "t": "Características e placa do motor",
+            "s": "Grau de proteção"
+          }
+        ],
+        "Características e placa do motor|Categoria e regime": [
+          {
+            "t": "Características e placa do motor",
+            "s": "Isolamento e temperatura"
+          }
+        ],
+        "Características e placa do motor|Leitura da placa": [
+          {
+            "t": "Características e placa do motor",
+            "s": "Categoria e regime"
+          }
+        ]
+      },
+      "requisitos_conceituais_subtopicos": {
+        "Princípios do motor de indução|Escorregamento e conjugado": [
+          {
+            "t": "Princípios do motor de indução",
+            "s": "Campo girante e velocidade"
+          }
+        ],
+        "Ligações do motor trifásico|Motor de 6 pontas": [
+          {
+            "t": "Ligações do motor trifásico",
+            "s": "Estrela e triângulo"
+          }
+        ],
+        "Ligações do motor trifásico|Motor de 9 e 12 pontas": [
+          {
+            "t": "Ligações do motor trifásico",
+            "s": "Motor de 6 pontas"
+          }
+        ],
+        "Características e placa do motor|Leitura da placa": [
+          {
+            "t": "Características e placa do motor",
+            "s": "Categoria e regime"
+          }
+        ]
+      }
     }
   }
 }
