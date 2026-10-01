@@ -1351,6 +1351,18 @@
             "t": "Rede Alyne",
             "s": "Pontos de atenção especializados"
           }
+        ],
+        "PNAB|Responsabilidades das esferas de governo": [
+          {
+            "t": "PNAB",
+            "s": "Tipos de equipes especializadas"
+          }
+        ],
+        "Lei 8.080/90|Comissões intersetoriais e consórcios": [
+          {
+            "t": "Lei 8.080/90",
+            "s": "Participação complementar do setor privado"
+          }
         ]
       },
       "requisitos_conceituais_subtopicos": {
@@ -1520,6 +1532,18 @@
           {
             "t": "PNAU",
             "s": "Componentes da RUE"
+          }
+        ],
+        "PNAB|Responsabilidades das esferas de governo": [
+          {
+            "t": "PNAB",
+            "s": "Tipos de equipes especializadas"
+          }
+        ],
+        "Lei 8.080/90|Comissões intersetoriais e consórcios": [
+          {
+            "t": "Lei 8.080/90",
+            "s": "Participação complementar do setor privado"
           }
         ]
       }
