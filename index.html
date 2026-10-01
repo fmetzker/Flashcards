@@ -1995,13 +1995,20 @@ function rodape(nome){
       const f = fila(), total = f.revisar.length + Math.max(0, E.meta - feitasHoje());
       const pend = resumoPendencias();
       if(pend.vencidas > 0){
-        const txt = pend.vencidas > RODADA ? "Revisar "+RODADA+" de "+pend.vencidas
-                  : "Revisar "+pend.vencidas+(pend.vencidas === 1 ? " vencida" : " vencidas");
+        /* âmbar só com ATRASO (revisão de dia anterior). Revisão que vence
+           hoje é o espaçamento funcionando, não pendência: fica verde e é
+           chamada "de hoje" — senão o âmbar aparece todo dia e para de
+           significar alguma coisa. */
+        const atraso = pend.atrasadas > 0;
+        const sufixo = atraso ? "" : " de hoje";
+        const txt = pend.vencidas > RODADA ? "Revisar "+RODADA+" de "+pend.vencidas+sufixo
+                  : atraso ? "Revisar "+pend.vencidas+(pend.vencidas === 1 ? " pendente" : " pendentes")
+                  : "Revisar "+pend.vencidas+sufixo;
         const detalhe = [];
-        if(pend.errouUltima) detalhe.push(pend.errouUltima+" você errou da última vez");
         if(pend.atrasadas) detalhe.push(pend.atrasadas+(pend.atrasadas === 1 ? " é de dia anterior" : " são de dias anteriores"));
+        if(pend.errouUltima) detalhe.push(pend.errouUltima+" você errou da última vez");
         const x = document.createElement("button");
-        x.className = "ambar";
+        x.className = atraso ? "ambar" : "verde";
         x.innerHTML = '<span></span><small class="previsao"></small>';
         x.children[0].textContent = txt;
         x.children[1].textContent = detalhe.join(" · ");

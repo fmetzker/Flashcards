@@ -902,10 +902,14 @@ revisões ainda vencidas, com "Mais 10" e "Parar". "Mais 10" retoma a MESMA
 sessão (`S.lista`, `S.pos`, `S.pendentes` intactos) — não é voltar à lista
 fechada que existia antes da sessão contínua. Regras que não podem cair:
   - **O botão promete só o que a rodada entrega.** Com revisão vencida, ele
-    diz "Revisar 10 de 34" (âmbar), nunca o atraso inteiro, e a contagem é
+    diz "Revisar 10 de 34", nunca o atraso inteiro, e a contagem é
     `resumoPendencias()`, que lê a mesma `fila().revisar` que a sessão
-    entrega primeiro. Âmbar é atenção; vermelho é só o aviso de "não dá tempo
-    antes da prova".
+    entrega primeiro.
+  - **Âmbar só com ATRASO** (revisão de dia anterior, `atrasadas > 0`).
+    Revisão que vence hoje é o espaçamento funcionando, não pendência: botão
+    verde, "Revisar 8 de hoje". Pintar o dia normal de âmbar faria a cor
+    aparecer todo dia e deixar de significar alguma coisa. Vermelho é só o
+    aviso de "não dá tempo antes da prova".
   - **Rodada só no "Estudar" da tela inicial** (modo `"normal"`). Estudo de
     tópico pela tela Matérias (`"filtro"`) e "Revisar erros" não pausam.
   - **Onde a sessão reabastece, o contador não mostra total**: o total cresce
