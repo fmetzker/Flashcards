@@ -48,7 +48,7 @@ module.exports = function (APP, t) {
       const q = APP.porId[id];
       const b = APP.BLOCOS_META.find(x => x.materias.includes(q.m));
       if (b && b.topicos) {
-        t.ok(b.topicos.includes(q.t), `"${q.t}" está fora do escopo de ${b.nome}`);
+        t.ok(APP.noEscopo(b.topicos, q), `"${q.t}|${q.s}" está fora do escopo de ${b.nome}`);
       }
     }
   });
@@ -63,7 +63,7 @@ module.exports = function (APP, t) {
     const b = APP.BLOCOS_META.find(x => x.materias.includes('matematica'));
     t.ok(b.questoes >= 4, 'preciso de cota >= 4 para caber revisão e novo no mesmo bloco');
     const daMateria = APP.BANCO.filter(q => q.m === 'matematica'
-      && (!b.topicos || b.topicos.includes(q.t)) && APP.grauAberto(q));
+      && APP.noEscopo(b.topicos, q) && APP.grauAberto(q));
     t.ok(daMateria.length >= 4, 'preciso de pelo menos 4 cartões abertos de matemática');
     // marca 2 como revisão vencida hoje; o resto continua "nunca visto"
     daMateria.slice(0, 2).forEach(q => {
@@ -95,7 +95,7 @@ module.exports = function (APP, t) {
     const ultimo = APP.BLOCOS_META[APP.BLOCOS_META.length - 1];
     const m = ultimo.materias[0];
     const alvo = APP.BANCO.find(q => q.m === m
-      && (!ultimo.topicos || ultimo.topicos.includes(q.t)) && APP.grauAberto(q));
+      && APP.noEscopo(ultimo.topicos, q) && APP.grauAberto(q));
     t.ok(alvo, `preciso de um cartão aberto de ${m}`);
     APP.E.cartoes[alvo.id] = { caixa: 1, acertos: 0, erros: 1, prox: hoje };
 
@@ -114,7 +114,7 @@ module.exports = function (APP, t) {
     APP.BLOCOS_META.forEach(bl => {
       const m = bl.materias[0];
       const q = APP.BANCO.find(x => x.m === m
-        && (!bl.topicos || bl.topicos.includes(x.t)) && APP.grauAberto(x) && !revIds.has(x.id));
+        && APP.noEscopo(bl.topicos, x) && APP.grauAberto(x) && !revIds.has(x.id));
       if (!q) return;
       APP.E.cartoes[q.id] = { caixa: 1, acertos: 0, erros: 1, prox: hoje };
       revIds.add(q.id);
@@ -148,7 +148,7 @@ module.exports = function (APP, t) {
     const cheio = APP.BLOCOS_META.find(b => b.materias.includes('matematica'));
     const excedente = cheio.questoes + 5;
     const cartoes = APP.BANCO.filter(q => q.m === cheio.materias[0]
-      && (!cheio.topicos || cheio.topicos.includes(q.t)) && APP.grauAberto(q));
+      && APP.noEscopo(cheio.topicos, q) && APP.grauAberto(q));
     t.ok(cartoes.length >= excedente,
       `preciso de ${excedente} cartões abertos de ${cheio.materias[0]}, só achei ${cartoes.length}`);
     cartoes.slice(0, excedente).forEach(q => {
@@ -178,7 +178,7 @@ module.exports = function (APP, t) {
       n + Math.max(0, bl.questoes - Math.min(porBloco[i].feitas, bl.questoes)), 0);
     const mat = APP.BLOCOS_META.find(b => b.materias.includes('matematica'));
     const cartoes = APP.BANCO.filter(q => q.m === mat.materias[0]
-      && (!mat.topicos || mat.topicos.includes(q.t)) && APP.grauAberto(q));
+      && APP.noEscopo(mat.topicos, q) && APP.grauAberto(q));
     t.ok(cartoes.length >= capacidade,
       `preciso de ${capacidade} cartões abertos de matemática (capacidade do dia), só achei ${cartoes.length}`);
     cartoes.slice(0, capacidade).forEach(q => {
@@ -202,7 +202,7 @@ module.exports = function (APP, t) {
       n + Math.max(0, bl.questoes - Math.min(porBloco[i].feitas, bl.questoes)), 0);
     const cheio = APP.BLOCOS_META.find(b => b.materias.includes('matematica'));
     APP.BANCO.filter(q => q.m === cheio.materias[0]
-      && (!cheio.topicos || cheio.topicos.includes(q.t)) && APP.grauAberto(q))
+      && APP.noEscopo(cheio.topicos, q) && APP.grauAberto(q))
       .forEach(q => { APP.E.cartoes[q.id] = { caixa: 1, acertos: 0, erros: 1, prox: hoje }; });
 
     const lote = APP.montarLoteSessao('normal', null, new Set());

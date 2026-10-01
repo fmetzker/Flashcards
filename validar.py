@@ -155,15 +155,22 @@ def valida_concursos(B):
             # pior que um erro. Mesma checagem que o validar.ps1 já fazia.
             if bl.get('topicos'):
                 do_bloco = [q for q in B if q['m'] in bl.get('materias', [])]
-                existentes = {q['t'] for q in do_bloco}
+                # Cada entrada é um tópico inteiro ("Álgebra") ou um subtópico
+                # só ("Álgebra|Equações do 2º grau") — mesma regra de noEscopo()
+                # no motor.js; as duas precisam concordar.
+                existentes = {q['t'] for q in do_bloco} |                              {f"{q['t']}|{q['s']}" for q in do_bloco if q.get('s')}
                 for t in bl['topicos']:
                     if t not in existentes:
-                        erros.append(f"concurso [{rot}], bloco '{bl['id']}': tópico '{t}' "
+                        erros.append(f"concurso [{rot}], bloco '{bl['id']}': tópico/subtópico '{t}' "
                                      "não existe no banco das matérias deste bloco")
+                    elif '|' in t and t.split('|')[0] in bl['topicos']:
+                        avisos.append(f"concurso [{rot}], bloco '{bl['id']}': '{t}' é redundante "
+                                      "— o tópico inteiro já está no escopo")
                 if len(set(bl['topicos'])) != len(bl['topicos']):
                     erros.append(f"concurso [{rot}], bloco '{bl['id']}': tópico repetido "
                                  "na lista de escopo")
-                disp = sum(1 for q in do_bloco if q['t'] in bl['topicos'])
+                disp = sum(1 for q in do_bloco if q['t'] in bl['topicos']
+                           or (q.get('s') and f"{q['t']}|{q['s']}" in bl['topicos']))
                 if disp < bl['questoes']:
                     avisos.append(f"concurso [{rot}], bloco '{bl['nome']}': dentro do escopo "
                                   f"declarado há {disp} questões para {bl['questoes']} da prova")

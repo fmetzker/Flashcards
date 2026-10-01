@@ -75,6 +75,17 @@ function apportion(pesos, total){
   return resultado;
 }
 
+/* O cartão cai no escopo do bloco? `topicos` nulo é a matéria inteira. Cada
+   entrada é um tópico inteiro ("Álgebra") ou um subtópico só
+   ("Álgebra|Equações do 2º grau"): o tópico do banco pode misturar o que o
+   edital pede com o que ele nem cita — Álgebra tem equação do 2º grau e
+   também logaritmo, e um edital de 9º ano pede só a primeira. Cartão sem
+   subtópico só entra pela forma de tópico inteiro. */
+function noEscopo(topicos, q){
+  if(!topicos) return true;
+  return topicos.indexOf(q.t) >= 0 || (!!q.s && topicos.indexOf(q.t + "|" + q.s) >= 0);
+}
+
 function blocosDaMeta(lista){
   const porMateria = {};                       // matéria -> bloco vencedor (peso = cota do edital/avulsa)
   const escopo = {};                           // matéria -> Set de tópicos, ou null = tudo
@@ -719,10 +730,10 @@ function montarLoteSessao(modo, filtro, excluir){
        foco, e quem seguia dois concursos nunca recebia a matéria exclusiva
        do outro; agora a sessão cobre tudo que a meta cobra, na mesma sessão.
 
-       Sorteia dentro do escopo de tópicos do bloco, quando ele existe: um
-       concurso pode cobrar só parte da matéria (Português do Moço de
-       Máquinas não pede regência nem colocação pronominal). Sem `topicos`
-       declarado, a matéria entra inteira.
+       Sorteia dentro do escopo do bloco, quando ele existe (noEscopo): um
+       concurso pode cobrar só parte da matéria — tópicos inteiros ou só
+       alguns subtópicos deles. Sem `topicos` declarado, a matéria entra
+       inteira.
 
        Cada bloco entra com o que ainda falta para fechar a cota dele. A
        cota (`bl.questoes`) é a fatia renormalizada da meta fixa — ver
@@ -740,7 +751,7 @@ function montarLoteSessao(modo, filtro, excluir){
       const daArea = id => {
         const x = porId[id];
         if(!x || excluir.has(id) || bl.materias.indexOf(x.m) < 0) return false;
-        return !bl.topicos || bl.topicos.indexOf(x.t) >= 0;
+        return noEscopo(bl.topicos, x);
       };
       return {falta, rev: q.revisar.filter(daArea), nov: q.novas.filter(daArea)};
     });

@@ -18,8 +18,11 @@
 > era assim", "descoberto em setembro") vai para o histórico.
 
 Aplicativo web de questões com repetição espaçada, contas e banco
-colaborativo. Hoje atende quatro concursos: Enfermeiro/Volta Redonda (edital
-003/2026-SMA, prova 20/09/2026), CAAQ-CDM/Marinha, Psicologia/Transpetro,
+colaborativo. Hoje atende cinco concursos: Enfermeiro/Volta Redonda (edital
+003/2026-SMA, prova 20/09/2026), CAAQ-CDM/Marinha, CFAQ-MOC/MOM/Marinha
+(Moço de Convés e Moço de Máquinas, mesma prova; **pré-edital**, com base
+nas Normas CPES 2026 enquanto a Capitania da conta não abre o PS),
+Psicologia/Transpetro,
 cadastrado como **pré-edital** (estrutura copiada do edital de 2023 enquanto
 o de 2026 não sai), e Manutenção Mecânica/Transpetro (Edital nº 03 -
 TRANSPETRO/PSP/TERRA/NÍVEL MÉDIO-2026.3, ênfase 11, polo Rio de Janeiro,
@@ -628,6 +631,22 @@ escopo restrito a um só ou com todos.
   sintaxe — 132 dos 172 cartões entram) e 10 de Matemática (sem lógica —
   116 dos 129). O bloco de Específicos não declara escopo porque a matéria
   inteira *é* o conteúdo da ênfase.
+  - **Cada entrada é um tópico inteiro (`"Álgebra"`) ou um subtópico só
+    (`"Álgebra|Equações do 2º grau"`).** O tópico do banco pode misturar o
+    que o edital pede com o que ele nem cita — Álgebra tem equação do 2º
+    grau e logaritmo, e o 9º ano pede só a primeira. Quem decide é
+    `noEscopo()`, no motor e nos testes; `validar.py` repete a mesma regra
+    e as duas precisam concordar. Cartão sem `s` só entra pela forma de
+    tópico inteiro. Quem usa o recorte por subtópico hoje é `cfaq-moc-mom`
+    em Matemática (810 dos 943 cartões entram).
+  - Escopo pode somar ao edital o que as **provas anteriores cobraram de
+    fato**, com a evidência dita no `_topicos` do bloco — é o caso de
+    `cfaq-moc-mom`, cujo Anexo III é curto mas as provas de 9º ano trazem
+    produtos notáveis, Pitágoras, semântica e coesão. Não é inventar
+    conteúdo (regra 11): é a prova publicada dizendo o que cai.
+  - **O simulado respeita o escopo** (`daProva()` no `index.html`):
+    imita a prova, então sorteia só o que ela cobra. O alerta de bloco
+    fraco também mede só dentro do escopo.
   - Ao deduplicar, o escopo é **união**, não o do bloco vencedor: se um
     concurso restringe e outro não, quem segue os dois estuda a matéria
     inteira. União é o que garante não estudar de menos.

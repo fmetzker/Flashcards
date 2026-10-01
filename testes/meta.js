@@ -62,8 +62,58 @@ module.exports = function (APP, t) {
     for (const b of APP.BLOCOS_META) {
       if (!b.topicos) continue;
       for (const tt of b.topicos) {
-        const existe = APP.BANCO.some(q => b.materias.includes(q.m) && q.t === tt);
-        t.ok(existe, `escopo de "${b.nome}" cita tópico inexistente: "${tt}"`);
+        const [tt0, ss] = tt.split('|');
+        const existe = APP.BANCO.some(q => b.materias.includes(q.m) && q.t === tt0
+                                         && (ss === undefined || q.s === ss));
+        t.ok(existe, `escopo de "${b.nome}" cita tópico/subtópico inexistente: "${tt}"`);
+      }
+    }
+  });
+
+  t.teste('escopo por subtópico: "Tópico|Subtópico" abre só aquele subtópico', () => {
+    /* o tópico do banco mistura o que o edital pede com o que ele nem cita —
+       Álgebra tem equação do 2º grau e logaritmo; o 9º ano pede só a 1ª */
+    const esc = ['Pontuação', 'Álgebra|Equações do 2º grau'];
+    t.ok(APP.noEscopo(esc, { t: 'Pontuação' }), 'tópico inteiro tinha que entrar');
+    t.ok(APP.noEscopo(esc, { t: 'Pontuação', s: 'Vírgula' }), 'subtópico de tópico inteiro tinha que entrar');
+    t.ok(APP.noEscopo(esc, { t: 'Álgebra', s: 'Equações do 2º grau' }), 'subtópico listado tinha que entrar');
+    t.ok(!APP.noEscopo(esc, { t: 'Álgebra', s: 'Equações logarítmicas' }), 'subtópico irmão não listado entrou');
+    t.ok(!APP.noEscopo(esc, { t: 'Álgebra' }), 'cartão sem subtópico entrou por um escopo só de subtópico');
+    t.ok(APP.noEscopo(null, { t: 'Qualquer' }), 'sem escopo, a matéria inteira entra');
+  });
+
+  t.teste('a sessão respeita o escopo por subtópico (revisão vencida fora dele não entra)', async () => {
+    /* revisão vencida passa por cima da fila de pré-requisito — é o único
+       jeito de o cartão fora do escopo chegar até o filtro da sessão */
+    await APP.montar({ concursos: ['cfaq-moc-mom'] });
+    const mat = bloco('matematica');
+    t.ok(mat && mat.topicos && mat.topicos.some(x => x.includes('|')),
+      'cfaq-moc-mom devia recortar Matemática por subtópico');
+    const fora = APP.BANCO.find(q => q.t === 'Álgebra' && q.s === 'Equações logarítmicas');
+    const dentro = APP.BANCO.find(q => q.t === 'Álgebra' && q.s === 'Equações do 2º grau');
+    t.ok(fora && dentro, 'preciso de um cartão de logaritmo e um de equação do 2º grau');
+    const hoje = APP.hoje();
+    APP.E.cartoes[fora.id] = { caixa: 1, acertos: 0, erros: 1, prox: hoje };
+    APP.E.cartoes[dentro.id] = { caixa: 1, acertos: 0, erros: 1, prox: hoje };
+    const lote = APP.montarLoteSessao('normal', null, new Set());
+    t.ok(lote.includes(dentro.id), 'a revisão dentro do escopo tinha que entrar');
+    t.ok(!lote.includes(fora.id), 'revisão de logaritmo entrou numa sessão do CFAQ (fora do escopo)');
+  });
+
+  t.teste('o simulado sorteia só dentro do escopo do bloco', async () => {
+    /* o simulado imita a prova: um simulado de 9º ano não pode trazer
+       logaritmo nem tabela-verdade só porque estão na mesma matéria */
+    await APP.montar({ concursos: ['cfaq-moc-mom'] });
+    const mat = APP.BLOCOS.find(b => b.materias.includes('matematica'));
+    t.ok(mat && mat.topicos, 'o bloco de Matemática do CFAQ devia ter escopo');
+    const fora = APP.BANCO.filter(q => q.m === 'matematica' && !APP.noEscopo(mat.topicos, q)).length;
+    t.ok(fora > 0, 'o teste precisa de cartão fora do escopo no banco carregado');
+    t.igual(APP.disponivel(mat), APP.BANCO.filter(q => q.m === 'matematica').length - fora,
+      'disponivel() contou cartão fora do escopo');
+    for (let i = 0; i < 30; i++) {
+      for (const id of APP.sorteia(mat)) {
+        const q = APP.porId[id];
+        t.ok(APP.noEscopo(mat.topicos, q), `simulado sorteou fora do escopo: ${q.t}|${q.s}`);
       }
     }
   });

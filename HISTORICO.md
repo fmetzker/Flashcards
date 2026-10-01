@@ -17,6 +17,22 @@ que o código já diz não vem: some.
 
 ---
 
+## Escopo por subtópico (outubro/2026)
+
+O escopo de bloco (`blocos[].topicos`) nasceu só por tópico, com o
+`transpetro-mec`, e isso bastava porque o Anexo IV de nível médio cortava
+tópicos inteiros (regência, colocação, lógica). O CFAQ-MOC/MOM quebrou isso:
+o edital é de 9º ano, mas os tópicos de Matemática do banco foram crescendo
+com cartão de nível superior (CAAQ) dentro dos mesmos rótulos — Álgebra
+passou a ter logaritmo, Lógica a ter tabela-verdade, Funções a ter inversa e
+paridade. Recortar por tópico deixaria entrar cerca de 107 cartões que a
+prova não cobra; recortar a menos tiraria Conjuntos, que é item do edital e
+mora em Lógica. Daí a forma `"Tópico|Subtópico"` e a função `noEscopo()`,
+que passou a ser a régua única: antes a mesma comparação
+(`topicos.includes(q.t)`) estava repetida em oito lugares dos testes.
+
+---
+
 ## Painel de desempenho
 
 **Três números errados, um de cada vez, todos por confundir perguntas

@@ -2155,7 +2155,7 @@ function pintarInicio(){
   if(BANCO_FOCO_PRONTO){
     BLOCOS.forEach(bl=>{
       let acc=0, t=0;
-      BANCO.forEach(q2=>{ if(blocoDe(q2)!==bl.id) return; const c=E.cartoes[q2.id]; if(c){acc+=c.acertos;t+=c.acertos+c.erros;} });
+      BANCO.forEach(q2=>{ if(blocoDe(q2)!==bl.id || !noEscopo(bl.topicos, q2)) return; const c=E.cartoes[q2.id]; if(c){acc+=c.acertos;t+=c.acertos+c.erros;} });
       if(t>=8 && acc/t < 0.4){
         const d3=document.createElement("div"); d3.className="alerta";
         d3.textContent = "Atenção: "+bl.nome+" está em "+Math.round(acc/t*100)+"% de acerto."+
@@ -3227,7 +3227,11 @@ function sairDoSimulado(){
   ir("inicio");
 }
 const totalProva = () => BLOCOS.reduce((s,b)=>s+b.questoes, 0);
-const disponivel = bl => BANCO.filter(q=>blocoDe(q)===bl.id).length;
+/* só o que cai NESTA prova: o simulado imita a prova, e o escopo do bloco
+   (noEscopo) é o recorte do edital — sem ele, um simulado de 9º ano sorteava
+   logaritmo e tabela-verdade da mesma matéria */
+const daProva = (bl, q) => blocoDe(q)===bl.id && noEscopo(bl.topicos, q);
+const disponivel = bl => BANCO.filter(q=>daProva(bl, q)).length;
 
 function pintarSimuladoInicio(){
   const horas = CONCURSO.duracaoMin/60;
@@ -3255,7 +3259,7 @@ function pintarSimuladoInicio(){
     : '<div class="alerta ok">Banco suficiente para simulado completo de '+totalProva()+' questões.</div>';
 }
 function sorteia(bl){
-  const pool = BANCO.filter(q=>blocoDe(q)===bl.id);
+  const pool = BANCO.filter(q=>daProva(bl, q));
   for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
   return pool.slice(0,Math.min(bl.questoes,pool.length)).map(q=>q.id);
 }

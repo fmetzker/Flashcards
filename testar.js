@@ -58,10 +58,11 @@ const FUNCOES = [
   'requisitosPendentes', 'requisitosPendentesSub', 'baseDominada',
   'grauDe', 'grauLiberado', 'grauAberto', 'menorGrauExistente', 'limparCacheGrau',
   'profundidadeTopico', 'profundidadeSubtopico', 'porDesbloqueio', 'porDesbloqueioSub',
-  'blocosDaMeta', 'progressoDoDia', 'progressoPorBloco',
+  'blocosDaMeta', 'noEscopo', 'progressoDoDia', 'progressoPorBloco',
   'feitasHoje', 'montarLoteSessao', 'agendarRepeticao', 'resumoDoBanco',
   'materiasInscritas', 'provaMaisProxima', 'blocoDe', 'embaralhaOrdem',
   'revisoesPorDia', 'aplicarFoco', 'carregarConfig', 'carregarBancoParcial',
+  'sorteia', 'disponivel',
   /* não são motor puro (tocam localStorage), mas o teste precisa alcançá-las */
   'salvar', 'podarEventosProprios', 'renovarSessao', 'chamarAuth',
   'sincronizarMateriasAtivas', 'zerar', 'zerarMateria', 'checarMetasBatidas',
