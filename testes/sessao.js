@@ -412,4 +412,30 @@ module.exports = function (APP, t) {
     APP.agendarRepeticao('abc', 'errei');   // não pode lançar
     t.ok(true);
   });
+  t.grupo('botão da tela inicial — resumoPendencias');
+
+  t.teste('conta vencidas, atrasadas e erradas na última vez', async () => {
+    /* é o que o botão anuncia ("Revisar 10 de 34", "4 você errou da última
+       vez") — vencidas tem que ser a mesma fila().revisar que a sessão
+       entrega primeiro, senão o botão promete uma coisa e a sessão faz outra */
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const hoje = APP.hoje();
+    const abertos = APP.BANCO.filter(q => APP.grauAberto(q)).slice(0, 3);
+    t.ok(abertos.length === 3, 'preciso de 3 cartões abertos');
+    const [atrasado, errado, futuro] = abertos;
+    APP.E.cartoes[atrasado.id] = { caixa: 3, acertos: 2, erros: 0, prox: APP.somarDias(hoje, -2) };
+    APP.E.cartoes[errado.id]   = { caixa: 1, acertos: 0, erros: 1, prox: hoje };
+    APP.E.cartoes[futuro.id]   = { caixa: 4, acertos: 3, erros: 0, prox: APP.somarDias(hoje, 5) };
+    const r = APP.resumoPendencias();
+    t.igual(r.vencidas, APP.fila().revisar.length, 'vencidas tem que ser a fila de revisão da sessão');
+    t.igual(r.vencidas, 2, 'o cartão do futuro não está vencido');
+    t.igual(r.atrasadas, 1, 'só o de dois dias atrás está atrasado (o de hoje vence hoje)');
+    t.igual(r.errouUltima, 1, 'só o de caixa 1 foi errado/chutado na última vez');
+  });
+
+  t.teste('sem cartão estudado, nada pendente', async () => {
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const r = APP.resumoPendencias();
+    t.igual([r.vencidas, r.atrasadas, r.errouUltima], [0, 0, 0]);
+  });
 };

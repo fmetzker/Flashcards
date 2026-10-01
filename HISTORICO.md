@@ -17,6 +17,21 @@ que o código já diz não vem: some.
 
 ---
 
+## Rodadas de 10 no "Estudar" (outubro/2026)
+
+O botão da tela inicial dizia sempre "Estudar agora", com ou sem revisão
+atrasada, e a sessão contínua mostrava "12/87", com o total crescendo a cada
+reabastecimento — a sensação era de estudo sem fim. Virou rodada de 10 com
+pausa, mantendo a sessão contínua por baixo: voltar à lista fechada de antes
+perderia o reabastecimento e a repetição agendada no meio da sessão. Junto,
+o botão passou a anunciar a revisão vencida (âmbar, "Revisar 10 de 34", com
+quantas a pessoa errou da última vez), e o `alert()` de "estudou tudo hoje"
+deu lugar à própria tela da rodada. Cogitado e descartado: estimar tempo da
+sessão (o app não mede tempo por cartão) e mensagem de culpa ou ameaça de
+perder a sequência (afasta justamente quem está atrás).
+
+---
+
 ## Peso da matéria avulsa (outubro/2026)
 
 A avulsa entrou na meta com peso fixo de 20 (`META_MATERIA_AVULSA`), pensado

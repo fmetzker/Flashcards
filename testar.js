@@ -46,7 +46,7 @@ const GLOBAIS_LET = [
 ];
 const GLOBAIS_CONST = [
   'porId', 'MATERIAS', 'blocoDaMateria', 'INTERVALOS', 'CAIXA_MAX',
-  'META_MATERIA_AVULSA', 'META_DIARIA', 'FUSO_BRASILIA',
+  'META_MATERIA_AVULSA', 'META_DIARIA', 'RODADA', 'FUSO_BRASILIA',
   'CHAVE', 'MAX_EVENTOS_PROPRIOS',
 ];
 /* As funções puras do motor — nenhuma toca DOM nem localStorage. */
@@ -61,7 +61,7 @@ const FUNCOES = [
   'blocosDaMeta', 'noEscopo', 'progressoDoDia', 'progressoPorBloco',
   'feitasHoje', 'montarLoteSessao', 'agendarRepeticao', 'resumoDoBanco',
   'materiasInscritas', 'provaMaisProxima', 'blocoDe', 'embaralhaOrdem',
-  'revisoesPorDia', 'aplicarFoco', 'carregarConfig', 'carregarBancoParcial',
+  'revisoesPorDia', 'resumoPendencias', 'aplicarFoco', 'carregarConfig', 'carregarBancoParcial',
   'sorteia', 'disponivel',
   /* não são motor puro (tocam localStorage), mas o teste precisa alcançá-las */
   'salvar', 'podarEventosProprios', 'renovarSessao', 'chamarAuth',

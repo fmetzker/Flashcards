@@ -895,6 +895,30 @@ aparecendo enquanto o backlog não zerasse. Passou a ser o comportamento
 apresentação; quem entra na sessão continua decidido por fora (cota do
 bloco, escada de pré-requisito).
 
+**O "Estudar" da tela inicial anda em rodadas de `RODADA` (10) respostas,
+mas a sessão continua contínua.** A cada 10 respostas, uma pausa
+(`pausarRodada()`, tela `rodada`) mostra sabia/chutei/errei, a meta e as
+revisões ainda vencidas, com "Mais 10" e "Parar". "Mais 10" retoma a MESMA
+sessão (`S.lista`, `S.pos`, `S.pendentes` intactos) — não é voltar à lista
+fechada que existia antes da sessão contínua. Regras que não podem cair:
+  - **O botão promete só o que a rodada entrega.** Com revisão vencida, ele
+    diz "Revisar 10 de 34" (âmbar), nunca o atraso inteiro, e a contagem é
+    `resumoPendencias()`, que lê a mesma `fila().revisar` que a sessão
+    entrega primeiro. Âmbar é atenção; vermelho é só o aviso de "não dá tempo
+    antes da prova".
+  - **Rodada só no "Estudar" da tela inicial** (modo `"normal"`). Estudo de
+    tópico pela tela Matérias (`"filtro"`) e "Revisar erros" não pausam.
+  - **Onde a sessão reabastece, o contador não mostra total**: o total cresce
+    a cada reabastecimento e dá a sensação de que o estudo não acaba. Na
+    rodada, "3/10"; no estudo de tópico, só o número do cartão; no "Revisar
+    erros", que é fechado, o total real.
+  - **"Atraso zerado" é fato, não enfeite**: aparece quando a rodada esvazia
+    a fila de revisão que existia ao começar, uma vez só. Cartão errado volta
+    para a caixa 1 com vencimento hoje, então só some da fila quando for
+    acertado.
+  - **Sem estimativa de tempo** ("~6 min"): o app não mede quanto a pessoa
+    demora por cartão, e o número seria inventado.
+
 **A ordem dentro do que já venceu** é decidida por `prioridade()`: caixa,
 taxa de erro da questão e peso do bloco na prova. Os pesos são calibrados
 para o desconto somado ficar **abaixo de 1** — erro e peso ordenam *dentro*

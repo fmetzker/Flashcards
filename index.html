@@ -437,6 +437,13 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   <div id="q-expl"></div>
 </div>
 
+<!-- ============ RODADA: pausa a cada RODADA respostas do "Estudar" ============ -->
+<div class="tela" id="tela-rodada">
+  <h1 id="rodada-titulo">Rodada concluída</h1>
+  <div class="sub" id="rodada-sub">–</div>
+  <div class="card" style="margin-top:16px" id="rodada-corpo"></div>
+</div>
+
 <!-- ============ SIMULADO: INÍCIO ============ -->
 <div class="tela" id="tela-simulado-inicio">
   <h1>Simulado</h1>
@@ -1952,7 +1959,7 @@ function ir(nome){
 /* telas sem navegação: as de foco (responder questão, fazer simulado), onde
    sair no meio perde trabalho, e as de portão (login, espera, escolha do
    concurso), onde navegar para o lado é justamente o que não pode */
-const SEM_NAV = ["estudo","simulado","login","espera","escolher-concurso","editor"];
+const SEM_NAV = ["estudo","rodada","simulado","login","espera","escolher-concurso","editor"];
 /* qual aba fica acesa em cada tela — as que não estão aqui não acendem
    nenhuma (Simulado, Propor, Revisar... são destinos de dentro do Hoje) */
 const ABA_DA_TELA = {inicio:"inicio", materias:"materias", stats:"stats", ajustes:"ajustes"};
@@ -1980,11 +1987,40 @@ function rodape(nome){
       const carregando=document.createElement("button"); carregando.textContent="Carregando questões…";
       carregando.disabled=true; carregando.className="fantasma"; alvo.appendChild(carregando);
     } else {
+      /* O botão diz o que a rodada vai fazer: com revisão vencida, é ela que
+         vem primeiro (montarLoteSessao), então o rótulo promete revisão — e
+         só o que a rodada entrega ("10 de 34"), nunca o atraso inteiro de
+         uma vez. Âmbar é atenção, não alarme: vermelho fica com o aviso de
+         "não dá tempo antes da prova" (#alerta-area). */
       const f = fila(), total = f.revisar.length + Math.max(0, E.meta - feitasHoje());
-      b(total>0 ? "Estudar agora" : "Estudar mesmo assim", ()=>iniciarSessao("normal"), "verde");
+      const pend = resumoPendencias();
+      if(pend.vencidas > 0){
+        const txt = pend.vencidas > RODADA ? "Revisar "+RODADA+" de "+pend.vencidas
+                  : "Revisar "+pend.vencidas+(pend.vencidas === 1 ? " vencida" : " vencidas");
+        const detalhe = [];
+        if(pend.errouUltima) detalhe.push(pend.errouUltima+" você errou da última vez");
+        if(pend.atrasadas) detalhe.push(pend.atrasadas+(pend.atrasadas === 1 ? " é de dia anterior" : " são de dias anteriores"));
+        const x = document.createElement("button");
+        x.className = "ambar";
+        x.innerHTML = '<span></span><small class="previsao"></small>';
+        x.children[0].textContent = txt;
+        x.children[1].textContent = detalhe.join(" · ");
+        if(!detalhe.length) x.children[1].remove();
+        x.onclick = ()=>iniciarSessao("normal");
+        alvo.appendChild(x);
+      } else {
+        b(total>0 ? "Estudar "+RODADA : "Estudar mesmo assim", ()=>iniciarSessao("normal"), "verde");
+      }
     }
   } else if(nome==="estudo"){
     box.classList.remove("ativa");
+  } else if(nome==="rodada"){
+    if(S && S.rodada && !S.rodada.acabou){
+      b("Parar", sairDoEstudo, "fantasma");
+      b("Mais "+RODADA, maisUmaRodada, "verde");
+    } else {
+      b("Voltar ao início", sairDoEstudo, "verde");
+    }
   } else if(nome==="simulado-inicio"){
     b("Voltar", ()=>ir("inicio"), "fantasma");
     if(BANCO_FOCO_PRONTO && BANCO.length>=20) b("Começar simulado", iniciarSimulado, "verde");
@@ -2552,7 +2588,26 @@ function iniciarSessao(modo, filtro){
   const lista = montarLoteSessao(modo, filtro, new Set());
   if(lista.length===0){ alert("Nada na fila. Adicione mais questões ao banco."); return; }
   S = {lista, pos:0, respondida:false, modo, filtro, pendentes:[]};
+  /* Rodada só no "Estudar" da tela inicial (modo normal): pausa a cada
+     RODADA respostas, mas a sessão continua a mesma — reabastecimento,
+     repetição agendada e o lote já montado seguem intactos do outro lado da
+     pausa. `vencidasNoInicio` é o que permite dizer "atraso zerado" quando
+     a rodada esvaziar a fila de revisão. */
+  if(modo === "normal") S.rodada = novaRodada(resumoPendencias().vencidas);
   ir("estudo"); mostrarQuestao();
+}
+
+function novaRodada(vencidasNoInicio){
+  return {n:0, sabia:0, chutei:0, errei:0, acabou:false, vencidasNoInicio};
+}
+
+/* "Mais 10": zera só a contagem da rodada; a sessão (S.lista, S.pos,
+   S.pendentes) segue de onde parou. A rodada nova mede o atraso a partir de
+   agora — "atraso zerado" aparece uma vez, não em toda rodada depois dele. */
+function maisUmaRodada(){
+  S.rodada = novaRodada(resumoPendencias().vencidas);
+  ir("estudo");
+  seguirSessao();
 }
 
 /* Toast: avisa sem fechar o cartão. Fica de fora de qualquer .tela (ver a
@@ -2629,7 +2684,14 @@ function mostrarQuestao(){
   document.getElementById("q-materia").style.display = "none";
   document.getElementById("q-tag").textContent = "";
   document.getElementById("q-tag").style.display = "none";
-  document.getElementById("q-contador").textContent = (S.pos+1)+"/"+S.lista.length;
+  /* o total do lote NÃO aparece onde a sessão reabastece: ele cresce a cada
+     reabastecimento e dá a sensação de que o estudo nunca acaba. Na rodada,
+     conta dentro dela ("3/10"); no estudo de tópico (sem limite), só o
+     número do cartão; no "Revisar erros", que é fechado, o total é real. */
+  document.getElementById("q-contador").textContent =
+    S.rodada ? (S.rodada.n+1)+"/"+RODADA
+    : S.modo === "erros" ? (S.pos+1)+"/"+S.lista.length
+    : String(S.pos+1);
   document.getElementById("q-id").textContent = q.id;
   pintarEnunciado(document.getElementById("q-enunciado"), q);
   document.getElementById("q-expl").innerHTML = "";
@@ -2783,6 +2845,7 @@ function registrar(id, resultado){
   checarMetasBatidas();   // pode marcar E.metasAnunciadas — por isso vem antes do salvar()
   salvar();
 
+  if(S.rodada){ S.rodada.n++; S.rodada[resultado]++; }
   S.pos++;
   /* repetição de cartão errado/chutado (agendarRepeticao) chegando na vez:
      entra como o PRÓXIMO cartão, empurrando o resto — checado a cada avanço
@@ -2791,6 +2854,13 @@ function registrar(id, resultado){
   const iPend = S.pendentes.findIndex(p => p.apareceEm <= S.pos);
   if(iPend >= 0) S.lista.splice(S.pos, 0, S.pendentes.splice(iPend,1)[0].id);
 
+  if(S.rodada && S.rodada.n >= RODADA){ pausarRodada(); return; }
+  seguirSessao();
+}
+
+/* Próximo cartão da sessão, reabastecendo quando o lote acaba. Separado de
+   registrar() porque a pausa da rodada retoma daqui ("Mais 10"). */
+function seguirSessao(){
   if(S.pos < S.lista.length){ mostrarQuestao(); return; }
 
   /* modo "erros" continua fechando ao fim, de propósito — já é uma lista
@@ -2801,6 +2871,9 @@ function registrar(id, resultado){
 
   const mais = montarLoteSessao(S.modo, S.filtro, new Set(S.lista));
   if(mais.length===0){
+    /* no "Estudar", o fim de tudo vira a própria tela da rodada (com o
+       resultado), em vez de um alert() que joga direto no Início */
+    if(S.rodada){ S.rodada.acabou = true; pausarRodada(); return; }
     S = null;
     alert("Você estudou tudo que havia disponível hoje!");
     ir("inicio");
@@ -2808,6 +2881,40 @@ function registrar(id, resultado){
   }
   S.lista = S.lista.concat(mais);
   mostrarQuestao();
+}
+
+/* Tela da pausa. Se a rodada fechou bem no fim do que havia, ela já é a tela
+   final: tenta reabastecer antes de oferecer "Mais 10" que não teria nada. */
+function pausarRodada(){
+  const r = S.rodada;
+  if(!r.acabou && S.pos >= S.lista.length && S.modo !== "erros"){
+    const mais = montarLoteSessao(S.modo, S.filtro, new Set(S.lista));
+    if(mais.length) S.lista = S.lista.concat(mais); else r.acabou = true;
+  }
+  const pend = resumoPendencias();
+  const zerou = r.vencidasNoInicio > 0 && pend.vencidas === 0;
+  document.getElementById("rodada-titulo").textContent =
+    zerou ? "Atraso zerado" : r.acabou ? "Tudo feito por hoje" : "Rodada concluída";
+  const feitas = feitasHoje();
+  document.getElementById("rodada-sub").textContent =
+    zerou ? "Você revisou tudo que estava vencido."
+    : r.acabou ? "Não há mais nada para estudar hoje."
+    : "Mais "+RODADA+" quando quiser — a sessão continua de onde parou.";
+  const corpo = document.getElementById("rodada-corpo"); corpo.innerHTML = "";
+  const linha = (rot,val)=>{
+    const d=document.createElement("div"); d.className="stat";
+    const a=document.createElement("span"); a.textContent=rot;
+    const v=document.createElement("span"); v.className="n"; v.textContent=val;
+    d.appendChild(a); d.appendChild(v); corpo.appendChild(d);
+  };
+  if(r.n){
+    linha("Sabia", r.sabia);
+    linha("Chutei", r.chutei);
+    linha("Errei", r.errei);
+  }
+  linha(E.meta ? "Meta de hoje" : "Feitas hoje", E.meta ? Math.min(feitas, E.meta)+"/"+E.meta : feitas);
+  linha("Revisões vencidas", pend.vencidas);
+  ir("rodada");
 }
 
 /* =======================================================================

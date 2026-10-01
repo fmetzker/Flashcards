@@ -859,6 +859,29 @@ function embaralhaOrdem(n){
    Hoje as duas coincidem — nada comprime intervalo —, mas `prox` é o que
    fila() lê para decidir o que vence, e o forecast tem que dizer o que a
    fila vai fazer, não o que a tabela de intervalos promete. */
+/* Tamanho da rodada do "Estudar" da tela inicial: a sessão continua
+   contínua (reabastece sozinha), só pausa a cada RODADA respostas para
+   mostrar o resultado e oferecer "mais 10" ou parar. */
+const RODADA = 10;
+
+/* O que o botão da tela inicial anuncia. `vencidas` é exatamente o que a
+   sessão vai entregar primeiro (a mesma fila().revisar, que vem antes de
+   cartão novo); `atrasadas` é a parte que já devia ter sido feita antes de
+   hoje; `errouUltima` é a parte em caixa 1 — chutou ou errou na última vez,
+   o sinal mais forte que o motor tem. */
+function resumoPendencias(){
+  const h = diaUTC(hoje());
+  const r = fila().revisar;
+  let atrasadas = 0, errouUltima = 0;
+  r.forEach(id=>{
+    const c = E.cartoes[id];
+    if(!c) return;
+    if(diaUTC(c.prox) < h) atrasadas++;
+    if(c.caixa === 1) errouUltima++;
+  });
+  return {vencidas: r.length, atrasadas, errouUltima};
+}
+
 function revisoesPorDia(){
   const inscritas = materiasInscritas();
   const h = diaUTC(hoje());

@@ -166,6 +166,7 @@ Migrações que rodam no boot: `migrarSessaoDoPerfil`, `migrarEstadoDoPerfil`,
 | `requisitosPendentes` / `topicoAberto` | pré-requisitos entre tópicos |
 | `requisitosPendentesSub` / `subtopicoAberto` | pré-requisitos entre subtópicos — exige `topicoAberto` primeiro |
 | `grauAberto` | tópico aberto **e** subtópico aberto (se houver requisito) **e** degrau alcançado — degrau é sempre medido no recorte mais fino que o cartão tem (subtópico, se tiver) |
+| `resumoPendencias` | o que o botão da tela inicial anuncia: `vencidas` (a mesma `fila().revisar`), `atrasadas` (de dias anteriores) e `errouUltima` (caixa 1) |
 | `fila` | separa `revisar` (por `prioridade`, desempate `cmpId`) de `novas` (filtradas por `grauAberto`, ordenadas por `cmpId`) |
 | `intercalar` | entrelaça revisão e novas na sessão, proporcional ao tamanho de cada lista |
 | `iniciarSessao` | modos `normal`, `filtro`, `erros` |
