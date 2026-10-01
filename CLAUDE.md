@@ -354,9 +354,14 @@ que não podem ser confundidas:
 sem concurso nenhum por trás: matéria avulsa entra em `materiasInscritas()`
 do mesmo jeito que a de um concurso inscrito. Diferente de concurso, ela não
 vem de um `bloco` de `concursos.json` — mas `blocosDaMeta()` cria um bloco
-sintético pra cada matéria avulsa, com cota fixa `META_MATERIA_AVULSA` (20
-por dia), então ela **entra** em `BLOCOS_META` e conta pra meta do dia,
-igual a qualquer bloco de concurso. Se a mesma matéria já tem bloco de algum
+sintético pra cada matéria avulsa, então ela **entra** em `BLOCOS_META` e
+conta pra meta do dia, igual a qualquer bloco de concurso. **O peso dela é o
+do MENOR bloco das provas seguidas** — avulsa nunca passa na frente de
+matéria que cai na prova: com peso fixo de 20, num edital de blocos de 10
+(Enfermeiro/VR), cada avulsa valeria o dobro de Português e tiraria espaço
+de Enfermagem, a que mais pesa na nota. Sem prova nenhuma seguida, o peso é
+`META_MATERIA_AVULSA` (20) — aí todas as matérias são avulsas e a divisão
+sai igual de qualquer jeito. Se a mesma matéria já tem bloco de algum
 concurso seguido, vale a **maior** cota entre os dois — a mesma regra de
 "matéria repetida não soma" que já valia entre concursos (ver acima), agora
 estendida à avulsa. O que ela não faz é entrar no simulado (inventar data de
@@ -559,8 +564,8 @@ escopo restrito a um só ou com todos.
 
 - **A divisão entre matérias segue o peso do edital, quando disponível.**
   `blocosDaMeta()` monta, para cada matéria, o mesmo "peso vencedor" de
-  sempre (a cota do bloco do edital, ou `META_MATERIA_AVULSA` para matéria
-  avulsa) e depois **rateia META_DIARIA proporcionalmente a esses pesos** —
+  sempre (a cota do bloco do edital, ou o peso da avulsa — o do menor bloco
+  das provas seguidas) e depois **rateia META_DIARIA proporcionalmente a esses pesos** —
   `apportion()`, método do maior resto (Hamilton): cada matéria recebe o
   piso da fração exata que lhe cabe, e as unidades que sobram por
   arredondamento vão para quem tem a maior parte fracionária perdida,

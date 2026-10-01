@@ -500,7 +500,7 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   <h1>Ajustes</h1>
 
   <div class="rotulo">Concursos e matérias</div>
-  <div class="aviso">Marque tudo que você estuda. O banco de questões passa a trazer as matérias de todos eles; a meta e o simulado usam o que estiver em foco na tela inicial. Matéria avulsa não tem prova atrás — entra na meta do dia com cota própria (20 por dia), mas não entra no simulado.</div>
+  <div class="aviso">Marque tudo que você estuda. O banco de questões passa a trazer as matérias de todos eles; a meta e o simulado usam o que estiver em foco na tela inicial. Matéria avulsa não tem prova atrás — entra na meta do dia com o peso da matéria mais leve da sua prova (nunca passa na frente do que cai nela), mas não entra no simulado.</div>
   <div id="concursos-corpo" style="margin-top:10px"></div>
 
   <div style="margin-top:24px" class="rotulo">Conta</div>
@@ -1342,7 +1342,7 @@ const padrao = {
   /* matérias avulsas: ids de matéria que a pessoa segue por conta própria,
      sem concurso/processo seletivo nenhum atrás — carrega o banco delas,
      libera pra estudo livre na tela Matérias e entra na meta do dia com
-     cota própria (META_MATERIA_AVULSA, tratada como bloco dentro de
+     o peso do menor bloco das provas seguidas (tratada como bloco dentro de
      blocosDaMeta()), mas não entra no simulado (isso exigiria inventar data
      de prova e regra de aprovação que não existem — regra 11 do
      CLAUDE.md). Pode conviver com E.concursos (extra sobre o que já é
@@ -4337,7 +4337,7 @@ function pintarEscolherConcurso(){
   c.appendChild(tituloSecao("Matérias avulsas"));
   const aviso = document.createElement("div");
   aviso.style.cssText = "font-size:12px;color:var(--tinta2);margin:-4px 0 10px";
-  aviso.textContent = "Sem prova nenhuma atrás — entra na meta do dia com cota própria (20 por dia), mas não entra no simulado.";
+  aviso.textContent = "Sem prova nenhuma atrás — entra na meta do dia com o peso da matéria mais leve da sua prova, mas não entra no simulado.";
   c.appendChild(aviso);
   ORDEM_MATERIAS.forEach(mid=> c.appendChild(linhaSelecao(
     (MATERIAS[mid]||{}).nome || mid, null, false,

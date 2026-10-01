@@ -139,7 +139,23 @@ module.exports = function (APP, t) {
     const doConcurso = bloco('portugues').peso;
     await APP.montar({ concursos: ['vr-enf-2026'], avulsas: ['portugues'] });
     const comAvulsa = bloco('portugues').peso;
-    t.igual(comAvulsa, Math.max(doConcurso, APP.META_MATERIA_AVULSA), 'devia ser o maior, nunca a soma');
+    const menorBloco = Math.min(...APP.CONCURSOS.find(c => c.id === 'vr-enf-2026').blocos.map(b => b.questoes));
+    t.igual(comAvulsa, Math.max(doConcurso, menorBloco), 'devia ser o maior, nunca a soma');
+  });
+
+  t.teste('com prova seguida, a avulsa pesa o menor bloco — nunca mais que matéria da prova', async () => {
+    /* peso fixo de 20 num edital de blocos de 10 fazia cada avulsa valer o
+       dobro de Português e tirava espaço da matéria principal */
+    await APP.montar({ concursos: ['vr-enf-2026'], avulsas: ['comandos-eletricos', 'maquinas-eletricas'] });
+    const daProva = APP.BLOCOS_META.filter(b => !b.id.startsWith('avulsa@'));
+    const avulsas = APP.BLOCOS_META.filter(b => b.id.startsWith('avulsa@'));
+    t.igual(avulsas.length, 2, 'as duas avulsas deviam virar bloco');
+    const menor = Math.min(...daProva.map(b => b.peso));
+    for (const a of avulsas) {
+      t.igual(a.peso, menor, `${a.nome} pesa ${a.peso}, devia pesar o menor bloco da prova (${menor})`);
+      for (const b of daProva) t.ok(a.questoes <= b.questoes,
+        `${a.nome} (${a.questoes}/dia) passou na frente de ${b.nome} (${b.questoes}/dia), que cai na prova`);
+    }
   });
 
   t.grupo('meta — rateio proporcional (apportion)');

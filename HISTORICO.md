@@ -17,6 +17,20 @@ que o código já diz não vem: some.
 
 ---
 
+## Peso da matéria avulsa (outubro/2026)
+
+A avulsa entrou na meta com peso fixo de 20 (`META_MATERIA_AVULSA`), pensado
+para quem estudava só avulsa. Com prova seguida, esse número não conversava
+com o edital: no Enfermeiro/VR (blocos 10, 10 e 50), duas avulsas levavam 9
+questões por dia cada, mais que Português (5) e SUS (4), e Enfermagem caía de
+36 para 23. A média dos blocos não resolvia (o bloco grande puxa a média
+para cima); o menor bloco resolve, e não muda nada onde os blocos já são
+iguais, como no CFAQ. Também se cogitou trocar a meta por 10 fixos por
+matéria, e foi descartado: perde o peso do edital e faz a meta voltar a
+crescer a cada matéria seguida, que é o que a meta fixa de 50 tinha corrigido.
+
+---
+
 ## Escopo por subtópico (outubro/2026)
 
 O escopo de bloco (`blocos[].topicos`) nasceu só por tópico, com o

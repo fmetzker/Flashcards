@@ -19,8 +19,8 @@
  * gerar-offline.ps1. Sem export, sem módulo, sem build (regra 4).
  */
 
-/* cota diária de cada matéria avulsa, tratada como bloco próprio dentro de
-   blocosDaMeta() — ver o bloco de mesclagem logo abaixo */
+/* peso da matéria avulsa quando não há prova nenhuma seguida — com prova,
+   ela pesa o mesmo que o menor bloco dela (ver blocosDaMeta) */
 const META_MATERIA_AVULSA = 20;
 
 /* Blocos que valem para a META DIÁRIA — a união de TODOS os concursos
@@ -106,22 +106,31 @@ function blocosDaMeta(lista){
       });
     });
   });
-  /* Matéria avulsa entra como se fosse o próprio bloco de um concurso: peso
-     fixo de META_MATERIA_AVULSA por matéria — antes avulsa só aparecia como
+  /* Matéria avulsa entra como se fosse o próprio bloco de um concurso, com
+     peso próprio (pesoAvulsa, logo abaixo) — antes avulsa só aparecia como
      contagem bruta, sem cota nenhuma ("sem contar pra meta"); virou bloco de
      verdade porque a pessoa marcou aquilo para estudar TODO dia, não só como
      sobra depois de fechar a cota do concurso.
      Se a matéria já tem bloco de algum concurso seguido, fica valendo o
-     MAIOR peso entre o bloco do concurso e o peso fixo da avulsa — mesma
+     MAIOR peso entre o bloco do concurso e o peso da avulsa — mesma
      regra de "matéria repetida não soma" que já vale entre concursos, agora
      estendida à avulsa. Escopo de tópicos sempre abre a matéria inteira:
      avulsa não tem edital nenhum limitando o que cai, então não faz sentido
      herdar o recorte de tópicos de um concurso que por acaso cobre a mesma
      matéria. */
+  /* O peso da avulsa é o do MENOR bloco das provas seguidas — nunca mais que
+     uma matéria que cai na prova. Um peso fixo faria, num edital de blocos
+     de 10, cada avulsa valer o dobro de Português e tirar espaço da matéria
+     principal, que é a que mais pesa na nota. Sem
+     prova nenhuma seguida, vale META_MATERIA_AVULSA; aí todas as matérias
+     são avulsas e o valor nem importa, a divisão sai igual. */
+  const pesosDaProva = [];
+  fonte.forEach(c=> (c.blocos||[]).forEach(bl=>{ if(bl.questoes > 0) pesosDaProva.push(bl.questoes); }));
+  const pesoAvulsa = pesosDaProva.length ? Math.min.apply(null, pesosDaProva) : META_MATERIA_AVULSA;
   (E.materiasAvulsas||[]).forEach(m=>{
-    if(!porMateria[m] || META_MATERIA_AVULSA > porMateria[m].questoes){
+    if(!porMateria[m] || pesoAvulsa > porMateria[m].questoes){
       porMateria[m] = {id: "avulsa", nome: (MATERIAS[m] && MATERIAS[m].nome) || m,
-                        questoes: META_MATERIA_AVULSA, materias: [m]};
+                        questoes: pesoAvulsa, materias: [m]};
     }
     escopo[m] = null;
   });
