@@ -1,0 +1,28 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'barras-pescado'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" width="320" height="240" font-family="Arial, Helvetica, sans-serif">
+<rect x="0" y="0" width="320" height="240" fill="#fff"/>
+<polyline points="50,32 50,200 300,200" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="46,200 300,200" fill="none" stroke="#c8d0d8" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="204" font-size="10" fill="#16232E" text-anchor="end">0</text>
+<polyline points="46,168 300,168" fill="none" stroke="#c8d0d8" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="172" font-size="10" fill="#16232E" text-anchor="end">10</text>
+<polyline points="46,136 300,136" fill="none" stroke="#c8d0d8" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="140" font-size="10" fill="#16232E" text-anchor="end">20</text>
+<polyline points="46,104 300,104" fill="none" stroke="#c8d0d8" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="108" font-size="10" fill="#16232E" text-anchor="end">30</text>
+<polyline points="46,72 300,72" fill="none" stroke="#c8d0d8" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="76" font-size="10" fill="#16232E" text-anchor="end">40</text>
+<polyline points="46,40 300,40" fill="none" stroke="#c8d0d8" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="44" font-size="10" fill="#16232E" text-anchor="end">50</text>
+<text x="40" y="26" font-size="11" fill="#16232E" text-anchor="start">toneladas</text>
+<rect x="68" y="72.0" width="30" height="128.0" fill="#7fa8d6" stroke="#16232E" stroke-width="1.5"/>
+<text x="83" y="216" font-size="11" fill="#16232E" text-anchor="middle">jan</text>
+<rect x="114" y="120.0" width="30" height="80.0" fill="#7fa8d6" stroke="#16232E" stroke-width="1.5"/>
+<text x="129" y="216" font-size="11" fill="#16232E" text-anchor="middle">fev</text>
+<rect x="160" y="88.0" width="30" height="112.0" fill="#7fa8d6" stroke="#16232E" stroke-width="1.5"/>
+<text x="175" y="216" font-size="11" fill="#16232E" text-anchor="middle">mar</text>
+<rect x="206" y="40.0" width="30" height="160.0" fill="#7fa8d6" stroke="#16232E" stroke-width="1.5"/>
+<text x="221" y="216" font-size="11" fill="#16232E" text-anchor="middle">abr</text>
+<rect x="252" y="104.0" width="30" height="96.0" fill="#7fa8d6" stroke="#16232E" stroke-width="1.5"/>
+<text x="267" y="216" font-size="11" fill="#16232E" text-anchor="middle">mai</text>
+</svg>
