@@ -1,0 +1,37 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:enfermagem/curva-peso-idade-ponto'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8.2 -2 303.8 250" width="303.8" height="250" font-family="Arial, Helvetica, sans-serif">
+<rect x="8.2" y="-2" width="303.8" height="250" fill="#fff"/>
+<polyline points="40,30 40,200 280,200" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="40" y="214" font-size="9" fill="#16232E" text-anchor="middle">0</text>
+<text x="100" y="214" font-size="9" fill="#16232E" text-anchor="middle">6</text>
+<text x="160" y="214" font-size="9" fill="#16232E" text-anchor="middle">12</text>
+<text x="220" y="214" font-size="9" fill="#16232E" text-anchor="middle">18</text>
+<text x="280" y="214" font-size="9" fill="#16232E" text-anchor="middle">24</text>
+<text x="35" y="203" font-size="9" fill="#16232E" text-anchor="end">2</text>
+<polyline points="40,200 280,200" fill="none" stroke="#DDE4EA" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="35" y="178.7" font-size="9" fill="#16232E" text-anchor="end">4</text>
+<polyline points="40,175.7 280,175.7" fill="none" stroke="#DDE4EA" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="35" y="154.4" font-size="9" fill="#16232E" text-anchor="end">6</text>
+<polyline points="40,151.4 280,151.4" fill="none" stroke="#DDE4EA" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="35" y="130.1" font-size="9" fill="#16232E" text-anchor="end">8</text>
+<polyline points="40,127.1 280,127.1" fill="none" stroke="#DDE4EA" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="35" y="105.9" font-size="9" fill="#16232E" text-anchor="end">10</text>
+<polyline points="40,102.9 280,102.9" fill="none" stroke="#DDE4EA" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="35" y="81.6" font-size="9" fill="#16232E" text-anchor="end">12</text>
+<polyline points="40,78.6 280,78.6" fill="none" stroke="#DDE4EA" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="35" y="57.3" font-size="9" fill="#16232E" text-anchor="end">14</text>
+<polyline points="40,54.3 280,54.3" fill="none" stroke="#DDE4EA" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="35" y="33" font-size="9" fill="#16232E" text-anchor="end">16</text>
+<polyline points="40,30 280,30" fill="none" stroke="#DDE4EA" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="160" y="230" font-size="10" fill="#16232E" text-anchor="middle" font-style="italic">idade (meses)</text>
+<text x="36" y="22" font-size="10" fill="#16232E" text-anchor="start" font-style="italic">peso (kg)</text>
+<polyline points="40,174.6 45,165.9 50,157.7 55,150 60,142.8 65,136.1 70,129.7 75,123.8 80,118.2 85,112.9 90,107.9 95,103.2 100,98.8 105,94.6 110,90.7 115,86.9 120,83.4 125,80.1 130,76.9 135,73.9 140,71 145,68.3 150,65.7 155,63.3 160,60.9 165,58.6 170,56.5 175,54.4 180,52.5 185,50.6 190,48.7 195,47 200,45.3 205,43.7 210,42.1 215,40.6 220,39.1 225,37.7 230,36.3 235,34.9 240,33.6 245,32.3 250,31.1 255,29.9 260,28.7 265,27.5 270,26.3 275,25.2 280,24.1" fill="none" stroke="#C0392B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="284" y="28.1" font-size="10" fill="#16232E" text-anchor="start" font-weight="bold">+2</text>
+<polyline points="40,184.2 45,177.2 50,170.6 55,164.4 60,158.6 65,153.2 70,148 75,143.2 80,138.7 85,134.4 90,130.4 95,126.6 100,123.1 105,119.7 110,116.5 115,113.5 120,110.7 125,108 130,105.4 135,103 140,100.7 145,98.5 150,96.4 155,94.4 160,92.5 165,90.7 170,89 175,87.3 180,85.7 185,84.2 190,82.7 195,81.3 200,79.9 205,78.6 210,77.4 215,76.1 220,74.9 225,73.8 230,72.7 235,71.6 240,70.5 245,69.5 250,68.5 255,67.5 260,66.5 265,65.6 270,64.7 275,63.8 280,62.9" fill="none" stroke="#2E7D4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="284" y="66.9" font-size="10" fill="#16232E" text-anchor="start" font-weight="bold">0</text>
+<polyline points="40,192.2 45,186.6 50,181.3 55,176.4 60,171.7 65,167.4 70,163.3 75,159.4 80,155.8 85,152.4 90,149.2 95,146.2 100,143.3 105,140.6 110,138.1 115,135.7 120,133.4 125,131.2 130,129.2 135,127.3 140,125.4 145,123.7 150,122 155,120.4 160,118.9 165,117.4 170,116 175,114.7 180,113.4 185,112.2 190,111 195,109.9 200,108.8 205,107.8 210,106.7 215,105.8 220,104.8 225,103.9 230,103 235,102.1 240,101.3 245,100.4 250,99.6 255,98.8 260,98.1 265,97.3 270,96.6 275,95.9 280,95.1" fill="none" stroke="#D68910" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="284" y="99.1" font-size="10" fill="#16232E" text-anchor="start" font-weight="bold">−2</text>
+<polyline points="40,195.8 45,190.8 50,186.2 55,181.8 60,177.7 65,173.8 70,170.2 75,166.7 80,163.5 85,160.5 90,157.6 95,155 100,152.4 105,150 110,147.8 115,145.6 120,143.6 125,141.7 130,139.9 135,138.2 140,136.5 145,135 150,133.5 155,132.1 160,130.7 165,129.4 170,128.2 175,127 180,125.9 185,124.8 190,123.8 195,122.8 200,121.8 205,120.9 210,120 215,119.1 220,118.2 225,117.4 230,116.6 235,115.9 240,115.1 245,114.4 250,113.7 255,113 260,112.3 265,111.6 270,111 275,110.3 280,109.7" fill="none" stroke="#C0392B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="284" y="113.7" font-size="10" fill="#16232E" text-anchor="start" font-weight="bold">−3</text>
+<circle cx="160" cy="124.8" r="4.5" fill="#1D5A8C"/>
+</svg>

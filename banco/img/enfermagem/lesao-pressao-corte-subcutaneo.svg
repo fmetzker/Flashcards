@@ -1,0 +1,13 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:enfermagem/lesao-pressao-corte-subcutaneo'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="4 24 360 172" width="360" height="172" font-family="Arial, Helvetica, sans-serif">
+<rect x="4" y="24" width="360" height="172" fill="#fff"/>
+<rect x="20" y="40" width="220" height="10" fill="#F6E0CC" stroke="#16232E" stroke-width="0.8"/>
+<text x="246" y="49" font-size="10" fill="#16232E" text-anchor="start">epiderme</text>
+<rect x="20" y="50" width="220" height="34" fill="#EFC9B0" stroke="#16232E" stroke-width="0.8"/>
+<text x="246" y="71" font-size="10" fill="#16232E" text-anchor="start">derme</text>
+<rect x="20" y="84" width="220" height="46" fill="#F7EDB4" stroke="#16232E" stroke-width="0.8"/>
+<text x="246" y="111" font-size="10" fill="#16232E" text-anchor="start">tecido subcutâneo</text>
+<rect x="20" y="130" width="220" height="50" fill="#D99A8C" stroke="#16232E" stroke-width="0.8"/>
+<text x="246" y="159" font-size="10" fill="#16232E" text-anchor="start">músculo</text>
+<polygon points="80,40 100,52 112,104 130,110 160,112 178,106 190,54 205,40" fill="#B5524A" stroke="#16232E" stroke-width="1.4" stroke-linejoin="round"/>
+</svg>

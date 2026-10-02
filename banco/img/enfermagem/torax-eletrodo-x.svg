@@ -1,0 +1,35 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:enfermagem/torax-eletrodo-x'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 3.6 262.8 298.2" width="300" height="340.4" font-family="Arial, Helvetica, sans-serif">
+<rect x="22" y="3.6" width="262.8" height="298.2" fill="#fff"/>
+<polygon points="70,40 230,40 262,90 250,280 50,280 38,90" fill="#F6E0CC" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+<rect x="138" y="52" width="24" height="150" fill="#fff" stroke="#16232E" stroke-width="1.6"/>
+<text x="150" y="222" font-size="9" fill="#16232E" text-anchor="middle">esterno</text>
+<polyline points="136,50 58,40" fill="none" stroke="#16232E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="164,50 242,40" fill="none" stroke="#16232E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="137,70 80,76 52,86" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="163,70 220,76 248,86" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="137,94 80,100 52,110" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="163,94 220,100 248,110" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="137,118 80,124 52,134" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="163,118 220,124 248,134" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="137,142 80,148 52,158" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="163,142 220,148 248,158" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="137,166 80,172 52,182" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="163,166 220,172 248,182" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="137,190 80,196 52,206" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="163,190 220,196 248,206" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="137,214 80,220 52,230" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="163,214 220,220 248,230" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="258" y="92" font-size="9" fill="#16232E" text-anchor="start">1º</text>
+<text x="258" y="116" font-size="9" fill="#16232E" text-anchor="start">2º</text>
+<text x="258" y="140" font-size="9" fill="#16232E" text-anchor="start">3º</text>
+<text x="258" y="164" font-size="9" fill="#16232E" text-anchor="start">4º</text>
+<text x="258" y="188" font-size="9" fill="#16232E" text-anchor="start">5º</text>
+<text x="258" y="212" font-size="9" fill="#16232E" text-anchor="start">6º</text>
+<polyline points="212,40 212,270" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,4"/>
+<text x="215" y="284" font-size="9" fill="#16232E" text-anchor="start">LHC</text>
+<circle cx="130" cy="155" r="7" fill="#1D5A8C"/>
+<text x="118" y="160" font-size="14" fill="#16232E" text-anchor="end" font-weight="bold">X</text>
+<text x="40" y="30" font-size="13" fill="#16232E" text-anchor="start" font-weight="bold">D</text>
+<text x="260" y="30" font-size="13" fill="#16232E" text-anchor="end" font-weight="bold">E</text>
+</svg>

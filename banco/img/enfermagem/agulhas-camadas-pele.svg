@@ -1,0 +1,21 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:enfermagem/agulhas-camadas-pele'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="4 -3.2 460 249.2" width="460" height="249.2" font-family="Arial, Helvetica, sans-serif">
+<rect x="4" y="-3.2" width="460" height="249.2" fill="#fff"/>
+<rect x="20" y="90" width="320" height="10" fill="#F6E0CC" stroke="#16232E" stroke-width="0.8"/>
+<text x="346" y="99" font-size="10" fill="#16232E" text-anchor="start">epiderme</text>
+<rect x="20" y="100" width="320" height="34" fill="#EFC9B0" stroke="#16232E" stroke-width="0.8"/>
+<text x="346" y="121" font-size="10" fill="#16232E" text-anchor="start">derme</text>
+<rect x="20" y="134" width="320" height="46" fill="#F7EDB4" stroke="#16232E" stroke-width="0.8"/>
+<text x="346" y="161" font-size="10" fill="#16232E" text-anchor="start">tecido subcutâneo</text>
+<rect x="20" y="180" width="320" height="50" fill="#D99A8C" stroke="#16232E" stroke-width="0.8"/>
+<text x="346" y="209" font-size="10" fill="#16232E" text-anchor="start">músculo</text>
+<polyline points="70,28 70,74" fill="none" stroke="#9AA8B5" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="70,74 70,202" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="66" y="24" font-size="14" fill="#16232E" text-anchor="end" font-weight="bold">A</text>
+<polyline points="92.2,46.2 124.7,78.7" fill="none" stroke="#9AA8B5" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="124.7,78.7 200,154" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="88.2" y="42.2" font-size="14" fill="#16232E" text-anchor="end" font-weight="bold">B</text>
+<polyline points="200.4,74 244.8,85.9" fill="none" stroke="#9AA8B5" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="244.8,85.9 320,106" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="196.4" y="70" font-size="14" fill="#16232E" text-anchor="end" font-weight="bold">C</text>
+</svg>
