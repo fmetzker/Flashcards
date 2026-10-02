@@ -1,0 +1,25 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:biologia-celular/corte-microtubulos-9x2-2'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 208 208" width="300" height="300" font-family="Arial, Helvetica, sans-serif">
+<rect x="-4" y="-4" width="208" height="208" fill="#fff"/>
+<circle cx="100" cy="100" r="88" fill="none" stroke="#16232E" stroke-width="1.6"/>
+<circle cx="96.3" cy="42.6" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="103.7" cy="37.4" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="134.1" cy="53.6" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="143.1" cy="54.4" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="155.9" cy="86.4" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="162.3" cy="92.8" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="151.6" cy="125.5" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="152.4" cy="134.5" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="123.1" cy="152.7" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="117.9" cy="160.1" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="83.8" cy="155.2" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="75.1" cy="157.5" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="52.1" cy="131.9" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="44" cy="128.1" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="42.8" cy="93.7" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="39" cy="85.5" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="60.3" cy="58.4" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="62.6" cy="49.7" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="93" cy="100" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+<circle cx="107" cy="100" r="5" fill="#C8D9EA" stroke="#16232E" stroke-width="1.3"/>
+</svg>

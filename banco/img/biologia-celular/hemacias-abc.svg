@@ -1,0 +1,11 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:biologia-celular/hemacias-abc'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="12 2 321 138.8" width="321" height="138.8" font-family="Arial, Helvetica, sans-serif">
+<rect x="12" y="2" width="321" height="138.8" fill="#fff"/>
+<polygon points="92,60 85.8,63.4 85.1,66.7 84,69.9 87.7,76 80.6,75.8 78.4,78.4 75.8,80.6 76,87.7 69.9,84 66.7,85.1 63.4,85.8 60,92 56.6,85.8 53.3,85.1 50.1,84 44,87.7 44.2,80.6 41.6,78.4 39.4,75.8 32.3,76 36,69.9 34.9,66.7 34.2,63.4 28,60 34.2,56.6 34.9,53.3 36,50.1 32.3,44 39.4,44.2 41.6,41.6 44.2,39.4 44,32.3 50.1,36 53.3,34.9 56.6,34.2 60,28 63.4,34.2 66.7,34.9 69.9,36 76,32.3 75.8,39.4 78.4,41.6 80.6,44.2 87.7,44 84,50.1 85.1,53.3 85.8,56.6" fill="#D9534F" stroke="#16232E" stroke-width="1.4"/>
+<circle cx="165" cy="60" r="32" fill="#D9534F" stroke="#16232E" stroke-width="1.4"/>
+<circle cx="165" cy="60" r="13" fill="#EE9B98" stroke="#16232E" stroke-width="0"/>
+<circle cx="275" cy="60" r="42" fill="#E8746F" stroke="#16232E" stroke-width="1.4"/>
+<text x="60" y="122" font-size="14" fill="#16232E" text-anchor="middle" font-weight="bold">A</text>
+<text x="165" y="122" font-size="14" fill="#16232E" text-anchor="middle" font-weight="bold">B</text>
+<text x="275" y="122" font-size="14" fill="#16232E" text-anchor="middle" font-weight="bold">C</text>
+</svg>

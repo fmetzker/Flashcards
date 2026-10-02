@@ -417,6 +417,14 @@ numeração e cor iguais em todos os cartões, e o custo de cada figura em uma
 linha. A regra 11 vale para o desenho: circuito-padrão da técnica,
 redesenhado, com a nomenclatura da fonte do cartão — nunca recorte de livro.
 
+**As outras matérias seguem o mesmo caminho: figura é código.** Cada uma tem
+o seu `figuras/<matéria>.py`, e o que se repete vira função com parâmetro.
+Exemplos: um `_paquimetro(leitura, resolução)` que calcula o traço
+coincidente, um `_grafico(f)` sobre a grade cartesiana, um `_ecg(ritmo)`
+sobre o papel milimetrado e um `_relogio(h, m)`. Assim, a próxima leitura de
+instrumento, gráfico ou traçado custa uma linha, e a geometria sai em escala
+a partir dos dados do enunciado, nunca "a olho".
+
 **O `alt` é obrigatório.** Descreve a figura em texto — o que o leitor de
 tela lê e o que aparece no lugar dela se não carregar. Descreve o que está
 desenhado (o que está marcado, onde), **nunca a resposta**: "o ângulo x",

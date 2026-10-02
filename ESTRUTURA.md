@@ -65,7 +65,7 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 | `banco/topicos.json` | Árvore oficial do edital — mostra tópico que a prova cobra e o banco não cobre |
 | `banco/requisitos.json` | A fila de estudo (tópico e subtópico) — **trava** cartão novo até a base do anterior da fila; mais o grafo conceitual que a justifica |
 | `banco/img/<matéria>/*` | Figuras de enunciado (campo `img`). Nenhuma lista à mão: o app, o `gerar-offline.ps1` e o `validar.py` as acham pelos próprios cartões |
-| `desenho.py` + `figuras/*.py` → `desenhar-figuras.py` | Diagramas elétricos gerados por código: cada circuito desenhado uma vez (`@circuito`), cada figura de cartão uma linha `vista()` — destaque, recorte, acionados, energizado, pontos de medição, falha. `--alt` sugere o texto alternativo; `--conferir` roda dentro do `validar.py`. SVG gerado **não se edita à mão** |
+| `desenho.py` + `figuras/*.py` → `desenhar-figuras.py` | Figuras dos cartões geradas por código, um arquivo por matéria. Diagramas elétricos: cada circuito desenhado uma vez (`@circuito`), cada figura de cartão uma linha `vista()` — destaque, recorte, acionados, energizado, pontos de medição, falha. Nas demais matérias, `simbolo()` com geradores paramétricos: instrumentos de medição, válvulas ISO 1219, geometria em escala, gráficos, traçados de ECG e esquemas de célula. `--alt` sugere o texto alternativo; `--conferir` roda dentro do `validar.py`. SVG gerado **não se edita à mão** |
 | `banco/indice-legado.json` | Ids na ordem antiga do array — migra progresso pré-id estável |
 | `banco/reescritas.json` | Mapa id antigo→novo de enunciados corrigidos — preserva progresso |
 | `sw.js` | Service worker, rede-primeiro. `VERSAO` sobe a cada mudança no app |

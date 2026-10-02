@@ -1,0 +1,39 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:biologia-celular/transporte-membrana-abc'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -2 418 242" width="418" height="242" font-family="Arial, Helvetica, sans-serif">
+<rect x="-6" y="-2" width="418" height="242" fill="#fff"/>
+<rect x="10" y="90" width="340" height="50" fill="#E8EEF4" stroke="none"/>
+<polyline points="10,90 350,90" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="10,140 350,140" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="14" y="22" font-size="10" fill="#16232E" text-anchor="start" font-style="italic">meio extracelular</text>
+<text x="14" y="222" font-size="10" fill="#16232E" text-anchor="start" font-style="italic">citoplasma</text>
+<circle cx="40" cy="45" r="3.5" fill="#5B7A99" stroke="#16232E" stroke-width="0"/>
+<circle cx="60" cy="60" r="3.5" fill="#5B7A99" stroke="#16232E" stroke-width="0"/>
+<circle cx="75" cy="40" r="3.5" fill="#5B7A99" stroke="#16232E" stroke-width="0"/>
+<circle cx="50" cy="75" r="3.5" fill="#5B7A99" stroke="#16232E" stroke-width="0"/>
+<circle cx="85" cy="70" r="3.5" fill="#5B7A99" stroke="#16232E" stroke-width="0"/>
+<circle cx="70" cy="180" r="3.5" fill="#5B7A99" stroke="#16232E" stroke-width="0"/>
+<polyline points="65,60 65,170" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="65,178 60,168 70,168" fill="#16232E"/>
+<rect x="150" y="84" width="14" height="62" fill="#E8A87C" stroke="#16232E" stroke-width="1.4"/>
+<rect x="176" y="84" width="14" height="62" fill="#E8A87C" stroke="#16232E" stroke-width="1.4"/>
+<rect x="155" y="37" width="6" height="6" fill="#2E7D4F"/>
+<rect x="177" y="52" width="6" height="6" fill="#2E7D4F"/>
+<rect x="167" y="27" width="6" height="6" fill="#2E7D4F"/>
+<rect x="187" y="69" width="6" height="6" fill="#2E7D4F"/>
+<rect x="167" y="185" width="6" height="6" fill="#2E7D4F"/>
+<polyline points="170,70 170,172" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="170,180 165,170 175,170" fill="#16232E"/>
+<rect x="262" y="80" width="46" height="70" rx="12" fill="#E8A87C" stroke="#16232E" stroke-width="1.4"/>
+<polygon points="262,36 266,43 258,43" fill="#B5524A"/>
+<polygon points="285,26 289,33 281,33" fill="#B5524A"/>
+<polygon points="300,51 304,58 296,58" fill="#B5524A"/>
+<polygon points="316,34 320,41 312,41" fill="#B5524A"/>
+<polygon points="276,58 280,65 272,65" fill="#B5524A"/>
+<polygon points="285,176 289,183 281,183" fill="#B5524A"/>
+<polyline points="285,170 285,64" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="285,56 280,66 290,66" fill="#16232E"/>
+<text x="318" y="192" font-size="10" fill="#16232E" text-anchor="start">ATP → ADP + P</text>
+<text x="43" y="120" font-size="15" fill="#16232E" text-anchor="middle" font-weight="bold">A</text>
+<text x="148" y="120" font-size="15" fill="#16232E" text-anchor="middle" font-weight="bold">B</text>
+<text x="263" y="120" font-size="15" fill="#16232E" text-anchor="middle" font-weight="bold">C</text>
+</svg>
