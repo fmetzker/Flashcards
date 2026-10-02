@@ -1,0 +1,37 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:manutencao-mecanica/valvula-4-3-centro-fechado'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="2 -9.8 236 124" width="300" height="157.6" font-family="Arial, Helvetica, sans-serif">
+<rect x="2" y="-9.8" width="236" height="124" fill="#fff"/>
+<rect x="60" y="30" width="40" height="40" fill="none" stroke="#16232E" stroke-width="2"/>
+<polyline points="72,67 72,39" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="72,33 69.3,39 74.7,39" fill="#16232E" stroke="#16232E" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="88,33 88,61" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="88,67 90.7,61 85.3,61" fill="#16232E" stroke="#16232E" stroke-width="1" stroke-linejoin="round"/>
+<rect x="100" y="30" width="40" height="40" fill="none" stroke="#16232E" stroke-width="2"/>
+<polyline points="112,30 112,38" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="107,38 117,38" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="128,30 128,38" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="123,38 133,38" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="112,70 112,62" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="107,62 117,62" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="128,70 128,62" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="123,62 133,62" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="140" y="30" width="40" height="40" fill="none" stroke="#16232E" stroke-width="2"/>
+<polyline points="152,67 165.4,38.4" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="168,33 163,37.3 167.9,39.6" fill="#16232E" stroke="#16232E" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="152,33 165.4,61.6" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="168,67 167.9,60.4 163,62.7" fill="#16232E" stroke="#16232E" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="112,30 112,18" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="112" y="15" font-size="11" fill="#16232E" text-anchor="middle" font-weight="bold">A</text>
+<polyline points="128,30 128,18" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="128" y="15" font-size="11" fill="#16232E" text-anchor="middle" font-weight="bold">B</text>
+<polyline points="112,70 112,82" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="112" y="96" font-size="11" fill="#16232E" text-anchor="middle" font-weight="bold">P</text>
+<polyline points="128,70 128,82" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="128" y="96" font-size="11" fill="#16232E" text-anchor="middle" font-weight="bold">T</text>
+<rect x="44" y="41" width="16" height="18" fill="none" stroke="#16232E" stroke-width="1.6"/>
+<polyline points="44,59 60,41" fill="none" stroke="#16232E" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="44,50 40,43 36,57 32,43 28,57 24,43 18,50" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="180" y="41" width="16" height="18" fill="none" stroke="#16232E" stroke-width="1.6"/>
+<polyline points="180,59 196,41" fill="none" stroke="#16232E" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="196,50 200,43 204,57 208,43 212,57 216,43 222,50" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,29 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:manutencao-mecanica/valvula-5-2-solenoide-mola'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="28 -9.8 154 134" width="300" height="261" font-family="Arial, Helvetica, sans-serif">
+<rect x="28" y="-9.8" width="154" height="134" fill="#fff"/>
+<rect x="60" y="30" width="40" height="40" fill="none" stroke="#16232E" stroke-width="2"/>
+<polyline points="80,67 72.5,38.8" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="71,33 69.9,39.5 75.1,38.1" fill="#16232E" stroke="#16232E" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="89,33 93.1,61.1" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="94,67 95.8,60.7 90.5,61.5" fill="#16232E" stroke="#16232E" stroke-width="1" stroke-linejoin="round"/>
+<rect x="100" y="30" width="40" height="40" fill="none" stroke="#16232E" stroke-width="2"/>
+<polyline points="120,67 127.5,38.8" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="129,33 124.9,38.1 130.1,39.5" fill="#16232E" stroke="#16232E" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="111,33 106.9,61.1" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="106,67 109.5,61.5 104.2,60.7" fill="#16232E" stroke="#16232E" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="111,30 111,18" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="111" y="15" font-size="11" fill="#16232E" text-anchor="middle" font-weight="bold">4</text>
+<polyline points="129,30 129,18" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="129" y="15" font-size="11" fill="#16232E" text-anchor="middle" font-weight="bold">2</text>
+<polyline points="106,70 106,82" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="106,82 100,91 112,91" fill="#fff" stroke="#16232E" stroke-width="1.4" stroke-linejoin="round"/>
+<text x="106" y="106" font-size="11" fill="#16232E" text-anchor="middle" font-weight="bold">5</text>
+<polyline points="120,70 120,82" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="120" y="96" font-size="11" fill="#16232E" text-anchor="middle" font-weight="bold">1</text>
+<polyline points="134,70 134,82" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="134,82 128,91 140,91" fill="#fff" stroke="#16232E" stroke-width="1.4" stroke-linejoin="round"/>
+<text x="134" y="106" font-size="11" fill="#16232E" text-anchor="middle" font-weight="bold">3</text>
+<rect x="44" y="41" width="16" height="18" fill="none" stroke="#16232E" stroke-width="1.6"/>
+<polyline points="44,59 60,41" fill="none" stroke="#16232E" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="140,50 144,43 148,57 152,43 156,57 160,43 166,50" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

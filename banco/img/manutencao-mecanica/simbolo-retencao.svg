@@ -1,0 +1,10 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:manutencao-mecanica/simbolo-retencao'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="4 4.4 192 65.6" width="300" height="102.5" font-family="Arial, Helvetica, sans-serif">
+<rect x="4" y="4.4" width="192" height="65.6" fill="#fff"/>
+<polyline points="20,40 80,40" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="110,40 180,40" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="98,26 112,40 98,54" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="90" cy="40" r="9" fill="none" stroke="#16232E" stroke-width="2"/>
+<text x="24" y="30" font-size="12" fill="#16232E" text-anchor="start" font-weight="bold">A</text>
+<text x="176" y="30" font-size="12" fill="#16232E" text-anchor="end" font-weight="bold">B</text>
+</svg>

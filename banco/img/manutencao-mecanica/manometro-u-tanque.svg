@@ -1,0 +1,23 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:manutencao-mecanica/manometro-u-tanque'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -10 229.8 231" width="300" height="301.6" font-family="Arial, Helvetica, sans-serif">
+<rect x="-6" y="-10" width="229.8" height="231" fill="#fff"/>
+<rect x="10" y="30" width="60" height="70" fill="#F4F7FA" stroke="#16232E" stroke-width="2"/>
+<text x="40" y="70" font-size="11" fill="#16232E" text-anchor="middle">tanque</text>
+<polyline points="70,60 110,60 110,180" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="126,60 126,180" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 110,180 A 25 25 0 0 0 160,180" fill="none" stroke="#16232E" stroke-width="2"/>
+<path d="M 126,180 A 9 9 0 0 0 144,180" fill="none" stroke="#16232E" stroke-width="2"/>
+<polyline points="144,180 144,20" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="160,180 160,20" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="152" y="14" font-size="10" fill="#16232E" text-anchor="middle" font-style="italic">aberto</text>
+<rect x="111" y="140" width="14" height="40" fill="#C9D3DC"/>
+<rect x="145" y="80" width="14" height="100" fill="#C9D3DC"/>
+<path d="M 110,180 A 25 25 0 0 0 160,180 L 144,180 A 9 9 0 0 1 126,180 Z" fill="#C9D3DC"/>
+<polyline points="170,80 200,80" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4,3"/>
+<polyline points="170,140 200,140" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4,3"/>
+<polyline points="192,140 192,88" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="192,82 189.3,88 194.7,88" fill="#16232E" stroke="#16232E" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="192,80 192,132" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="192,138 194.7,132 189.3,132" fill="#16232E" stroke="#16232E" stroke-width="1" stroke-linejoin="round"/>
+<text x="200" y="115" font-size="13" fill="#16232E" text-anchor="start" font-style="italic">h</text>
+</svg>

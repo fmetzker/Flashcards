@@ -1,0 +1,15 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:manutencao-mecanica/plano-de-corte-aa'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="44 2 212 146" width="300" height="206.6" font-family="Arial, Helvetica, sans-serif">
+<rect x="44" y="2" width="212" height="146" fill="#fff"/>
+<rect x="60" y="40" width="180" height="70" fill="none" stroke="#16232E" stroke-width="2.5"/>
+<circle cx="150" cy="75" r="18" fill="none" stroke="#16232E" stroke-width="2.5"/>
+<polyline points="150,18 150,132" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="12,3,2,3"/>
+<polyline points="150,22 150,36" fill="none" stroke="#16232E" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="150,114 150,128" fill="none" stroke="#16232E" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="150,26 136,26" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="128,26 136,29.6 136,22.4" fill="#16232E" stroke="#16232E" stroke-width="1" stroke-linejoin="round"/>
+<polyline points="150,124 136,124" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="128,124 136,127.6 136,120.4" fill="#16232E" stroke="#16232E" stroke-width="1" stroke-linejoin="round"/>
+<text x="118" y="31" font-size="13" fill="#16232E" text-anchor="start" font-weight="bold">A</text>
+<text x="118" y="129" font-size="13" fill="#16232E" text-anchor="start" font-weight="bold">A</text>
+</svg>

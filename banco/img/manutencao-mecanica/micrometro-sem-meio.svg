@@ -1,0 +1,49 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:manutencao-mecanica/micrometro-sem-meio'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -6 290 152" width="300" height="157.2" font-family="Arial, Helvetica, sans-serif">
+<rect x="0" y="-6" width="290" height="152" fill="#fff"/>
+<rect x="16" y="46" width="164" height="48" fill="#F4F7FA" stroke="#16232E" stroke-width="2"/>
+<polyline points="16,70 174,70" fill="none" stroke="#16232E" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="30,70 30,59" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="30" y="56" font-size="11" fill="#16232E" text-anchor="middle">0</text>
+<polyline points="42,70 42,63" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="54,70 54,63" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="66,70 66,63" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="78,70 78,63" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="90,70 90,59" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="90" y="56" font-size="11" fill="#16232E" text-anchor="middle">5</text>
+<polyline points="102,70 102,63" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="114,70 114,63" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="126,70 126,63" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="138,70 138,63" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="150,70 150,59" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="150" y="56" font-size="11" fill="#16232E" text-anchor="middle">10</text>
+<polyline points="162,70 162,63" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="174,70 174,63" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="36,70 36,77" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="48,70 48,77" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="60,70 60,77" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="72,70 72,77" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="84,70 84,77" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="96,70 96,77" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="108,70 108,77" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="120,70 120,77" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="132,70 132,77" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="144,70 144,77" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="156,70 156,77" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="168,70 168,77" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="174,18 192,10 274,10 274,130 192,130 174,122" fill="#fff" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+<polyline points="192,10 192,130" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="174,115 182,115" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="174,106 182,106" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="174,97 182,97" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="174,88 182,88" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="174,79 188,79" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="196" y="83" font-size="10" fill="#16232E" text-anchor="start">35</text>
+<polyline points="174,70 182,70" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="174,61 182,61" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="174,52 182,52" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="174,43 182,43" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="174,34 188,34" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="196" y="38" font-size="10" fill="#16232E" text-anchor="start">40</text>
+<polyline points="174,25 182,25" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
