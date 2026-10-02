@@ -18,23 +18,17 @@
 > era assim", "descoberto em setembro") vai para o histórico.
 
 Aplicativo web de questões com repetição espaçada, contas e banco
-colaborativo. Hoje atende cinco concursos: Enfermeiro/Volta Redonda (edital
-003/2026-SMA, prova 20/09/2026), CAAQ-CDM/Marinha, CFAQ-MOC/MOM/Marinha
+colaborativo. Hoje atende três concursos: Enfermeiro/Volta Redonda (edital
+003/2026-SMA, prova 20/09/2026), CAAQ-CDM/Marinha e CFAQ-MOC/MOM/Marinha
 (Moço de Convés e Moço de Máquinas, mesma prova; **pré-edital**, com base
-nas Normas CPES 2026 enquanto a Capitania da conta não abre o PS),
-Psicologia/Transpetro,
-cadastrado como **pré-edital** (estrutura copiada do edital de 2023 enquanto
-o de 2026 não sai), e Manutenção Mecânica/Transpetro (Edital nº 03 -
-TRANSPETRO/PSP/TERRA/NÍVEL MÉDIO-2026.3, ênfase 11, polo Rio de Janeiro,
-prova 29/11/2026). Novo concurso é editar `concursos.json` — não exige
-mexer no código.
+nas Normas CPES 2026 enquanto a Capitania da conta não abre o PS). Novo
+concurso é editar `concursos.json` — não exige mexer no código.
 
-Moço de Máquinas e Enfermagem do Trabalho, ambos da Transpetro, saíram de
-`concursos.json` porque ninguém mais vai prestar essas provas — mas os
-bancos de questões (`banco/maritimo-maquinas.json` e
-`banco/enfermagem-trabalho.json`) continuam no repositório, intactos, para
-o caso de precisarem voltar. Matéria sem concurso ativo é situação normal
-no app: a matéria só não aparece pra ninguém estudar até algum concurso
+Os quatro cargos da Transpetro (Moço de Máquinas, Enfermagem do Trabalho,
+Psicologia e Manutenção Mecânica) saíram de `concursos.json` porque ninguém
+mais vai prestar essas provas — mas os bancos de questões continuam no
+repositório, intactos, para o caso de precisarem voltar. Matéria sem
+concurso ativo é situação normal no app: a matéria só não aparece pra ninguém estudar até algum concurso
 voltar a referenciá-la em `blocos[].materias`, **ou** até ser marcada
 `"avulsa": true` em `banco/materias.json` — o segundo caminho, hoje usado
 por Enfermagem do Trabalho, Psicologia e Máquinas e Prática Marítima (nenhuma
@@ -183,9 +177,9 @@ no Safari do iPhone sem nenhuma etapa de compilação.
     regra de aprovação e conteúdo programático saem do edital publicado, e
     o campo `edital` de `concursos.json` diz de onde. Quando a fonte não
     existe (pré-edital, cargo novo), registrar o que é certo e deixar o
-    resto **vazio e declarado** — como `transpetro-psi`, que tem o bloco de
-    Específicos contado mas sem tópicos, porque Psicologia é ênfase nova em
-    2026 e não há edital anterior da Transpetro para esse cargo. Assunto
+    resto **vazio e declarado** — como `psicologia`, que ficou sem árvore
+    em `topicos.json` porque era ênfase nova da Transpetro em 2026 e não
+    havia edital anterior para esse cargo. Assunto
     inventado é pior que assunto faltando: a pessoa estuda com sensação de
     cobertura e chega na prova sem ter visto o que caiu.
 12. **Concurso que ninguém mais vai prestar sai de `concursos.json`, mas o
@@ -193,15 +187,15 @@ no Safari do iPhone sem nenhuma etapa de compilação.
     oferecer aquele cargo pra estudo — não apaga o trabalho de escrever as
     questões, que pode servir de novo se o concurso voltar (mudança de
     edital, prova adiada) ou se outro concurso vier a usar a mesma matéria.
-    Foi o caso de Moço de Máquinas e Enfermagem do Trabalho, ambos da
-    Transpetro: saíram de `concursos.json`, e `banco/maritimo-maquinas.json`
-    e `banco/enfermagem-trabalho.json` continuam intactos. As duas matérias
-    — mais `psicologia`, que nunca teve bloco de concurso próprio apesar de
-    o concurso "Psicologia/Transpetro" existir em `concursos.json` — foram
-    depois marcadas `"avulsa": true` em `banco/materias.json`: continuam sem
-    concurso atrás, mas passaram a ser conteúdo avulso de propósito, à
-    disposição de quem quiser seguir sem prova nenhuma. Matéria sem concurso
-    ativo **e** sem avulsa declarada não é estudada automaticamente por
+    Foi o caso dos quatro cargos da Transpetro: saíram de `concursos.json`,
+    e os bancos das matérias continuam intactos. `maritimo-maquinas`,
+    `enfermagem-trabalho` e `psicologia` estão marcadas `"avulsa": true` em
+    `banco/materias.json`: continuam sem concurso atrás, mas são conteúdo
+    avulso de propósito, à disposição de quem quiser seguir sem prova
+    nenhuma. `manutencao-mecanica` e `ingles` ficaram **inativas** (nem
+    concurso, nem avulsa) — e `testes/concursos-fixture.json` guarda o
+    `transpetro-mec` só como cenário dos testes do motor, nunca do app.
+    Matéria sem concurso ativo **e** sem avulsa declarada não é estudada automaticamente por
     ninguém — só entra na sessão de quem, na tela de seleção, marcá-la à mão
     como matéria avulsa (ver "Matéria, tópico e subtópico").
 
@@ -572,9 +566,9 @@ escopo restrito a um só ou com todos.
   desempatando pela mesma ordem de `ORDEM_MATERIAS` (determinístico, nunca
   `Math.random()`). O peso pré-rateio fica exposto em `bl.peso` — é ele, não
   `bl.questoes` (a cota já rateada), quem prova a regra abaixo.
-- **Matéria repetida não soma, vale o maior PESO.** Português cai nos quatro
+- **Matéria repetida não soma, vale o maior PESO.** Português cai em todos os
   concursos cadastrados; somar o peso inflaria a fatia dele às custas das
-  outras matérias. Estudar a cota de Português no dia serve para as quatro
+  outras matérias. Estudar a cota de Português no dia serve para todas as
   provas ao mesmo tempo. A mesma regra vale entre bloco de concurso e
   matéria avulsa: se a mesma matéria aparece nos dois, fica o maior peso,
   nunca a soma.
@@ -631,11 +625,7 @@ escopo restrito a um só ou com todos.
   nível fundamental/médio, por exemplo, cobre menos itens de Português que
   um de nível superior, que costuma cobrir praticamente tudo. Bloco sem
   `topicos` significa **matéria inteira**. Quem usa o escopo hoje é
-  `transpetro-mec`: o Anexo IV de nível médio lista 8 itens de Português
-  (sem regência, colocação pronominal, coordenação/subordinação nem
-  sintaxe — 132 dos 172 cartões entram) e 10 de Matemática (sem lógica —
-  116 dos 129). O bloco de Específicos não declara escopo porque a matéria
-  inteira *é* o conteúdo da ênfase.
+  `cfaq-moc-mom`, em Português e Matemática.
   - **Cada entrada é um tópico inteiro (`"Álgebra"`) ou um subtópico só
     (`"Álgebra|Equações do 2º grau"`).** O tópico do banco pode misturar o
     que o edital pede com o que ele nem cita — Álgebra tem equação do 2º

@@ -17,6 +17,18 @@ que o código já diz não vem: some.
 
 ---
 
+## Saem Psicologia e Manutenção Mecânica da Transpetro (outubro/2026)
+
+Ninguém mais vai prestar as duas provas, e pela regra 12 os dois concursos
+saíram de `concursos.json` com os bancos intactos. `manutencao-mecanica` e
+`ingles` (que só o `transpetro-psi` usava) ficaram inativas; `psicologia`
+já era avulsa. Os testes do motor usavam o `transpetro-mec` como cenário em
+quase todo arquivo de `testes/` — bloco grande de matéria só dele, escopo
+por tópico, fila de requisitos de Mecânica —, então ele foi guardado em
+`testes/concursos-fixture.json`, que `testar.js` soma ao catálogo só dentro
+do teste. Reescrever ~90 casos para outro concurso trocaria o cenário que
+eles provam.
+
 ## Rodadas de 10 no "Estudar" (outubro/2026)
 
 O botão da tela inicial dizia sempre "Estudar agora", com ou sem revisão

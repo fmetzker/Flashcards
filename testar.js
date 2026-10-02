@@ -83,6 +83,12 @@ function lerDados() {
     if (!fs.existsSync(p)) throw new Error('arquivo ausente: ' + a);
     dados[a] = JSON.parse(fs.readFileSync(p, 'utf8'));
   }
+  /* Concurso que saiu do catálogo (regra 12) mas continua sendo o cenário
+     dos testes do motor: entra só aqui, nunca no app. Id que já exista em
+     produção não é sobrescrito. */
+  const fixture = JSON.parse(fs.readFileSync(path.join(RAIZ, 'testes/concursos-fixture.json'), 'utf8'));
+  const ids = new Set(dados['concursos.json'].concursos.map(c => c.id));
+  for (const c of fixture.concursos) if (!ids.has(c.id)) dados['concursos.json'].concursos.push(c);
   return dados;
 }
 
