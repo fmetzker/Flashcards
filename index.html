@@ -1381,6 +1381,10 @@ const padrao = {
      agregada (resumo_desempenho). Sincronizado pra perfis.progresso_zerado_em
      junto de materias_ativas (ver sincronizarMateriasAtivas). */
   progressoZeradoEm: null,
+  /* ISO de quando ESTE aparelho reconstruiu o progresso a partir do próprio
+     log no servidor (reconstruirDoProprioLog). null = ainda não. Roda uma vez
+     por aparelho de aprovador, para desfazer a importação do log alheio. */
+  reparoPullConta: null,
   /* {materia: ISO} — instante do último zerarMateria() de cada matéria.
      Mesma ideia do progressoZeradoEm acima, um nível mais fino: lá o corte
      vale pra conta inteira, aqui só pros cartões daquela matéria.
@@ -1795,6 +1799,112 @@ async function puxarSimulados(){
   });
 }
 
+/* REPARO DO PROGRESSO DO APROVADOR — uma vez por aparelho.
+
+   Até a v322 o pull pessoal não filtrava por conta, e a policy "aprovador lê
+   tudo" (Painel) fazia o servidor devolver o log de todo mundo: cada
+   resposta alheia entrou no progresso local do aprovador (HISTORICO.md). O
+   log DELE no servidor ficou limpo — o app só envia o que a conta responde —
+   então ele é a fonte da verdade para refazer o estado.
+
+   O que fica de fora do log e por isso é preservado do estado local: o que
+   veio ANTES do corte — progresso de antes de a conta existir, migrado do
+   esquema de perfis e nunca enviado. O corte é o que vier primeiro entre a
+   primeira resposta da conta no log e o início da importação alheia
+   (INICIO_IMPORTACAO_ALHEIA): resposta alheia nunca tem data anterior a
+   isso, e progresso pré-conta nunca tem data posterior.
+
+   Os marcos de zerar valem como no resto do app: evento anterior a
+   progressoZeradoEm não conta (zerar() apaga tudo, inclusive os dias);
+   evento de matéria anterior a materiasZeradas[m] conta no dia mas não no
+   cartão (zerarMateria() só tira os cartões). Reescrita de enunciado
+   (regra 5) é resolvida como no Painel. */
+const INICIO_IMPORTACAO_ALHEIA = Date.parse("2026-08-29T00:00:00-03:00");
+
+function montarEstadoReconstruido(eventos, simulados, mapa, materiaDe){
+  const instante = v => { const d = Date.parse(v); return isNaN(d) ? null : d; };
+  const marcoConta = instante(E.progressoZeradoEm);
+  const zeradas = E.materiasZeradas || {};
+  const primeiro = eventos.reduce((min, ev)=>{
+    const t = instante(ev.ts);
+    return t === null ? min : Math.min(min, t);
+  }, Infinity);
+  const corte = Math.min(primeiro, INICIO_IMPORTACAO_ALHEIA);
+  const diaCorte = fmtDiaBrasilia.format(new Date(corte));
+  const antesDoCorte = obj => {
+    const r = {};
+    Object.keys(obj || {}).forEach(k=>{ if(k < diaCorte) r[k] = obj[k]; });
+    return r;
+  };
+  const novo = {
+    dias: antesDoCorte(E.dias), diasTotal: antesDoCorte(E.diasTotal),
+    diasCertas: antesDoCorte(E.diasCertas),
+    diasMateria: JSON.parse(JSON.stringify(antesDoCorte(E.diasMateria))),
+    cartoes: {}, simulados: [],
+  };
+  eventos.forEach(ev=>{
+    const t = instante(ev.ts);
+    if(t === null || (marcoConta !== null && t < marcoConta)) return;
+    const id = resolverReescrita(mapa, ev.questao_id);
+    const dia = fmtDiaBrasilia.format(new Date(t));
+    novo.dias[dia] = (novo.dias[dia]||0) + 1;
+    novo.diasTotal[dia] = (novo.diasTotal[dia]||0) + 1;
+    if(ev.resultado === "sabia") novo.diasCertas[dia] = (novo.diasCertas[dia]||0) + 1;
+    novo.diasMateria[dia] = novo.diasMateria[dia] || {};
+    const m = materiaDe(id);
+    if(m) novo.diasMateria[dia][m] = (novo.diasMateria[dia][m]||0) + 1;
+    const marcoMat = m ? instante(zeradas[m]) : null;
+    if(marcoMat !== null && t < marcoMat) return;
+    const c = novo.cartoes[id] || {caixa:1, acertos:0, erros:0, prox:hoje(), ts:null};
+    if(ev.resultado === "sabia") c.acertos++; else c.erros++;
+    if(!c.ts || t > instante(c.ts)){ c.caixa = ev.caixa_depois; c.prox = ev.prox; c.ts = ev.ts; }
+    novo.cartoes[id] = c;
+  });
+  // cartão local sem evento no log: só fica se é de antes do corte (pré-conta)
+  Object.keys(E.cartoes).forEach(id=>{
+    if(id in novo.cartoes) return;
+    const c = E.cartoes[id];
+    if(!c.ts || instante(c.ts) < corte) novo.cartoes[id] = c;
+  });
+  const doLog = new Set(simulados.map(x=>x.id));
+  const naFila = new Set(FILA_SIM.map(x=>x.id));
+  simulados.forEach(x=>{
+    const t = instante(x.criado_em);
+    if(marcoConta !== null && t !== null && t < marcoConta) return;
+    novo.simulados.push({id:x.id, data:x.data, acertos:x.acertos, total:x.total, concurso:x.concurso});
+  });
+  (E.simulados || []).forEach(x=>{
+    if(doLog.has(x.id)) return;
+    if(naFila.has(x.id) || (x.data && x.data < diaCorte)) novo.simulados.push(x);
+  });
+  return novo;
+}
+
+async function reconstruirDoProprioLog(){
+  const conta = "&usuario_id=eq."+encodeURIComponent(CONTA_ID);
+  const eventos = await buscarTudo("eventos_resposta?select=id,questao_id,ts,resultado,caixa_depois,prox,criado_em"+conta+"&order=criado_em.asc,id.asc");
+  const simulados = await buscarTudo("simulados?select=id,data,acertos,total,concurso,criado_em"+conta+"&order=criado_em.asc,id.asc");
+  const mapa = await mapaReescritas();
+  const indice = await indiceBancoCompleto();
+  const materiaDe = id => indice[id] || (porId[id] && porId[id].m) || null;
+  const novo = montarEstadoReconstruido(eventos, simulados, mapa, materiaDe);
+  E.cartoes = novo.cartoes;
+  E.dias = novo.dias; E.diasTotal = novo.diasTotal; E.diasCertas = novo.diasCertas;
+  E.diasMateria = novo.diasMateria;
+  E.simulados = novo.simulados;
+  E.eventosProprios = [];
+  /* resposta dada enquanto os awaits acima rodavam: já está na FILA (ainda
+     não enviada) e foi aplicada no E que acabou de ser substituído — aplica
+     de novo por cima. Quando for enviada, aoEnviar a marca como própria e o
+     pull não conta outra vez. */
+  FILA.forEach(ev=> aplicarEventoRemoto(ev, new Set()));
+  if(eventos.length){ CURSOR_EV.valor = eventos[eventos.length-1].criado_em; salvarCursor(CURSOR_EV.chave, CURSOR_EV.valor); }
+  if(simulados.length){ CURSOR_SIM.valor = simulados[simulados.length-1].criado_em; salvarCursor(CURSOR_SIM.chave, CURSOR_SIM.valor); }
+  E.reparoPullConta = new Date().toISOString();
+  salvar();
+  mostrarToast("Progresso refeito a partir do servidor: respostas de outras contas, importadas por engano, foram retiradas.");
+}
+
 /* dispara em segundo plano — nunca lança erro pra fora, nunca trava a
    navegação. Chamar de novo enquanto uma sincronização está em andamento
    não faz nada; a fila persiste até a próxima chamada dar certo. */
@@ -1805,8 +1915,13 @@ async function sincronizar(){
   try{
     await empurrarFila("eventos_resposta", FILA, chaveFila, ev=>E.eventosProprios.push(ev.id));
     await empurrarFila("simulados", FILA_SIM, chaveFilaSim);
-    await puxarEventos();
-    await puxarSimulados();
+    /* depois de empurrar, para o log do servidor já ter tudo desta conta;
+       se o push falhou, nem chega aqui — o reparo espera a próxima vez */
+    if(SOU_APROVADOR && !E.reparoPullConta) await reconstruirDoProprioLog();
+    else{
+      await puxarEventos();
+      await puxarSimulados();
+    }
     /* materias_ativas (Painel de desempenho) reaproveita esta malha de
        retentativa em vez de ter a própria: sincronizarMateriasAtivas()
        nunca lança erro (try/catch interno), então uma falha dela aqui não

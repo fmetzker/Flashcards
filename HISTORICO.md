@@ -32,6 +32,14 @@ responde), o estrago foi só local. Correção: filtro de conta explícito na
 URL, falhando fechado sem conta. A lição virou regra no `CLAUDE.md`: policy
 diz o que se pode ler, não o que é seu.
 
+O estado já contaminado foi desfeito na versão seguinte, refazendo-o pelo log
+da própria conta uma vez por aparelho de aprovador. Duas perdas aceitas: o
+dia do corte em que houve resposta pré-conta perde essa parte, e um cartão
+pré-conta respondido de novo depois perde os acertos/erros de antes (o log só
+tem os de depois). Subtrair só o alheio, em vez de refazer, não era possível:
+caixa e vencimento foram sobrescritos pelo evento mais novo, e o valor
+anterior não ficou guardado em lugar nenhum.
+
 ## Ordem da revisão: caixa 1, depois caixa alta, base primeiro (outubro/2026)
 
 Até aqui `prioridade()` ordenava as vencidas num número só, `caixa − erro×0,6

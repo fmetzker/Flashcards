@@ -42,7 +42,7 @@ const RAIZ = __dirname;
 const GLOBAIS_LET = [
   'BANCO', 'CONCURSO', 'BLOCOS', 'BLOCOS_META', 'ORDEM_MATERIAS', 'TOPICOS_EDITAL',
   'REQ_MATERIA', 'REQUISITOS', 'REQUISITOS_SUB', 'CONCURSOS', 'INSCRITOS', 'E', 'S',
-  'SESSAO', 'SUPA',
+  'SESSAO', 'SUPA', 'SOU_APROVADOR', 'FILA', 'FILA_SIM',
 ];
 const GLOBAIS_CONST = [
   'porId', 'MATERIAS', 'blocoDaMateria', 'INTERVALOS', 'CAIXA_MAX',
@@ -67,6 +67,7 @@ const FUNCOES = [
   'salvar', 'podarEventosProprios', 'renovarSessao', 'chamarAuth',
   'sincronizarMateriasAtivas', 'zerar', 'zerarMateria', 'checarMetasBatidas',
   'registrar', 'aplicarEventoRemoto', 'puxarEventos', 'puxarSimulados',
+  'sincronizar', 'montarEstadoReconstruido', 'reconstruirDoProprioLog',
 ];
 
 function lerDados() {

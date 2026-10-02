@@ -471,6 +471,14 @@ duas perguntas parecidas já produziu um número errado (ver `HISTORICO.md`):
   todo mundo para um aprovador, e cada resposta alheia entrava no progresso
   dele como se fosse de outro aparelho. Sem conta, o pull não roda.
   `testes/sincronizacao.js` reprova quem tirar o filtro.
+  - **O estrago antigo é desfeito uma vez por aparelho de aprovador**
+    (`reconstruirDoProprioLog()`, marcado em `E.reparoPullConta`): refaz
+    cartões, dias e simulados a partir do log DA CONTA, que ficou limpo. O
+    que é anterior ao corte (primeira resposta no log ou
+    `INICIO_IMPORTACAO_ALHEIA`, o que vier antes) fica do estado local — é o
+    progresso pré-conta, que nunca subiu. Respeita `progressoZeradoEm`,
+    `materiasZeradas` e reescritas. Só roda depois de a fila subir: com envio
+    falhando, refazer apagaria a resposta que ainda não está no log.
 
 - **"Revisões atrasadas" filtra por matéria ativa.** `eventos_resposta` é
   *append-only* e nunca esquece matéria abandonada, então sem o filtro um
