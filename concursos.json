@@ -6,8 +6,8 @@
       "cargo": "Enfermeiro",
       "orgao": "Volta Redonda",
       "banca": "FEVRE",
-      "edital": "003/2026-SMA",
-      "data": "2026-09-20",
+      "edital": "003/2026-SMA; data pelo Edital de Retificação e Reaplicação nº 001/2026, de 24/09/2026 (anulou a aplicação de 20/09/2026 só para Enfermeiro e marcou a reaplicação da prova objetiva para 29/11/2026; demais cláusulas inalteradas, item 4.2)",
+      "data": "2026-11-29",
       "inicio": "2026-07-28",
       "duracaoMin": 180,
       "blocos": [
