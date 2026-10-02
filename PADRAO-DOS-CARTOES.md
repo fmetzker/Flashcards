@@ -595,14 +595,19 @@ escolher a ordem** dentro do que está vencido.
 
 ### 4.2 O que muda agora
 
-Dentro do que está vencido, a ordem passa a considerar, além da caixa:
+Dentro do que está vencido, a ordem é (cada item só desempata o anterior):
 
-1. **Caixa** (o que está mais atrasado no Leitner vem primeiro) — já valia.
-2. **Taxa de erro da questão** — o que a pessoa erra mais volta antes.
-3. **Peso do bloco na prova** — empate resolve pelo que vale mais pontos.
+1. **Caixa 1 primeiro** — o que a pessoa errou ou chutou na última vez.
+2. **Depois, da caixa mais alta para a mais baixa** — protege o que já
+   levou meses para firmar.
+3. **A base antes** — degrau mais baixo do recorte, tópico e subtópico mais
+   cedo na fila de estudo.
+4. **Taxa de erro da questão**, depois **peso do bloco na prova**.
 
-O objetivo é que o tempo escasso vá para o que muda mais a nota, sem quebrar
-a lógica do espaçamento (nada é adiantado além do que já venceu).
+O objetivo é que, sobrando pouco tempo, ele vá para o que se errou e para o
+que mais se perde esquecendo, com a base na frente — sem quebrar a lógica do
+espaçamento (nada é adiantado além do que já venceu). Detalhes e motivos no
+`CLAUDE.md`, "A ordem dentro do que já venceu".
 
 ---
 

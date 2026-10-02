@@ -53,7 +53,7 @@ const GLOBAIS_CONST = [
 const FUNCOES = [
   'hoje', 'diaUTC', 'somarDias', 'proximaData', 'diasAteMaisProxima',
   'caixaDepois', 'previsaoRevisao',
-  'prioridade', 'fila', 'apportion', 'cmpId',
+  'prioridade', 'ordenarRevisoes', 'fila', 'apportion', 'cmpId',
   'indexarRequisitos', 'topicoAberto', 'subtopicoAberto',
   'requisitosPendentes', 'requisitosPendentesSub', 'baseDominada',
   'grauDe', 'grauLiberado', 'grauAberto', 'menorGrauExistente', 'limparCacheGrau',

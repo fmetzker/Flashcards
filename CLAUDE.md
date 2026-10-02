@@ -593,8 +593,9 @@ escopo restrito a um só ou com todos.
   própria cota cedia lugar a cartão novo de um vizinho com fila curta,
   porque o excedente de revisão simplesmente não entrava — não ficava
   atrás do cartão novo, ficava de fora do lote inteiro.
-  - As revisões saem reordenadas por `prioridade()` **entre** as matérias
-    (caixa, taxa de erro, peso do bloco), não agrupadas por matéria. Os
+  - As revisões saem reordenadas por `ordenarRevisoes()` **entre** as
+    matérias (ver "A ordem dentro do que já venceu"), não agrupadas por
+    matéria. Os
     cartões novos continuam agrupados por matéria, na ordem de
     `BLOCOS_META` — ali não há urgência a comparar entre matérias.
   - A meta continua honesta: tudo que entra na sessão conta em
@@ -913,11 +914,30 @@ fechada que existia antes da sessão contínua. Regras que não podem cair:
   - **Sem estimativa de tempo** ("~6 min"): o app não mede quanto a pessoa
     demora por cartão, e o número seria inventado.
 
-**A ordem dentro do que já venceu** é decidida por `prioridade()`: caixa,
-taxa de erro da questão e peso do bloco na prova. Os pesos são calibrados
-para o desconto somado ficar **abaixo de 1** — erro e peso ordenam *dentro*
-da caixa e nunca atravessam a fronteira dela, porque caixa 1 ("errei na
-revisão mais recente") é o sinal mais forte que existe.
+**A ordem dentro do que já venceu** é decidida por `ordenarRevisoes()`, a
+única função que ordena revisão — `fila()`, o estudo de tópico e a sessão
+normal chamam ela, e `testes/sessao.js` reprova se algum divergir. Comparação
+em camadas, cada critério só desempatando o anterior:
+
+1. **Reaprendizado antes de retenção.** Caixa 1 ("errei ou chutei na última
+   vez") vem antes de tudo: é onde a prova tira ponto, e cartão de base na
+   caixa 1 tranca de novo o degrau e o tópico que dependem dele
+   (`grauLiberado` exige caixa ≥ 2) — revisar primeiro é o que destrava.
+2. **Na retenção, caixa mais alta primeiro.** Cartão de caixa alta levou
+   meses de acerto; esquecido, volta para a 1 e o investimento some. A
+   caixa 2 fica por último — preço assumido.
+3. **Degrau relativo** — grau menos o menor grau do recorte (`{m,t,s}` ou
+   `{m,t}`), a mesma definição de base de `baseDominada()`. Não o `n` puro.
+4. **Posição do tópico na fila**, como **fração** da fila da matéria (filas
+   têm tamanhos diferentes; profundidade bruta não compara entre matérias).
+5. **Posição do subtópico** na fila de subtópicos.
+6. **`prioridade()`**: taxa de erro (só com 3+ respostas) e peso do bloco.
+7. **`id`** (`cmpId()`).
+
+Isto só decide a ORDEM — nada adianta revisão nem a esconde. Pesa quando a
+pessoa para no meio (rodadas de 10) ou o atraso passa da capacidade do dia:
+o que fica para amanhã é o fim desta lista. Atraso em dias **não** é
+critério.
 
 **A ordem do arquivo nunca decide nada.** Onde nenhum critério pedagógico
 distingue dois cartões, quem desempata é o `id` — e isso é um embaralhamento
@@ -929,13 +949,14 @@ desempate de `revisar` em `fila()`, e os modos `"filtro"` e `"erros"` de
 `montarLoteSessao()`. Sem isso a tabuada saía 3×2, 3×3, 3×4… — dava para
 responder somando o anterior em vez de lembrar, o oposto de recordação ativa,
 e valia tanto para cartão novo (ordem do arquivo) quanto para revisão (a
-`prioridade()` empata em todo cartão de mesma caixa, sem erro, do mesmo
-bloco, e `sort` estável devolvia o arquivo de novo).
+chave de `ordenarRevisoes()` empata em todo cartão de mesma caixa, degrau e
+recorte, sem erro, do mesmo bloco, e `sort` estável devolvia o arquivo de
+novo).
 
 Duas coisas que isso **não** é. Não é critério pedagógico novo por cima dos
 que existem: é o contrário, tira de cena um critério acidental que ninguém
 escolheu — o `id` é o ÚLTIMO desempate, nunca passa na frente de
-`prioridade()`. E não é sorteio: `fila()` roda de novo a cada reabastecimento
+nenhum critério de `ordenarRevisoes()`. E não é sorteio: `fila()` roda de novo a cada reabastecimento
 da sessão, então com `Math.random()` a ordem mudaria no meio dela e nenhum
 teste conseguiria travá-la. O simulado é o único que sorteia de verdade
 (`sorteia()`, Fisher–Yates), porque ali cada prova tem que ser diferente.

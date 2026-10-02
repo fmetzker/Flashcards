@@ -458,31 +458,21 @@ function previsaoRevisao(id, resultado){
   return {caixa, data, dias: Math.round((diaUTC(data) - diaUTC(hoje()))/86400000)};
 }
 
-/* Prioridade dentro do que JÁ VENCEU (PADRAO-DOS-CARTOES.md, seção 4.2).
+/* Desempate por ERRO e PESO DO BLOCO dentro do que JÁ VENCEU — o 6º
+   critério de ordenarRevisoes(), logo abaixo, que é quem decide a ordem.
 
-   Nada aqui adianta revisão: o espaçamento continua mandando em QUANDO o
-   cartão volta. Isto decide só a ORDEM entre os que já venceram, para o caso
-   comum de a fila ser maior que o tempo disponível — aí importa o que sai
-   primeiro.
+   Quando chega aqui, caixa, degrau e posição na fila já empataram, então o
+   termo `c.caixa` se cancela e sobra só o desconto:
 
-   Três critérios, nesta ordem de peso:
+   - TAXA DE ERRO da própria questão — a que a pessoa já errou 4 vezes é mais
+     urgente que a que ela errou uma. Só entra com histórico suficiente (3
+     respostas), senão uma única resposta azarada dominaria a ordem.
+   - PESO DO BLOCO na prova — por onde vale mais ponto. Mais fraco de
+     propósito: peso de bloco não é sinal de dificuldade, só de retorno.
 
-   1. CAIXA — quanto mais baixa, mais recente é a dificuldade. Continua sendo
-      o sinal mais forte, como já era.
-   2. TAXA DE ERRO da própria questão — duas questões na caixa 2 não são
-      iguais: a que a pessoa já errou 4 vezes é mais urgente que a que ela
-      errou uma. Só entra com histórico suficiente (3 respostas), senão uma
-      única resposta azarada dominaria a ordem.
-   3. PESO DO BLOCO na prova — desempate por onde vale mais ponto. É o critério
-      mais fraco de propósito: peso de bloco não é sinal de dificuldade, só de
-      retorno, e não deve passar na frente do que a pessoa não sabe.
-
-   Os pesos (0.6 e 0.3) são calibrados para que a soma máxima do desconto
-   fique ABAIXO de 1 — ou seja, abaixo da distância entre duas caixas. Sem
-   isso, um cartão da caixa 2 que a pessoa erra muito passaria na frente de um
-   da caixa 1, e caixa 1 quer dizer "errei na revisão mais recente", que é o
-   sinal mais forte que existe. Erro histórico e peso do bloco ordenam DENTRO
-   da caixa; nunca atravessam a fronteira dela. */
+   A caixa continua na conta para o número fazer sentido sozinho (e os pesos
+   0.6 e 0.3 somarem menos de 1, abaixo da distância entre duas caixas), mas
+   quem ordena por caixa é ordenarRevisoes(). */
 function prioridade(id){
   const c = E.cartoes[id];
   const respostas = c.acertos + c.erros;
@@ -490,6 +480,75 @@ function prioridade(id){
   const bl = BLOCOS.find(b => b.id === blocoDe(porId[id]));
   const peso = bl ? bl.questoes / Math.max(1, E.meta) : 0; // 0..1
   return c.caixa - erro * 0.6 - peso * 0.3;
+}
+
+/* ORDEM DO QUE JÁ VENCEU (PADRAO-DOS-CARTOES.md, seção 4.2).
+
+   Nada aqui adianta revisão: o espaçamento continua mandando em QUANDO o
+   cartão volta. Isto decide só a ORDEM entre os que já venceram — o que
+   importa quando a pessoa para no meio (rodadas de 10) ou quando o atraso
+   passa da capacidade do dia: o que fica para trás é o fim desta lista.
+
+   Critérios, cada um só desempatando o anterior:
+
+   1. REAPRENDIZADO antes de RETENÇÃO. Caixa 1 é "errei ou chutei na última
+      vez": é onde a prova tira ponto, e cartão de base na caixa 1 tranca de
+      novo o degrau e o tópico que dependem dele (grauLiberado exige caixa
+      >= 2). Revisar primeiro é o que destrava o avanço.
+   2. Na retenção, CAIXA MAIS ALTA PRIMEIRO. Cartão de caixa 6 levou meses de
+      acerto para chegar lá; esquecido, volta para a 1 e o investimento some.
+      É o que mais se perde deixando para amanhã. A caixa 2 (um acerto só
+      depois do erro) fica por último — é o preço assumido.
+   3. DEGRAU RELATIVO: grau do cartão menos o menor grau existente no recorte
+      dele ({m,t,s} com subtópico, {m,t} sem) — 0 é a base da escada, a mesma
+      definição de base que baseDominada() usa. Não o `n` puro: num
+      subtópico só com nível 2 e 3, o 2 é a base.
+   4. POSIÇÃO DO TÓPICO NA FILA, como fração da fila da matéria (0 = começo,
+      1 = fim). Fração e não profundidade bruta porque as filas têm tamanhos
+      diferentes — o 20º tópico de uma fila de 29 não está "mais longe" que
+      o 15º de uma de 19.
+   5. POSIÇÃO DO SUBTÓPICO na fila de subtópicos do tópico.
+   6. prioridade(): taxa de erro e peso do bloco.
+   7. id (cmpId) — embaralha o que ainda empatar.
+
+   Comparação em camadas, e não um número só, para nenhum critério precisar
+   de peso calibrado à mão para não atravessar o de cima.
+
+   A chave de cada cartão é calculada uma vez: menor grau por recorte e
+   profundidade máxima por matéria saem de uma passada só pelo BANCO, em vez
+   de uma passada por recorte. */
+function ordenarRevisoes(ids){
+  const menorGrau = {}, maxProf = {}, memoT = {}, memoS = {};
+  BANCO.forEach(q=>{
+    const g = grauDe(q);
+    const kt = q.m + "|" + q.t;
+    if(!(kt in menorGrau) || g < menorGrau[kt]) menorGrau[kt] = g;
+    if(q.s){
+      const ks = kt + "|" + q.s;
+      if(!(ks in menorGrau) || g < menorGrau[ks]) menorGrau[ks] = g;
+    }
+    const p = profundidadeTopico(q.m, q.t, memoT);
+    if(!(q.m in maxProf) || p > maxProf[q.m]) maxProf[q.m] = p;
+  });
+  const chave = {};
+  ids.forEach(id=>{
+    const q = porId[id], c = E.cartoes[id];
+    const recorte = q.m + "|" + q.t + (q.s ? "|" + q.s : "");
+    const max = maxProf[q.m] || 0;
+    chave[id] = [
+      c.caixa <= 1 ? 0 : 1,
+      -c.caixa,
+      grauDe(q) - (menorGrau[recorte] || 1),
+      max ? profundidadeTopico(q.m, q.t, memoT) / max : 0,
+      q.s ? profundidadeSubtopico(q.m, q.t, q.s, memoS) : 0,
+      prioridade(id),
+    ];
+  });
+  return ids.slice().sort((a,b)=>{
+    const ka = chave[a], kb = chave[b];
+    for(let i = 0; i < ka.length; i++) if(ka[i] !== kb[i]) return ka[i] - kb[i];
+    return cmpId(a, b);
+  });
 }
 
 /* A ORDEM DO ARQUIVO NUNCA DECIDE NADA. Onde nenhum critério pedagógico
@@ -521,10 +580,10 @@ function fila(){
     if(!c){ if(grauAberto(q)) novas.push(q.id); }
     else if(c.prox <= h) revisar.push(q.id);
   });
-  /* prioridade() continua mandando na revisão; o id só entra quando ela
-     empata — e empata muito: todo cartão de mesma caixa, sem histórico de
-     erro, do mesmo bloco, dá exatamente o mesmo número. */
-  revisar.sort((a,b)=> prioridade(a) - prioridade(b) || cmpId(a,b));
+  /* ordenarRevisoes() manda na revisão; o id só entra quando todos os
+     critérios dela empatam — e empatam muito: mesma caixa, mesmo degrau,
+     mesmo recorte, sem histórico de erro dão exatamente a mesma chave. */
+  const revisarOrdenado = ordenarRevisoes(revisar);
   /* `novas` não tem critério nenhum acima do id: a ordem pedagógica já foi
      imposta pelo filtro acima — o cartão só chega aqui se o tópico dele
      estiver aberto E o degrau dele alcançado, e dentro de um mesmo recorte
@@ -533,7 +592,7 @@ function fila(){
      remoção das camadas entre tópicos; o id não é critério, é a ausência
      deliberada de um. */
   novas.sort(cmpId);
-  return {revisar, novas};
+  return {revisar: revisarOrdenado, novas};
 }
 
 /* Quanto do dia conta para a meta. Duas regras:
@@ -718,7 +777,8 @@ function montarLoteSessao(modo, filtro, excluir){
       x.m===filtro.m &&
       (!filtro.t || x.t===filtro.t) &&
       (!filtro.s || x.s===filtro.s));
-    const h = hoje(), rev = [], nov = [];
+    const h = hoje(), nov = [];
+    let rev = [];
     limparCacheGrau();
     alvo.forEach(x=>{
       if(excluir.has(x.id)) return;
@@ -728,7 +788,7 @@ function montarLoteSessao(modo, filtro, excluir){
       if(!c){ if(grauAberto(x)) nov.push(x.id); }
       else if(c.prox <= h) rev.push(x.id);
     });
-    rev.sort((a,b)=> prioridade(a) - prioridade(b) || cmpId(a,b));   // mesma ordem do estudo normal
+    rev = ordenarRevisoes(rev);   // mesma ordem do estudo normal
     nov.sort(cmpId);
     // revisão primeiro, cartão novo só se sobrar espaço — ver o comentário
     // no modo normal, mais abaixo, sobre a troca de intercalar() por isto
@@ -776,14 +836,13 @@ function montarLoteSessao(modo, filtro, excluir){
        pessoa via revisão atrasada de uma matéria enquanto o app já
        oferecia conteúdo inédito de outra (ver HISTORICO.md).
 
-       `q.revisar` já vem ordenado por prioridade() (fila()); filtrar por
+       `q.revisar` já vem ordenado por ordenarRevisoes() (fila()); filtrar por
        área preserva essa ordem, então juntar as áreas e ordenar de novo é
        só reimpor a ordem GLOBAL onde a concatenação por bloco a
        desfez. */
     const todasRevisoes = [];
     areas.forEach(a=>{ if(a.falta) todasRevisoes.push.apply(todasRevisoes, a.rev); });
-    todasRevisoes.sort((a,b)=> prioridade(a) - prioridade(b) || cmpId(a,b));
-    const revs = todasRevisoes.slice(0, capacidade);
+    const revs = ordenarRevisoes(todasRevisoes).slice(0, capacidade);
 
     /* Cartão NOVO continua com a cota de cada bloco, individualmente — é o
        que ela existe para dividir. Só muda o quanto dela sobra: um bloco

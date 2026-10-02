@@ -159,7 +159,8 @@ Migrações que rodam no boot: `migrarSessaoDoPerfil`, `migrarEstadoDoPerfil`,
 | `proximaData` | Leitner: caixas 1–8, intervalos 1/3/7/14/30/60/120, teto por proximidade da prova |
 | `caixaDepois` | caixa resultante de uma resposta: `sabia` sobe um degrau, `chutei`/`errei` voltam à 1 — usada por `registrar()` **e** pela previsão do botão |
 | `previsaoRevisao` | `{caixa, data, dias}` se a resposta for X — alimenta o rótulo "volta em N dias" de cada botão (`textoPrevisao`, no `index.html`) |
-| `prioridade` | ordena **vencidas**: caixa, taxa de erro, peso do bloco |
+| `ordenarRevisoes` | ordena **vencidas**, nos três lugares que montam revisão: caixa 1 primeiro → retenção da caixa alta para a baixa → degrau relativo → posição do tópico na fila (fração) → do subtópico → `prioridade` → `cmpId` |
+| `prioridade` | 6º critério de `ordenarRevisoes`: desconto por taxa de erro e peso do bloco |
 | `cmpId` | desempate final em toda fila — ordenar pelo `id` (SHA-1 do enunciado) É embaralhar, sem sorteio |
 | `grauDe` | nível do cartão; ausente = 1 |
 | `grauLiberado` | até que degrau abriu (caixa ≥ 2 em todos do degrau); aceita `s` opcional — escopa a SUBTÓPICO quando passado, a TÓPICO inteiro quando não |
@@ -167,7 +168,7 @@ Migrações que rodam no boot: `migrarSessaoDoPerfil`, `migrarEstadoDoPerfil`,
 | `requisitosPendentesSub` / `subtopicoAberto` | pré-requisitos entre subtópicos — exige `topicoAberto` primeiro |
 | `grauAberto` | tópico aberto **e** subtópico aberto (se houver requisito) **e** degrau alcançado — degrau é sempre medido no recorte mais fino que o cartão tem (subtópico, se tiver) |
 | `resumoPendencias` | o que o botão da tela inicial anuncia: `vencidas` (a mesma `fila().revisar`), `atrasadas` (de dias anteriores) e `errouUltima` (caixa 1) |
-| `fila` | separa `revisar` (por `prioridade`, desempate `cmpId`) de `novas` (filtradas por `grauAberto`, ordenadas por `cmpId`) |
+| `fila` | separa `revisar` (por `ordenarRevisoes`) de `novas` (filtradas por `grauAberto`, ordenadas por `cmpId`) |
 | `intercalar` | entrelaça revisão e novas na sessão, proporcional ao tamanho de cada lista |
 | `iniciarSessao` | modos `normal`, `filtro`, `erros` |
 | `registrar` | grava resposta, atualiza caixa, alimenta a fila de sync |

@@ -17,6 +17,29 @@ que o código já diz não vem: some.
 
 ---
 
+## Ordem da revisão: caixa 1, depois caixa alta, base primeiro (outubro/2026)
+
+Até aqui `prioridade()` ordenava as vencidas num número só, `caixa − erro×0,6
+− peso×0,3`: caixa crescente, e erro e peso desempatando dentro dela. Dois
+problemas apareceram ao discutir a ordem. Um cartão de base na caixa 1
+tranca de novo o degrau e o tópico que dependem dele, e podia ficar atrás de
+um exercício avançado da mesma caixa só por ter menos erro ou bloco mais
+leve — a escada travava mais tempo que o necessário. E a caixa crescente
+deixava por último justamente o cartão de caixa alta, o que mais se perde
+quando esquecido.
+
+Três opções foram pesadas: (a) caixa 1 primeiro e depois retenção da caixa
+alta para a baixa; (b) inverter tudo, caixa alta primeiro e caixa 1 por
+último; (c) manter a caixa crescente e só acrescentar a base. Ficou a (a).
+A (b) foi descartada porque deixava para o fim exatamente o que se errou —
+quem para na primeira rodada de 10 revisaria só o que já sabia — e mantinha
+fechado por mais tempo o que a base errada tranca.
+
+Virou comparação em camadas (`ordenarRevisoes()`) em vez de mais pesos no
+mesmo número, para nenhum critério precisar de calibração à mão para não
+atravessar o outro. `prioridade()` ficou como 6º critério. Atraso em dias foi
+considerado e deixado de fora até ver como esta ordem se comporta.
+
 ## Saem Psicologia e Manutenção Mecânica da Transpetro (outubro/2026)
 
 Ninguém mais vai prestar as duas provas, e pela regra 12 os dois concursos

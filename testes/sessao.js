@@ -341,6 +341,32 @@ module.exports = function (APP, t) {
     limpar();
   });
 
+  t.teste('fila, estudo de tópico e sessão normal revisam na MESMA ordem', async () => {
+    /* Os três lugares chamam ordenarRevisoes(); se algum voltar a ordenar
+       por conta própria, a ordem diverge e a pessoa vê uma coisa no
+       "Estudar" e outra na tela Matérias. Caixas e tópicos variados para a
+       chave inteira trabalhar, não só o id. */
+    await APP.montar({ concursos: ['transpetro-mec'] });
+    const porTopico = {};
+    APP.BANCO.filter(q => q.m === 'manutencao-mecanica')
+      .forEach(q => { (porTopico[q.t] = porTopico[q.t] || []).push(q); });
+    const escolhidos = Object.values(porTopico).slice(0, 6).flatMap(l => l.slice(0, 2));
+    escolhidos.forEach((q, i) => {
+      APP.E.cartoes[q.id] = { caixa: 1 + (i % 6), acertos: 2, erros: i % 3, prox: APP.hoje() };
+    });
+    APP.limparCacheGrau();
+    const ids = new Set(escolhidos.map(q => q.id));
+    const daFila = APP.fila().revisar;
+    t.igual(daFila.length, ids.size, 'todos os escolhidos deviam estar vencidos');
+    const doTopico = APP.montarLoteSessao('filtro', { m: 'manutencao-mecanica' }, new Set())
+      .filter(id => ids.has(id));
+    const daSessao = APP.montarLoteSessao('normal', null, new Set()).filter(id => ids.has(id));
+    t.igual(doTopico, daFila, 'estudo de tópico divergiu da fila');
+    t.igual(daSessao, daFila, 'sessão normal divergiu da fila');
+    t.naoIgual(daFila, [...daFila].sort(APP.cmpId), 'a ordem saiu só por id — a chave não trabalhou');
+    limpar();
+  });
+
   t.teste('a ordem é a mesma em toda chamada — sem sorteio', async () => {
     /* fila() roda de novo a cada reabastecimento da sessão: com Math.random()
        a ordem mudaria no meio dela, e nenhum teste conseguiria travá-la. */

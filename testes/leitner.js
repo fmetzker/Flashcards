@@ -133,10 +133,10 @@ module.exports = function (APP, t) {
 
   t.grupo('prioridade');
 
-  t.teste('caixa baixa vem antes de caixa alta, sempre', () => {
-    /* Os pesos de erro (0.6) e de bloco (0.3) somam menos de 1 de
-       propósito: ordenam DENTRO da caixa e nunca atravessam a fronteira
-       dela, porque caixa 1 é o sinal mais forte que o motor produz. */
+  t.teste('os descontos de erro e peso somam menos que uma caixa', () => {
+    /* prioridade() hoje só desempata DENTRO da mesma caixa (critério 6 de
+       ordenarRevisoes) — mas o número continua tendo de fazer sentido
+       sozinho: 0.6 + 0.3 < 1, nunca atravessa a distância entre caixas. */
     APP.BLOCOS = [];
     APP.E.cartoes = {
       baixa: { caixa: 1, acertos: 9, erros: 0, prox: '2020-01-01' },
@@ -145,7 +145,7 @@ module.exports = function (APP, t) {
     APP.porId.baixa = { id: 'baixa', m: 'x', t: 'y' };
     APP.porId.alta = { id: 'alta', m: 'x', t: 'y' };
     t.ok(APP.prioridade('baixa') < APP.prioridade('alta'),
-      'cartão de caixa 1 sem erro nenhum tem que vir antes de caixa 2 só de erro');
+      'desconto de caixa 2 só de erro passou da caixa 1 sem erro');
     delete APP.porId.baixa; delete APP.porId.alta;
   });
 
@@ -173,6 +173,109 @@ module.exports = function (APP, t) {
     t.igual(APP.prioridade('novo'), 3, '2 respostas: erro ainda não pesa');
     t.ok(APP.prioridade('velho') < 3, '3 respostas: erro passa a pesar');
     delete APP.porId.novo; delete APP.porId.velho;
+  });
+
+
+  t.grupo('ordem da revisão');
+
+  /* Cenário sintético, do zero: matéria x com fila A → B → C e, dentro de A,
+     fila de subtópicos s1 → s2; matéria y com fila P → Q (mais curta, para
+     provar que a posição é FRAÇÃO da fila). Cada cartão é
+     [id, m, t, s, n, caixa, erros]. Restaura banco e requisitos no fim,
+     porque os outros testes não reindexam REQUISITOS ao montar. */
+  function ordem(cartoes) {
+    const salvo = { BANCO: APP.BANCO, REQ: APP.REQUISITOS, SUB: APP.REQUISITOS_SUB, BLOCOS: APP.BLOCOS };
+    try {
+      APP.BLOCOS = [];
+      APP.REQUISITOS = { 'x|B': ['A'], 'x|C': ['B'], 'y|Q': ['P'] };
+      APP.REQUISITOS_SUB = { 'x|A|s2': [{ t: 'A', s: 's1' }] };
+      APP.BANCO = cartoes.map(([id, m, tt, s, n]) => {
+        const q = { id, m, t: tt };
+        if (s) q.s = s;
+        if (n) q.n = n;
+        return q;
+      });
+      APP.E.cartoes = {};
+      cartoes.forEach(([id, , , , , caixa, erros]) => {
+        APP.porId[id] = APP.BANCO.find(q => q.id === id);
+        APP.E.cartoes[id] = { caixa, acertos: 3, erros: erros || 0, prox: '2020-01-01' };
+      });
+      return APP.ordenarRevisoes(cartoes.map(c => c[0]));
+    } finally {
+      cartoes.forEach(([id]) => delete APP.porId[id]);
+      APP.BANCO = salvo.BANCO; APP.REQUISITOS = salvo.REQ;
+      APP.REQUISITOS_SUB = salvo.SUB; APP.BLOCOS = salvo.BLOCOS;
+      APP.E.cartoes = {};
+    }
+  }
+
+  t.teste('caixa 1 (reaprendizado) vem antes de qualquer caixa de retenção', () => {
+    /* mesmo sendo degrau 3 contra a base: errou ou chutou, revisa primeiro */
+    t.igual(ordem([
+      ['a', 'x', 'A', 's1', 1, 2],
+      ['z', 'x', 'A', 's1', 3, 1],
+    ]), ['z', 'a']);
+  });
+
+  t.teste('na retenção, caixa mais alta primeiro', () => {
+    /* ids em ordem contrária à esperada: se a caixa não decidir, o id
+       inverte tudo e o teste acusa */
+    t.igual(ordem([
+      ['a', 'x', 'A', 's1', 1, 2],
+      ['b', 'x', 'A', 's1', 1, 3],
+      ['c', 'x', 'A', 's1', 1, 6],
+      ['d', 'x', 'A', 's1', 1, 1],
+    ]), ['d', 'c', 'b', 'a']);
+  });
+
+  t.teste('mesma caixa: o degrau base vem antes, mesmo errando menos', () => {
+    t.igual(ordem([
+      ['a', 'x', 'A', 's1', 2, 4, 3],
+      ['b', 'x', 'A', 's1', 1, 4, 0],
+    ]), ['b', 'a']);
+  });
+
+  t.teste('degrau é RELATIVO ao recorte: sem nível 1, o 2 é a base', () => {
+    /* s3 só tem nível 2 — é a base dele. Em s1 o nível 2 é o segundo
+       degrau. Com o `n` puro os dois empatariam e o id poria 'a' na frente. */
+    t.igual(ordem([
+      ['a', 'x', 'A', 's1', 2, 4],
+      ['a0', 'x', 'A', 's1', 1, 5],
+      ['b', 'x', 'A', 's3', 2, 4],
+    ]), ['a0', 'b', 'a']);
+  });
+
+  t.teste('mesma caixa e degrau: tópico do começo da fila vem antes', () => {
+    t.igual(ordem([
+      ['a', 'x', 'C', null, 1, 4],
+      ['b', 'x', 'A', null, 1, 4],
+      ['c', 'x', 'B', null, 1, 4],
+    ]), ['b', 'c', 'a']);
+  });
+
+  t.teste('posição na fila é FRAÇÃO da fila da matéria', () => {
+    /* x|B está no meio de uma fila de 3 (0.5); y|Q no fim de uma de 2 (1).
+       Pela profundidade bruta os dois valem 1 e o id poria 'a' na frente. */
+    t.igual(ordem([
+      ['a', 'y', 'Q', null, 1, 4],
+      ['b', 'x', 'B', null, 1, 4],
+      ['c', 'x', 'C', null, 1, 4],
+      ['d', 'y', 'P', null, 1, 4],
+    ]), ['d', 'b', 'a', 'c']);
+  });
+
+  t.teste('mesmo tópico: subtópico anterior na fila vem antes', () => {
+    t.igual(ordem([
+      ['a', 'x', 'A', 's2', 1, 4],
+      ['b', 'x', 'A', 's1', 1, 4],
+    ]), ['b', 'a']);
+  });
+
+  t.teste('tudo empatado acima: quem erra mais vem primeiro', () => {
+    t.igual(ordem([
+      ['a', 'x', 'A', 's1', 1, 4, 0],
+      ['b', 'x', 'A', 's1', 1, 4, 3],
+    ]), ['b', 'a']);
   });
 
 };
