@@ -1763,10 +1763,18 @@ function aplicarEventoRemoto(ev, proprios){
    idênticas uma da outra; a única diferença real é o que `aplicar` faz com
    cada linha. `cursor` é {valor, chave} (ver CURSOR_EV/CURSOR_SIM). */
 async function puxarPaginado(tabela, campos, cursor, aplicar){
+  /* FILTRO DE CONTA EXPLÍCITO, nunca só a RLS. A RLS diz o que a conta PODE
+     ler, não o que é DELA: a policy "aprovador lê tudo" (Painel de
+     desempenho) faz o servidor devolver o log de todo mundo para um
+     aprovador, e sem este filtro cada resposta de outra conta entrava no
+     progresso dele como se fosse sua (ver HISTORICO.md). Sem conta, não
+     puxa — falhar fechado. */
+  if(!CONTA_ID) throw new Error("puxar "+tabela+": sem conta");
+  const daConta = "&usuario_id=eq."+encodeURIComponent(CONTA_ID);
   let pagina;
   do{
     const filtro = cursor.valor ? "&criado_em=gt."+encodeURIComponent(cursor.valor) : "";
-    const r = await chamarRest(tabela+"?select="+campos+"&order=criado_em.asc&limit="+TAMANHO_PAGINA+filtro);
+    const r = await chamarRest(tabela+"?select="+campos+"&order=criado_em.asc&limit="+TAMANHO_PAGINA+daConta+filtro);
     if(!r.ok) throw new Error("puxar "+tabela+": o servidor respondeu "+r.status);
     pagina = await r.json();
     pagina.forEach(item=>{ aplicar(item); cursor.valor = item.criado_em; });

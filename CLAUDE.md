@@ -465,6 +465,13 @@ genérica fabricaria um número com cara de autoritativo (regra 11). Tudo aqui
 As regras que o painel não pode quebrar — cada uma existe porque confundir
 duas perguntas parecidas já produziu um número errado (ver `HISTORICO.md`):
 
+- **A policy amplia o que o aprovador LÊ, não o que é DELE.** Toda leitura
+  do progresso pessoal (`puxarPaginado()`: eventos e simulados) filtra por
+  `usuario_id=eq.CONTA_ID` explicitamente — a RLS sozinha devolve o log de
+  todo mundo para um aprovador, e cada resposta alheia entrava no progresso
+  dele como se fosse de outro aparelho. Sem conta, o pull não roda.
+  `testes/sincronizacao.js` reprova quem tirar o filtro.
+
 - **"Revisões atrasadas" filtra por matéria ativa.** `eventos_resposta` é
   *append-only* e nunca esquece matéria abandonada, então sem o filtro um
   cartão que a conta não estuda mais fica atrasado para sempre.

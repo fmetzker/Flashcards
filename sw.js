@@ -3,7 +3,7 @@
    mais questões), troque o número da VERSAO abaixo. É isso que faz o
    aparelho baixar o arquivo novo em vez de continuar servindo o antigo. */
 
-const VERSAO = "v321-ordem-da-revisao";
+const VERSAO = "v322-pull-so-da-conta";
 const CACHE = "prova-enf-" + VERSAO;
 
 /* Cache do BANCO (tudo debaixo de ./banco/) é separado do cache do APP, e

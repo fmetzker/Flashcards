@@ -17,6 +17,21 @@ que o código já diz não vem: some.
 
 ---
 
+## O aprovador importava o progresso de todo mundo (outubro/2026)
+
+O pull pessoal (`puxarPaginado()`, eventos e simulados) nunca filtrou por
+conta: contava com a RLS para receber só as linhas da própria. Em 29/08 o
+Painel de desempenho criou a policy "aprovador lê tudo" — e, a partir dali,
+cada sincronização de um aprovador baixava as respostas de todas as contas e
+as aplicava no próprio estado como se viessem de outro aparelho: caixa,
+vencimento, acertos, contagem do dia, meta, sequência, simulados. Ninguém
+percebeu por mais de um mês; apareceu como "Português 10/10 (+1)" num dia em
+que o aprovador não tinha estudado Português — 11 respostas de outra conta.
+O log do servidor do aprovador ficou limpo (o app só envia o que a conta
+responde), o estrago foi só local. Correção: filtro de conta explícito na
+URL, falhando fechado sem conta. A lição virou regra no `CLAUDE.md`: policy
+diz o que se pode ler, não o que é seu.
+
 ## Ordem da revisão: caixa 1, depois caixa alta, base primeiro (outubro/2026)
 
 Até aqui `prioridade()` ordenava as vencidas num número só, `caixa − erro×0,6
