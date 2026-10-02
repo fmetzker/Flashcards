@@ -1,0 +1,21 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/angulo-central-inscrito-100'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 -10.6 212 236.6" width="300" height="334.9" font-family="Arial, Helvetica, sans-serif">
+<rect x="14" y="-10.6" width="212" height="236.6" fill="#fff"/>
+<circle cx="120" cy="120" r="90" fill="none" stroke="#16232E" stroke-width="2"/>
+<polyline points="120,120 51.1,177.9" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="120,120 188.9,177.9" fill="none" stroke="#16232E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="104.4,31.4 51.1,177.9" fill="none" stroke="#1D5A8C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="104.4,31.4 188.9,177.9" fill="none" stroke="#1D5A8C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 104.7,132.9 A 20 20 0 0 0 135.3,132.9" fill="none" stroke="#16232E" stroke-width="1.6"/>
+<text x="120" y="158.2" font-size="12" fill="#16232E" text-anchor="middle">100°</text>
+<path d="M 95.5,55.8 A 26 26 0 0 0 117.4,53.9" fill="none" stroke="#1D5A8C" stroke-width="1.6"/>
+<text x="107.7" y="73.4" font-size="12" fill="#1D5A8C" text-anchor="middle">x</text>
+<circle cx="120" cy="120" r="2.5" fill="#16232E"/>
+<text x="130" y="114" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">O</text>
+<circle cx="104.4" cy="31.4" r="2.5" fill="#16232E"/>
+<text x="104.4" y="23.4" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">V</text>
+<circle cx="51.1" cy="177.9" r="2.5" fill="#16232E"/>
+<text x="41.1" y="187.9" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">P</text>
+<circle cx="188.9" cy="177.9" r="2.5" fill="#16232E"/>
+<text x="198.9" y="187.9" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">Q</text>
+</svg>

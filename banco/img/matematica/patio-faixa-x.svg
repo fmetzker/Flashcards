@@ -1,0 +1,28 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/patio-faixa-x'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 14 311.4 213.6" width="311.4" height="213.6" font-family="Arial, Helvetica, sans-serif">
+<rect x="14" y="14" width="311.4" height="213.6" fill="#fff"/>
+<polygon points="30,30 270,30 270,180 30,180" fill="#C9D3DC" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="60,60 240,60 240,150 60,150" fill="#fff" stroke="#16232E" stroke-width="1.6" stroke-linejoin="round"/>
+<text x="150" y="110" font-size="12" fill="#16232E" text-anchor="middle">jardim: 450 m²</text>
+<polyline points="30,180 30,200" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="270,180 270,200" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="150,196 34.8,196" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="30,196 36,198.7 36,193.3" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<polyline points="150,196 265.2,196" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="270,196 264,193.3 264,198.7" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<text x="150" y="209.2" font-size="12" fill="#16232E" text-anchor="middle">40 m</text>
+<polyline points="270,180 290,180" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="270,30 290,30" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="286,105 286,175.2" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="286,180 288.7,174 283.3,174" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<polyline points="286,105 286,34.8" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="286,30 283.3,36 288.7,36" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<text x="295" y="109.2" font-size="12" fill="#16232E" text-anchor="middle">25 m</text>
+<polyline points="30,105 30,109" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="60,105 60,109" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="45,105 34.8,105" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="30,105 36,107.7 36,102.3" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<polyline points="45,105 55.2,105" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="60,105 54,102.3 54,107.7" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<text x="45" y="118.2" font-size="12" fill="#16232E" text-anchor="middle">x</text>
+</svg>

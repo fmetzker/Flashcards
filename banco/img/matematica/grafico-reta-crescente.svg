@@ -1,0 +1,47 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/grafico-reta-crescente'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.4 -9.6 234.6 290" width="300" height="370.8" font-family="Arial, Helvetica, sans-serif">
+<rect x="-1.4" y="-9.6" width="234.6" height="290" fill="#fff"/>
+<polyline points="20,254 20,20" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="46,254 46,20" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="72,254 72,20" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="98,254 98,20" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="124,254 124,20" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="150,254 150,20" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="176,254 176,20" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="202,254 202,20" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="20,254 202,254" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="20,228 202,228" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="20,202 202,202" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="20,176 202,176" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="20,150 202,150" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="20,124 202,124" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="20,98 202,98" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="20,72 202,72" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="20,46 202,46" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="20,20 202,20" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="20,176 206.4,176" fill="none" stroke="#16232E" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="212,176 205,172.8 205,179.2" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<polyline points="98,254 98,15.6" fill="none" stroke="#16232E" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="98,10 94.8,17 101.2,17" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<text x="210" y="192" font-size="12" fill="#16232E" text-anchor="start" font-style="italic">x</text>
+<text x="88" y="16" font-size="12" fill="#16232E" text-anchor="start" font-style="italic">y</text>
+<text x="20" y="190" font-size="9" fill="#5A6B7A" text-anchor="middle">-3</text>
+<text x="46" y="190" font-size="9" fill="#5A6B7A" text-anchor="middle">-2</text>
+<text x="72" y="190" font-size="9" fill="#5A6B7A" text-anchor="middle">-1</text>
+<text x="124" y="190" font-size="9" fill="#5A6B7A" text-anchor="middle">1</text>
+<text x="150" y="190" font-size="9" fill="#5A6B7A" text-anchor="middle">2</text>
+<text x="176" y="190" font-size="9" fill="#5A6B7A" text-anchor="middle">3</text>
+<text x="202" y="190" font-size="9" fill="#5A6B7A" text-anchor="middle">4</text>
+<text x="93" y="257" font-size="9" fill="#5A6B7A" text-anchor="end">-3</text>
+<text x="93" y="231" font-size="9" fill="#5A6B7A" text-anchor="end">-2</text>
+<text x="93" y="205" font-size="9" fill="#5A6B7A" text-anchor="end">-1</text>
+<text x="93" y="153" font-size="9" fill="#5A6B7A" text-anchor="end">1</text>
+<text x="93" y="127" font-size="9" fill="#5A6B7A" text-anchor="end">2</text>
+<text x="93" y="101" font-size="9" fill="#5A6B7A" text-anchor="end">3</text>
+<text x="93" y="75" font-size="9" fill="#5A6B7A" text-anchor="end">4</text>
+<text x="93" y="49" font-size="9" fill="#5A6B7A" text-anchor="end">5</text>
+<text x="93" y="23" font-size="9" fill="#5A6B7A" text-anchor="end">6</text>
+<polyline points="27.8,264.4 29.1,261.8 30.4,259.2 31.7,256.6 33,254 34.3,251.4 35.6,248.8 36.9,246.2 38.2,243.6 39.5,241 40.8,238.4 42.1,235.8 43.4,233.2 44.7,230.6 46,228 47.3,225.4 48.6,222.8 49.9,220.2 51.2,217.6 52.5,215 53.8,212.4 55.1,209.8 56.4,207.2 57.7,204.6 59,202 60.3,199.4 61.6,196.8 62.9,194.2 64.2,191.6 65.5,189 66.8,186.4 68.1,183.8 69.4,181.2 70.7,178.6 72,176 73.3,173.4 74.6,170.8 75.9,168.2 77.2,165.6 78.5,163 79.8,160.4 81.1,157.8 82.4,155.2 83.7,152.6 85,150 86.3,147.4 87.6,144.8 88.9,142.2 90.2,139.6 91.5,137 92.8,134.4 94.1,131.8 95.4,129.2 96.7,126.6 98,124 99.3,121.4 100.6,118.8 101.9,116.2 103.2,113.6 104.5,111 105.8,108.4 107.1,105.8 108.4,103.2 109.7,100.6 111,98 112.3,95.4 113.6,92.8 114.9,90.2 116.2,87.6 117.5,85 118.8,82.4 120.1,79.8 121.4,77.2 122.7,74.6 124,72 125.3,69.4 126.6,66.8 127.9,64.2 129.2,61.6 130.5,59 131.8,56.4 133.1,53.8 134.4,51.2 135.7,48.6 137,46 138.3,43.4 139.6,40.8 140.9,38.2 142.2,35.6 143.5,33 144.8,30.4 146.1,27.8 147.4,25.2 148.7,22.6 150,20 151.3,17.4 152.6,14.8 153.9,12.2 155.2,9.6 156.5,7" fill="none" stroke="#1D5A8C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="72" cy="176" r="3.5" fill="#16232E"/>
+<circle cx="98" cy="124" r="3.5" fill="#16232E"/>
+</svg>

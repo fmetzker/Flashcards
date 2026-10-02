@@ -1,0 +1,16 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/mastro-estai-abc'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="4 -10.4 232 245" width="300" height="316.8" font-family="Arial, Helvetica, sans-serif">
+<rect x="4" y="-10.4" width="232" height="245" fill="#fff"/>
+<polyline points="20,200 220,200" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="60,200 60,20" fill="none" stroke="#16232E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="195,200 60,20" fill="none" stroke="#1D5A8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="60,189 71,189 71,200" fill="none" stroke="#16232E" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="76" y="114.2" font-size="12" fill="#16232E" text-anchor="middle">20 m</text>
+<text x="127.5" y="216.2" font-size="12" fill="#16232E" text-anchor="middle">15 m</text>
+<circle cx="195" cy="200" r="3" fill="#16232E"/>
+<text x="203" y="216" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">A</text>
+<circle cx="60" cy="200" r="3" fill="#16232E"/>
+<text x="54" y="216" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">B</text>
+<circle cx="60" cy="20" r="3" fill="#16232E"/>
+<text x="50" y="16" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">C</text>
+</svg>

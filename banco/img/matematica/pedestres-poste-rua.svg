@@ -1,0 +1,27 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/pedestres-poste-rua'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 3 312 242.6" width="312" height="242.6" font-family="Arial, Helvetica, sans-serif">
+<rect x="-6" y="3" width="312" height="242.6" fill="#fff"/>
+<polyline points="10,180 290,180" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="10,37.4 290,37.4" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="40,180 169.6,37.4" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="256,180 169.6,37.4" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="169.6,37.4 169.6,180" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,4"/>
+<path d="M 62,180 A 22 22 0 0 0 54.8,163.7" fill="none" stroke="#16232E" stroke-width="1.6"/>
+<text x="69.3" y="171.3" font-size="12" fill="#16232E" text-anchor="middle">α</text>
+<path d="M 244.6,161.2 A 22 22 0 0 0 234,180" fill="none" stroke="#16232E" stroke-width="1.6"/>
+<text x="228.1" y="168.5" font-size="12" fill="#16232E" text-anchor="middle">β</text>
+<circle cx="40" cy="180" r="3" fill="#16232E"/>
+<text x="40" y="198" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">A</text>
+<circle cx="256" cy="180" r="3" fill="#16232E"/>
+<text x="256" y="198" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">B</text>
+<circle cx="169.6" cy="37.4" r="3" fill="#16232E"/>
+<text x="169.6" y="29.4" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">P</text>
+<polyline points="40,180 40,218" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="256,180 256,218" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="148,214 44.8,214" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="40,214 46,216.7 46,211.3" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<polyline points="148,214 251.2,214" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="256,214 250,211.3 250,216.7" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<text x="148" y="227.2" font-size="12" fill="#16232E" text-anchor="middle">12 m</text>
+<text x="175.6" y="108.7" font-size="10" fill="#16232E" text-anchor="start" font-style="italic">largura</text>
+</svg>

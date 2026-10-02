@@ -1,0 +1,9 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/planificacao-prisma-triangular'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 -13 212 225.9" width="300" height="319.7" font-family="Arial, Helvetica, sans-serif">
+<rect x="14" y="-13" width="212" height="225.9" fill="#fff"/>
+<polygon points="30,55 90,55 90,145 30,145" fill="#fff" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="90,55 150,55 150,145 90,145" fill="#E3ECF5" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="150,55 210,55 210,145 150,145" fill="#fff" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="90,55 150,55 120,3" fill="none" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="90,145 150,145 120,197" fill="none" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+</svg>

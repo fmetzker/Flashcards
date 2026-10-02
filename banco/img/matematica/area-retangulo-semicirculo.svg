@@ -1,0 +1,23 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/area-retangulo-semicirculo'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-19.8 14 315.8 161.6" width="315.8" height="161.6" font-family="Arial, Helvetica, sans-serif">
+<rect x="-19.8" y="14" width="315.8" height="161.6" fill="#fff"/>
+<polygon points="30,30 230,30 230,130 30,130" fill="#E3ECF5" stroke="#16232E" stroke-width="0" stroke-linejoin="round"/>
+<path d="M 230,30 A 50 50 0 0 1 230,130 Z" fill="#E3ECF5" stroke="none"/>
+<polyline points="230,30 30,30 30,130 230,130" fill="none" stroke="#16232E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 230,30 A 50 50 0 0 1 230,130" fill="none" stroke="#16232E" stroke-width="2.2"/>
+<polyline points="230,30 230,130" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4,4"/>
+<polyline points="30,130 30,148" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="230,130 230,148" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="130,144 34.8,144" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="30,144 36,146.7 36,141.3" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<polyline points="130,144 225.2,144" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="230,144 224,141.3 224,146.7" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<text x="130" y="157.2" font-size="12" fill="#16232E" text-anchor="middle">8 m</text>
+<polyline points="30,130 20,130" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="30,30 20,30" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="16,80 16,125.2" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="16,130 18.7,124 13.3,124" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<polyline points="16,80 16,34.8" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="16,30 13.3,36 18.7,36" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<text x="7" y="84.2" font-size="12" fill="#16232E" text-anchor="middle">4 m</text>
+</svg>

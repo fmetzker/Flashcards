@@ -1,0 +1,9 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/planificacao-piramide-quadrada'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="12 12 216 216" width="300" height="300" font-family="Arial, Helvetica, sans-serif">
+<rect x="12" y="12" width="216" height="216" fill="#fff"/>
+<polygon points="90,90 150,90 150,150 90,150" fill="#E3ECF5" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="90,90 150,90 120,28" fill="#fff" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="150,90 150,150 212,120" fill="#fff" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="150,150 90,150 120,212" fill="#fff" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="90,150 90,90 28,120" fill="#fff" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+</svg>

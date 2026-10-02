@@ -1,0 +1,12 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/cordas-6-4-8-y'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 14 212 212" width="300" height="300" font-family="Arial, Helvetica, sans-serif">
+<rect x="14" y="14" width="212" height="212" fill="#fff"/>
+<circle cx="120" cy="120" r="90" fill="none" stroke="#16232E" stroke-width="2"/>
+<polyline points="146,33.8 189.3,177.4" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="169.5" y="78.3" font-size="13" fill="#16232E" text-anchor="middle">6</text>
+<text x="170.1" y="156.4" font-size="13" fill="#16232E" text-anchor="middle">4</text>
+<polyline points="85.4,203.1 204.4,88.9" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="121" y="158.1" font-size="13" fill="#16232E" text-anchor="middle">8</text>
+<text x="195.8" y="116.9" font-size="13" fill="#16232E" text-anchor="middle" font-style="italic">y</text>
+<circle cx="172" cy="120" r="3" fill="#16232E"/>
+</svg>

@@ -1,0 +1,18 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/triangulo-angulo-externo'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -68.7 298 270.7" width="300" height="272.5" font-family="Arial, Helvetica, sans-serif">
+<rect x="-12" y="-68.7" width="298" height="270.7" fill="#fff"/>
+<polygon points="30,160 190,160 119.9,-32.7" fill="none" stroke="#16232E" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="190,160 270,160" fill="none" stroke="#16232E" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6,4"/>
+<path d="M 56,160 A 26 26 0 0 0 41,136.4" fill="none" stroke="#16232E" stroke-width="1.6"/>
+<text x="63.7" y="142.7" font-size="12" fill="#16232E" text-anchor="middle">65°</text>
+<path d="M 212,160 A 22 22 0 0 0 182.5,139.3" fill="none" stroke="#16232E" stroke-width="1.6"/>
+<text x="211.8" y="133.1" font-size="12" fill="#16232E" text-anchor="middle">110°</text>
+<path d="M 111.4,-14.6 A 20 20 0 0 0 126.7,-13.9" fill="none" stroke="#16232E" stroke-width="1.6"/>
+<text x="118.5" y="3.8" font-size="13" fill="#16232E" text-anchor="middle">?</text>
+<circle cx="30" cy="160" r="0" fill="#16232E"/>
+<text x="20" y="164" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">A</text>
+<circle cx="190" cy="160" r="0" fill="#16232E"/>
+<text x="190" y="178" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">B</text>
+<circle cx="119.9" cy="-32.7" r="0" fill="#16232E"/>
+<text x="119.9" y="-40.7" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">C</text>
+</svg>

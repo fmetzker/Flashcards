@@ -1,0 +1,9 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/circulo-no-quadrado'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 14 192 192" width="300" height="300" font-family="Arial, Helvetica, sans-serif">
+<rect x="14" y="14" width="192" height="192" fill="#fff"/>
+<polygon points="30,30 190,30 190,190 30,190" fill="none" stroke="#16232E" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="110" cy="110" r="80" fill="none" stroke="#16232E" stroke-width="2"/>
+<circle cx="110" cy="110" r="3" fill="#16232E"/>
+<polyline points="110,110 179.3,70" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="150.1" y="103.7" font-size="12" fill="#16232E" text-anchor="middle">8 cm</text>
+</svg>

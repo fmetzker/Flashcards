@@ -1,0 +1,17 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/cabo-entre-predios'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-32.4 9 298.4 236.6" width="300" height="237.9" font-family="Arial, Helvetica, sans-serif">
+<rect x="-32.4" y="9" width="298.4" height="236.6" fill="#fff"/>
+<polyline points="10,200 250,200" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="12,200 40,200 40,25 12,25" fill="#E3ECF5" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="180,200 208,200 208,130 180,130" fill="#E3ECF5" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+<polyline points="40,25 180,130" fill="none" stroke="#1D5A8C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="-2" y="116.7" font-size="12" fill="#16232E" text-anchor="middle">25 m</text>
+<text x="194" y="169.2" font-size="12" fill="#16232E" text-anchor="middle">10 m</text>
+<polyline points="40,200 40,218" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="180,200 180,218" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="110,214 44.8,214" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="40,214 46,216.7 46,211.3" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<polyline points="110,214 175.2,214" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="180,214 174,211.3 174,216.7" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<text x="110" y="227.2" font-size="12" fill="#16232E" text-anchor="middle">20 m</text>
+</svg>

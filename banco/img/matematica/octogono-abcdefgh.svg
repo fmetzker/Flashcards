@@ -1,0 +1,20 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/octogono-abcdefgh'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="1.4 -0.1 217.2 222.4" width="300" height="307.2" font-family="Arial, Helvetica, sans-serif">
+<rect x="1.4" y="-0.1" width="217.2" height="222.4" fill="#fff"/>
+<polyline points="79.4,36.1 140.6,36.1" fill="none" stroke="#16232E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="73.3" y="26.3" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">A</text>
+<polyline points="140.6,36.1 183.9,79.4" fill="none" stroke="#16232E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="146.7" y="26.3" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">B</text>
+<polyline points="183.9,79.4 183.9,140.6" fill="none" stroke="#16232E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="198.7" y="78.3" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">C</text>
+<polyline points="183.9,140.6 140.6,183.9" fill="none" stroke="#16232E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="198.7" y="151.7" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">D</text>
+<polyline points="140.6,183.9 79.4,183.9" fill="none" stroke="#16232E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="146.7" y="203.7" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">E</text>
+<polyline points="79.4,183.9 36.1,140.6" fill="none" stroke="#16232E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="73.3" y="203.7" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">F</text>
+<polyline points="36.1,140.6 36.1,79.4" fill="none" stroke="#16232E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="21.3" y="151.7" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">G</text>
+<polyline points="36.1,79.4 79.4,36.1" fill="none" stroke="#16232E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="21.3" y="78.3" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">H</text>
+</svg>

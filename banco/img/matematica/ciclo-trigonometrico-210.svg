@@ -1,0 +1,19 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/ciclo-trigonometrico-210'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -6 245 247" width="300" height="302.4" font-family="Arial, Helvetica, sans-serif">
+<rect x="-1" y="-6" width="245" height="247" fill="#fff"/>
+<polyline points="15,120 222.4,120" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="228,120 221,116.8 221,123.2" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<polyline points="120,225 120,17.6" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="120,12 116.8,19 123.2,19" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<text x="226" y="136" font-size="10" fill="#16232E" text-anchor="end" font-style="italic">cos</text>
+<text x="126" y="18" font-size="10" fill="#16232E" text-anchor="start" font-style="italic">sen</text>
+<circle cx="120" cy="120" r="85" fill="none" stroke="#16232E" stroke-width="2"/>
+<text x="155.4" y="89.6" font-size="12" fill="#5A6B7A" text-anchor="middle">I</text>
+<text x="84.6" y="89.6" font-size="12" fill="#5A6B7A" text-anchor="middle">II</text>
+<text x="84.6" y="160.4" font-size="12" fill="#5A6B7A" text-anchor="middle">III</text>
+<text x="155.4" y="160.4" font-size="12" fill="#5A6B7A" text-anchor="middle">IV</text>
+<polyline points="120,120 46.4,162.5" fill="none" stroke="#1D5A8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 142,120 A 22 22 0 1 0 100.9,131" fill="none" stroke="#1D5A8C" stroke-width="1.8"/>
+<circle cx="46.4" cy="162.5" r="3" fill="#16232E"/>
+<text x="36.4" y="176.5" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">P</text>
+</svg>

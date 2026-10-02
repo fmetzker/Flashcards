@@ -1,0 +1,17 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/prisma-hexagonal'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="24 23.2 192 183.6" width="300" height="286.8" font-family="Arial, Helvetica, sans-serif">
+<rect x="24" y="23.2" width="192" height="183.6" fill="#fff"/>
+<polygon points="180,60 145,80.8 75,80.8 40,60 75,39.2 145,39.2" fill="#E3ECF5" stroke="#16232E" stroke-width="2" stroke-linejoin="round"/>
+<polyline points="200,170 165,190.8" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="180,60 200,170" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="165,190.8 95,190.8" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="145,80.8 165,190.8" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="95,190.8 60,170" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="75,80.8 95,190.8" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="60,170 95,149.2" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,4"/>
+<polyline points="40,60 60,170" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="95,149.2 165,149.2" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,4"/>
+<polyline points="75,39.2 95,149.2" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,4"/>
+<polyline points="165,149.2 200,170" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,4"/>
+<polyline points="145,39.2 165,149.2" fill="none" stroke="#16232E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,4"/>
+</svg>

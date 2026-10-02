@@ -1,0 +1,28 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/duas-escadas-mesmo-angulo'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 4 272 246.7" width="300" height="272.1" font-family="Arial, Helvetica, sans-serif">
+<rect x="-6" y="4" width="272" height="246.7" fill="#fff"/>
+<polyline points="10,180 250,180" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="220,180 220,20" fill="none" stroke="#16232E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="130,180 220,24.1" fill="none" stroke="#16232E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 144,180 A 14 14 0 0 0 137,167.9" fill="none" stroke="#16232E" stroke-width="1.6"/>
+<text x="149.1" y="172.8" font-size="11" fill="#16232E" text-anchor="middle">α</text>
+<text x="164.6" y="100.3" font-size="12" fill="#16232E" text-anchor="middle">3 m</text>
+<polyline points="160,180 220,76.1" fill="none" stroke="#1D5A8C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 174,180 A 14 14 0 0 0 167,167.9" fill="none" stroke="#16232E" stroke-width="1.6"/>
+<text x="179.1" y="172.8" font-size="11" fill="#16232E" text-anchor="middle">α</text>
+<text x="179.6" y="126.2" font-size="12" fill="#16232E" text-anchor="middle">2 m</text>
+<polyline points="160,180 160,198" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="220,180 220,198" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="190,194 164.8,194" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="160,194 166,196.7 166,191.3" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<polyline points="190,194 215.2,194" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="220,194 214,191.3 214,196.7" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<text x="190" y="207.2" font-size="12" fill="#16232E" text-anchor="middle">1 m</text>
+<polyline points="130,180 130,222" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="220,180 220,222" fill="none" stroke="#16232E" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="175,218 134.8,218" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="130,218 136,220.7 136,215.3" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<polyline points="175,218 215.2,218" fill="none" stroke="#16232E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="220,218 214,215.3 214,220.7" fill="#16232E" stroke="#16232E" stroke-width="1"/>
+<text x="175" y="231.9" font-size="14" fill="#16232E" text-anchor="middle">?</text>
+</svg>

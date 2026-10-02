@@ -1,0 +1,20 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/tales-triangulo-de-paralelo-bc'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0.1 -14.4 259.8 239" width="300" height="276" font-family="Arial, Helvetica, sans-serif">
+<rect x="0.1" y="-14.4" width="259.8" height="239" fill="#fff"/>
+<polygon points="130,20 30,200 230,200" fill="none" stroke="#16232E" stroke-width="2.2" stroke-linejoin="round"/>
+<polyline points="90,92 170,92" fill="none" stroke="#1D5A8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="99.5" y="54.4" font-size="12" fill="#16232E" text-anchor="middle">4</text>
+<text x="49.5" y="144.4" font-size="12" fill="#16232E" text-anchor="middle">6</text>
+<text x="160.5" y="54.4" font-size="12" fill="#16232E" text-anchor="middle">6</text>
+<text x="210.5" y="144.7" font-size="13" fill="#16232E" text-anchor="middle" font-style="italic">x</text>
+<circle cx="130" cy="20" r="2.5" fill="#16232E"/>
+<text x="130" y="12" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">A</text>
+<circle cx="30" cy="200" r="2.5" fill="#16232E"/>
+<text x="20" y="206" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">B</text>
+<circle cx="230" cy="200" r="2.5" fill="#16232E"/>
+<text x="240" y="206" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">C</text>
+<circle cx="90" cy="92" r="2.5" fill="#16232E"/>
+<text x="78" y="94" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">D</text>
+<circle cx="170" cy="92" r="2.5" fill="#16232E"/>
+<text x="182" y="94" font-size="13" fill="#16232E" text-anchor="middle" font-weight="bold">E</text>
+</svg>

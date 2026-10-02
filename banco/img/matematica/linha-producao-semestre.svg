@@ -1,0 +1,32 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/linha-producao-semestre'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 1.2 312 223" width="312" height="223" font-family="Arial, Helvetica, sans-serif">
+<rect x="14" y="1.2" width="312" height="223" fill="#fff"/>
+<polyline points="50,32 50,190" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="50,190 310,190" fill="none" stroke="#16232E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="46,190 310,190" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="194" font-size="10" fill="#16232E" text-anchor="end">15</text>
+<polyline points="46,160 310,160" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="164" font-size="10" fill="#16232E" text-anchor="end">20</text>
+<polyline points="46,130 310,130" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="134" font-size="10" fill="#16232E" text-anchor="end">25</text>
+<polyline points="46,100 310,100" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="104" font-size="10" fill="#16232E" text-anchor="end">30</text>
+<polyline points="46,70 310,70" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="74" font-size="10" fill="#16232E" text-anchor="end">35</text>
+<polyline points="46,40 310,40" fill="none" stroke="#DDE4EA" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="42" y="44" font-size="10" fill="#16232E" text-anchor="end">40</text>
+<text x="40" y="26" font-size="11" fill="#16232E" text-anchor="start">mil barris</text>
+<text x="75" y="206" font-size="11" fill="#16232E" text-anchor="middle">jan</text>
+<text x="119" y="206" font-size="11" fill="#16232E" text-anchor="middle">fev</text>
+<text x="163" y="206" font-size="11" fill="#16232E" text-anchor="middle">mar</text>
+<text x="207" y="206" font-size="11" fill="#16232E" text-anchor="middle">abr</text>
+<text x="251" y="206" font-size="11" fill="#16232E" text-anchor="middle">mai</text>
+<text x="295" y="206" font-size="11" fill="#16232E" text-anchor="middle">jun</text>
+<polyline points="75,100 119,76 163,124 207,94 251,82 295,148" fill="none" stroke="#1D5A8C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="75" cy="100" r="3.5" fill="#16232E"/>
+<circle cx="119" cy="76" r="3.5" fill="#16232E"/>
+<circle cx="163" cy="124" r="3.5" fill="#16232E"/>
+<circle cx="207" cy="94" r="3.5" fill="#16232E"/>
+<circle cx="251" cy="82" r="3.5" fill="#16232E"/>
+<circle cx="295" cy="148" r="3.5" fill="#16232E"/>
+</svg>

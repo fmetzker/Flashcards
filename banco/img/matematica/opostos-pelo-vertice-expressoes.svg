@@ -1,0 +1,10 @@
+<!-- gerado por desenhar-figuras.py a partir de circuito 'simbolo:matematica/opostos-pelo-vertice-expressoes'; não editar à mão -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="23.9 -22.3 212.2 244.5" width="300" height="345.6" font-family="Arial, Helvetica, sans-serif">
+<rect x="23.9" y="-22.3" width="212.2" height="244.5" fill="#fff"/>
+<polyline points="220.1,36.9 39.9,163.1" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="101.5,-6.3 158.5,206.3" fill="none" stroke="#16232E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 149.7,86.2 A 24 24 0 0 0 123.8,76.8" fill="none" stroke="#16232E" stroke-width="1.6"/>
+<text x="146.4" y="59.1" font-size="12" fill="#16232E" text-anchor="middle">5x+20°</text>
+<path d="M 110.3,113.8 A 24 24 0 0 0 136.2,123.2" fill="none" stroke="#16232E" stroke-width="1.6"/>
+<text x="113.6" y="149.3" font-size="12" fill="#16232E" text-anchor="middle">2x+50°</text>
+</svg>
