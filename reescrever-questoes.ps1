@@ -38,44 +38,158 @@ function Id-Questao([string]$enunciado) {
 # preservado automaticamente — só é sobrescrito se a entrada do lote trouxer
 # 'eo'.
 #
-# Este lote aplica o PADRAO-DOS-CARTOES.md §1.9.5 a Máquinas Elétricas:
-# enunciados que diziam "o Franchi" ou "a apostila" passam a perguntar pelo
-# fato, e a fonte continua no 'f'. Vêm junto as notas por alternativa
-# genéricas ou repetidas (§1.9.3).
+# Este lote aplica o PADRAO-DOS-CARTOES.md §1.9.5 a Comandos Elétricos:
+# enunciados que diziam "a apostila" ou "o Franchi" passam a perguntar pelo
+# fato ou pela prática, e o caso ilustrativo vira a própria situação ("Num
+# torno...", "Numa siderúrgica..."). A fonte continua no 'f'. Vêm junto as
+# notas por alternativa genéricas ou repetidas (§1.9.3).
 
 $REESCRITAS = @{
-  '2f3e643ac7' = @{
-    q = 'No teste de polaridade, com as bobinas 1 e 2 em série recebendo 220 V e uma lâmpada na bobina 3, a lâmpada acendeu. O que isso indica?'
+  '5d5e3b9826' = @{
+    q = 'Na partida direta, o que identificam S0 e S1?'
+    e = 'A letra S identifica os dispositivos de comando manual. S0 é o botão desliga (vermelho, NF 11-12) e S1 o botão liga (verde, NA 13-14).'
   }
-  '7a0345e55c' = @{
-    q = 'Por que, em algumas máquinas, se desacopla o motor antes de testar o sentido de giro?'
-    eo = @('Correta: o risco é danificar o equipamento.', 'Errada: o motor parte com carga normalmente.', 'Errada: não é medição de rotação.', 'Errada: o relé térmico não sofre com o sentido de giro.', 'Errada: a razão é a segurança do equipamento.')
+  '1d047558d5' = @{
+    q = 'Nos diagramas de comando, que dispositivos são identificados pela letra Q (Q11, Q12)?'
+    eo = @('Correta: Q = disjuntor.', 'Errada: contatores são K.', 'Errada: botões são S.', 'Errada: a lâmpada é E1 (em outra convenção, H).', 'Errada: fusíveis são F.')
   }
-  '76169d574c' = @{
-    q = 'Pela regra prática, o que acontece com a vida útil do isolamento a cada 10 °C acima do limite da classe?'
-    eo = @('Correta: metade a cada 10 °C.', 'Errada: a perda é bem maior que 10%.', 'Errada: a degradação é gradual e começa antes da queima.', 'Errada: o calor degrada, não reforça.', 'Errada: a degradação é gradual; a vida útil não zera de uma vez.')
+  'd4ec7cd020' = @{
+    q = 'Se a corrente nominal do fusível deve ser pelo menos 20% maior que a do motor, qual é o mínimo para um motor de 20 A?'
   }
-  'd90c9a7dc8' = @{
-    q = 'Em que situação se desaconselha o uso de motofreio?'
-    eo = @('Correta: contaminação do freio.', 'Errada: ponte rolante e elevador são aplicações típicas do motofreio.', 'Errada: parada precisa é justamente o que o motofreio oferece.', 'Errada: correia transportadora é outra aplicação típica.', 'Errada: a potência não é o critério citado.')
+  'e52187c070' = @{
+    q = 'Com qual valor se ajusta a corrente do relé térmico?'
   }
-  '017ea5edf7' = @{
-    q = 'Qual é o fator de potência mínimo exigido pela ANEEL?'
+  'e91e96b4f0' = @{
+    q = 'Em que tipo de máquina se aceita o relé térmico em rearme automático?'
   }
-  'dfa4b29133' = @{
-    q = 'Qual é a localização de capacitores mais eficaz tecnicamente?'
+  'fff794fd7a' = @{
+    q = 'Como se liga um disjuntor-motor tripolar a um motor monofásico?'
+    eo = @('Correta: todos os polos no caminho da corrente.', 'Errada: com um polo só, a proteção térmica fica desequilibrada.', 'Errada: em paralelo, cada polo sentiria só parte da corrente.', 'Errada: o disjuntor-motor tripolar tem ligação própria para monofásico e para bifásico.', 'Errada: nenhum polo vai ao terra.')
   }
-  '4b24d76a42' = @{
-    q = 'Em que tipo de motor se desaconselha instalar capacitor de correção individual?'
-    eo = @('Correta: reversão.', 'Errada: bomba em regime contínuo, sem reversão, é caso adequado.', 'Errada: ventilador sem reversão nem partidas frequentes é caso adequado.', 'Errada: o problema seria o motor de MAIS de uma velocidade.', 'Errada: o problema é o excesso de partidas, não poucas.')
+  '0b3461e5f4' = @{
+    q = 'Em que situação se recomenda partir um motor só com disjuntor-motor, sem contator?'
   }
-  '4e96d00ee7' = @{
-    q = 'Quantos watts vale 1 cv?'
-    eo = @('Correta: 736.', 'Errada: 746 é o hp.', 'Errada: é o kW.', 'Errada: 860 é o fator de kW para kcal/h, outra conversão.', 'Errada: 550 é o hp em ft·lbf/s, não em watts.')
+  'f5636b967c' = @{
+    q = 'Qual é a diferença entre um seccionador e um interruptor?'
   }
-  'a7a3a6761a' = @{
-    q = 'Num caso real, a chave 110/220 V de um transformador foi ligada invertida e a saída deu o dobro. Como o ohmímetro teria mostrado o erro antes?'
-    eo = @('Correta: leitura invertida.', 'Errada: as posições dão valores diferentes.', 'Errada: infinito seria bobina aberta.', 'Errada: zero seria curto.', 'Errada: as duas posições dão resistências diferentes, e a inversão aparece.')
+  'd2d7d47666' = @{
+    q = 'Um contator vibra e faz ruído durante o funcionamento. Qual é uma causa típica?'
+  }
+  '55583a8b7f' = @{
+    q = 'Numa bomba, uma chave-boia substituiu o botão de ligar. Como ela comanda a bobina do contator?'
+  }
+  '7749dfce4b' = @{
+    q = 'Para que tipo de máquina se indica a partida direta?'
+  }
+  'f6ca72689b' = @{
+    q = 'A partir de que potência a NBR 5410 recomenda consultar a concessionária antes de partir um motor direto na rede pública de baixa tensão?'
+  }
+  '907d28ea1a' = @{
+    q = 'Como se testa se um relé térmico está "cansado"?'
+  }
+  '0cfb3a1e94' = @{
+    q = 'Como se testa se um relé térmico está "viciado"?'
+  }
+  '53941a0db0' = @{
+    q = 'Na partida direta, ao pressionar S1 o disjuntor do comando desarma na hora. Que falha causa esse sintoma?'
+  }
+  'fd5bf26fa6' = @{
+    q = 'Na partida direta, a lâmpada E1 não apaga nunca, nem com o motor desligado. Que falha causa isso?'
+  }
+  'd29e0b2d84' = @{
+    q = 'Um contator trepida (vibra) no conjunto magnético durante o funcionamento. Quais são as consequências?'
+  }
+  '04641ff197' = @{
+    q = 'Em que condição se pode medir resistência com ohmímetro ou megômetro num painel?'
+  }
+  '4a948ba563' = @{
+    q = 'Como é formado o sistema de partida direta com reversão?'
+  }
+  'f0ec5eae60' = @{
+    q = 'Na reversão da figura, o disjuntor-motor Q1 atua por sobrecarga. O que acontece no comando?'
+  }
+  'aafdb2dde8' = @{
+    q = 'Quais são os tipos de intertravamento usados em comandos de reversão?'
+    eo = @('Correta: os três tipos.', 'Errada: temporizador e fim de curso não impedem os dois contatores de fecharem juntos.', 'Errada: são proteções, não intertravamentos.', 'Errada: são sensores.', 'Errada: há também os elétricos.')
+  }
+  '343d313886' = @{
+    q = 'No comando em 24 VCC, as bobinas, lâmpadas e sensores vão sendo ligados e logo em seguida começam a desligar. Que falha da fonte causa isso?'
+  }
+  'ebfa5a929d' = @{
+    q = 'Numa retificadora, o sensor S10 foi trocado e queimou de novo, abrindo o fusível F2. A bobina de K10 mediu quase 0 Ω. O que o eletricista verificou antes de trocar a bobina?'
+  }
+  '058ddfb2c1' = @{
+    q = 'Que desvantagem a partida estrela-triângulo tem no instante da comutação?'
+  }
+  '207926675b' = @{
+    q = 'Quais são vantagens da chave estrela-triângulo?'
+  }
+  '67ca8de1bb' = @{
+    q = 'Como se verifica se o condutor terra está interrompido numa alimentação trifásica?'
+  }
+  '0cdbc6fafc' = @{
+    q = 'Um eletricista simplificou o comando de uma estrela-triângulo com um temporizador comum. Dias depois, K2 e K3 colaram e os fusíveis queimaram. Qual era a causa?'
+    e = 'O temporizador próprio para Y-Δ tem um retardo (entre 30 e 100 ms, tipicamente cerca de 50 ms) para K2 abrir e extinguir o arco antes de K3 fechar. Sem ele, os dois se sobrepunham: curto, contatos colados e fusíveis queimados. Outra solução é o intertravamento mecânico.'
+  }
+  'e50a0cf6ba' = @{
+    q = 'Qual é a sequência de funcionamento da chave compensadora?'
+  }
+  '05b7fe99f6' = @{
+    q = 'Com um tap de relação a = 0,5 na chave compensadora, a quanto fica reduzido o conjugado de partida?'
+  }
+  '2bdd6fe564' = @{
+    q = 'Um vigilante tentou partir várias vezes um compressor com chave compensadora, que não ganhava velocidade, até sentir cheiro de queimado. O que se danificou, e por quê?'
+    eo = @('Correta: partidas seguidas aquecem o autotransformador.', 'Errada: rearmar o relé não o danifica; quem esquentou foi o autotransformador.', 'Errada: os contatores não foram o dano; o autotransformador precisou ser rebobinado.', 'Errada: não houve falta de fase.', 'Errada: a causa foi a carga — as válvulas de alívio estavam fechadas.')
+  }
+  'f64ca31a73' = @{
+    q = 'Qual é a menor resistência típica de um sensor PTC em bom estado, e o que indica um valor próximo de zero?'
+  }
+  'fdb2b62489' = @{
+    q = 'Num torno, o motor Dahlander roncava e não girava só na velocidade alta. O que foi medido e encontrado?'
+  }
+  'b83ce7bf2c' = @{
+    q = 'Qual é o sintoma característico de falta de fase num motor Dahlander?'
+  }
+  'ebf8474c58' = @{
+    q = 'Como se testa se o contato de uma chave comutadora de velocidades está danificado?'
+    eo = @('Correta: continuidade posição a posição.', 'Errada: corrente em vazio testa o motor, não a chave.', 'Errada: medir com o motor ligado é outro teste e é perigoso.', 'Errada: megômetro testa isolação.', 'Errada: bússola não diz nada sobre o contato da chave.')
+  }
+  'd85e45c3c4' = @{
+    q = 'Qual é a corrente de partida típica, a plena carga, de um motor com aceleração rotórica?'
+  }
+  '2a128b5fcb' = @{
+    q = 'Em que equipamento é típico o uso do motor de anéis com aceleração rotórica?'
+  }
+  'a763de32fe' = @{
+    q = 'Na partida rotórica automática, como a velocidade aumenta de um estágio para o outro?'
+  }
+  'a37fd1eb0b' = @{
+    q = 'Uma ponte rolante com motor de anéis se movia só devagar. Medindo entre os terminais L e M do rotor, a resistência estava alta. O que foi encontrado?'
+  }
+  'd461c1c326' = @{
+    q = 'Por que um motor de anéis parado não está necessariamente desenergizado?'
+    eo = @('Correta: rotor aberto, estator energizado.', 'Errada: escovas não guardam carga.', 'Errada: resistores não acumulam carga.', 'Errada: sem movimento o rotor não gera tensão.', 'Errada: a ponte é alimentada pela rede; o perigo é o estator energizado.')
+  }
+  'bc08faa4da' = @{
+    q = 'Antes de subir numa ponte rolante para manutenção, o que se deve fazer?'
+  }
+  '8bba56e42f' = @{
+    q = 'Em que aplicação o sensor óptico de barreira é usado como proteção do operador?'
+  }
+  '6869ef4abe' = @{
+    q = 'Numa siderúrgica, um sensor indutivo falhava porque o batente tinha folga mecânica. Qual foi a solução?'
+    eo = @('Correta: óptico a distância maior.', 'Errada: o capacitivo também tem distância pequena.', 'Errada: a tensão não muda a distância sensora.', 'Errada: mascarar a falha não resolve.', 'Errada: o reed switch também exige o atuador perto; a folga continuaria atrapalhando.')
+  }
+  '688ffd8d57' = @{
+    q = 'Por que se recomendam motores com isolação reforçada quando alimentados por inversor?'
+    eo = @('Correta: picos de chaveamento.', 'Errada: o inversor não eleva a tensão da rede.', 'Errada: girar acima da nominal afeta o conjugado, não a isolação.', 'Errada: o inversor tem proteções.', 'Errada: a partida é suave.')
+  }
+  'feff088d0f' = @{
+    q = 'Que vantagem tem a placa de montagem com acabamento metalizado (galvanizada ou zincada)?'
+  }
+  '3c06c0e08f' = @{
+    q = 'Num painel, um temporizador de retardo na desenergização foi instalado no lugar de um de retardo na energização, e a máquina quebrou a trava no teste. Quais foram as duas falhas?'
+    eo = @('Correta: tipo errado + sem teste.', 'Errada: o motor e a trava funcionavam; o problema foi a ordem de acionamento.', 'Errada: a fiação estava certa; o temporizador é que era do tipo errado.', 'Errada: aterramento e disjuntor não explicam motor e trava acionando juntos.', 'Errada: a tensão estava certa; o temporizador não esperou o tempo.')
   }
 }
 
