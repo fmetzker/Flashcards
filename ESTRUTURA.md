@@ -73,7 +73,8 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 | `validar.py` | Integridade do banco **e** conduta do motor (roda o `testar.js`). `--rascunho` valida candidato, `--patches` valida `eo`/`n`/`o`/`s`/`c`/`e`/`t`/`f`/`img`/`alt`, nenhum dos dois grava |
 | `validar.ps1` | Invólucro: só chama o `validar.py` com os mesmos argumentos. Não valida nada por conta própria |
 | `testar.js` + `testes/*.js` | Conduta do **motor** (Leitner, pré-requisito, nível, meta, fuso). `node testar.js [filtro]`; o `validar.py` roda sozinho. `testes/concursos-fixture.json` soma ao catálogo, só no teste, concurso que saiu de `concursos.json` mas segue de cenário |
-| `auditar-banco.py` / `.ps1` | Mede contra o `PADRAO-DOS-CARTOES.md`. Mede, não reprova |
+| `auditar-banco.py` | Mede contra o `PADRAO-DOS-CARTOES.md`. Mede, não reprova |
+| `auditar-banco.ps1` | Invólucro: só chama o `auditar-banco.py`, como o `validar.ps1` |
 | `rascunho.json` | Cartões em elaboração, sem `id`. Vazio quando não há trabalho |
 | `explicacoes.json` | Patches por `id`: `eo`, `n`, `o`, `s`, `c`, `e`, `t`, `f`, `img` e/ou `alt`. Vazio quando não há trabalho |
 | `servidor.ps1` | Servidor local, `http://localhost:8080` |

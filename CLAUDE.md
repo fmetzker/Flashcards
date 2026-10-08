@@ -690,7 +690,7 @@ dado de incidência que este projeto não tem (não existe base de provas
 anteriores da banca — a priorização usa peso do bloco no edital, cobertura
 do conteúdo programático e onde a pessoa erra mais).
 
-Três pontos de lá que decidem trabalho:
+Quatro pontos de lá que decidem trabalho:
 
 - **Um fato, um cartão — e só um cartão** (seção 1.5). Dois cartões cobrando
   o mesmo fato competem entre si e gastam duas revisões para fixar uma
@@ -703,6 +703,12 @@ Três pontos de lá que decidem trabalho:
 - **Manutenção** (5): corrigir alternativa/explicação/fonte é livre; corrigir
   **enunciado** só por `reescrever-questoes.ps1`, senão zera o histórico de
   todo mundo (regra 5). Aposentar quase nunca é a resposta certa.
+- **Ensinar antes de cobrar** (1.9): termo técnico da resposta precisa de
+  definição antes na fila, fórmula vem com a origem dos fatores, nota do
+  `eo` diz o que a alternativa é, pergunta de procedimento diz em que passo
+  estamos, e o enunciado não cita apostila nem livro. No cartão novo, o
+  `validar --rascunho` reprova nota repetida no `eo` e material didático no
+  enunciado.
 
 `auditar-banco.ps1`/`.py` mede o banco contra esse padrão — diferente do
 `validar`, **não reprova nada**; a saída só ajuda a escolher o que corrigir

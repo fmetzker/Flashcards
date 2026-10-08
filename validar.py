@@ -32,6 +32,9 @@ BANCO_DIR = os.path.join(RAIZ, 'banco')
 CONCURSOS = os.path.join(RAIZ, 'concursos.json')
 
 erros, avisos = [], []
+# Material didático nomeado no enunciado (PADRAO-DOS-CARTOES.md §1.9.5). O
+# auditar-banco.py usa a mesma expressão para medir o banco antigo.
+MATERIAL_NO_ENUNCIADO = re.compile(r'\bapostila\b|\bFranchi\b|\bSENAI\b', re.I)
 materias = []          # [{id, nome}] na ordem de exibição
 nome_materia = {}      # id -> nome
 
@@ -1075,6 +1078,23 @@ def carrega_rascunho(B, caminho):
             erros.append(f"rascunho: questão '{q.get('q','?')[:50]}...' sem 'eo' — decida por "
                          "alternativa se vale nota (\"\" é válido pra quem não merece), mas o "
                          "campo precisa existir. Ver PADRAO-DOS-CARTOES.md §1.4.1")
+        # Quem diz de onde vem o fato é o 'f'. No enunciado, "segundo a
+        # apostila" vira parte do que se decora e não vale nada fora do curso;
+        # fato de norma cita a norma (PADRAO-DOS-CARTOES.md §1.9.5). Só para
+        # cartão novo: o banco antigo é corrigido por reescrever-questoes.ps1.
+        m_mat = MATERIAL_NO_ENUNCIADO.search(q.get('q', ''))
+        if m_mat:
+            erros.append(f"rascunho: questão '{q.get('q','?')[:50]}...' cita o material didático "
+                         f"no enunciado (\"{m_mat.group(0)}\") — a fonte vai no 'f'; se o fato é "
+                         "de norma, cite a norma. Ver PADRAO-DOS-CARTOES.md §1.9.5")
+        # Nota igual em duas alternativas erradas não explica nenhuma das duas
+        # ("Errada: não é o motivo." três vezes). Vazio continua valendo.
+        notas = [n.strip() for i, n in enumerate(q.get('eo') or []) if i != q.get('c') and n and n.strip()]
+        repetidas = sorted({n for n in notas if notas.count(n) > 1})
+        if repetidas:
+            erros.append(f"rascunho: questão '{q.get('q','?')[:50]}...' repete a mesma nota em "
+                         f"alternativas diferentes (\"{repetidas[0][:40]}\") — diga o que cada "
+                         "uma é de verdade, ou deixe \"\". Ver PADRAO-DOS-CARTOES.md §1.9.3")
         B.append(q)
     print(f"Rascunho: {len(cands)} candidato(s) avaliados junto do banco (nada foi gravado)\n")
     return B

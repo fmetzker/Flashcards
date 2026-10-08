@@ -112,10 +112,45 @@ def distrator_curto(q):
     return None
 
 
+MATERIAL = re.compile(r'\bapostila\b|\bFranchi\b|\bSENAI\b', re.I)   # mesma do validar.py
+
+
+def material_no_enunciado(q):
+    """1.9.5 — quem diz de onde vem o fato é o 'f', não o enunciado.
+
+    "Segundo a apostila" vira parte do que se decora e não vale nada fora do
+    curso. No cartão novo o validar.py reprova; aqui mede o que já existe."""
+    m = MATERIAL.search(q['q'])
+    if m:
+        return f'enunciado cita o material didático ("{m.group(0)}")'
+    return None
+
+
+def nota_que_nao_ensina(q):
+    """1.9.3 — a nota por alternativa diz o que AQUELA alternativa é.
+
+    Dois sinais objetivos: a mesma nota repetida em alternativas erradas
+    diferentes, e nota curta demais para dizer qualquer coisa além de
+    "errada" ("Errada: não é o motivo."). Vazio não conta — é decisão válida
+    (§1.4.1). Matemática repete nota de propósito em erro de conta; o
+    julgamento de cada caso continua humano."""
+    eo = q.get('eo') or []
+    notas = [n.strip() for i, n in enumerate(eo) if i != q['c'] and n and n.strip()]
+    rep = sorted({n for n in notas if notas.count(n) > 1})
+    if rep:
+        return f'a mesma nota em {notas.count(rep[0])} alternativas: "{rep[0][:50]}"'
+    curtas = [n for n in notas if len(n) < 30]
+    if curtas:
+        return f'nota curta demais para ensinar: "{curtas[0]}"'
+    return None
+
+
 VERIFICACOES = [
     ('sem-pergunta',      sem_pergunta_real,  'ALTO'),
     ('alternativa-lixo',  alternativa_lixo,   'ALTO'),
     ('explicacao-fraca',  explicacao_fraca,   'ALTO'),
+    ('material-no-q',     material_no_enunciado, 'MÉDIO'),
+    ('nota-nao-ensina',   nota_que_nao_ensina, 'MÉDIO'),
     ('distrator-curto',   distrator_curto,    'MÉDIO'),
     ('enunciado-longo',   enunciado_longo,    'MÉDIO'),
     ('negativa',          negativa,           'BAIXO'),

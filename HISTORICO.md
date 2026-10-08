@@ -474,6 +474,20 @@ no `validar.py` em vez de lembrete.
 matéria ativa em 0% e as duas inativas em 59%. Quem estuda vê uma matéria, não
 o banco.
 
+**Dez fotos de quem estuda viraram o §1.9 do padrão (outubro/2026).** Cartões
+que passavam em tudo o que o `validar` confere, e mesmo assim não ensinavam:
+o porquê usava termo nunca definido (corrente em vazio, comutador), a
+fórmula era decorada sem a origem dos fatores, o `eo` dizia "não é o motivo"
+três vezes, "o que vem antes de religar" tinha quatro respostas certas, e
+um cartão de Manutenção dizia que o aterramento temporário impede a
+reenergização — quem impede é o bloqueio. O mesmo levantamento achou 82
+enunciados citando "a apostila" ou "o Franchi". As regras foram escritas
+para valer em toda matéria, e duas delas viraram checagem: o `validar
+--rascunho` reprova material didático no enunciado e nota repetida no `eo`;
+o `auditar-banco` mede as duas no banco antigo. O `auditar-banco.ps1`, que
+era uma segunda implementação, virou invólucro do `.py` no mesmo passo — o
+`validar.ps1` já tinha mostrado onde isso termina.
+
 ---
 
 ## Contas e sincronização

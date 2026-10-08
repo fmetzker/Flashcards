@@ -444,6 +444,110 @@ não "o ângulo x, colateral interno de 70°, que mede 110°".
 pasta da própria matéria, tamanho, `alt` presente, SVG sem script nem
 referência externa. Imagem em `banco/img/` que nenhum cartão usa vira aviso.
 
+
+### 1.9 O cartão não cobra o que ainda não ensinou
+
+Saiu de uma revisão feita por quem estuda: dez cartões fotografados no app,
+em três matérias diferentes, com o mesmo tipo de queixa — "não entendi o
+conceito", "quero saber o porquê disso". Nenhum dos dez tinha erro que o
+`validar` pegasse. O defeito era de ordem: o cartão dependia de algo que
+nenhum cartão anterior tinha ensinado. As regras abaixo valem para todas as
+matérias.
+
+#### 1.9.1 Conceito antes do porquê
+
+Cartão de "por que X?" cuja resposta usa um termo técnico só funciona se o
+termo já foi definido antes — no mesmo subtópico com `n` menor, ou num
+subtópico anterior da fila. "O entreferro é pequeno para reduzir a corrente
+em vazio" não ensina nada a quem não sabe o que é corrente em vazio; vira
+frase decorada.
+
+Ao escrever um cartão de porquê, liste os termos da correta e do `e` e
+confira se cada um tem cartão de definição antes. Se não tiver, escreva a
+definição primeiro (`n=1`) e deixe o porquê em `n=2`. Termo de um tópico que
+só abre muito depois na fila (fator de potência dentro de Constituição do
+motor) não ganha cartão fora do lugar: a explicação o define em meia frase.
+
+#### 1.9.2 Fórmula vem com a origem de cada fator
+
+Fórmula cobrada só como "qual é a fórmula" é decorada e esquecida. Quando a
+fonte permite derivar, cada fator ganha um cartão de definição (`n=1`): por
+que ele multiplica ou divide, de onde sai a constante. Os cartões de
+aplicação (`n=2`) vêm depois.
+
+- ✅ Ns = 120·f/p: uma volta por ciclo com 2 polos; 60 voltas/s viram 3600
+  rpm; mais pares de polos, mais devagar; 120 = 60 s/min × 2 polos por par —
+  com a armadilha dos 120° entre fases como distrator.
+- ❌ Inventar derivação que a fonte não sustenta. Constante empírica fica
+  como é, e o cartão diz que é empírica.
+
+#### 1.9.3 A nota por alternativa diz o que aquela alternativa É
+
+O `eo` existe para quem errou entender por que pensou errado. "Errada: não é
+o motivo.", "Errada: também invertida." e a mesma frase repetida em quatro
+posições não explicam nada — são piores que posição vazia, porque ocupam o
+lugar da explicação.
+
+A nota boa nomeia a coisa real de onde o distrator vem: a outra peça (o
+número 5 da figura é a barra do rotor), o outro passo da sequência
+(impedir a religação é o bloqueio, o 2º passo), o outro tipo (polos lisos e
+salientes são do motor síncrono), o significado da palavra (congêneres =
+do mesmo gênero). Sem nada a dizer, deixe `""` (§1.4.1).
+
+O `validar --rascunho` reprova cartão novo com a mesma nota em duas
+alternativas; o `auditar-banco` mede, no banco antigo, nota repetida e nota
+com menos de 30 caracteres.
+
+#### 1.9.4 Pergunta sobre procedimento diz em que ponto dele estamos
+
+"O que se faz ANTES de religar?" numa sequência de cinco passos tem quatro
+respostas certas. O enunciado diz o que já foi feito ("depois de retirar as
+ferramentas e as pessoas, o que falta antes de religar?") e pergunta pelo
+passo seguinte. Vale para toda sequência: desenergização, partida de motor,
+conduta de enfermagem, passos de um cálculo.
+
+#### 1.9.5 O enunciado não cita o material didático
+
+"Segundo a apostila", "pelo Franchi": quem diz de onde vem o fato é o `f`.
+No enunciado, o nome do livro vira parte do que se decora e não vale nada
+fora do curso — a prova e o serviço não perguntam o que a apostila diz.
+
+- **Fato de norma cita a norma**, que é o que vale fora da sala: "Por que a
+  NR-10 proíbe adornos...", com o item no `f`.
+- **Recomendação só do livro**, sem norma atrás: pergunte pela prática ("Com
+  que valor se ajusta o relé térmico?"), e o `f` diz de quem é.
+- **Caso ilustrativo do livro**: descreva a situação ("Um compressor não
+  ganhava velocidade...") sem dizer de onde ela saiu.
+
+O `validar --rascunho` reprova "apostila", "Franchi" e "SENAI" no enunciado
+de cartão novo; o `auditar-banco` mede o banco antigo.
+
+#### 1.9.6 A dificuldade é a do assunto do cartão
+
+Um cartão de substantivo × adjetivo que se erra por não saber o que é
+"congêneres" mede vocabulário, não classe de palavras — e, sendo `n=1` no
+primeiro subtópico da fila, derruba logo no começo quem ainda está
+aprendendo a base. Duas saídas: trocar as palavras por outras comuns, ou
+subir o `n` para que o cartão chegue depois da base, com o significado de
+cada palavra no `eo`. O vocabulário vira cartão próprio, em Semântica.
+
+#### 1.9.7 Assunto que atravessa classes entra no subtópico de cada uma
+
+Locução existe em quase toda classe de palavras. Um subtópico "Locuções"
+abriria tudo de uma vez, antes das classes; espalhar cada tipo no subtópico
+da classe dele (verbal em Verbo, prepositiva em Preposição...) faz cada um
+abrir na ordem da fila. O cartão de contraste entre dois tipos fica no
+subtópico do que abre por último — só ali as duas bases já foram vistas.
+
+#### 1.9.8 Cobrir o que a fonte e a prova cobram, não tudo o que existe
+
+O pedido de "mais sobre X" é atendido até onde a fonte e as provas vão.
+Locução pronominal e interjetiva não entraram porque as provas da CFAQ não
+as cobram; a lista de vocabulário saiu de palavras que aparecem nos textos
+das provas de MOC/MOM, não de uma lista de "palavras difíceis". O objetivo de
+quem estuda é passar na prova e trabalhar bem — conhecimento acumulado sem
+uso é tempo tirado do que cai.
+
 ---
 
 ## 2. O que não fazer
@@ -779,3 +883,13 @@ Antes de dar o cartão por pronto:
 - [ ] Se adaptado de uma questão real: dá pra responder em **segundos**
       por quem domina o fato/método, ou ainda carrega a demora do
       original (conta longa, texto longo)? Ver 1.6.
+- [ ] Todo termo técnico da correta e do `e` já foi definido antes, na fila?
+      Ver 1.9.1.
+- [ ] Cada nota do `eo` diz o que aquela alternativa é de verdade, sem
+      frase repetida nem "não é o motivo"? Ver 1.9.3.
+- [ ] Se pergunta sobre um procedimento, o enunciado diz em que passo
+      estamos, para ter uma resposta só? Ver 1.9.4.
+- [ ] O enunciado não nomeia apostila nem livro (fato de norma cita a
+      norma)? Ver 1.9.5.
+- [ ] A dificuldade é a do assunto do cartão, e não de vocabulário ou de
+      outro tópico? Ver 1.9.6.
