@@ -488,6 +488,15 @@ o `auditar-banco` mede as duas no banco antigo. O `auditar-banco.ps1`, que
 era uma segunda implementação, virou invólucro do `.py` no mesmo passo — o
 `validar.ps1` já tinha mostrado onde isso termina.
 
+**Medir errado faz consertar o que não estava quebrado.** Na mesma rodada, três
+critérios do `auditar-banco` marcavam centenas de cartões bons: "distrator
+curto" pegava termo técnico certeiro ("Metonímia", "√3/2") — 98 de 106
+apontamentos —, "explicação curta" pegava a tabuada que já mostra a conta, e
+"nota curta" pegava "Errada: isso é megômetro.". Os três passaram a exigir o
+sinal do defeito de verdade (a correta destoando pelo tamanho, explicação
+sem conta, frase genérica). O que sobrou era real, e incluía um cartão com o
+`c` na alternativa errada — o `validar` agora reprova `eo` e `c` que discordam.
+
 ---
 
 ## Contas e sincronização

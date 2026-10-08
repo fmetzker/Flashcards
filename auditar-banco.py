@@ -93,7 +93,9 @@ def negativa(q):
 def explicacao_fraca(q):
     """1.4 — a explicação precisa dizer POR QUE."""
     e = q['e'].strip()
-    if len(e) < 40:
+    # conta curta e completa ("f(4) = 2×4 + 3 = 11", "3 × 7 = 3 somado 7
+    # vezes, o que dá 21") já é a explicação inteira: mostrar mais não ensina
+    if len(e) < 40 and '=' not in e:
         return f'explicação com {len(e)} caracteres (curta demais para ensinar)'
     if re.search(r'^(a )?(alternativa|opção|letra)\s+[a-e]\b', e, re.I):
         return 'explicação só aponta a letra, não explica'
@@ -104,8 +106,17 @@ def distrator_curto(q):
     """1.3 — distrator plausível.
 
     Distrator drasticamente mais curto que a correta costuma ser preenchimento
-    ("Nunca", "Apenas X"), que ninguém marcaria por engano de verdade."""
+    ("Nunca", "Apenas X"), que ninguém marcaria por engano de verdade.
+
+    Só conta quando a correta é também a mais longa por mais de 10
+    caracteres — a pista que a seção de viés do CLAUDE.md descreve. Sem essa
+    condição, termo técnico curto e certeiro ("Metonímia", "√3/2",
+    "Intramuscular") era marcado como defeito: medido em outubro/2026, 98 de
+    106 apontamentos eram desse tipo."""
     correta = len(q['o'][q['c']])
+    outros = [len(a) for i, a in enumerate(q['o']) if i != q['c']]
+    if correta - max(outros) <= 10:
+        return None
     curtos = [a for i, a in enumerate(q['o']) if i != q['c'] and len(a) * 3 < correta and len(a) < 25]
     if curtos:
         return 'distrator curto demais para ser plausível: ' + ' | '.join(curtos[:2])
