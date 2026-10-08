@@ -416,3 +416,77 @@ def _motor_cc(lig):
 for _lig in ("serie", "paralelo", "composto", "independente", "ima"):
     circuito(f"motor-cc-{_lig}")((lambda l: lambda: _motor_cc(l))(_lig))
     vista(M, f"motor-cc-{_lig}", f"motor-cc-{_lig}")
+
+
+# ---- motor de indução em corte e rotor em gaiola (Franchi 1.4, Figura 1.3) ------
+# Desenho nosso, não a figura da WEG que o Franchi reproduz: corte transversal
+# com as partes numeradas de fora para dentro, e a gaiola sem o núcleo de
+# chapas. Os números e a letra A não dizem o nome da peça — é o que os cartões
+# perguntam.
+
+def _numero(d, x, y, n, alvo):
+    d.linha([alvo, (x, y)], esp=1.2)
+    d.circulo(alvo[0], alvo[1], 2.5, preench="#16232E")
+    d.circulo(x, y, 10, preench="#fff", esp=1.5)
+    d.texto(x, y + 4.5, str(n), tam=12, ancora="middle", negrito=True)
+
+
+@circuito("motor-inducao-corte")
+def motor_inducao_corte():
+    d = Desenho(370, 320, alt="Corte transversal de um motor de indução trifásico, com seis "
+                "partes numeradas de fora para dentro: 1, o anel externo com aletas; 2, o anel "
+                "largo em cinza; 3, os pequenos círculos alaranjados ao longo desse anel; "
+                "4, a folga estreita entre o anel cinza e o cilindro central; 5, os pequenos "
+                "círculos na borda do cilindro central; 6, o círculo escuro no centro.")
+    cx, cy = 165, 160
+    pol = lambda r, a: (cx + r * math.cos(math.radians(a)), cy + r * math.sin(math.radians(a)))
+    with d.grupo("carcaca"):
+        for k in range(20):
+            d.linha([pol(130, k * 18), pol(142, k * 18)], esp=3)
+        d.circulo(cx, cy, 128, esp=7)
+    with d.grupo("nucleo-estator"):
+        d.circulo(cx, cy, 124, preench="#E3E6E8", esp=1.5)
+        d.circulo(cx, cy, 72, preench="#fff", esp=1.5)
+    with d.grupo("enrolamento"):
+        for k in range(24):
+            x, y = pol(84, k * 15)
+            d.circulo(x, y, 6, preench="#D9873B", esp=1)
+    with d.grupo("rotor"):
+        d.circulo(cx, cy, 65, preench="#C9CED3", esp=1.5)
+        for k in range(18):
+            x, y = pol(56, k * 20 + 10)
+            d.circulo(x, y, 4.5, preench="#8E99A3", esp=1)
+    with d.grupo("eixo"):
+        d.circulo(cx, cy, 16, preench="#4A5560", esp=1.5)
+    for n, (r, a), y in ((1, (128, -48), 28), (2, (104, -22), 82), (3, (84, 0), 136),
+                         (4, (68.5, 18), 190), (5, (56, 30), 244), (6, (8, 40), 298)):
+        _numero(d, 350, y, n, pol(r, a))
+    return d
+
+
+vista(M, "motor-inducao-corte", "motor-inducao-corte")
+
+
+@circuito("rotor-gaiola")
+def rotor_gaiola():
+    d = Desenho(360, 190, alt="Vista lateral de um rotor sem o núcleo de chapas: oito barras "
+                "paralelas vão de uma ponta à outra e estão presas, nas duas extremidades, a "
+                "peças em forma de anel, cada uma marcada com a letra A. O eixo atravessa o "
+                "conjunto pelo centro.")
+    with d.grupo("eixo"):
+        d.retangulo(14, 89, 332, 14, preench="#4A5560", esp=1.5)
+    with d.grupo("barras"):
+        for k in range(8):
+            y = 46 + k * 14.3
+            d.linha([(88, y), (272, y)], esp=5)
+    with d.grupo("aneis"):
+        for x in (72, 272):
+            d.retangulo(x, 36, 16, 120, preench="#8E99A3", esp=1.5)
+    for x in (80, 280):
+        d.linha([(x, 36), (x, 22)], esp=1.2)
+        d.circulo(x, 13, 10, preench="#fff", esp=1.5)
+        d.texto(x, 17.5, "A", tam=12, ancora="middle", negrito=True)
+    return d
+
+
+vista(M, "rotor-gaiola", "rotor-gaiola")
