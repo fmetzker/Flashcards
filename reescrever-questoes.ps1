@@ -38,158 +38,56 @@ function Id-Questao([string]$enunciado) {
 # preservado automaticamente — só é sobrescrito se a entrada do lote trouxer
 # 'eo'.
 #
-# Este lote aplica o PADRAO-DOS-CARTOES.md §1.9.5 a Comandos Elétricos:
-# enunciados que diziam "a apostila" ou "o Franchi" passam a perguntar pelo
-# fato ou pela prática, e o caso ilustrativo vira a própria situação ("Num
-# torno...", "Numa siderúrgica..."). A fonte continua no 'f'. Vêm junto as
-# notas por alternativa genéricas ou repetidas (§1.9.3).
+# Este lote aplica o PADRAO-DOS-CARTOES.md §1.1 e §2 aos enunciados que o
+# auditar-banco marcava como "não é pergunta" ou "alternativa de formato
+# proibido": "assinale a correta" vira pergunta respondível, "Apenas I / Apenas
+# II" vira uma escolha direta, e o cartão de vetores com I, II e III passa a
+# cobrar só a III — a I e a II viram cartões próprios.
 
 $REESCRITAS = @{
-  '5d5e3b9826' = @{
-    q = 'Na partida direta, o que identificam S0 e S1?'
-    e = 'A letra S identifica os dispositivos de comando manual. S0 é o botão desliga (vermelho, NF 11-12) e S1 o botão liga (verde, NA 13-14).'
+  '5228d91bbc' = @{
+    q = 'Um infográfico do IBGE (PNAD 2015) mostra a porcentagem de pessoas que praticaram esporte por faixa etária: 15-17 anos = 53,6%; 18-24 ≈ 47%; 25-39 ≈ 41,3%; 40-59 ≈ 33,4%; 60 ou mais = 27,6%. Em qual faixa a porcentagem fica entre 30% e 40%?'
+    o = @('40 a 59 anos', '25 a 39 anos', '60 anos ou mais', '18 a 24 anos', '15 a 17 anos')
+    c = 0
+    e = 'Só a faixa de 40 a 59 anos, com cerca de 33,4%, fica entre 30% e 40%. A de 25 a 39 passa de 40% (41,3%) e a de 60 ou mais fica abaixo de 30% (27,6%). A prática de esporte cai com a idade.'
+    eo = @('Correta: cerca de 33,4%.', 'Errada: 25 a 39 anos fica em cerca de 41,3%, acima de 40%.', 'Errada: 60 anos ou mais fica em 27,6%, abaixo de 30%.', 'Errada: 18 a 24 anos fica em cerca de 47%.', 'Errada: 15 a 17 anos fica em 53,6%.')
   }
-  '1d047558d5' = @{
-    q = 'Nos diagramas de comando, que dispositivos são identificados pela letra Q (Q11, Q12)?'
-    eo = @('Correta: Q = disjuntor.', 'Errada: contatores são K.', 'Errada: botões são S.', 'Errada: a lâmpada é E1 (em outra convenção, H).', 'Errada: fusíveis são F.')
+  'e0390d6b95' = @{
+    q = 'No trecho ''...ficou imóvel, quieta'', por que a palavra ''imóvel'' leva acento gráfico?'
+    o = @('Por ser paroxítona terminada em l', 'Por ser oxítona terminada em l', 'Por ser proparoxítona', 'Porque toda palavra terminada em l leva acento', 'Porque admite duas pronúncias (dupla prosódia)')
+    c = 0
+    e = '''Imóvel'' (i-MÓ-vel) tem a sílaba tônica na penúltima — é paroxítona. Paroxítonas terminadas em ''l'' são acentuadas; oxítonas em ''l'', como papel e anel, não.'
+    eo = @('Correta: i-MÓ-vel, paroxítona terminada em l.', 'Errada: a tônica é ''mó'', não a última sílaba; e oxítona em l não leva acento (papel).', 'Errada: ''imóvel'' tem três sílabas e a tônica é a do meio.', 'Errada: oxítonas em l, como papel e anel, não levam acento.', 'Errada: ''imóvel'' tem uma pronúncia só.')
   }
-  'd4ec7cd020' = @{
-    q = 'Se a corrente nominal do fusível deve ser pelo menos 20% maior que a do motor, qual é o mínimo para um motor de 20 A?'
+  '554b4d2bcd' = @{
+    q = 'Em ''Vamos levantar esses questionamentos e saber porque as pessoas não querem mais trabalhar nessa área...'', que valor tem a palavra ''mais''?'
+    o = @('Advérbio de tempo: indica que a ação deixou de ocorrer', 'Advérbio de intensidade, como em ''mais forte''', 'Pronome indefinido, como em ''mais pessoas''', 'Conjunção aditiva, com o sentido de ''e''', 'Preposição que liga ''querem'' a ''trabalhar''')
+    c = 0
+    e = 'Em ''não querem MAIS trabalhar'', o ''mais'' junto da negação indica que uma ação que costumava ocorrer deixou de ocorrer — valor de tempo (não mais = deixaram de). É advérbio de tempo.'
+    eo = @('Correta: ''não... mais'' = deixaram de querer — valor de tempo.', 'Errada: intensidade modifica adjetivo ou advérbio (''mais forte''); aqui ''mais'' vai com a negação do verbo.', 'Errada: pronome indefinido acompanha substantivo (''mais pessoas''); aqui não há substantivo.', 'Errada: ''mais'' com sentido de ''e'' só aparece em contas (''dois mais dois'').', 'Errada: ''querer'' liga-se a ''trabalhar'' sem preposição.')
   }
-  'e52187c070' = @{
-    q = 'Com qual valor se ajusta a corrente do relé térmico?'
+  '686f3753b1' = @{
+    q = 'Os cursos “requerem o ensino médio técnico”. Como são a regência do verbo “requerer” e a do substantivo “requerimento”?'
   }
-  'e91e96b4f0' = @{
-    q = 'Em que tipo de máquina se aceita o relé térmico em rearme automático?'
+  'dceb134622' = @{
+    q = 'Calcule A = 2⁴, B = −2⁴ e C = (−2)⁴. Que relação há entre eles?'
   }
-  'fff794fd7a' = @{
-    q = 'Como se liga um disjuntor-motor tripolar a um motor monofásico?'
-    eo = @('Correta: todos os polos no caminho da corrente.', 'Errada: com um polo só, a proteção térmica fica desequilibrada.', 'Errada: em paralelo, cada polo sentiria só parte da corrente.', 'Errada: o disjuntor-motor tripolar tem ligação própria para monofásico e para bifásico.', 'Errada: nenhum polo vai ao terra.')
+  '83ccf0f034' = @{
+    q = 'Qual destas propriedades dos conjuntos numéricos vale SEMPRE?'
   }
-  '0b3461e5f4' = @{
-    q = 'Em que situação se recomenda partir um motor só com disjuntor-motor, sem contator?'
+  'e2a8fd9c3d' = @{
+    q = 'Com o sujeito composto antes do verbo, qual é a concordância certa em ''A leitura e a escrita ___ para a formação''?'
+    o = @('são fundamentais', 'é fundamental', 'é fundamentais', 'são fundamental', 'tanto faz ''é'' ou ''são'', as duas formas valem')
+    c = 0
+    e = 'Sujeito composto antes do verbo (''a leitura e a escrita'', dois núcleos) leva o verbo ao plural, e o predicativo concorda com ele: ''são fundamentais''.'
+    eo = @('Correta: verbo e predicativo no plural.', 'Errada: singular com sujeito de dois núcleos antes do verbo é erro de concordância.', 'Errada: mistura verbo no singular com predicativo no plural.', 'Errada: o predicativo também vai ao plural, com o sujeito composto.', 'Errada: com o sujeito composto antes do verbo, só o plural é correto.')
   }
-  'f5636b967c' = @{
-    q = 'Qual é a diferença entre um seccionador e um interruptor?'
-  }
-  'd2d7d47666' = @{
-    q = 'Um contator vibra e faz ruído durante o funcionamento. Qual é uma causa típica?'
-  }
-  '55583a8b7f' = @{
-    q = 'Numa bomba, uma chave-boia substituiu o botão de ligar. Como ela comanda a bobina do contator?'
-  }
-  '7749dfce4b' = @{
-    q = 'Para que tipo de máquina se indica a partida direta?'
-  }
-  'f6ca72689b' = @{
-    q = 'A partir de que potência a NBR 5410 recomenda consultar a concessionária antes de partir um motor direto na rede pública de baixa tensão?'
-  }
-  '907d28ea1a' = @{
-    q = 'Como se testa se um relé térmico está "cansado"?'
-  }
-  '0cfb3a1e94' = @{
-    q = 'Como se testa se um relé térmico está "viciado"?'
-  }
-  '53941a0db0' = @{
-    q = 'Na partida direta, ao pressionar S1 o disjuntor do comando desarma na hora. Que falha causa esse sintoma?'
-  }
-  'fd5bf26fa6' = @{
-    q = 'Na partida direta, a lâmpada E1 não apaga nunca, nem com o motor desligado. Que falha causa isso?'
-  }
-  'd29e0b2d84' = @{
-    q = 'Um contator trepida (vibra) no conjunto magnético durante o funcionamento. Quais são as consequências?'
-  }
-  '04641ff197' = @{
-    q = 'Em que condição se pode medir resistência com ohmímetro ou megômetro num painel?'
-  }
-  '4a948ba563' = @{
-    q = 'Como é formado o sistema de partida direta com reversão?'
-  }
-  'f0ec5eae60' = @{
-    q = 'Na reversão da figura, o disjuntor-motor Q1 atua por sobrecarga. O que acontece no comando?'
-  }
-  'aafdb2dde8' = @{
-    q = 'Quais são os tipos de intertravamento usados em comandos de reversão?'
-    eo = @('Correta: os três tipos.', 'Errada: temporizador e fim de curso não impedem os dois contatores de fecharem juntos.', 'Errada: são proteções, não intertravamentos.', 'Errada: são sensores.', 'Errada: há também os elétricos.')
-  }
-  '343d313886' = @{
-    q = 'No comando em 24 VCC, as bobinas, lâmpadas e sensores vão sendo ligados e logo em seguida começam a desligar. Que falha da fonte causa isso?'
-  }
-  'ebfa5a929d' = @{
-    q = 'Numa retificadora, o sensor S10 foi trocado e queimou de novo, abrindo o fusível F2. A bobina de K10 mediu quase 0 Ω. O que o eletricista verificou antes de trocar a bobina?'
-  }
-  '058ddfb2c1' = @{
-    q = 'Que desvantagem a partida estrela-triângulo tem no instante da comutação?'
-  }
-  '207926675b' = @{
-    q = 'Quais são vantagens da chave estrela-triângulo?'
-  }
-  '67ca8de1bb' = @{
-    q = 'Como se verifica se o condutor terra está interrompido numa alimentação trifásica?'
-  }
-  '0cdbc6fafc' = @{
-    q = 'Um eletricista simplificou o comando de uma estrela-triângulo com um temporizador comum. Dias depois, K2 e K3 colaram e os fusíveis queimaram. Qual era a causa?'
-    e = 'O temporizador próprio para Y-Δ tem um retardo (entre 30 e 100 ms, tipicamente cerca de 50 ms) para K2 abrir e extinguir o arco antes de K3 fechar. Sem ele, os dois se sobrepunham: curto, contatos colados e fusíveis queimados. Outra solução é o intertravamento mecânico.'
-  }
-  'e50a0cf6ba' = @{
-    q = 'Qual é a sequência de funcionamento da chave compensadora?'
-  }
-  '05b7fe99f6' = @{
-    q = 'Com um tap de relação a = 0,5 na chave compensadora, a quanto fica reduzido o conjugado de partida?'
-  }
-  '2bdd6fe564' = @{
-    q = 'Um vigilante tentou partir várias vezes um compressor com chave compensadora, que não ganhava velocidade, até sentir cheiro de queimado. O que se danificou, e por quê?'
-    eo = @('Correta: partidas seguidas aquecem o autotransformador.', 'Errada: rearmar o relé não o danifica; quem esquentou foi o autotransformador.', 'Errada: os contatores não foram o dano; o autotransformador precisou ser rebobinado.', 'Errada: não houve falta de fase.', 'Errada: a causa foi a carga — as válvulas de alívio estavam fechadas.')
-  }
-  'f64ca31a73' = @{
-    q = 'Qual é a menor resistência típica de um sensor PTC em bom estado, e o que indica um valor próximo de zero?'
-  }
-  'fdb2b62489' = @{
-    q = 'Num torno, o motor Dahlander roncava e não girava só na velocidade alta. O que foi medido e encontrado?'
-  }
-  'b83ce7bf2c' = @{
-    q = 'Qual é o sintoma característico de falta de fase num motor Dahlander?'
-  }
-  'ebf8474c58' = @{
-    q = 'Como se testa se o contato de uma chave comutadora de velocidades está danificado?'
-    eo = @('Correta: continuidade posição a posição.', 'Errada: corrente em vazio testa o motor, não a chave.', 'Errada: medir com o motor ligado é outro teste e é perigoso.', 'Errada: megômetro testa isolação.', 'Errada: bússola não diz nada sobre o contato da chave.')
-  }
-  'd85e45c3c4' = @{
-    q = 'Qual é a corrente de partida típica, a plena carga, de um motor com aceleração rotórica?'
-  }
-  '2a128b5fcb' = @{
-    q = 'Em que equipamento é típico o uso do motor de anéis com aceleração rotórica?'
-  }
-  'a763de32fe' = @{
-    q = 'Na partida rotórica automática, como a velocidade aumenta de um estágio para o outro?'
-  }
-  'a37fd1eb0b' = @{
-    q = 'Uma ponte rolante com motor de anéis se movia só devagar. Medindo entre os terminais L e M do rotor, a resistência estava alta. O que foi encontrado?'
-  }
-  'd461c1c326' = @{
-    q = 'Por que um motor de anéis parado não está necessariamente desenergizado?'
-    eo = @('Correta: rotor aberto, estator energizado.', 'Errada: escovas não guardam carga.', 'Errada: resistores não acumulam carga.', 'Errada: sem movimento o rotor não gera tensão.', 'Errada: a ponte é alimentada pela rede; o perigo é o estator energizado.')
-  }
-  'bc08faa4da' = @{
-    q = 'Antes de subir numa ponte rolante para manutenção, o que se deve fazer?'
-  }
-  '8bba56e42f' = @{
-    q = 'Em que aplicação o sensor óptico de barreira é usado como proteção do operador?'
-  }
-  '6869ef4abe' = @{
-    q = 'Numa siderúrgica, um sensor indutivo falhava porque o batente tinha folga mecânica. Qual foi a solução?'
-    eo = @('Correta: óptico a distância maior.', 'Errada: o capacitivo também tem distância pequena.', 'Errada: a tensão não muda a distância sensora.', 'Errada: mascarar a falha não resolve.', 'Errada: o reed switch também exige o atuador perto; a folga continuaria atrapalhando.')
-  }
-  '688ffd8d57' = @{
-    q = 'Por que se recomendam motores com isolação reforçada quando alimentados por inversor?'
-    eo = @('Correta: picos de chaveamento.', 'Errada: o inversor não eleva a tensão da rede.', 'Errada: girar acima da nominal afeta o conjugado, não a isolação.', 'Errada: o inversor tem proteções.', 'Errada: a partida é suave.')
-  }
-  'feff088d0f' = @{
-    q = 'Que vantagem tem a placa de montagem com acabamento metalizado (galvanizada ou zincada)?'
-  }
-  '3c06c0e08f' = @{
-    q = 'Num painel, um temporizador de retardo na desenergização foi instalado no lugar de um de retardo na energização, e a máquina quebrou a trava no teste. Quais foram as duas falhas?'
-    eo = @('Correta: tipo errado + sem teste.', 'Errada: o motor e a trava funcionavam; o problema foi a ordem de acionamento.', 'Errada: a fiação estava certa; o temporizador é que era do tipo errado.', 'Errada: aterramento e disjuntor não explicam motor e trava acionando juntos.', 'Errada: a tensão estava certa; o temporizador não esperou o tempo.')
+  'c999b7d51c' = @{
+    q = 'Se o produto misto [u, v, w] de três vetores não nulos de ℝ³ é zero, o que se conclui sobre eles?'
+    o = @('São linearmente dependentes, isto é, coplanares', 'São ortogonais dois a dois', 'Pelo menos um deles é o vetor nulo', 'São todos paralelos entre si', 'Formam uma base de ℝ³, por serem independentes')
+    c = 0
+    e = 'O produto misto é o volume, com sinal, do paralelepípedo formado pelos três vetores. Volume zero significa que eles estão num mesmo plano: são coplanares, ou seja, linearmente dependentes.'
+    eo = @('Correta: produto misto nulo = coplanares = linearmente dependentes.', 'Errada: ortogonais dois a dois dariam o maior volume possível, não zero.', 'Errada: o enunciado diz que nenhum é nulo; basta estarem num mesmo plano.', 'Errada: paralelos também dão zero, mas não é preciso tanto — basta serem coplanares.', 'Errada: base exige independência, e produto misto zero é justamente dependência.')
   }
 }
 

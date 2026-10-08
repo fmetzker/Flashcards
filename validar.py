@@ -700,6 +700,18 @@ def valida_questoes(B):
                 avisos.append(f"[{rot}] 'eo' presente mas vazio em todas as alternativas — "
                               "ok se foi decisão consciente (ex.: memorização pura, sem erro "
                               "conceitual a explicar); revise se não foi")
+            else:
+                # A nota diz qual é a certa, e 'c' também — os dois têm de
+                # concordar. Já houve cartão com a nota "Correta" e a conta do
+                # 'e' na alternativa 0 e 'c' apontando para a 1: o app aceitava
+                # a resposta errada como certa, para todo mundo.
+                c = q.get('c')
+                diz_certa = [i for i, x in enumerate(eo) if isinstance(x, str) and x.strip().startswith('Correta')]
+                if (diz_certa and c not in diz_certa) or \
+                   (isinstance(c, int) and 0 <= c < len(eo) and str(eo[c]).strip().startswith('Errada')):
+                    erros.append(f"[{rot}] 'eo' e 'c' discordam sobre qual é a correta: 'c' = {c}, "
+                                 f"nota \"Correta\" em {diz_certa or 'nenhuma'} — confira qual "
+                                 "alternativa é a certa antes de corrigir um dos dois")
         # "a palavra citada" sem a palavra em lugar nenhum do cartão —
         # formatação de destaque (grifo/sublinhado) que existia na prova
         # impressa e não sobrevive à transcrição. Ver os regex acima.
