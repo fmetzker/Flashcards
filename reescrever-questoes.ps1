@@ -38,114 +38,44 @@ function Id-Questao([string]$enunciado) {
 # preservado automaticamente — só é sobrescrito se a entrada do lote trouxer
 # 'eo'.
 #
-# Este lote aplica o PADRAO-DOS-CARTOES.md §1.9.5 a Manutenção Elétrica:
-# enunciados que diziam "a apostila" passam a perguntar pelo fato ou pela
-# prática, e a fonte continua no 'f'. Vêm junto as notas por alternativa que não
-# diziam o que a alternativa é ("não é o argumento", "não confere"), §1.9.3.
+# Este lote aplica o PADRAO-DOS-CARTOES.md §1.9.5 a Máquinas Elétricas:
+# enunciados que diziam "o Franchi" ou "a apostila" passam a perguntar pelo
+# fato, e a fonte continua no 'f'. Vêm junto as notas por alternativa
+# genéricas ou repetidas (§1.9.3).
 
 $REESCRITAS = @{
-  '97e5e73900' = @{
-    q = 'Por que não se deve improvisar durante a manutenção, mesmo quando o improviso resolve na hora?'
-    eo = @('Correta: risco futuro.', 'Errada: o problema não é o tempo — o improviso às vezes é até mais rápido na hora.', 'Errada: fazer certo é que economiza material; o risco do improviso é o acidente e a nova falha.', 'Errada: não é questão de burocracia; o risco é técnico.', 'Errada: o motivo é segurança e nova falha, não a garantia.')
+  '2f3e643ac7' = @{
+    q = 'No teste de polaridade, com as bobinas 1 e 2 em série recebendo 220 V e uma lâmpada na bobina 3, a lâmpada acendeu. O que isso indica?'
   }
-  '94db489656' = @{
-    q = 'Que atitude ambiental se espera do mantenedor com fitas, pilhas, lâmpadas e cabos usados?'
-    eo = @('Correta: uso racional e descarte legal.', 'Errada: pilha e lâmpada no lixo comum contaminam o ambiente; o descarte segue a lei.', 'Errada: guardar resíduo no painel acumula sujeira e risco, e não é descarte.', 'Errada: é poluente e perigoso.', 'Errada: o resíduo é responsabilidade de quem fez o serviço, não do operador.')
+  '7a0345e55c' = @{
+    q = 'Por que, em algumas máquinas, se desacopla o motor antes de testar o sentido de giro?'
+    eo = @('Correta: o risco é danificar o equipamento.', 'Errada: o motor parte com carga normalmente.', 'Errada: não é medição de rotação.', 'Errada: o relé térmico não sofre com o sentido de giro.', 'Errada: a razão é a segurança do equipamento.')
   }
-  'f6547cd9a1' = @{
-    q = 'Por que, num cabo longo, se usa a escala de resistência do multímetro em vez da de continuidade?'
-    eo = @('Correta: limite do bipe.', 'Errada: a continuidade é um ohmímetro com bipe; não tem relação com CA.', 'Errada: isolação é com megômetro.', 'Errada: as duas escalas usam a bateria do mesmo jeito.', 'Errada: a medição é com o circuito desenergizado; o problema é o limite do bipe.')
-    e = 'O bipe de continuidade só atua com resistência baixíssima; um cabo comprido tem alguns ohms e o bipe não tocaria mesmo estando inteiro. Num exemplo de cabo longo, cada par deu 2,1 Ω.'
+  '76169d574c' = @{
+    q = 'Pela regra prática, o que acontece com a vida útil do isolamento a cada 10 °C acima do limite da classe?'
+    eo = @('Correta: metade a cada 10 °C.', 'Errada: a perda é bem maior que 10%.', 'Errada: a degradação é gradual e começa antes da queima.', 'Errada: o calor degrada, não reforça.', 'Errada: a degradação é gradual; a vida útil não zera de uma vez.')
   }
-  '78e37be4d1' = @{
-    q = 'Pela regra prática para máquinas rotativas, qual é a resistência de isolação mínima, a 40 °C, de um motor de 440 V?'
-    eo = @('Correta: 0,44 + 1.', 'Errada: esqueceu o +1.', 'Errada: 4,4 seria ler 440 V como 4,4 kV; 440 V = 0,44 kV.', 'Errada: 440 é a tensão em volts, não a isolação; a regra usa kV + 1.', 'Errada: 44 não sai da regra kV + 1, que dá 0,44 + 1.')
+  'd90c9a7dc8' = @{
+    q = 'Em que situação se desaconselha o uso de motofreio?'
+    eo = @('Correta: contaminação do freio.', 'Errada: ponte rolante e elevador são aplicações típicas do motofreio.', 'Errada: parada precisa é justamente o que o motofreio oferece.', 'Errada: correia transportadora é outra aplicação típica.', 'Errada: a potência não é o critério citado.')
   }
-  'bb5056f070' = @{
-    q = 'Por quanto tempo se mantém a tensão de ensaio do megômetro na medição de isolação de um motor?'
-    eo = @('Correta: 1 minuto.', 'Errada: curto demais.', 'Errada: a leitura de rotina é feita com um minuto de ensaio.', 'Errada: o motor está desligado.', 'Errada: uma hora não é ensaio de rotina; a leitura sai com um minuto.')
+  '017ea5edf7' = @{
+    q = 'Qual é o fator de potência mínimo exigido pela ANEEL?'
   }
-  '3261101990' = @{
-    q = 'Qual é a menor resistência de isolação aceitável, na prática, para motores de baixa potência e baixa tensão?'
-    eo = @('Correta: ≈ 2 MΩ.', 'Errada: kΩ indica isolação danificada.', 'Errada: muito baixo.', 'Errada: é quase curto.', 'Errada: gigaohms é isolação excelente, não o mínimo aceitável.')
+  'dfa4b29133' = @{
+    q = 'Qual é a localização de capacitores mais eficaz tecnicamente?'
   }
-  '335671d614' = @{
-    q = 'Um motor apresentou isolação baixa por causa de umidade. O que às vezes a recupera?'
-    eo = @('Correta: estufa.', 'Errada: não recupera a isolação.', 'Errada: o relé térmico protege de sobrecarga; não mexe na isolação do motor.', 'Errada: ligar com isolação baixa arrisca curto e choque; primeiro se seca o motor.', 'Errada: inverter duas fases muda o sentido de giro, não a isolação.')
+  '4b24d76a42' = @{
+    q = 'Em que tipo de motor se desaconselha instalar capacitor de correção individual?'
+    eo = @('Correta: reversão.', 'Errada: bomba em regime contínuo, sem reversão, é caso adequado.', 'Errada: ventilador sem reversão nem partidas frequentes é caso adequado.', 'Errada: o problema seria o motor de MAIS de uma velocidade.', 'Errada: o problema é o excesso de partidas, não poucas.')
   }
-  '897948d19a' = @{
-    q = 'Ao substituir um TC ligado a um amperímetro, que TC se deve usar?'
-    eo = @('Correta: casado.', 'Errada: pode perder exatidão.', 'Errada: erraria a escala.', 'Errada: sem secundário não há corrente para o instrumento.', 'Errada: sem TC, a corrente alta do circuito passaria pelo amperímetro pequeno.')
+  '4e96d00ee7' = @{
+    q = 'Quantos watts vale 1 cv?'
+    eo = @('Correta: 736.', 'Errada: 746 é o hp.', 'Errada: é o kW.', 'Errada: 860 é o fator de kW para kcal/h, outra conversão.', 'Errada: 550 é o hp em ft·lbf/s, não em watts.')
   }
-  '19d56a6fba' = @{
-    q = 'Antes de começar uma manutenção corretiva, que dados se devem coletar?'
-  }
-  'b656f510a1' = @{
-    q = 'Depois de levantar as hipóteses da falha, por qual verificação se começa?'
-    eo = @('Correta: visual.', 'Errada: é o último recurso.', 'Errada: vem depois.', 'Errada: nem sempre é preciso.', 'Errada: chamar o fabricante antes de olhar é o erro clássico — muitas falhas se veem a olho.')
-  }
-  '6542e0ab8e' = @{
-    q = 'Ao investigar uma falha, como se comprova a hipótese de "motor queimado"?'
-  }
-  '8034155407' = @{
-    q = 'Ao investigar uma falha, como se comprova a hipótese de "cabo que alimenta o motor rompido"?'
-  }
-  '777bb63bd2' = @{
-    q = 'Um motor, ao ser ligado, queima os fusíveis imediatamente. Que falha do motor causa isso?'
-    eo = @('Correta: curto entre bobinas.', 'Errada: faz roncar.', 'Errada: rolamento gasto dá ruído e aquecimento, não curto.', 'Errada: desliga, mas não queima fusível.', 'Errada: ventilador quebrado aquece o motor aos poucos; não queima fusível na hora.')
-  }
-  '4939ded637' = @{
-    q = 'Ao energizar, um motor ronca e não desenvolve torque. Que falha dos enrolamentos causa isso?'
-  }
-  '85990cabf0' = @{
-    q = 'Como se testa se uma bobina do motor está aberta?'
-    eo = @('Correta: ohmímetro início-fim.', 'Errada: isso testa isolação.', 'Errada: o alicate mostra corrente, mas não diz qual bobina está aberta.', 'Errada: o termovisor vê aquecimento, não interrupção da bobina.', 'Errada: não localiza e é arriscado.')
-  }
-  '7c26581603' = @{
-    q = 'No gráfico de tendência da figura, a corrente do motor M1 salta de 12 A para 18 A no horário em que a mesa parou. O que isso indica?'
-    eo = @('Correta: travamento com sobrecarga.', 'Errada: não é o que o gráfico mostra.', 'Errada: em vazio a corrente cai.', 'Errada: trocar o TC não muda a corrente do motor, só a leitura.', 'Errada: a parametrização errada explica a demora da proteção, não o salto de corrente.')
-  }
-  '6f44fa87ae' = @{
-    q = 'No caso do motor M1, por que a proteção do inversor demorou a desligar o motor que acabou queimando?'
-  }
-  '60771f0720' = @{
-    q = 'Qual é a ordem de validação de uma manutenção corretiva?'
-    eo = @('Correta: medir → testar → registrar → encerrar.', 'Errada: a OS só fecha depois de medir, testar e registrar.', 'Errada: registra-se o resultado, então medir e testar vêm antes do registro.', 'Errada: medir vem antes de testar, e a OS fecha por último.', 'Errada: sem medir e testar, não há como validar o reparo.')
-  }
-  '3e0036d18a' = @{
-    q = 'No caso do robô metalúrgico que não funcionava, qual era a causa do defeito?'
-    eo = @('Correta: curto no sinalizador.', 'Errada: as mensagens de falha de rede eram sintoma — a equipe perdeu dois dias nelas.', 'Errada: o controlador reiniciava porque a tensão caía, mas estava bom.', 'Errada: não era mecânico.', 'Errada: não era software.')
-  }
-  '5b89b4f38a' = @{
-    q = 'Por que a manutenção preditiva costuma ficar só nos equipamentos mais críticos?'
-  }
-  '30f017aedb' = @{
-    q = 'Que referência se usa para avaliar o resultado de uma inspeção instrumental?'
-    eo = @('Correta: fabricante ou histórico.', 'Errada: não é parâmetro técnico.', 'Errada: é parte do histórico, não sempre.', 'Errada: sem referência não se avalia.', 'Errada: outra fábrica tem equipamento e condição diferentes; compara-se com equipamento semelhante do próprio setor.')
-  }
-  '6c6cf71f3b' = @{
-    q = 'Num plano de manutenção preventiva, que serviço periódico se faz no inversor de frequência e no controlador programável?'
-    eo = @('Correta: backup.', 'Errada: trocar motor todo ano não é preventiva, é desperdício.', 'Errada: isolação é medição de motor, e não diária.', 'Errada: rebobinar é reparo de motor queimado, não preventiva.', 'Errada: pintura não protege o que se perde numa pane: os parâmetros e o programa.')
-  }
-  'd23bac9166' = @{
-    q = 'Antes de inspeção ou teste com o equipamento em funcionamento, o que se deve fazer?'
-    eo = @('Correta: comunicar.', 'Errada: o teste é com ele ligado.', 'Errada: nunca.', 'Errada: mexer nas proteções aumenta o risco, não o reduz.', 'Errada: o teste pode parar ou acionar a máquina de surpresa.')
-  }
-  '0817961da3' = @{
-    q = 'O que é preciso para implantar manutenção preditiva?'
-  }
-  '69361b5a7c' = @{
-    q = 'No plano de preditiva do motor M1, que grandezas são medidas mensalmente?'
-    eo = @('Correta: as quatro.', 'Errada: o plano do M1 mede grandezas elétricas, não temperatura.', 'Errada: rotação não está entre as grandezas medidas no plano do M1.', 'Errada: ruído é inspeção auditiva, não medição do plano.', 'Errada: preditiva é medição.')
-  }
-  '2b6bb736c3' = @{
-    q = 'Que resistência teria uma isolação perfeita?'
-  }
-  '3537562869' = @{
-    q = 'Por que se levam em conta as medições anteriores ao avaliar a isolação de um equipamento?'
-  }
-  '493acea6f7' = @{
-    q = 'Na correção da resistência de isolação para 40 °C, como o coeficiente kt varia com a temperatura do enrolamento?'
+  'a7a3a6761a' = @{
+    q = 'Num caso real, a chave 110/220 V de um transformador foi ligada invertida e a saída deu o dobro. Como o ohmímetro teria mostrado o erro antes?'
+    eo = @('Correta: leitura invertida.', 'Errada: as posições dão valores diferentes.', 'Errada: infinito seria bobina aberta.', 'Errada: zero seria curto.', 'Errada: as duas posições dão resistências diferentes, e a inversão aparece.')
   }
 }
 
