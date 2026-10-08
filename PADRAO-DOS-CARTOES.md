@@ -495,8 +495,10 @@ salientes são do motor síncrono), o significado da palavra (congêneres =
 do mesmo gênero). Sem nada a dizer, deixe `""` (§1.4.1).
 
 O `validar --rascunho` reprova cartão novo com a mesma nota em duas
-alternativas; o `auditar-banco` mede, no banco antigo, nota repetida e nota
-com menos de 30 caracteres.
+alternativas; o `auditar-banco` mede, no banco antigo, frase genérica ("não
+é o motivo", "não confere"), nota com menos de 20 caracteres e a mesma nota em
+três ou mais alternativas. Nota curta que nomeia a coisa ("Errada: isso é
+megômetro.") é boa e passa.
 
 #### 1.9.4 Pergunta sobre procedimento diz em que ponto dele estamos
 

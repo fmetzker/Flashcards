@@ -126,20 +126,31 @@ def material_no_enunciado(q):
     return None
 
 
+GENERICA = re.compile(
+    r'não é o (motivo|argumento|citado|critério|foco|caso|objetivo|indicador|teste|'
+    r'procedimento|correto)|não confere|não aparece|não tem relação|é outra (coisa|etapa|função)|'
+    r'é outro (documento|assunto)|não é a (definição|lista|solução)|não foi a solução|'
+    r'também invertid', re.I)
+
+
 def nota_que_nao_ensina(q):
     """1.9.3 — a nota por alternativa diz o que AQUELA alternativa é.
 
-    Dois sinais objetivos: a mesma nota repetida em alternativas erradas
-    diferentes, e nota curta demais para dizer qualquer coisa além de
-    "errada" ("Errada: não é o motivo."). Vazio não conta — é decisão válida
-    (§1.4.1). Matemática repete nota de propósito em erro de conta; o
-    julgamento de cada caso continua humano."""
+    Três sinais objetivos: frase genérica que serviria para qualquer
+    distrator ("não é o motivo", "não confere"), nota curta demais para dizer
+    algo além de "errada" ("Errada: nunca."), e a mesma nota em três ou mais
+    alternativas. Nota curta que nomeia a coisa ("Errada: isso é megômetro.")
+    passa, e duas alternativas com a mesma nota também — às vezes as duas são
+    mesmo "preventiva". Vazio não conta: é decisão válida (§1.4.1)."""
     eo = q.get('eo') or []
     notas = [n.strip() for i, n in enumerate(eo) if i != q['c'] and n and n.strip()]
-    rep = sorted({n for n in notas if notas.count(n) > 1})
+    gen = [n for n in notas if GENERICA.search(n) and len(n) < 45]   # a frase É a nota
+    if gen:
+        return f'nota genérica: "{gen[0][:60]}"'
+    rep = sorted({n for n in notas if notas.count(n) > 2})
     if rep:
         return f'a mesma nota em {notas.count(rep[0])} alternativas: "{rep[0][:50]}"'
-    curtas = [n for n in notas if len(n) < 30]
+    curtas = [n for n in notas if len(n) < 20]
     if curtas:
         return f'nota curta demais para ensinar: "{curtas[0]}"'
     return None
