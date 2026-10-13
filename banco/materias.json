@@ -11,5 +11,6 @@
 {"id":"biologia-celular","nome":"Biologia Celular","avulsa":true},
 {"id":"comandos-eletricos","nome":"Comandos Elétricos","avulsa":true},
 {"id":"maquinas-eletricas","nome":"Máquinas Elétricas","avulsa":true},
-{"id":"manutencao-eletrica","nome":"Manutenção Elétrica","avulsa":true}
+{"id":"manutencao-eletrica","nome":"Manutenção Elétrica","avulsa":true},
+{"id":"morfofuncional","nome":"Ciências Morfofuncionais","avulsa":true}
 ]
