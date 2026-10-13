@@ -158,8 +158,7 @@ regra 9 do `CLAUDE.md` proíbe script de gravação em lote no banco, e
 preencher `eo` retroativamente é trabalho de conteúdo, revisado um cartão
 de cada vez, não de automação. Mas existe uma campanha em andamento,
 matéria por matéria, priorizada pela cobertura mais baixa medida em
-agosto/2026 (`com eo / total`): Biologia Celular (0%, prioridade máxima —
-nenhum dos 134 cartões tinha `eo`), depois SUS (64%) e Inglês (70%),
+agosto/2026 (`com eo / total`): SUS (64%) e Inglês (70%),
 Enfermagem do Trabalho (74%), Português e Matemática (73-74%), até
 Manutenção Mecânica e Enfermagem (90%, já bem cobertas). `eo` retroativo
 segue o mesmo critério de "vale a pena" desta seção — não é preencher tudo
@@ -835,8 +834,8 @@ para evitar:
 1. **Matéria**: a de menor contagem no banco, entre as que algum concurso
    ativo usa e que têm fonte real para consultar (`banco/topicos.json` ou
    conteúdo já estabelecido). Duas exclusões, e as duas são inelegibilidade,
-   não fraqueza: matéria **sem fonte** — caso de `psicologia` enquanto não
-   sai o edital — fica fora pela regra 11 do `CLAUDE.md`; matéria **sem
+   não fraqueza: matéria **sem fonte** — caso de cargo pré-edital sem
+   conteúdo programático publicado — fica fora pela regra 11 do `CLAUDE.md`; matéria **sem
    concurso ativo** fica fora pela regra 12, porque ninguém consegue estudá-la
    hoje. A segunda o `validar` reprova sozinho, no rascunho, antes de gravar;
    a primeira depende de julgamento, porque "não existe fonte" é coisa que

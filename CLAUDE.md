@@ -24,16 +24,17 @@ colaborativo. Hoje atende três concursos: Enfermeiro/Volta Redonda (edital
 nas Normas CPES 2026 enquanto a Capitania da conta não abre o PS). Novo
 concurso é editar `concursos.json` — não exige mexer no código.
 
-Os quatro cargos da Transpetro (Moço de Máquinas, Enfermagem do Trabalho,
-Psicologia e Manutenção Mecânica) saíram de `concursos.json` porque ninguém
-mais vai prestar essas provas — mas os bancos de questões continuam no
-repositório, intactos, para o caso de precisarem voltar. Matéria sem
+Os cargos da Transpetro (Moço de Máquinas, Enfermagem do Trabalho e
+Manutenção Mecânica) saíram de `concursos.json` porque ninguém mais vai
+prestar essas provas — mas os bancos de questões continuam no repositório,
+intactos, para o caso de precisarem voltar. Matéria sem
 concurso ativo é situação normal no app: a matéria só não aparece pra ninguém estudar até algum concurso
 voltar a referenciá-la em `blocos[].materias`, **ou** até ser marcada
 `"avulsa": true` em `banco/materias.json` — o segundo caminho, hoje usado
-por Enfermagem do Trabalho, Psicologia e Máquinas e Prática Marítima (nenhuma
-delas referenciada por concurso algum no momento) além de Biologia Celular
-(nunca teve concurso, avulsa desde que nasceu). Ver regra 12.
+por Enfermagem do Trabalho e Máquinas e Prática Marítima (nenhuma delas
+referenciada por concurso algum no momento) além das matérias de curso
+próprio, que nunca tiveram concurso: as três de Eletrotécnica e Ciências
+Morfofuncionais. Ver regra 12.
 
 ## Estrutura
 
@@ -177,9 +178,10 @@ no Safari do iPhone sem nenhuma etapa de compilação.
     regra de aprovação e conteúdo programático saem do edital publicado, e
     o campo `edital` de `concursos.json` diz de onde. Quando a fonte não
     existe (pré-edital, cargo novo), registrar o que é certo e deixar o
-    resto **vazio e declarado** — como `psicologia`, que ficou sem árvore
-    em `topicos.json` porque era ênfase nova da Transpetro em 2026 e não
-    havia edital anterior para esse cargo. Assunto
+    resto **vazio e declarado** — como o `cfaq-moc-mom`, pré-edital, com
+    data provisória e escopo tirado das normas e das provas anteriores, ou
+    a matéria de curso próprio que não ganha árvore em `topicos.json` por
+    não ter edital nenhum. Assunto
     inventado é pior que assunto faltando: a pessoa estuda com sensação de
     cobertura e chega na prova sem ter visto o que caiu.
 12. **Concurso que ninguém mais vai prestar sai de `concursos.json`, mas o
@@ -187,9 +189,9 @@ no Safari do iPhone sem nenhuma etapa de compilação.
     oferecer aquele cargo pra estudo — não apaga o trabalho de escrever as
     questões, que pode servir de novo se o concurso voltar (mudança de
     edital, prova adiada) ou se outro concurso vier a usar a mesma matéria.
-    Foi o caso dos quatro cargos da Transpetro: saíram de `concursos.json`,
-    e os bancos das matérias continuam intactos. `maritimo-maquinas`,
-    `enfermagem-trabalho` e `psicologia` estão marcadas `"avulsa": true` em
+    Foi o caso dos cargos da Transpetro: saíram de `concursos.json`, e os
+    bancos das matérias continuam intactos. `maritimo-maquinas` e
+    `enfermagem-trabalho` estão marcadas `"avulsa": true` em
     `banco/materias.json`: continuam sem concurso atrás, mas são conteúdo
     avulso de propósito, à disposição de quem quiser seguir sem prova
     nenhuma. `manutencao-mecanica` e `ingles` ficaram **inativas** (nem
@@ -198,6 +200,13 @@ no Safari do iPhone sem nenhuma etapa de compilação.
     Matéria sem concurso ativo **e** sem avulsa declarada não é estudada automaticamente por
     ninguém — só entra na sessão de quem, na tela de seleção, marcá-la à mão
     como matéria avulsa (ver "Matéria, tópico e subtópico").
+
+    **Excluir uma matéria de vez** — arquivo do banco, figuras, fila em
+    `requisitos.json` e entrada em `materias.json` — é decisão explícita do
+    dono do projeto, nunca limpeza por iniciativa de quem mantém o banco. O
+    git guarda o que saiu; o app descarta da conta a matéria avulsa que
+    deixou de existir, e o painel ignora as respostas antigas dela como id
+    órfão.
 
     **Guardar é uma coisa, escrever é outra: cartão novo só entra em matéria
     ativa.** O que já existe fica intacto — corrigir alternativa, explicação,
@@ -281,8 +290,7 @@ Antes de escrever qualquer cartão, ler `PADRAO-DOS-CARTOES.md`.
 dos concursos cadastrados em `concursos.json` que a usam, mas matéria sem
 nenhum concurso ativo é situação normal, não erro: fica no banco, disponível
 pra quando algum concurso voltar a referenciá-la (é o caso de
-`maritimo-maquinas` e `enfermagem-trabalho` hoje, e já foi o caso de
-`psicologia` antes dela ganhar um concurso próprio):
+`maritimo-maquinas` e `enfermagem-trabalho` hoje):
 
 **Não há tabela de contagem aqui de propósito:** contagem mantida à mão num
 arquivo que ninguém relê é pior que contagem nenhuma, porque parece verdade.
@@ -299,10 +307,8 @@ for m in json.load(open('banco/materias.json', encoding='utf-8')):
 PY
 ```
 
-Dois fatos sobre matérias que **não** saem de contagem nenhuma:
+Um fato sobre matérias que **não** sai de contagem nenhuma:
 
-- **`psicologia` não tem árvore em `topicos.json`** porque não existe edital
-  anterior do cargo na Transpetro — regra 11, e não esquecimento.
 - **`matematica` tem o tópico `Lógica`, que não consta do Anexo IV.** Fica no
   banco por ser útil, mas está fora do escopo declarado do concurso.
 

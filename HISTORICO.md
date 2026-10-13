@@ -17,6 +17,19 @@ que o código já diz não vem: some.
 
 ---
 
+## Psicologia e Biologia Celular excluídas (outubro/2026)
+
+Em 13/10 o dono do projeto pediu para excluir as duas matérias de vez, contra
+o que a regra 12 previa até então (o banco fica mesmo sem concurso).
+Psicologia estava vazia desde que o cargo da Transpetro saiu de
+`concursos.json`; Biologia Celular tinha 144 cartões, 7 figuras e fila
+própria, de um curso que deixou de ser estudado. Saíram arquivo, figuras,
+fila e entrada em `materias.json`; os testes do motor que usavam Biologia
+Celular como exemplo de matéria avulsa passaram a usar Ciências
+Morfofuncionais. A regra 12 ganhou a ressalva de que excluir é decisão do
+dono, e o conteúdo continua recuperável pelo git (commit anterior a esta
+exclusão).
+
 ## O aprovador importava o progresso de todo mundo (outubro/2026)
 
 O pull pessoal (`puxarPaginado()`, eventos e simulados) nunca filtrou por

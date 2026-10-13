@@ -3679,68 +3679,6 @@
         ]
       }
     },
-    "biologia-celular": {
-      "criterio": "A fila segue a própria estrutura do curso (Alberts, Fundamentos da biologia celular), do que é uma célula até como ela conversa. (1-3) a base: Teoria celular (quem descobriu a célula e como), Microscopia e classificação celular (procarionte × eucarionte, técnicas de observação) e Célula animal, vegetal e vírus, a comparação de tipos que só faz sentido depois de saber classificar. (4-6) a membrana: Composição da membrana e mosaico fluido → Especializações da membrana e transporte passivo → Transporte ativo e endo/exocitose, que é o degrau seguinte (ativo é o que passivo não explica: contra gradiente, com gasto de ATP). (7-8) a sinalização, que parte da mesma membrana: Moléculas e tipos de sinalização celular → Receptores celulares e proteína G, o mecanismo. (9-10) o citoesqueleto: Citosol e microtúbulos → Actina e filamentos intermediários, as três famílias de filamento na ordem que o próprio banco já usa.",
-      "requisitos": {
-        "Microscopia e classificação celular": [
-          "Teoria celular"
-        ],
-        "Célula animal, vegetal e vírus": [
-          "Microscopia e classificação celular"
-        ],
-        "Composição da membrana e mosaico fluido": [
-          "Célula animal, vegetal e vírus"
-        ],
-        "Especializações da membrana e transporte passivo": [
-          "Composição da membrana e mosaico fluido"
-        ],
-        "Transporte ativo e endo/exocitose": [
-          "Especializações da membrana e transporte passivo"
-        ],
-        "Moléculas e tipos de sinalização celular": [
-          "Transporte ativo e endo/exocitose"
-        ],
-        "Receptores celulares e proteína G": [
-          "Moléculas e tipos de sinalização celular"
-        ],
-        "Citosol e microtúbulos": [
-          "Receptores celulares e proteína G"
-        ],
-        "Actina e filamentos intermediários": [
-          "Citosol e microtúbulos"
-        ]
-      },
-      "criterio_conceitual": "10 tópicos, sem subtópico, cada um cobrindo um recorte fechado do currículo de biologia celular (Alberts, Fundamentos da biologia celular). Teoria celular é a base histórica — quem descobriu a célula e como — e não pressupõe nada. Microscopia e classificação celular (procarionte×eucarionte, técnicas de observação) exige Teoria celular porque classificar célula pressupõe já saber o que é uma célula. Daqui o grafo se ramifica em três frentes que não dependem uma da outra, todas exigindo só Microscopia e classificação celular como base comum: (1) Célula animal, vegetal e vírus — comparação de tipos celulares e a posição do vírus como parasita intracelular obrigatório, síntese que só faz sentido depois de já saber classificar célula; (2) a membrana — Composição da membrana e mosaico fluido é o primeiro passo, Especializações da membrana e transporte passivo exige o modelo de mosaico fluido pra explicar como a especialização e o transporte passivo atravessam essa estrutura, e Transporte ativo e endo/exocitose exige o transporte passivo por ser o próximo degrau (ativo é o que passivo não explica: contra gradiente, com gasto de ATP); a sinalização celular também parte da membrana — Moléculas e tipos de sinalização celular exige Composição da membrana porque sinalização parácrina/endócrina/autócrina se liga a receptores DA membrana, e Receptores celulares e proteína G exige Moléculas e tipos de sinalização porque o receptor é o mecanismo, não faz sentido sem já saber que tipos de sinal existem; (3) o citoesqueleto — Citosol e microtúbulos exige só Microscopia e classificação celular (microtúbulo é uma estrutura da célula eucarionte), e Actina e filamentos intermediários exige Citosol e microtúbulos por ser a continuação do mesmo assunto (as três famílias de filamento do citoesqueleto, na ordem que o próprio banco já usa). Fica sem dependência conceitual só Teoria celular — a base de tudo o que vem depois, e por isso também a primeira da fila.",
-      "requisitos_conceituais": {
-        "Microscopia e classificação celular": [
-          "Teoria celular"
-        ],
-        "Célula animal, vegetal e vírus": [
-          "Microscopia e classificação celular"
-        ],
-        "Composição da membrana e mosaico fluido": [
-          "Microscopia e classificação celular"
-        ],
-        "Especializações da membrana e transporte passivo": [
-          "Composição da membrana e mosaico fluido"
-        ],
-        "Transporte ativo e endo/exocitose": [
-          "Especializações da membrana e transporte passivo"
-        ],
-        "Moléculas e tipos de sinalização celular": [
-          "Composição da membrana e mosaico fluido"
-        ],
-        "Receptores celulares e proteína G": [
-          "Moléculas e tipos de sinalização celular"
-        ],
-        "Citosol e microtúbulos": [
-          "Microscopia e classificação celular"
-        ],
-        "Actina e filamentos intermediários": [
-          "Citosol e microtúbulos"
-        ]
-      }
-    },
     "enfermagem-trabalho": {
       "criterio": "17 tópicos, todos fatos paralelos dentro de si (mesmo caso de manutencao-mecanica: nenhum ganhou escada interna, campo n). Matéria ficou sem nenhuma entrada aqui até virar avulsa — os 17 abriam juntos, sem ordem nenhuma. Fila de ORDEM DE ENSINO (não dependência de conceito — ver '_a_fila' no topo do arquivo), seguindo a lógica de um currículo de saúde do trabalhador: Sistema de Saúde Brasileiro abre primeiro por situar onde a saúde do trabalhador entra dentro do SUS, a base institucional de tudo; Legislação de Segurança e Medicina do Trabalho em seguida, o arcabouço legal (NRs) que sustenta os programas que vêm depois; Elementos de Higiene Ocupacional introduz os agentes de risco (físico, químico, biológico) que Toxicologia da Indústria de Petróleo, Gás e Derivados especializa para o setor, e que Biossegurança e Saúde complementa do lado da proteção; Epidemiologia e Vigilância da Saúde do Trabalhador dá o instrumental de medição que Doenças Profissionais e Doenças Relacionadas ao Trabalho aplica; PCMSO segue por ser o programa que rastreia justamente essas doenças, e Administração de Serviços de Saúde e dos SESMT vem depois por ser a estrutura organizacional que roda o PCMSO; Gestão de Segurança e Saúde do Trabalho generaliza essa gestão; Ergonomia Aplicada ao Trabalho e Bem-Estar, Saúde e Qualidade de Vida no Trabalho tratam do lado humano/postural, o segundo generalizando o primeiro; Níveis de Atenção à Saúde situa onde a assistência acontece; Sistematização da Assistência de Enfermagem é o método de cuidado que Assistência de Enfermagem em Urgências e Emergências aplica a um contexto agudo; Ética e Deontologia de Enfermagem, base profissional que atravessa tudo, mas sem travar nada abaixo dela; Bioestatística, ferramenta de análise que não trava nem depende de nenhum outro tópico da lista, fecha a fila.",
       "requisitos": {

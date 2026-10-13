@@ -121,14 +121,14 @@ module.exports = function (APP, t) {
   t.grupo('meta — matéria avulsa');
 
   t.teste('matéria avulsa vira bloco com peso próprio', async () => {
-    await APP.montar({ concursos: [], avulsas: ['biologia-celular'] });
-    const b = bloco('biologia-celular');
+    await APP.montar({ concursos: [], avulsas: ['morfofuncional'] });
+    const b = bloco('morfofuncional');
     t.ok(b, 'avulsa devia ter virado bloco da meta');
     t.igual(b.peso, APP.META_MATERIA_AVULSA);
   });
 
   t.teste('avulsa não depende de concurso nenhum', async () => {
-    await APP.montar({ concursos: [], avulsas: ['biologia-celular'] });
+    await APP.montar({ concursos: [], avulsas: ['morfofuncional'] });
     t.igual(APP.CONCURSO, null, 'sem concurso seguido, CONCURSO é null');
     t.igual(APP.BLOCOS, [], 'sem concurso, BLOCOS (da prova) fica vazio');
     t.ok(APP.BLOCOS_META.length > 0, 'mas BLOCOS_META tem o bloco sintético da avulsa');
