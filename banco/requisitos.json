@@ -4663,6 +4663,15 @@
         ],
         "Articulações": [
           "Esqueleto axial e apendicular"
+        ],
+        "Tipos de tecido muscular": [
+          "Articulações"
+        ],
+        "Contração muscular": [
+          "Tipos de tecido muscular"
+        ],
+        "Nomes e classificação dos músculos": [
+          "Contração muscular"
         ]
       }
     }

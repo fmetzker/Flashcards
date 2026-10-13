@@ -339,3 +339,143 @@ _fig("articulacoes-tipos-abcd", _articulacoes, "Quatro esquemas de união entre 
      "paralelos, ligados ao longo do comprimento por uma membrana de fibras. C: duas peças ósseas separadas "
      "por uma faixa azul de cartilagem. D: duas extremidades ósseas cobertas por cartilagem azul, separadas "
      "por um espaço com líquido e envolvidas por uma cápsula.")
+
+
+# ---- músculo ---------------------------------------------------------------------
+
+def _estrias(d, x0, x1, y0, y1, passo=5):
+    for x in range(int(x0) + 3, int(x1) - 2, passo):
+        d.linha([(x, y0 + 2), (x, y1 - 2)], cor="#B5615A", esp=0.9)
+
+
+def _tecidos_musculares():
+    d = Desenho(420, 300)
+    # A: estriado esquelético — fibras longas, estriadas, muitos núcleos na periferia
+    for y in (18, 50):
+        d._add(f'<rect x="50" y="{y}" width="350" height="26" rx="10" fill="{MUSCULO_CLARO}" stroke="{{c}}" '
+               f'stroke-width="1.3"/>', [(50, y), (400, y + 26)])
+        _estrias(d, 52, 398, y, y + 26)
+        for k, x in enumerate(range(80, 390, 46)):
+            _elipse(d, x, y + (4 if k % 2 else 22), 8, 2.6, preench=NUCLEO, esp=0)
+    # B: liso — células fusiformes, um núcleo central, sem estrias
+    for linha, y in enumerate((112, 132, 152)):
+        for x in range(60 + (linha % 2) * 34, 400, 68):
+            fus = f"M {x - 34},{y} Q {x},{y - 11} {x + 34},{y} Q {x},{y + 11} {x - 34},{y} Z"
+            _caminho(d, fus, [(x - 34, y - 11), (x + 34, y + 11)], preench=MUSCULO_CLARO, esp=1.1)
+            _elipse(d, x, y, 7, 2.4, preench=NUCLEO, esp=0)
+    # C: estriado cardíaco — fibras ramificadas, estriadas, núcleo central, discos intercalares
+    fibra = ("M 50,206 L 190,206 L 236,186 L 400,186 L 400,208 L 250,208 L 214,226 L 400,226 L 400,248 "
+             "L 210,248 L 190,236 L 50,236 Z")
+    _caminho(d, fibra, [(50, 186), (400, 248)], preench=MUSCULO_CLARO, esp=1.3)
+    _estrias(d, 52, 188, 206, 236)
+    _estrias(d, 238, 398, 186, 208)
+    _estrias(d, 216, 398, 226, 248)
+    for x, y in ((100, 221), (300, 197), (320, 237)):
+        _elipse(d, x, y, 7, 3.2, preench=NUCLEO, esp=0)
+    for x, ya, yb in ((150, 206, 236), (350, 186, 208), (260, 226, 248)):
+        d.linha([(x, ya), (x + 3, (ya + yb) / 2), (x, yb)], esp=3.2)
+    for t, y in (("A", 46), ("B", 132), ("C", 217)):
+        _rotulo(d, 24, y, t)
+    return d
+
+
+_fig("musculos-tres-tecidos-abc", _tecidos_musculares, "Três tecidos musculares vistos ao microscópio, em "
+     "faixas. A: fibras longas e cilíndricas, com listras transversais e vários núcleos achatados encostados na "
+     "borda. B: células em forma de fuso, sem listras, cada uma com um único núcleo no meio. C: fibras com "
+     "listras transversais que se ramificam e se unem, com um núcleo no centro de cada célula e traços escuros "
+     "atravessando a fibra onde uma célula encosta na outra.")
+
+
+def _envoltorios():
+    d = Desenho(360, 300)
+    cx, cy = 160, 150
+    d.circulo(cx, cy, 118, preench="#F6E3D6", esp=4.5)
+    fasc = [(cx, cy - 58), (cx + 56, cy - 14), (cx + 34, cy + 56), (cx - 36, cy + 56), (cx - 56, cy - 14), (cx, cy + 4)]
+    for fx, fy in fasc:
+        d.circulo(fx, fy, 34, preench="#EFC9BE", esp=2.4)
+        for j in range(-3, 4):
+            for i in range(-3, 4):
+                x, y = fx + i * 9.5 + (4.7 if j % 2 else 0), fy + j * 8.4
+                if (x - fx) ** 2 + (y - fy) ** 2 < 28 ** 2:
+                    d.circulo(x, y, 4.2, preench=MUSCULO_CLARO, esp=0.7)
+    _chamada(d, (cx + 84, cy - 84), (300, 40), "A")
+    _chamada(d, (cx + 56 + 34, cy - 14), (316, 150), "B")
+    _chamada(d, (cx + 34 + 9.5, cy + 56 + 8.4), (300, 262), "C")
+    return d
+
+
+_fig("musculo-envoltorios-abc", _envoltorios, "Corte transversal de um músculo esquelético: um grande "
+     "círculo envolvido por uma camada externa grossa (marcada A). Dentro dele, vários feixes redondos, cada "
+     "um contornado por uma camada própria (o contorno de um feixe está marcado B). Dentro de cada feixe, "
+     "muitos círculos pequenos, cada um envolvido por uma camada finíssima (a de um deles está marcada C).")
+
+
+def _sarcomero(d, y, z0, z1, rotulos=False):
+    meio = (z0 + z1) / 2
+    for z in (z0, z1):
+        d.linha([(z, y - 34), (z, y + 34)], esp=3)
+    for k in range(-2, 3):                                  # filamentos finos, presos às linhas Z
+        yy = y + k * 14
+        d.linha([(z0, yy), (z0 + 120, yy)], cor="#4F6FA8", esp=1.6)
+        d.linha([(z1, yy), (z1 - 120, yy)], cor="#4F6FA8", esp=1.6)
+    for k in (-1.5, -0.5, 0.5, 1.5):                        # filamentos grossos, no centro
+        yy = y + k * 14
+        d.linha([(meio - 80, yy), (meio + 80, yy)], cor="#B5524A", esp=4)
+        for x in range(int(meio - 74), int(meio + 75), 12):
+            if abs(x - meio) > 8:
+                s = 1 if x > meio else -1
+                d.linha([(x, yy), (x + s * 4, yy - 4)], cor="#B5524A", esp=1.2)
+                d.linha([(x, yy), (x + s * 4, yy + 4)], cor="#B5524A", esp=1.2)
+    if rotulos:
+        _chamada(d, (z0 + 30, y - 28), (z0 + 30, y - 58), "X")
+        _chamada(d, (meio + 50, y + 7), (meio + 96, y + 58), "Y")
+
+
+def _sarcomeros():
+    d = Desenho(420, 300)
+    _sarcomero(d, 90, 40, 380, rotulos=True)
+    _sarcomero(d, 230, 90, 330)
+    d.texto(210, 150, "relaxado", tam=12, ancora="middle", italico=True)
+    d.texto(210, 290, "contraído", tam=12, ancora="middle", italico=True)
+    return d
+
+
+_fig("sarcomero-relaxado-contraido", _sarcomeros, "Dois esquemas do mesmo sarcômero, um embaixo do outro, "
+     "delimitados por duas linhas verticais grossas. Presos a cada linha vertical, filamentos finos azuis "
+     "apontam para o centro (um marcado X); no centro, filamentos grossos vermelhos com pequenas cabeças "
+     "(um marcado Y). Em cima, legenda 'relaxado'; embaixo, legenda 'contraído', com as linhas verticais mais "
+     "próximas e os filamentos finos avançando mais sobre os grossos.")
+
+
+def _formas_musculo():
+    d = Desenho(440, 200)
+    # A: circular — anel de fibras em volta de uma abertura
+    for r in (16, 22, 28, 34):
+        _elipse(d, 60, 80, r + 10, r, esp=1.4, cor="#B5524A")
+    _elipse(d, 60, 80, 20, 10, preench="#fff", esp=1.6)
+    # B: triangular (convergente) — fibras em leque convergindo para um tendão
+    for k in range(9):
+        d.linha([(150 + k * 9, 30 + abs(k - 4) * 3), (186, 132)], cor="#B5524A", esp=1.6)
+    d.linha([(186, 132), (186, 152)], esp=3)
+    # C: fusiforme — fusiforme com fibras paralelas e tendões nas pontas
+    _caminho(d, "M 280,30 Q 312,82 280,134 Q 248,82 280,30 Z", [(248, 30), (312, 134)], preench=MUSCULO_CLARO, esp=1.6)
+    for dx in (-12, -6, 0, 6, 12):
+        d._add(f'<path d="M 280,36 Q {280 + dx * 2.2},82 280,128" fill="none" stroke="#B5524A" stroke-width="1.2"/>',
+               [(280 + dx * 2.2, 36), (280, 128)])
+    d.linha([(280, 12), (280, 30)], esp=3)
+    d.linha([(280, 134), (280, 152)], esp=3)
+    # D: peniforme — tendão central com fibras oblíquas dos dois lados
+    d.linha([(380, 14), (380, 152)], esp=3)
+    for y in range(34, 132, 10):
+        d.linha([(380, y), (356, y - 16)], cor="#B5524A", esp=1.6)
+        d.linha([(380, y), (404, y - 16)], cor="#B5524A", esp=1.6)
+    for t, x in (("A", 60), ("B", 186), ("C", 280), ("D", 380)):
+        _rotulo(d, x, 180, t)
+    return d
+
+
+_fig("musculos-formas-abcd", _formas_musculo, "Quatro esquemas da disposição das fibras de um músculo. A: "
+     "fibras em anéis concêntricos ao redor de uma abertura. B: fibras em leque, largas de um lado e "
+     "convergindo para um único tendão do outro. C: músculo alongado, mais grosso no meio e afinando nas duas "
+     "pontas, com fibras paralelas e um tendão em cada ponta. D: um tendão central percorrendo todo o "
+     "comprimento, com fibras curtas e oblíquas saindo dos dois lados, como uma pena.")
