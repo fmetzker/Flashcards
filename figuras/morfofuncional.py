@@ -479,3 +479,122 @@ _fig("musculos-formas-abcd", _formas_musculo, "Quatro esquemas da disposição d
      "convergindo para um único tendão do outro. C: músculo alongado, mais grosso no meio e afinando nas duas "
      "pontas, com fibras paralelas e um tendão em cada ponta. D: um tendão central percorrendo todo o "
      "comprimento, com fibras curtas e oblíquas saindo dos dois lados, como uma pena.")
+
+
+# ---- sistema reprodutor ------------------------------------------------------------
+
+ROSA = "#F4C7C3"
+ROSA_ESC = "#E39A94"
+OVARIO = "#F6DCB4"
+GLANDULA = "#E8D3A4"
+
+
+def _feminino():
+    d = Desenho(400, 300)
+    utero = ("M 140,92 C 140,58 260,58 260,92 C 260,140 226,170 216,196 L 216,206 L 184,206 L 184,196 "
+             "C 174,170 140,140 140,92 Z")
+    _caminho(d, utero, [(140, 58), (260, 206)], preench=ROSA_ESC, esp=1.8)
+    _caminho(d, "M 160,90 C 176,86 224,86 240,90 L 204,160 L 196,160 Z", [(160, 86), (240, 160)],
+             preench=ROSA, esp=1)                                   # cavidade com endométrio
+    _caminho(d, "M 186,206 L 182,286 L 218,286 L 214,206 Z", [(182, 206), (218, 286)], preench=ROSA, esp=1.6)
+    for s in (-1, 1):                                               # tubas, ovários e fímbrias
+        x0 = 200 + s * 60
+        tuba = (f"M {x0},86 C {200 + s * 110},62 {200 + s * 150},54 {200 + s * 160},88 "
+                f"C {200 + s * 166},108 {200 + s * 158},124 {200 + s * 146},132")
+        xs = sorted((x0, 200 + s * 166))
+        _caminho(d, tuba, [(xs[0], 54), (xs[1], 132)], cor="{c}", esp=10)
+        _caminho(d, tuba, [(xs[0], 54), (xs[1], 132)], cor=ROSA, esp=7)
+        for a in (-40, -15, 10, 35, 60):
+            ang = math.radians(a + (90 if s > 0 else 90))
+            fx, fy = 200 + s * 146, 132
+            d.linha([(fx, fy), (fx + s * 14 * math.cos(math.radians(a)), fy + 14 * math.sin(math.radians(a)) + 6)],
+                    esp=2.2)
+        _elipse(d, 200 + s * 112, 150, 24, 14, preench=OVARIO, esp=1.6)
+        d.linha([(200 + s * 88, 150), (200 + s * 62, 118)], esp=1.4, tracejado="3 3")
+    _chamada(d, (88, 150), (30, 196), "A")
+    _chamada(d, (100, 64), (64, 22), "B")
+    _chamada(d, (46, 146), (22, 112), "C")
+    _chamada(d, (240, 120), (330, 210), "D")
+    _chamada(d, (200, 250), (270, 262), "E")
+    return d
+
+
+_fig("reprodutor-feminino-abcde", _feminino, "Esquema frontal dos órgãos internos femininos. No centro, um "
+     "órgão oco em forma de pera invertida, com a cavidade interna triangular (marcado D), que se estreita "
+     "embaixo e continua num canal até a abertura externa (marcado E). Do alto do órgão central sai, para "
+     "cada lado, um tubo fino e curvo (marcado B do lado esquerdo) que termina em franjas abertas (marcadas "
+     "C). Logo abaixo de cada franja, um órgão oval preso ao órgão central por um cordão (o da esquerda "
+     "marcado A).")
+
+
+def _masculino():
+    d = Desenho(380, 330)
+    d.circulo(170, 80, 42, preench="#FBF1C8", esp=1.8)              # bexiga
+    d.texto(170, 84, "bexiga", tam=11, ancora="middle", italico=True)
+    _elipse(d, 232, 104, 11, 30, preench=GLANDULA, esp=1.5, rot=18)  # vesícula seminal
+    _elipse(d, 170, 142, 26, 19, preench=GLANDULA, esp=1.6)         # próstata
+    d.circulo(186, 178, 6, preench=GLANDULA, esp=1.3)               # bulbouretral
+    uretra = "M 170,122 L 170,184 C 170,206 150,214 128,222 L 62,252"
+    _caminho(d, uretra, [(62, 122), (170, 252)], cor="#B5524A", esp=2.2)
+    _caminho(d, "M 166,192 C 150,204 120,212 92,226 L 56,244 L 66,264 L 104,248 C 132,236 160,228 176,210 Z",
+             [(56, 192), (176, 264)], preench=ROSA, esp=1.6)        # pênis
+    _caminho(d, uretra, [(62, 122), (170, 252)], cor="#B5524A", esp=2.2)
+    d.circulo(52, 256, 13, preench=ROSA_ESC, esp=1.4)               # glande
+    _caminho(d, "M 126,250 C 112,286 136,322 168,318 C 200,314 206,276 186,250 Z", [(112, 250), (206, 322)],
+             preench="#F7E3DA", esp=1.2)                            # escroto
+    _elipse(d, 156, 286, 20, 26, preench=OVARIO, esp=1.6)           # testículo
+    _caminho(d, "M 172,262 C 186,270 188,296 172,310", [(172, 262), (188, 310)], cor="#9C6B3E", esp=7)
+    deferente = "M 172,310 C 196,300 202,262 214,220 C 226,180 252,140 256,100 C 260,52 214,40 204,60 C 196,76 200,110 186,130"
+    _caminho(d, deferente, [(172, 40), (260, 310)], cor="#4F6FA8", esp=2.4)
+    _chamada(d, (150, 290), (88, 300), "A")
+    _chamada(d, (184, 286), (240, 300), "B")
+    _chamada(d, (226, 196), (296, 214), "C")
+    _chamada(d, (236, 92), (300, 70), "D")
+    _chamada(d, (188, 146), (300, 150), "E")
+    _chamada(d, (190, 180), (260, 250), "F")
+    return d
+
+
+_fig("reprodutor-masculino-abcdef", _masculino, "Esquema lateral dos órgãos masculinos. No alto, a bexiga. "
+     "Logo abaixo dela, envolvendo o início do canal que sai da bexiga, uma glândula arredondada (marcada E); "
+     "atrás da bexiga, uma glândula alongada (marcada D); abaixo da glândula E, uma glândula pequena e redonda "
+     "(marcada F). O canal segue pelo pênis até a ponta. Embaixo, dentro do escroto, um órgão oval (marcado A), "
+     "com uma estrutura em forma de vírgula encostada atrás dele (marcada B). Dessa estrutura sai um tubo "
+     "azul (marcado C) que sobe, contorna a bexiga por cima e desce por trás dela até a glândula E.")
+
+
+def _ciclo():
+    d = Desenho(440, 290)
+    x0, x1, base, alto = 60, 400, 240, 50
+    X = lambda dia: x0 + (dia - 1) * (x1 - x0) / 27
+    d._add(f'<rect x="{_n(X(1))}" y="{alto}" width="{_n(X(5) - X(1))}" height="{base - alto}" fill="#F8DCDC"/>',
+           [(X(1), alto), (X(5), base)])
+    d.texto(X(1), alto - 8, "menstruação", tam=10, italico=True)
+    d.linha([(x0, alto - 6), (x0, base), (x1 + 6, base)], esp=1.6)
+    for dia in (1, 7, 14, 21, 28):
+        d.linha([(X(dia), base), (X(dia), base + 5)], esp=1.2)
+        d.texto(X(dia), base + 18, str(dia), tam=11, ancora="middle")
+    d.texto((x0 + x1) / 2, base + 36, "dia do ciclo", tam=11, ancora="middle", italico=True)
+    d.linha([(X(14), alto - 4), (X(14), base)], esp=1, tracejado="4 3")
+    d.texto(X(14), alto - 8, "ovulação", tam=10, ancora="middle", italico=True)
+    g = lambda t, c, w: math.exp(-((t - c) / w) ** 2)
+    curvas = [  # (rótulo, cor, função do dia -> 0..1, dia do rótulo)
+        ("1", "#2E7D4F", lambda t: 0.22 + 0.1 * g(t, 4, 3) + 0.25 * g(t, 14, 0.9), 4),
+        ("2", "#B5524A", lambda t: 0.08 + 0.85 * g(t, 14, 0.9), 14),
+        ("3", "#4F6FA8", lambda t: 0.1 + 0.62 * g(t, 12.8, 2.2) + 0.3 * g(t, 21, 3), 11),
+        ("4", "#9C6B3E", lambda t: 0.04 + 0.62 * g(t, 21.5, 3.2), 22),
+    ]
+    for rot, cor, f, dia_r in curvas:
+        pts = [(X(t / 4), base - f(t / 4) * (base - alto - 20)) for t in range(4, 113)]
+        d.linha(pts, cor=cor, esp=2.4)
+        xr, yr = X(dia_r), base - f(dia_r) * (base - alto - 20) - 16
+        _rotulo(d, xr + (14 if rot == "1" else 0), yr, rot, tam=12)
+    return d
+
+
+_fig("ciclo-hormonios-1234", _ciclo, "Gráfico dos níveis de quatro hormônios ao longo de um ciclo de 28 dias, "
+     "com a menstruação marcada nos dias 1 a 5 e a ovulação no dia 14. Curva 1: baixa, com uma elevação leve no "
+     "início do ciclo e um pico pequeno no dia 14. Curva 2: baixa o ciclo todo, com um pico alto e estreito no "
+     "dia 14. Curva 3: sobe na primeira metade até um pico pouco antes do dia 14, cai e tem uma segunda "
+     "elevação menor por volta do dia 21. Curva 4: baixa até a ovulação e alta na segunda metade, com pico por "
+     "volta do dia 21.")

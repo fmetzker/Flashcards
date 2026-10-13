@@ -4672,6 +4672,21 @@
         ],
         "Nomes e classificação dos músculos": [
           "Contração muscular"
+        ],
+        "Sistema reprodutor masculino": [
+          "Nomes e classificação dos músculos"
+        ],
+        "Sistema reprodutor feminino": [
+          "Sistema reprodutor masculino"
+        ],
+        "Gametogênese": [
+          "Sistema reprodutor feminino"
+        ],
+        "Hormônios e ciclo menstrual": [
+          "Gametogênese"
+        ],
+        "Fecundação, gestação e lactação": [
+          "Hormônios e ciclo menstrual"
         ]
       }
     }
