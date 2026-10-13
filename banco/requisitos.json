@@ -4639,6 +4639,20 @@
           }
         ]
       }
+    },
+    "morfofuncional": {
+      "criterio": "A fila segue as quatro unidades da disciplina (tegumentar, esquelético, muscular, reprodutor) e, dentro de cada uma, vai da estrutura para a função. (1-4) Pele: as camadas e seus tecidos, as células da epiderme, os anexos que atravessam essas camadas e, por último, as funções e o envelhecimento, que dependem de tudo isso. (5-8) Esqueleto: o tecido ósseo e a cartilagem, a forma e as partes de um osso, a divisão axial × apendicular e as articulações, que unem os ossos já vistos. (9-11) Músculo: os três tecidos, a contração do esquelético (actina, miosina, cálcio) e os nomes e formas dos músculos. (12-16) Reprodutor: os órgãos masculinos e femininos, a gametogênese que acontece neles, os hormônios que a regulam e, por fim, fecundação, gestação e lactação, que juntam tudo.",
+      "requisitos": {
+        "Células da epiderme": [
+          "Camadas da pele"
+        ],
+        "Anexos cutâneos": [
+          "Células da epiderme"
+        ],
+        "Funções e envelhecimento da pele": [
+          "Anexos cutâneos"
+        ]
+      }
     }
   }
 }
