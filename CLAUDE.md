@@ -714,7 +714,9 @@ Quatro pontos de lá que decidem trabalho:
   `eo` diz o que a alternativa é, pergunta de procedimento diz em que passo
   estamos, e o enunciado não cita apostila nem livro. No cartão novo, o
   `validar --rascunho` reprova nota repetida no `eo` e material didático no
-  enunciado.
+  enunciado. A explicação de exercício diz o método e mostra os passos, e o
+  cartão tirado de prova com texto traz no enunciado o trecho de que a
+  resposta depende (1.9.9 e 1.9.10, medidos pelo `auditar-banco`).
 
 `auditar-banco.ps1`/`.py` mede o banco contra esse padrão — diferente do
 `validar`, **não reprova nada**; a saída só ajuda a escolher o que corrigir

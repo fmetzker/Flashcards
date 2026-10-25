@@ -17,6 +17,35 @@ que o código já diz não vem: some.
 
 ---
 
+## Revisão das explicações de Matemática (outubro/2026)
+
+Em 25/10, a partir de quatro cartões fotografados no app, o pedido foi ter em
+toda a Matemática "de forma bem didática a forma de resolver na explicação".
+Três coisas saíram dessa revisão, além das explicações reescritas:
+
+- **Potenciação não existia como subtópico**, embora o Anexo III do CFAQ a
+  cite e a Radiciação já cobrasse expoente negativo e fracionário. Entrou na
+  fila logo depois de Operações e expressões numéricas, com o porquê de cada
+  regra contado em fatores. Fatoração em números primos, que não tinha
+  nenhum cartão de nível 1, ganhou a base (quadrado perfeito, número de
+  divisores).
+- **Três cartões ensinavam errado.** `c88ee0a066` dava 17h45min30s para uma
+  travessia de 12.930 s a partir das 14h20 — a explicação somava 10.800 +
+  1.530, que é 12.330; o certo é 17h55min30s. `879ac4c175` tinha duas
+  alternativas de mesmo valor, (4/3)π(16³ − 15³) e (2.884π)/3. O cartão do
+  45 dizia, numa nota, que 45 × 15 dá quadrado perfeito (dá 3³ × 5²).
+  Nenhum dos três era pegável pelo `validar`.
+- **`validar --rascunho` não deixava criar subtópico novo com a fila dele.**
+  O `testar.js` lia só o banco em disco: com a fila nova, ele acusava
+  subtópico inexistente; com a fila velha, o validador acusava subtópico fora
+  da fila. Desde então o rascunho chega ao motor por `TESTAR_RASCUNHO`.
+
+A revisão também achou cartões de exercício repetidos com os mesmos números
+e só o rótulo trocado — `83c9849b77`/`987ac9721a` (torcedores, 23 + 23 + 15
+− 6 − 5), `9cabb3e314`/`ba0f491a67` (convés 8-5-5) e `161f7c8b41`/
+`7d830969dd` ((x² − 4)/(x − 2)) — o caso que o §1.5 do padrão manda fundir.
+Ficaram como estavam: aposentar cartão apaga histórico e é decisão do dono.
+
 ## Psicologia e Biologia Celular excluídas (outubro/2026)
 
 Em 13/10 o dono do projeto pediu para excluir as duas matérias de vez, contra

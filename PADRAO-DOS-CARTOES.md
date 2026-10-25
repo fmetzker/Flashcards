@@ -549,6 +549,57 @@ das provas de MOC/MOM, não de uma lista de "palavras difíceis". O objetivo de
 quem estuda é passar na prova e trabalhar bem — conhecimento acumulado sem
 uso é tempo tirado do que cai.
 
+#### 1.9.9 A explicação do exercício mostra o caminho, não só o resultado
+
+Quem errou um exercício precisa ver como se resolve, na ordem em que se
+resolve. "45 = 3² × 5; falta um 5" é a resposta de quem já sabe; quem errou
+precisa de "fatore; quadrado perfeito tem todo expoente par; confira primo
+por primo; o 5 está com expoente 1". Na explicação de exercício:
+
+1. **O método primeiro, em uma frase** — qual regra resolve e como se
+   reconhece que é ela: "mais operários terminam o mesmo serviço em menos
+   dias → proporção inversa, produto fixo"; "retirada sem ordem → combinação".
+2. **Os passos com os números do próprio cartão**, um por vez.
+3. **O porquê da regra, quando cabe numa linha**: a⁰ = 1 porque aⁿ ÷ aⁿ = 1;
+   o MMC pega o maior expoente porque o múltiplo precisa conter os dois
+   números; a combinação divide o arranjo por p! porque cada grupo aparece
+   p! vezes. Regra sem porquê é decorada e esquecida (1.9.2).
+4. **A resposta, e a conferência quando é rápida** (15 + 51 = 66 = 11 × 6).
+
+Fica de fora o cartão de pura memória (a tabuada, §1.4.1): ali não há
+caminho a mostrar. E a nota por alternativa segue o §1.9.3 — quando não dá
+para dizer de onde vem um número errado, a posição fica vazia; "não
+corresponde ao cálculo correto" ocupa o lugar de uma nota sem ensinar nada.
+
+O `auditar-banco` lista como `conta-ausente` o exercício de Matemática com
+resposta numérica e nenhum sinal de operação na explicação. É lista para
+ler: moda e mediana, por exemplo, se explicam sem conta.
+
+#### 1.9.10 O enunciado traz o trecho de que a resposta depende
+
+Cartão tirado de prova com texto não leva o texto junto. "Qual destes termos
+é advérbio?" sem a frase em que o "apenas" aparece, ou "o núcleo do sujeito
+no primeiro parágrafo" sem o parágrafo, viram adivinhação — fora da prova o
+texto não existe.
+
+- **Traga a frase para o enunciado**, dentro dos 300 caracteres (1.7). Quando
+  as alternativas são palavras soltas, prefira palavras da própria frase:
+  "Em 'Inscrições em seleções custam apenas R$ 8', qual palavra é
+  advérbio?", com inscrições, apenas, seleções, custam e em.
+- **Termo que se classifica sozinho dispensa a frase** — "adaptação" é
+  substantivo em qualquer contexto. Precisa da frase o que muda de classe ou
+  de sentido conforme o uso ("apenas", "custa", "cerca").
+- **Interpretação do texto inteiro não vira cartão.** Se a pergunta só se
+  responde lendo a crônica toda, não há trecho de duas frases que a sustente
+  — e copiar mais que isso de um texto protegido é problema à parte (1.6).
+  O caminho é trocar por uma pergunta que se sustente num trecho, ou deixar
+  a questão para o simulado.
+
+Corrigir o enunciado de um cartão existente é sempre pelo
+`reescrever-questoes.ps1` (5.2). O `auditar-banco` lista como
+`texto-ausente` o enunciado que se refere a "destes termos", "texto sobre" ou
+a um parágrafo numerado sem que ele ou as alternativas citem trecho nenhum.
+
 ---
 
 ## 2. O que não fazer
@@ -894,3 +945,7 @@ Antes de dar o cartão por pronto:
       norma)? Ver 1.9.5.
 - [ ] A dificuldade é a do assunto do cartão, e não de vocabulário ou de
       outro tópico? Ver 1.9.6.
+- [ ] Se é exercício, a explicação diz o método e mostra os passos com os
+      números do cartão? Ver 1.9.9.
+- [ ] Se veio de prova com texto, o enunciado traz o trecho de que a
+      resposta depende? Ver 1.9.10.

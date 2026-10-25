@@ -167,10 +167,53 @@ def nota_que_nao_ensina(q):
     return None
 
 
+# "no texto" sozinho fica de fora de propósito: cartão de teoria diz "um termo
+# já citado no texto" no sentido geral, e "parágrafo" é também o de lei
+REFERE_TEXTO = re.compile(
+    r'\b(dest[ea]s|dess[ea]s)\s+(termos?|palavras?|vocábulos?|trechos?|fragmentos?)\b|'
+    r'\btexto sobre\b|\b(primeiro|segundo|terceiro|quarto|último)\s+parágrafo\b|\d\s*°\s*§', re.I)
+CITACAO = re.compile(r"['\"“”‘’«»]")
+
+
+def texto_ausente(q):
+    """1.9.10 — o cartão traz o trecho de que a resposta depende.
+
+    Cartão tirado de prova com texto pergunta "qual destes termos é advérbio?"
+    ou "o núcleo do sujeito no primeiro parágrafo" — e, fora da prova, o texto
+    não existe. Sinal objetivo: o enunciado se refere a um texto, termo ou
+    parágrafo, e nem ele nem as alternativas citam trecho nenhum. Termo que se
+    classifica sozinho ("edital", "adaptação") passa no julgamento, mas não
+    aqui: a lista é para ler, não para corrigir às cegas."""
+    if not REFERE_TEXTO.search(q['q']):
+        return None
+    if CITACAO.search(q['q']) or any(CITACAO.search(o) for o in q['o']):
+        return None
+    return 'enunciado se refere a um texto que nem ele nem as alternativas citam'
+
+
+def conta_ausente(q):
+    """1.9.9 — exercício de Matemática mostra a conta na explicação.
+
+    Em cartão de exercício (n ≥ 2), quem errou precisa ver o caminho, não só a
+    regra ou o resultado. Sem nenhum sinal de operação na explicação, o
+    caminho quase sempre ficou de fora. Só conta quando a resposta é um
+    número: Lógica e Estatística têm cartão de nível 2 que é conceito, e ali
+    não há conta a mostrar. Vale só para Matemática."""
+    if q['m'] != 'matematica' or q.get('n', 1) < 2:
+        return None
+    if not re.search(r'\d', q['o'][q['c']]):
+        return None
+    if re.search(r'[=→×÷+−]', q['e']):
+        return None
+    return 'exercício sem nenhuma conta na explicação'
+
+
 VERIFICACOES = [
     ('sem-pergunta',      sem_pergunta_real,  'ALTO'),
     ('alternativa-lixo',  alternativa_lixo,   'ALTO'),
     ('explicacao-fraca',  explicacao_fraca,   'ALTO'),
+    ('texto-ausente',     texto_ausente,      'ALTO'),
+    ('conta-ausente',     conta_ausente,      'MÉDIO'),
     ('material-no-q',     material_no_enunciado, 'MÉDIO'),
     ('nota-nao-ensina',   nota_que_nao_ensina, 'MÉDIO'),
     ('distrator-curto',   distrator_curto,    'MÉDIO'),
