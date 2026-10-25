@@ -543,7 +543,7 @@
           }
         ]
       },
-      "criterio_subtopicos": "Escada em ONDAS: dentro de cada tópico grande, uma leva pequena de subtópicos abre de cada vez (2 a 4), não tudo nem um por um — os mais básicos primeiro, os mais complexos esperando mais. Onde existe dependência matemática real, ela manda; onde os subtópicos são fatos paralelos sem dependência real entre si, a ordem é pedagógica (mesmo espírito do '_cadeia_entre_raizes' do topo do arquivo, um nível mais fundo). Aritmética (17 subtópicos): Multiplicação é a única raiz — sustenta todo o resto. Onda 2 (após Multiplicação): Operações e expressões numéricas e Conjuntos numéricos, os dois mais básicos. Onda 3 (após Operações): Sistema de unidades de medida, Divisibilidade e Médias — contas do dia a dia sobre a base de operações já dominada. Onda 4 (após Divisibilidade): Sequências numéricas, Radiciação, Notação científica — mais especializadas. Dali em diante, a cadeia de dependência real de sempre: Fatoração em números primos -> MMC e MDC (os dois) -> Frações -> Razão e proporção -> Porcentagem/Regra de três -> Juros; e Sequências numéricas -> Progressões. Álgebra (12 subtópicos): duas raízes — Equações do 1º grau (a mais básica de verdade) e Produtos notáveis (identidades algébricas, base de fatoração). Inequações, Sistemas de equações e Equações exponenciais exigem só 1º grau (generalizam ou reaplicam a mesma manipulação); Fatoração e Equações racionais exigem Produtos notáveis (fatorar é aplicar as identidades). Equações do 2º grau exige Fatoração (resolver por fatoração é o método mais básico); dali saem Equações biquadradas e irracionais (ambas reduzem a uma equação do 2º grau depois de uma substituição ou de elevar ao quadrado). Equações modulares exige só 1º grau; Equações logarítmicas exige Equações exponenciais, sua operação inversa. Geometria (9 subtópicos): duas raízes — Ângulos e Segmentos, as duas medidas mais elementares. Polígonos e quadriláteros e Circunferência e círculo exigem Ângulos; Triângulos exige os dois (usa ângulo interno e comprimento de lado). Poliedros exige Polígonos (um sólido é limitado por faces poligonais); Áreas compostas e Geometria analítica exigem Triângulos (área composta decompõe em triângulos; geometria analítica usa distância/ponto médio de segmento, que o triângulo retângulo de apoio já pressupõe). Geometria espacial, o tópico mais avançado, exige Poliedros. Lógica (8 subtópicos): quatro raízes verdadeiramente independentes — Proposições, Conjuntos, Associação lógica e Sequências lógicas (as duas últimas são estilos de questão próprios, sem pré-requisito real). Conectivos e tabela-verdade e Quantificadores exigem só Proposições; Equivalências lógicas e Argumentos e silogismos exigem Conectivos e tabela-verdade, que é a ferramenta que os dois usam pra verificar validade. Funções (4 subtópicos): Conceitos gerais de função é a única raiz; Função afim exige essa base; Função quadrática e Função exponencial e logarítmica exigem Função afim, o tipo mais simples de função antes de generalizar. Trigonometria (4 subtópicos): Razões no triângulo retângulo é a raiz (a mesma que Trigonometria já exige de Geometria); Ângulos notáveis e Leis do triângulo exigem essa base (a lei do triângulo generaliza a razão do triângulo retângulo pra qualquer triângulo); Círculo trigonométrico, o mais abstrato, exige Ângulos notáveis. Matrizes (2 subtópicos): Operações com matrizes é a raiz; Determinantes exige essa base, porque o cálculo de determinante parte das mesmas operações. Desde a fila, esses subtópicos abrem UM DE CADA VEZ: 'requisitos_subtopicos' é a serialização das ondas descritas acima — mesma ordem, desempatada dentro de cada onda pelo subtópico com mais cartões —, e as ondas originais ficam registradas em 'requisitos_conceituais_subtopicos'.",
+      "criterio_subtopicos": "Escada em ONDAS: dentro de cada tópico grande, uma leva pequena de subtópicos abre de cada vez (2 a 4), não tudo nem um por um — os mais básicos primeiro, os mais complexos esperando mais. Onde existe dependência matemática real, ela manda; onde os subtópicos são fatos paralelos sem dependência real entre si, a ordem é pedagógica (mesmo espírito do '_cadeia_entre_raizes' do topo do arquivo, um nível mais fundo). Aritmética (18 subtópicos): Multiplicação é a única raiz — sustenta todo o resto. Onda 2 (após Multiplicação): Operações e expressões numéricas e Conjuntos numéricos, os dois mais básicos. Onda 3 (após Operações): Potenciação, Sistema de unidades de medida, Divisibilidade e Médias — contas do dia a dia sobre a base de operações já dominada; Potenciação vem primeiro na fila porque é multiplicação repetida e a notação de expoente aparece nos subtópicos seguintes. Onda 4 (após Divisibilidade e Potenciação): Sequências numéricas, Radiciação (a operação inversa da potência), Notação científica (potências de 10) — mais especializadas. Fatoração em números primos também exige Potenciação: o resultado se escreve com expoentes (2³ × 5). Dali em diante, a cadeia de dependência real de sempre: Fatoração em números primos -> MMC e MDC (os dois) -> Frações -> Razão e proporção -> Porcentagem/Regra de três -> Juros; e Sequências numéricas -> Progressões. Álgebra (12 subtópicos): duas raízes — Equações do 1º grau (a mais básica de verdade) e Produtos notáveis (identidades algébricas, base de fatoração). Inequações, Sistemas de equações e Equações exponenciais exigem só 1º grau (generalizam ou reaplicam a mesma manipulação); Fatoração e Equações racionais exigem Produtos notáveis (fatorar é aplicar as identidades). Equações do 2º grau exige Fatoração (resolver por fatoração é o método mais básico); dali saem Equações biquadradas e irracionais (ambas reduzem a uma equação do 2º grau depois de uma substituição ou de elevar ao quadrado). Equações modulares exige só 1º grau; Equações logarítmicas exige Equações exponenciais, sua operação inversa. Geometria (9 subtópicos): duas raízes — Ângulos e Segmentos, as duas medidas mais elementares. Polígonos e quadriláteros e Circunferência e círculo exigem Ângulos; Triângulos exige os dois (usa ângulo interno e comprimento de lado). Poliedros exige Polígonos (um sólido é limitado por faces poligonais); Áreas compostas e Geometria analítica exigem Triângulos (área composta decompõe em triângulos; geometria analítica usa distância/ponto médio de segmento, que o triângulo retângulo de apoio já pressupõe). Geometria espacial, o tópico mais avançado, exige Poliedros. Lógica (8 subtópicos): quatro raízes verdadeiramente independentes — Proposições, Conjuntos, Associação lógica e Sequências lógicas (as duas últimas são estilos de questão próprios, sem pré-requisito real). Conectivos e tabela-verdade e Quantificadores exigem só Proposições; Equivalências lógicas e Argumentos e silogismos exigem Conectivos e tabela-verdade, que é a ferramenta que os dois usam pra verificar validade. Funções (4 subtópicos): Conceitos gerais de função é a única raiz; Função afim exige essa base; Função quadrática e Função exponencial e logarítmica exigem Função afim, o tipo mais simples de função antes de generalizar. Trigonometria (4 subtópicos): Razões no triângulo retângulo é a raiz (a mesma que Trigonometria já exige de Geometria); Ângulos notáveis e Leis do triângulo exigem essa base (a lei do triângulo generaliza a razão do triângulo retângulo pra qualquer triângulo); Círculo trigonométrico, o mais abstrato, exige Ângulos notáveis. Matrizes (2 subtópicos): Operações com matrizes é a raiz; Determinantes exige essa base, porque o cálculo de determinante parte das mesmas operações. Desde a fila, esses subtópicos abrem UM DE CADA VEZ: 'requisitos_subtopicos' é a serialização das ondas descritas acima — mesma ordem, desempatada dentro de cada onda pelo subtópico com mais cartões —, e as ondas originais ficam registradas em 'requisitos_conceituais_subtopicos'.",
       "requisitos_subtopicos": {
         "Aritmética|Operações e expressões numéricas": [
           {
@@ -551,10 +551,16 @@
             "s": "Multiplicação"
           }
         ],
-        "Aritmética|Divisibilidade": [
+        "Aritmética|Potenciação": [
           {
             "t": "Aritmética",
             "s": "Operações e expressões numéricas"
+          }
+        ],
+        "Aritmética|Divisibilidade": [
+          {
+            "t": "Aritmética",
+            "s": "Potenciação"
           }
         ],
         "Aritmética|Fatoração em números primos": [
@@ -859,6 +865,12 @@
             "s": "Operações e expressões numéricas"
           }
         ],
+        "Aritmética|Potenciação": [
+          {
+            "t": "Aritmética",
+            "s": "Operações e expressões numéricas"
+          }
+        ],
         "Aritmética|Divisibilidade": [
           {
             "t": "Aritmética",
@@ -881,18 +893,30 @@
           {
             "t": "Aritmética",
             "s": "Divisibilidade"
+          },
+          {
+            "t": "Aritmética",
+            "s": "Potenciação"
           }
         ],
         "Aritmética|Notação científica": [
           {
             "t": "Aritmética",
             "s": "Divisibilidade"
+          },
+          {
+            "t": "Aritmética",
+            "s": "Potenciação"
           }
         ],
         "Aritmética|Fatoração em números primos": [
           {
             "t": "Aritmética",
             "s": "Divisibilidade"
+          },
+          {
+            "t": "Aritmética",
+            "s": "Potenciação"
           }
         ],
         "Aritmética|MMC e MDC": [

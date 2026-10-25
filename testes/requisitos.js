@@ -136,10 +136,10 @@ module.exports = function (APP, t) {
        chama subtopicoAberto(), não só "a caixa está em dia". Sem isso,
        histórico de antes da escada abriria o próximo da fila de graça.
        Cadeia: Multiplicação -> Operações e expressões numéricas ->
-       Divisibilidade. */
+       Potenciação. */
     await APP.montar({ concursos: ['transpetro-mec'] });
     const meio = 'Operações e expressões numéricas';
-    const fim = 'Divisibilidade';
+    const fim = 'Potenciação';
     t.ok(!APP.subtopicoAberto('matematica', 'Aritmética', meio), meio + ' começa fechado');
 
     dominar('matematica', 'Aritmética', meio);   // domina o meio, pulando Multiplicação
@@ -164,8 +164,8 @@ module.exports = function (APP, t) {
     t.igual(abertos(), ['Multiplicação', 'Operações e expressões numéricas'],
       'só o próximo da fila podia ter aberto');
     dominar('matematica', 'Aritmética', 'Operações e expressões numéricas');
-    t.ok(abertos().includes('Divisibilidade'), 'agora o terceiro da fila abre');
-    t.ok(!abertos().includes('Fatoração em números primos'), 'e o quarto ainda não');
+    t.ok(abertos().includes('Potenciação'), 'agora o terceiro da fila abre');
+    t.ok(!abertos().includes('Divisibilidade'), 'e o quarto ainda não');
   });
 
   t.teste('em toda matéria abre no máximo UM tópico por vez', async () => {

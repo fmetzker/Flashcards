@@ -608,7 +608,7 @@ def valida_js(fonte):
         os.unlink(tmp)
 
 
-def valida_motor():
+def valida_motor(rascunho=None):
     """Roda testar.js — a CONDUTA do motor, não só a sintaxe.
 
     Leitner, grafo de pré-requisito, escada de nível, meta do dia e fuso de
@@ -621,9 +621,14 @@ def valida_motor():
     if not os.path.exists('testar.js'):
         avisos.append("testar.js ausente: a conduta do motor NÃO foi conferida")
         return
+    # em --rascunho, o motor roda com os candidatos dentro do banco, como o
+    # resto desta validação (ver lerDados() no testar.js)
+    env = dict(os.environ)
+    if rascunho:
+        env['TESTAR_RASCUNHO'] = rascunho
     try:
         r = subprocess.run(['node', 'testar.js'], capture_output=True, text=True,
-                           encoding='utf-8', errors='replace')
+                           encoding='utf-8', errors='replace', env=env)
     except FileNotFoundError:
         avisos.append("node não encontrado: a conduta do motor NÃO foi conferida")
         return
@@ -1237,12 +1242,14 @@ def main():
         sys.exit(1)
 
     # --rascunho <arquivo>: avalia candidatos como se já estivessem no banco
+    rascunho = None
     if '--rascunho' in sys.argv:
         i = sys.argv.index('--rascunho')
         alvo = sys.argv[i + 1] if i + 1 < len(sys.argv) else 'rascunho.json'
         if not os.path.isabs(alvo):
             alvo = os.path.join(os.path.dirname(os.path.abspath(__file__)), alvo)
         B = carrega_rascunho(B, alvo)
+        rascunho = alvo
 
     # --patches <arquivo>: aplica eo em memória sobre cartão existente
     if '--patches' in sys.argv:
@@ -1253,7 +1260,7 @@ def main():
         B = carrega_patches(B, alvo)
 
     valida_js(fonte)
-    valida_motor()
+    valida_motor(rascunho)
     ids = valida_questoes(B)
     valida_imagens(B)
     valida_migracao(B, ids)

@@ -29,6 +29,7 @@
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const crypto = require('crypto');
 
 const RAIZ = __dirname;
 
@@ -90,6 +91,20 @@ function lerDados() {
   const fixture = JSON.parse(fs.readFileSync(path.join(RAIZ, 'testes/concursos-fixture.json'), 'utf8'));
   const ids = new Set(dados['concursos.json'].concursos.map(c => c.id));
   for (const c of fixture.concursos) if (!ids.has(c.id)) dados['concursos.json'].concursos.push(c);
+  /* `validar.py --rascunho` avalia os candidatos COMO SE já estivessem no
+     banco, e passa o arquivo por TESTAR_RASCUNHO para o motor ver o mesmo
+     banco. Sem isso, um lote que cria subtópico e o põe na fila não passava
+     nunca: a fila nova citava subtópico que o disco ainda não tinha, e a fila
+     velha não alcançava o subtópico do rascunho. */
+  const rascunho = process.env.TESTAR_RASCUNHO;
+  if (rascunho) {
+    for (const q of JSON.parse(fs.readFileSync(rascunho, 'utf8'))) {
+      const arq = 'banco/' + q.m + '.json';
+      if (!dados[arq]) continue;
+      const id = crypto.createHash('sha1').update(q.q, 'utf8').digest('hex').slice(0, 10);
+      dados[arq].push(Object.assign({ id }, q));
+    }
+  }
   return dados;
 }
 
