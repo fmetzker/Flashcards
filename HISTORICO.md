@@ -41,10 +41,20 @@ Três coisas saíram dessa revisão, além das explicações reescritas:
   da fila. Desde então o rascunho chega ao motor por `TESTAR_RASCUNHO`.
 
 A revisão também achou cartões de exercício repetidos com os mesmos números
-e só o rótulo trocado — `83c9849b77`/`987ac9721a` (torcedores, 23 + 23 + 15
-− 6 − 5), `9cabb3e314`/`ba0f491a67` (convés 8-5-5) e `161f7c8b41`/
-`7d830969dd` ((x² − 4)/(x − 2)) — o caso que o §1.5 do padrão manda fundir.
-Ficaram como estavam: aposentar cartão apaga histórico e é decisão do dono.
+e só o rótulo trocado — `987ac9721a` (torcedores, 23 + 23 + 15 − 6 − 5),
+`9cabb3e314` (convés 8-5-5) e `161f7c8b41` ((x² − 4)/(x − 2)). Com o aval do
+dono, foram fundidos em `83c9849b77`, `ba0f491a67` e `7d830969dd`. Não havia
+caminho para isso: nenhum script tirava cartão do banco, e editar à mão fere
+a regra 9. O `reescrever-questoes.ps1` ganhou a tabela `$FUNDIR`, que tira o
+cartão e põe o par em `reescritas.json`, onde o `migrarReescritas` já sabia
+levar o histórico para um id que existe. Na primeira versão, a linha tirada
+virava linha em branco (no PowerShell, `$null` num vetor de texto vira
+texto vazio); hoje ela sai pela posição.
+
+Os três cartões de Português que dependiam do texto inteiro — duas questões
+de interpretação da crônica de Rubem Braga e uma da reportagem da
+'Ruaologia' — viraram perguntas sobre um trecho curto citado no enunciado,
+pelo mesmo script.
 
 ## Psicologia e Biologia Celular excluídas (outubro/2026)
 

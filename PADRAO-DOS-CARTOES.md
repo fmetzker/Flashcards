@@ -806,6 +806,13 @@ errado e não dá para consertar**:
   reescrever o que tem mais histórico para cobrir o fato melhor, e aposentar
   o outro.
 
+**Fundir não apaga histórico.** É pelo `reescrever-questoes.ps1`, na tabela
+`$FUNDIR` (id que sai → id que fica): o cartão que sai deixa o banco, e o par
+entra em `reescritas.json`, então quem estudou o que saiu segue com o
+histórico no que fica — se a conta respondeu os dois, vale o mais recente.
+Fica o cartão de enunciado mais claro; o que ele tiver de pior (nota por
+alternativa, nível) se corrige depois pelo caminho de sempre (5.1).
+
 Na dúvida, **reescreva em vez de apagar**: 5.2 preserva o histórico, e um
 cartão corrigido vale mais que um buraco.
 

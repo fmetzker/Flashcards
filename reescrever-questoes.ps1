@@ -38,39 +38,48 @@ function Id-Questao([string]$enunciado) {
 # preservado automaticamente — só é sobrescrito se a entrada do lote trouxer
 # 'eo'.
 #
-# Este lote traz para o enunciado o trecho de que a resposta depende, em
-# cartões de Português tirados de prova com texto: "Qual destes termos é
-# advérbio?" sem a frase, "o núcleo do sujeito no primeiro parágrafo" sem o
-# parágrafo. Fora do app, o texto da prova não existe — o cartão precisa se
-# sustentar sozinho (PADRAO-DOS-CARTOES.md §1.1 e §1.6).
+# Este lote troca três cartões de interpretação que só se respondiam com o
+# texto inteiro da prova (crônica de Rubem Braga, reportagem da 'Ruaologia')
+# por perguntas que se sustentam num trecho curto citado no enunciado
+# (PADRAO-DOS-CARTOES.md §1.9.10). O id antigo aponta para o novo, então quem
+# já estudava o cartão segue com o histórico.
 
 $REESCRITAS = @{
-  'f57be1ef63' = @{
-    q = 'No subtítulo de notícia ''Inscrições em seleções custam apenas R$ 8'', qual palavra deve ser classificada morfologicamente como advérbio?'
-    o = @('inscrições.', 'apenas.', 'seleções.', 'custam.', 'em.')
+  'ebe2a93113' = @{
+    q = 'Na crônica ''Meu ideal seria escrever...'', Rubem Braga fala da moça ''que está doente, que sempre está doente e sempre está enlutada e sozinha naquela pequena casa cinzenta''. A cor cinzenta da casa sugere:'
+    o = @('a tristeza e o isolamento da moça doente, reclusa naquela casa', 'o material barato da construção, típico do bairro do autor', 'o tempo nublado do dia em que o autor escreveu a crônica', 'a velhice da moça, que já tem os cabelos grisalhos', 'a discrição de quem prefere não chamar atenção na rua')
+    c = 0
+    e = 'A cor da casa acompanha o retrato da moça no mesmo trecho: doente, enlutada, sozinha. O cinza, sem brilho, reforça essa tristeza e esse isolamento — é um detalhe descritivo com valor simbólico, não informação sobre a construção ou o tempo.'
+    eo = @('Correta: o cinza reforça o que o trecho já diz da moça — doente, enlutada, sozinha.', 'Errada: o trecho não fala de material nem de preço; a cor está ligada ao estado da moça.', 'Errada: o tempo do dia não aparece; o cinza é da casa, não do céu.', 'Errada: o trecho não diz a idade dela; enlutada é estar de luto, não ser velha.', 'Errada: discrição não aparece; o que o trecho destaca é doença, luto e solidão.')
+  }
+  '52b53bcb71' = @{
+    q = 'No fim da crônica ''Meu ideal seria escrever...'', o autor diz que contaria ter ouvido a história na rua, mas confessa: ''eu inventei toda a minha história em um só segundo, quando pensei na tristeza daquela moça que está doente''. O que motivou a história?'
+    o = @('a conversa de dois desconhecidos que ele ouviu na rua', 'a tristeza da moça doente que mora em seu bairro', 'o pedido de um jornal por uma história engraçada', 'a vontade de ver a história contada em vários países', 'a lembrança de uma história que ele ouviu na infância')
     c = 1
-    e = '''Apenas'' equivale a ''somente'': modifica ''R$ 8'', restringindo o valor — por isso a banca o classifica como advérbio (a NGB o chama também de palavra denotativa de exclusão). Na mesma frase, ''inscrições'' e ''seleções'' são substantivos, ''custam'' é verbo e ''em'' é preposição.'
-    eo = @('Errada: ''inscrições'' é substantivo, núcleo do sujeito.', 'Correta: ''apenas'' (= somente) modifica o valor ''R$ 8'', restringindo-o.', 'Errada: ''seleções'' é substantivo, ligado a ''inscrições'' pela preposição ''em''.', 'Errada: ''custam'' é verbo (custar, presente do indicativo).', 'Errada: ''em'' é preposição: liga ''inscrições'' a ''seleções''.')
+    e = 'O autor separa o que contaria aos outros (que ouviu a história de um desconhecido na rua) da verdade que esconde: inventou tudo num segundo, pensando na tristeza da moça doente. A motivação é ela — o desejo de fazê-la rir.'
+    eo = @('Errada: é o que ele diria a quem perguntasse; a verdade que ele esconde é outra.', 'Correta: ''quando pensei na tristeza daquela moça''.', 'Errada: o jornal aparece como lugar onde a moça leria a história, não como quem a pediu.', 'Errada: espalhar-se pelo mundo é um desejo sobre o efeito da história, não o que a motivou.', 'Errada: o trecho fala de invenção ''em um só segundo'', não de lembrança.')
   }
-  '1715aaccdc' = @{
-    q = 'Um comunicado sobre um processo seletivo, com curso de formação previsto para maio, termina assim: ''A taxa de inscrição custa R$ 8,00. Saiba mais no edital.'' Qual destes termos do comunicado NÃO é substantivo?'
-    e = '''Custa'' é o verbo custar (3ª pessoa do singular do presente do indicativo), núcleo do predicado de ''A taxa de inscrição custa R$ 8,00''. Processo, maio, formação e edital nomeiam coisas: são substantivos.'
+  'f6fdc99de3' = @{
+    q = 'No título de uma reportagem, ''"A rua não é um romance", afirma ex-sem teto e idealizador de Escola de Redução de Danos'', as aspas e o verbo ''afirma'' indicam que a frase entre aspas é:'
+    o = @('opinião do próprio jornalista sobre a vida na rua', 'paráfrase do jornalista, com palavras dele mesmo', 'fala do entrevistado, reproduzida pelo jornalista', 'trecho de um romance, citado de forma irônica', 'ditado popular, sem autor que se possa apontar')
+    c = 2
+    e = 'Aspas seguidas de um verbo de dizer (afirma, diz, revela) marcam discurso direto: a frase é de outra pessoa — aqui, do ex-sem-teto entrevistado — e o jornalista só a reproduz. É assim que a reportagem introduz vozes diferentes da sua.'
+    eo = @('Errada: o verbo ''afirma'' atribui a frase ao ex-sem-teto, não ao jornalista.', 'Errada: paráfrase reescreve com outras palavras e dispensa aspas; as aspas marcam as palavras exatas.', 'Correta: aspas + ''afirma'' = discurso direto do entrevistado.', 'Errada: ''romance'' aqui é idealização (a rua não é um romance), não um livro citado.', 'Errada: o verbo ''afirma'' tem sujeito: o ex-sem-teto do título.')
   }
-  '37cd63777b' = @{
-    q = 'Em ''Entre hoje e o dia 14 de janeiro, a Marinha do Brasil, por meio da Diretoria de Portos e Costas (DPC), vai receber inscrições'', qual é o núcleo do sujeito com o qual concorda a locução verbal ''vai receber''?'
-  }
-  '826e9e1aa7' = @{
-    q = 'Numa notícia: ''O risco de um apagão na navegação marítima brasileira será discutido'', com base num diagnóstico que ''previu que a marinha mercante, em breve, sofrerá com a falta de pessoal qualificado''. A que se refere o termo ''apagão''?'
-  }
-  '69010375cf' = @{
-    q = 'Um texto intitulado ''Comissões debatem risco de apagão na Marinha Mercante'' relata uma audiência marcada na Câmara, com data, nomes dos convidados e falas entre aspas, e indica o site de onde foi tirado. Pela forma e pelo conteúdo, ele pertence ao gênero:'
-  }
-  '876c54e41d' = @{
-    q = 'No texto ''Registro de encantamento e atestado de importância'' (Stela Maris Rezende), que celebra o prazer de entrar em livrarias e ler, qual fragmento evidencia ironia?'
-  }
-  '670de76010' = @{
-    q = 'Num vídeo pelos 217 anos do Corpo de Fuzileiros Navais, sobre a prontidão desses militares ''na paz ou na guerra'', o narrador diz: ''Quando a natureza desafia o homem, eles estão lá. Em qualquer lugar, a qualquer hora''. Qual é o sentido da frase?'
-  }
+}
+
+# ---- o que fundir ------------------------------------------------------------
+# id que sai -> id que fica. Para dois cartões que cobram o MESMO exercício,
+# com os mesmos números e só o rótulo trocado (PADRAO-DOS-CARTOES.md §1.5 e
+# §5.3). O cartão que sai é retirado do banco, e o par entra em
+# reescritas.json: quem estudou o que saiu segue com o histórico no que
+# fica (migrarReescritas, no index.html, fica com o mais recente se a conta
+# respondeu os dois). O id que fica precisa existir no banco.
+
+$FUNDIR = @{
+  '987ac9721a' = '83c9849b77'   # torcedores: 23 + 23 + 15 − 6 − 5 = 50
+  '9cabb3e314' = 'ba0f491a67'   # convés triangular 8-5-5, área 12 m²
+  '161f7c8b41' = '7d830969dd'   # (x² − 4)/(x − 2) = x + 2
 }
 
 # ---- aplica ------------------------------------------------------------------
@@ -79,16 +88,42 @@ $materias = [System.IO.File]::ReadAllText((Join-Path $dir 'materias.json'), [Sys
 $mapa = @{}          # id_antigo -> id_novo
 $alterados = 0
 
+# antes de tirar qualquer cartão, confere que o par da fusão existe: um
+# destino ausente deixaria o histórico apontando para lugar nenhum
+$todos = @{}
+foreach ($m in $materias) {
+  $arq = Join-Path $dir "$($m.id).json"
+  if (-not (Test-Path $arq)) { continue }
+  foreach ($l in [System.IO.File]::ReadAllLines($arq, [System.Text.Encoding]::UTF8)) {
+    $l = $l.Trim().TrimEnd(',')
+    if ($l.StartsWith('{')) { $todos[($l | ConvertFrom-Json).id] = $true }
+  }
+}
+foreach ($k in $FUNDIR.Keys) {
+  $alvo = $FUNDIR[$k]
+  if (-not $todos.ContainsKey($alvo)) { throw "Fusão $k -> $alvo`: o cartão que fica não existe no banco." }
+  if ($FUNDIR.ContainsKey($alvo)) { throw "Fusão $k -> $alvo`: o cartão que fica também está marcado para sair." }
+}
+
 foreach ($m in $materias) {
   $arq = Join-Path $dir "$($m.id).json"
   if (-not (Test-Path $arq)) { continue }
   $linhas = [System.IO.File]::ReadAllLines($arq, [System.Text.Encoding]::UTF8)
   $mudouArquivo = $false
+  $sair = @{}          # posições dos cartões fundidos, que saem do arquivo
 
   for ($i = 0; $i -lt $linhas.Count; $i++) {
     $l = $linhas[$i].Trim().TrimEnd(',')
     if (-not $l.StartsWith('{')) { continue }
     $q = $l | ConvertFrom-Json
+    if ($FUNDIR.ContainsKey($q.id)) {
+      $mapa[$q.id] = $FUNDIR[$q.id]
+      $sair[$i] = $true
+      $mudouArquivo = $true
+      $alterados++
+      Write-Host "  [$($q.id) => $($FUNDIR[$q.id])] $($m.id)/$($q.t) (fundido, sai do banco)"
+      continue
+    }
     if (-not $REESCRITAS.ContainsKey($q.id)) { continue }
 
     $novo = $REESCRITAS[$q.id]
@@ -129,6 +164,18 @@ foreach ($m in $materias) {
   }
 
   if ($mudouArquivo -and -not $DryRun) {
+    # cartão fundido sai; a última linha de cartão não leva vírgula, porque o
+    # array JSON fecha logo depois dela
+    # pela posição, não por $null: num vetor de texto, $null vira '' e a
+    # linha ficaria em branco no arquivo em vez de sair
+    $linhas = @(for ($k = 0; $k -lt $linhas.Count; $k++) { if (-not $sair.ContainsKey($k)) { $linhas[$k] } })
+    $ultimo = -1
+    for ($k = 0; $k -lt $linhas.Count; $k++) { if ($linhas[$k].Trim().StartsWith('{')) { $ultimo = $k } }
+    for ($k = 0; $k -lt $linhas.Count; $k++) {
+      if (-not $linhas[$k].Trim().StartsWith('{')) { continue }
+      $s = $linhas[$k].TrimEnd().TrimEnd(',')
+      $linhas[$k] = if ($k -eq $ultimo) { $s } else { $s + ',' }
+    }
     [System.IO.File]::WriteAllText($arq, ($linhas -join "`n") + "`n", (New-Object System.Text.UTF8Encoding $false))
   }
 }

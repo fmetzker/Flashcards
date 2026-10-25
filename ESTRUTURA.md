@@ -98,7 +98,7 @@ falham fechado.
 | `incorporar-rascunho.ps1` | `rascunho.json` | cartão novo inteiro | cartão escrito à mão |
 | `explicar-alternativas.ps1` | `explicacoes.json`, ou `-DoSupabase` (caixa `correcoes`) | `eo`, `n`, `o`, `s`, `c`, `e`, `t`, `f`, `img` e/ou `alt` por `id` | campo em cartão que já existe |
 | `incorporar-propostas.ps1` | Supabase | cartão novo inteiro | caixa de entrada colaborativa |
-| `reescrever-questoes.ps1` | — | `q` + `banco/reescritas.json` | único jeito de mudar enunciado |
+| `reescrever-questoes.ps1` | — | `q` + `banco/reescritas.json`; tira o cartão fundido | único jeito de mudar enunciado e de fundir dois cartões repetidos (`$FUNDIR`) |
 
 Campo ausente no patch é **preservado**: mandar só `n` não apaga o `eo`.
 
