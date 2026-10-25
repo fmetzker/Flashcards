@@ -38,56 +38,38 @@ function Id-Questao([string]$enunciado) {
 # preservado automaticamente — só é sobrescrito se a entrada do lote trouxer
 # 'eo'.
 #
-# Este lote aplica o PADRAO-DOS-CARTOES.md §1.1 e §2 aos enunciados que o
-# auditar-banco marcava como "não é pergunta" ou "alternativa de formato
-# proibido": "assinale a correta" vira pergunta respondível, "Apenas I / Apenas
-# II" vira uma escolha direta, e o cartão de vetores com I, II e III passa a
-# cobrar só a III — a I e a II viram cartões próprios.
+# Este lote traz para o enunciado o trecho de que a resposta depende, em
+# cartões de Português tirados de prova com texto: "Qual destes termos é
+# advérbio?" sem a frase, "o núcleo do sujeito no primeiro parágrafo" sem o
+# parágrafo. Fora do app, o texto da prova não existe — o cartão precisa se
+# sustentar sozinho (PADRAO-DOS-CARTOES.md §1.1 e §1.6).
 
 $REESCRITAS = @{
-  '5228d91bbc' = @{
-    q = 'Um infográfico do IBGE (PNAD 2015) mostra a porcentagem de pessoas que praticaram esporte por faixa etária: 15-17 anos = 53,6%; 18-24 ≈ 47%; 25-39 ≈ 41,3%; 40-59 ≈ 33,4%; 60 ou mais = 27,6%. Em qual faixa a porcentagem fica entre 30% e 40%?'
-    o = @('40 a 59 anos', '25 a 39 anos', '60 anos ou mais', '18 a 24 anos', '15 a 17 anos')
-    c = 0
-    e = 'Só a faixa de 40 a 59 anos, com cerca de 33,4%, fica entre 30% e 40%. A de 25 a 39 passa de 40% (41,3%) e a de 60 ou mais fica abaixo de 30% (27,6%). A prática de esporte cai com a idade.'
-    eo = @('Correta: cerca de 33,4%.', 'Errada: 25 a 39 anos fica em cerca de 41,3%, acima de 40%.', 'Errada: 60 anos ou mais fica em 27,6%, abaixo de 30%.', 'Errada: 18 a 24 anos fica em cerca de 47%.', 'Errada: 15 a 17 anos fica em 53,6%.')
+  'f57be1ef63' = @{
+    q = 'No subtítulo de notícia ''Inscrições em seleções custam apenas R$ 8'', qual palavra deve ser classificada morfologicamente como advérbio?'
+    o = @('inscrições.', 'apenas.', 'seleções.', 'custam.', 'em.')
+    c = 1
+    e = '''Apenas'' equivale a ''somente'': modifica ''R$ 8'', restringindo o valor — por isso a banca o classifica como advérbio (a NGB o chama também de palavra denotativa de exclusão). Na mesma frase, ''inscrições'' e ''seleções'' são substantivos, ''custam'' é verbo e ''em'' é preposição.'
+    eo = @('Errada: ''inscrições'' é substantivo, núcleo do sujeito.', 'Correta: ''apenas'' (= somente) modifica o valor ''R$ 8'', restringindo-o.', 'Errada: ''seleções'' é substantivo, ligado a ''inscrições'' pela preposição ''em''.', 'Errada: ''custam'' é verbo (custar, presente do indicativo).', 'Errada: ''em'' é preposição: liga ''inscrições'' a ''seleções''.')
   }
-  'e0390d6b95' = @{
-    q = 'No trecho ''...ficou imóvel, quieta'', por que a palavra ''imóvel'' leva acento gráfico?'
-    o = @('Por ser paroxítona terminada em l', 'Por ser oxítona terminada em l', 'Por ser proparoxítona', 'Porque toda palavra terminada em l leva acento', 'Porque admite duas pronúncias (dupla prosódia)')
-    c = 0
-    e = '''Imóvel'' (i-MÓ-vel) tem a sílaba tônica na penúltima — é paroxítona. Paroxítonas terminadas em ''l'' são acentuadas; oxítonas em ''l'', como papel e anel, não.'
-    eo = @('Correta: i-MÓ-vel, paroxítona terminada em l.', 'Errada: a tônica é ''mó'', não a última sílaba; e oxítona em l não leva acento (papel).', 'Errada: ''imóvel'' tem três sílabas e a tônica é a do meio.', 'Errada: oxítonas em l, como papel e anel, não levam acento.', 'Errada: ''imóvel'' tem uma pronúncia só.')
+  '1715aaccdc' = @{
+    q = 'Um comunicado sobre um processo seletivo, com curso de formação previsto para maio, termina assim: ''A taxa de inscrição custa R$ 8,00. Saiba mais no edital.'' Qual destes termos do comunicado NÃO é substantivo?'
+    e = '''Custa'' é o verbo custar (3ª pessoa do singular do presente do indicativo), núcleo do predicado de ''A taxa de inscrição custa R$ 8,00''. Processo, maio, formação e edital nomeiam coisas: são substantivos.'
   }
-  '554b4d2bcd' = @{
-    q = 'Em ''Vamos levantar esses questionamentos e saber porque as pessoas não querem mais trabalhar nessa área...'', que valor tem a palavra ''mais''?'
-    o = @('Advérbio de tempo: indica que a ação deixou de ocorrer', 'Advérbio de intensidade, como em ''mais forte''', 'Pronome indefinido, como em ''mais pessoas''', 'Conjunção aditiva, com o sentido de ''e''', 'Preposição que liga ''querem'' a ''trabalhar''')
-    c = 0
-    e = 'Em ''não querem MAIS trabalhar'', o ''mais'' junto da negação indica que uma ação que costumava ocorrer deixou de ocorrer — valor de tempo (não mais = deixaram de). É advérbio de tempo.'
-    eo = @('Correta: ''não... mais'' = deixaram de querer — valor de tempo.', 'Errada: intensidade modifica adjetivo ou advérbio (''mais forte''); aqui ''mais'' vai com a negação do verbo.', 'Errada: pronome indefinido acompanha substantivo (''mais pessoas''); aqui não há substantivo.', 'Errada: ''mais'' com sentido de ''e'' só aparece em contas (''dois mais dois'').', 'Errada: ''querer'' liga-se a ''trabalhar'' sem preposição.')
+  '37cd63777b' = @{
+    q = 'Em ''Entre hoje e o dia 14 de janeiro, a Marinha do Brasil, por meio da Diretoria de Portos e Costas (DPC), vai receber inscrições'', qual é o núcleo do sujeito com o qual concorda a locução verbal ''vai receber''?'
   }
-  '686f3753b1' = @{
-    q = 'Os cursos “requerem o ensino médio técnico”. Como são a regência do verbo “requerer” e a do substantivo “requerimento”?'
+  '826e9e1aa7' = @{
+    q = 'Numa notícia: ''O risco de um apagão na navegação marítima brasileira será discutido'', com base num diagnóstico que ''previu que a marinha mercante, em breve, sofrerá com a falta de pessoal qualificado''. A que se refere o termo ''apagão''?'
   }
-  'dceb134622' = @{
-    q = 'Calcule A = 2⁴, B = −2⁴ e C = (−2)⁴. Que relação há entre eles?'
+  '69010375cf' = @{
+    q = 'Um texto intitulado ''Comissões debatem risco de apagão na Marinha Mercante'' relata uma audiência marcada na Câmara, com data, nomes dos convidados e falas entre aspas, e indica o site de onde foi tirado. Pela forma e pelo conteúdo, ele pertence ao gênero:'
   }
-  '83ccf0f034' = @{
-    q = 'Qual destas propriedades dos conjuntos numéricos vale SEMPRE?'
+  '876c54e41d' = @{
+    q = 'No texto ''Registro de encantamento e atestado de importância'' (Stela Maris Rezende), que celebra o prazer de entrar em livrarias e ler, qual fragmento evidencia ironia?'
   }
-  'e2a8fd9c3d' = @{
-    q = 'Com o sujeito composto antes do verbo, qual é a concordância certa em ''A leitura e a escrita ___ para a formação''?'
-    o = @('são fundamentais', 'é fundamental', 'é fundamentais', 'são fundamental', 'tanto faz ''é'' ou ''são'', as duas formas valem')
-    c = 0
-    e = 'Sujeito composto antes do verbo (''a leitura e a escrita'', dois núcleos) leva o verbo ao plural, e o predicativo concorda com ele: ''são fundamentais''.'
-    eo = @('Correta: verbo e predicativo no plural.', 'Errada: singular com sujeito de dois núcleos antes do verbo é erro de concordância.', 'Errada: mistura verbo no singular com predicativo no plural.', 'Errada: o predicativo também vai ao plural, com o sujeito composto.', 'Errada: com o sujeito composto antes do verbo, só o plural é correto.')
-  }
-  'c999b7d51c' = @{
-    q = 'Se o produto misto [u, v, w] de três vetores não nulos de ℝ³ é zero, o que se conclui sobre eles?'
-    o = @('São linearmente dependentes, isto é, coplanares', 'São ortogonais dois a dois', 'Pelo menos um deles é o vetor nulo', 'São todos paralelos entre si', 'Formam uma base de ℝ³, por serem independentes')
-    c = 0
-    e = 'O produto misto é o volume, com sinal, do paralelepípedo formado pelos três vetores. Volume zero significa que eles estão num mesmo plano: são coplanares, ou seja, linearmente dependentes.'
-    eo = @('Correta: produto misto nulo = coplanares = linearmente dependentes.', 'Errada: ortogonais dois a dois dariam o maior volume possível, não zero.', 'Errada: o enunciado diz que nenhum é nulo; basta estarem num mesmo plano.', 'Errada: paralelos também dão zero, mas não é preciso tanto — basta serem coplanares.', 'Errada: base exige independência, e produto misto zero é justamente dependência.')
+  '670de76010' = @{
+    q = 'Num vídeo pelos 217 anos do Corpo de Fuzileiros Navais, sobre a prontidão desses militares ''na paz ou na guerra'', o narrador diz: ''Quando a natureza desafia o homem, eles estão lá. Em qualquer lugar, a qualquer hora''. Qual é o sentido da frase?'
   }
 }
 
