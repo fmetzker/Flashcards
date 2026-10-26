@@ -56,6 +56,16 @@ de interpretação da crônica de Rubem Braga e uma da reportagem da
 'Ruaologia' — viraram perguntas sobre um trecho curto citado no enunciado,
 pelo mesmo script.
 
+## Ciências Morfofuncionais excluída (outubro/2026)
+
+Em 26/10 o dono do projeto pediu para excluir a matéria avulsa de curso
+próprio (261 cartões, 13 figuras geradas por `figuras/morfofuncional.py`,
+fila de 16 tópicos). Saíram arquivo, figuras, gerador, fila e entrada em
+`materias.json`. Os testes do motor que a usavam como exemplo de matéria
+avulsa — e de matéria sem grafo conceitual — passaram a usar Enfermagem do
+Trabalho, que é avulsa e também não declara `requisitos_conceituais`. O
+conteúdo continua no git, no commit 8198fda.
+
 ## Psicologia e Biologia Celular excluídas (outubro/2026)
 
 Em 13/10 o dono do projeto pediu para excluir as duas matérias de vez, contra

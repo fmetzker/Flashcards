@@ -33,8 +33,7 @@ voltar a referenciá-la em `blocos[].materias`, **ou** até ser marcada
 `"avulsa": true` em `banco/materias.json` — o segundo caminho, hoje usado
 por Enfermagem do Trabalho e Máquinas e Prática Marítima (nenhuma delas
 referenciada por concurso algum no momento) além das matérias de curso
-próprio, que nunca tiveram concurso: as três de Eletrotécnica e Ciências
-Morfofuncionais. Ver regra 12.
+próprio, que nunca tiveram concurso: as três de Eletrotécnica. Ver regra 12.
 
 ## Estrutura
 

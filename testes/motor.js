@@ -13,10 +13,10 @@ module.exports = function (APP, t) {
   });
 
   t.teste('materiasInscritas é a união dos concursos mais as avulsas', async () => {
-    await APP.montar({ concursos: ['caaq-cdm'], avulsas: ['morfofuncional'] });
+    await APP.montar({ concursos: ['caaq-cdm'], avulsas: ['enfermagem-trabalho'] });
     const m = APP.materiasInscritas();
     t.ok(m.includes('portugues') && m.includes('matematica'), 'faltou matéria do concurso');
-    t.ok(m.includes('morfofuncional'), 'faltou a avulsa');
+    t.ok(m.includes('enfermagem-trabalho'), 'faltou a avulsa');
     t.igual(m.length, new Set(m).size, 'matéria repetida na união');
   });
 
@@ -64,11 +64,11 @@ module.exports = function (APP, t) {
 
   t.teste('matéria sem grafo declarado não quebra a ordenação', async () => {
     /* "Matéria/tópico sem grafo cai toda na profundidade 0" */
-    await APP.montar({ materias: ['morfofuncional'] });
+    await APP.montar({ materias: ['enfermagem-trabalho'] });
     const resumo = APP.resumoDoBanco();
-    const d = resumo['morfofuncional'];
+    const d = resumo['enfermagem-trabalho'];
     if (!d) return;
-    const nomes = APP.porDesbloqueio('morfofuncional', d.topicos);
+    const nomes = APP.porDesbloqueio('enfermagem-trabalho', d.topicos);
     t.igual(nomes.length, Object.keys(d.topicos).length, 'a ordenação perdeu tópico');
   });
 
