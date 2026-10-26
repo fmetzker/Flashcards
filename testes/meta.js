@@ -121,14 +121,18 @@ module.exports = function (APP, t) {
   t.grupo('meta — matéria avulsa');
 
   t.teste('matéria avulsa vira bloco com peso próprio', async () => {
-    await APP.montar({ concursos: [], avulsas: ['enfermagem-trabalho'] });
-    const b = bloco('enfermagem-trabalho');
+    const [avulsa] = APP.avulsasDeTeste();
+    if (!avulsa) return;
+    await APP.montar({ concursos: [], avulsas: [avulsa] });
+    const b = bloco(avulsa);
     t.ok(b, 'avulsa devia ter virado bloco da meta');
     t.igual(b.peso, APP.META_MATERIA_AVULSA);
   });
 
   t.teste('avulsa não depende de concurso nenhum', async () => {
-    await APP.montar({ concursos: [], avulsas: ['enfermagem-trabalho'] });
+    const [avulsa] = APP.avulsasDeTeste();
+    if (!avulsa) return;
+    await APP.montar({ concursos: [], avulsas: [avulsa] });
     t.igual(APP.CONCURSO, null, 'sem concurso seguido, CONCURSO é null');
     t.igual(APP.BLOCOS, [], 'sem concurso, BLOCOS (da prova) fica vazio');
     t.ok(APP.BLOCOS_META.length > 0, 'mas BLOCOS_META tem o bloco sintético da avulsa');
@@ -146,7 +150,9 @@ module.exports = function (APP, t) {
   t.teste('com prova seguida, a avulsa pesa o menor bloco — nunca mais que matéria da prova', async () => {
     /* peso fixo de 20 num edital de blocos de 10 fazia cada avulsa valer o
        dobro de Português e tirava espaço da matéria principal */
-    await APP.montar({ concursos: ['vr-enf-2026'], avulsas: ['comandos-eletricos', 'maquinas-eletricas'] });
+    const duas = APP.avulsasDeTeste().slice(0, 2);
+    if (duas.length < 2) return;
+    await APP.montar({ concursos: ['vr-enf-2026'], avulsas: duas });
     const daProva = APP.BLOCOS_META.filter(b => !b.id.startsWith('avulsa@'));
     const avulsas = APP.BLOCOS_META.filter(b => b.id.startsWith('avulsa@'));
     t.igual(avulsas.length, 2, 'as duas avulsas deviam virar bloco');

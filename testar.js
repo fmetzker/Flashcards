@@ -187,7 +187,8 @@ function carregarApp(opcoes = {}) {
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
   sandbox.self = sandbox;
-  sandbox.window.DADOS = lerDados();
+  const dados = lerDados();
+  sandbox.window.DADOS = dados;
 
   /* A linha de exportação é anexada DENTRO do mesmo escopo do script, que é
      a única forma de enxergar as ligações `let`/`const` de topo — elas não
@@ -234,6 +235,22 @@ function carregarApp(opcoes = {}) {
     APP.aplicarFoco(null);
     APP.limparCacheGrau();
     return APP;
+  };
+
+  /* "Uma matéria avulsa qualquer", tirada do materias.json na hora em vez de
+     escrita no teste: excluir uma matéria (regra 12) não pode derrubar teste
+     do motor que só precisava de um exemplo. Ficam de fora as que algum
+     concurso usa, para a avulsa não se confundir com bloco de prova.
+     `semGrafo` pede matéria sem requisitos_conceituais. Lista vazia faz o
+     teste pular, do mesmo jeito que matéria ausente já pulava. */
+  APP.avulsasDeTeste = ({ semGrafo = false } = {}) => {
+    const deConcurso = new Set(dados['concursos.json'].concursos
+      .flatMap(c => c.blocos.flatMap(b => b.materias)));
+    const req = (dados['banco/requisitos.json'] || {}).materias || {};
+    return dados['banco/materias.json']
+      .filter(m => m.avulsa && !deConcurso.has(m.id))
+      .filter(m => !semGrafo || !(req[m.id] && req[m.id].requisitos_conceituais))
+      .map(m => m.id);
   };
   return APP;
 }

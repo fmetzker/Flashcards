@@ -33,7 +33,8 @@ voltar a referenciá-la em `blocos[].materias`, **ou** até ser marcada
 `"avulsa": true` em `banco/materias.json` — o segundo caminho, hoje usado
 por Enfermagem do Trabalho e Máquinas e Prática Marítima (nenhuma delas
 referenciada por concurso algum no momento) além das matérias de curso
-próprio, que nunca tiveram concurso: as três de Eletrotécnica. Ver regra 12.
+próprio, que nunca tiveram concurso: as três de Eletrotécnica e Saúde
+Pública. Ver regra 12.
 
 ## Estrutura
 
@@ -206,6 +207,17 @@ no Safari do iPhone sem nenhuma etapa de compilação.
     git guarda o que saiu; o app descarta da conta a matéria avulsa que
     deixou de existir, e o painel ignora as respostas antigas dela como id
     órfão.
+
+    **Excluir uma matéria não mexe em nenhuma outra**, e três coisas
+    garantem isso. O progresso é chaveado pelo `id` do cartão, e o
+    validador barra enunciado e `id` repetidos no banco INTEIRO, não só
+    dentro da matéria — então duas matérias que cobrem o mesmo fato (Saúde
+    Pública e SUS cobrem a Lei 8.142) têm cartões de ids diferentes, e o
+    progresso de uma não é o da outra. A fila de `requisitos.json` é por
+    matéria e nunca aponta para tópico de outra. E teste do motor que só
+    precisa de "uma matéria avulsa qualquer" pede `APP.avulsasDeTeste()`
+    (`testar.js`), que escolhe do `materias.json` na hora — escrever o nome
+    de uma matéria no teste faz a exclusão dela travar o commit.
 
     **Guardar é uma coisa, escrever é outra: cartão novo só entra em matéria
     ativa.** O que já existe fica intacto — corrigir alternativa, explicação,

@@ -4601,6 +4601,89 @@
           }
         ]
       }
+    },
+    "saude-publica": {
+      "criterio": "A fila segue as quatro unidades da disciplina de Saúde Pública: primeiro a história (Primeira República, previdência, Reforma Sanitária), porque o SUS só se entende como resposta ao sistema excludente que veio antes; depois o SUS e o controle social; depois as concepções de saúde e doença, que são a base dos determinantes, da história natural da doença e da educação em saúde; depois a epidemiologia, que precede desenhos de estudo e vigilância; por fim a atenção primária, a ESF e as equipes para populações específicas, do geral para o particular.",
+      "requisitos": {
+        "Previdência e assistência médica antes do SUS": [
+          "Saúde pública na Primeira República"
+        ],
+        "Reforma Sanitária e criação do SUS": [
+          "Previdência e assistência médica antes do SUS"
+        ],
+        "Direito à saúde e princípios do SUS": [
+          "Reforma Sanitária e criação do SUS"
+        ],
+        "Participação da comunidade no SUS": [
+          "Direito à saúde e princípios do SUS"
+        ],
+        "Concepções de saúde e doença": [
+          "Participação da comunidade no SUS"
+        ],
+        "Determinantes sociais da saúde": [
+          "Concepções de saúde e doença"
+        ],
+        "História natural da doença e prevenção": [
+          "Determinantes sociais da saúde"
+        ],
+        "Educação em saúde": [
+          "História natural da doença e prevenção"
+        ],
+        "Epidemiologia: conceito e medidas": [
+          "Educação em saúde"
+        ],
+        "Desenhos de estudo epidemiológico": [
+          "Epidemiologia: conceito e medidas"
+        ],
+        "Doenças transmissíveis e vigilância em saúde": [
+          "Desenhos de estudo epidemiológico"
+        ],
+        "Atenção primária e redes de atenção": [
+          "Doenças transmissíveis e vigilância em saúde"
+        ],
+        "Estratégia Saúde da Família e território": [
+          "Atenção primária e redes de atenção"
+        ],
+        "Equipes para populações específicas": [
+          "Estratégia Saúde da Família e território"
+        ]
+      },
+      "criterio_conceitual": "Reforma Sanitária exige o modelo previdenciário: ela nasce contra ele. Princípios do SUS exigem a Reforma Sanitária e a CF/88, de onde saem. Participação da comunidade exige os princípios (é uma das diretrizes do art. 198). Determinantes sociais, história natural da doença e educação em saúde exigem as concepções de saúde (modelo biomédico x social). Desenhos de estudo e vigilância exigem os conceitos e medidas da epidemiologia (incidência, prevalência). Atenção primária exige os princípios do SUS; ESF exige APS (é a estratégia prioritária dela); equipes específicas exigem a ESF (são modalidades dela).",
+      "requisitos_conceituais": {
+        "Reforma Sanitária e criação do SUS": [
+          "Previdência e assistência médica antes do SUS"
+        ],
+        "Direito à saúde e princípios do SUS": [
+          "Reforma Sanitária e criação do SUS"
+        ],
+        "Participação da comunidade no SUS": [
+          "Direito à saúde e princípios do SUS"
+        ],
+        "Determinantes sociais da saúde": [
+          "Concepções de saúde e doença"
+        ],
+        "História natural da doença e prevenção": [
+          "Concepções de saúde e doença"
+        ],
+        "Educação em saúde": [
+          "Concepções de saúde e doença"
+        ],
+        "Desenhos de estudo epidemiológico": [
+          "Epidemiologia: conceito e medidas"
+        ],
+        "Doenças transmissíveis e vigilância em saúde": [
+          "Epidemiologia: conceito e medidas"
+        ],
+        "Atenção primária e redes de atenção": [
+          "Direito à saúde e princípios do SUS"
+        ],
+        "Estratégia Saúde da Família e território": [
+          "Atenção primária e redes de atenção"
+        ],
+        "Equipes para populações específicas": [
+          "Estratégia Saúde da Família e território"
+        ]
+      }
     }
   }
 }

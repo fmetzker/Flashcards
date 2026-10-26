@@ -56,6 +56,36 @@ de interpretação da crônica de Rubem Braga e uma da reportagem da
 'Ruaologia' — viraram perguntas sobre um trecho curto citado no enunciado,
 pelo mesmo script.
 
+## Saúde Pública criada, e os testes param de nomear matéria (outubro/2026)
+
+Em 26/10 entrou a matéria avulsa `saude-publica`, de uma disciplina EAD de
+faculdade: 153 cartões em 15 tópicos, tirados de cerca de 55 questões únicas
+com gabarito comentado das quatro unidades (história das políticas de saúde,
+processo saúde-doença, epidemiologia e vigilância, atenção primária e ESF).
+Como na matéria anterior de curso próprio, o formato "I, II e III" virou um
+cartão por afirmativa, e a fonte de cada fato foi a primária (CF/88, Leis
+8.080 e 8.142, PNAB, Alma-Ata, Leavell e Clark, Lalonde), não só o gabarito.
+
+Ficaram de fora os itens do gabarito que se contradizem ou contrariam a
+fonte: "só a afirmativa I está correta" quando o próprio comentário diz que
+a I é falsa; Laframboise com "biológico, físico e psíquico" (o comentário e
+o modelo têm quatro campos); Leavell e Clark com quatro níveis de prevenção
+(a quaternária é de Jamoulle, 1986); prevenção secundária como "eliminar
+causas e fatores de risco" (isso é primária); duas respostas diferentes para
+o papel da rede de serviços na vigilância; "concentração de renda" como
+área de risco; "redução da desigualdade" aumentando a suscetibilidade; a
+epidemia de "sarampo" do século XVII, que a historiografia registra como
+varíola; e "educação em saúde" definida com a definição de educação
+permanente. Os fatos que a matéria SUS já cobre (Lei 8.142, art. 196, PNAB)
+entraram de novo, por decisão do dono, com enunciados próprios.
+
+No mesmo pedido, a exigência de que excluir uma matéria não afete outra
+levou a uma mudança nos testes: os que só precisavam de "uma avulsa
+qualquer" tinham o nome escrito (Biologia Celular, depois Morfofuncional,
+depois Enfermagem do Trabalho e as de Eletrotécnica), e cada exclusão os
+quebrava e travava o commit. Agora pedem `APP.avulsasDeTeste()`, que escolhe
+do `materias.json` na hora.
+
 ## Ciências Morfofuncionais excluída (outubro/2026)
 
 Em 26/10 o dono do projeto pediu para excluir a matéria avulsa de curso
