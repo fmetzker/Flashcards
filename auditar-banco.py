@@ -228,7 +228,7 @@ VERIFICACOES = [
 # trecho da fila que o ensina; subtópico None é o começo do tópico. Só matéria com
 # fila e com marca reconhecível no texto: a de Matemática é o símbolo.
 CONCEITOS = {'matematica': [
-    ('potência', 'Aritmética', 'Potenciação', r'[²³⁴⁵⁶⁷⁸⁹ⁿ]|\^|\bpotência'),
+    ('potência', 'Aritmética', 'Potenciação', r'(?<![cdk]m)(?<!\bm)[²³⁴⁵⁶⁷⁸⁹ⁿ]|\^|\bpotência'),
     ('raiz', 'Aritmética', 'Radiciação', r'√|∛|\braiz (quadrada|cúbica)|(quadrado|cubo) perfeito|\bradical'),
     ('porcentagem', 'Aritmética', 'Porcentagem', r'\d\s*%|por cento|porcentagem'),
     ('fração', 'Aritmética', 'Frações', r'\bfraç|(?<![\d/.,])\d+/\d+(?![\d/])'),
