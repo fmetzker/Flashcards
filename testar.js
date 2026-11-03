@@ -58,6 +58,7 @@ const FUNCOES = [
   'indexarRequisitos', 'topicoAberto', 'subtopicoAberto',
   'requisitosPendentes', 'requisitosPendentesSub', 'baseDominada',
   'grauDe', 'grauLiberado', 'grauAberto', 'menorGrauExistente', 'limparCacheGrau',
+  'atualizarEscada', 'revisaoEmEspera', 'emEspera', 'chaveEscada', 'grauPelaHistoria',
   'profundidadeTopico', 'profundidadeSubtopico', 'porDesbloqueio', 'porDesbloqueioSub',
   'blocosDaMeta', 'noEscopo', 'progressoDoDia', 'progressoPorBloco',
   'feitasHoje', 'montarLoteSessao', 'agendarRepeticao', 'resumoDoBanco',
@@ -229,6 +230,7 @@ function carregarApp(opcoes = {}) {
     APP.E.concursos = concursos;
     APP.E.materiasAvulsas = avulsas;
     APP.E.escopoEstudo = null;
+    APP.E.escada = {};
     APP.INSCRITOS = APP.CONCURSOS.filter(c => concursos.includes(c.id));
     const aCarregar = materias.length ? materias : APP.materiasInscritas();
     await APP.carregarBancoParcial(aCarregar);

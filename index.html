@@ -1385,6 +1385,9 @@ const padrao = {
      log no servidor (reconstruirDoProprioLog). null = ainda não. Roda uma vez
      por aparelho de aprovador, para desfazer a importação do log alheio. */
   reparoPullConta: null,
+  /* {"matéria|tópico|subtópico": degrau} — o mais alto que já abriu para a conta.
+     Só sobe; ver atualizarEscada() no motor.js. */
+  escada: {},
   /* {materia: ISO} — instante do último zerarMateria() de cada matéria.
      Mesma ideia do progressoZeradoEm acima, um nível mais fino: lá o corte
      vale pra conta inteira, aqui só pros cartões daquela matéria.
@@ -3626,6 +3629,21 @@ function pintarStats(){
     linha.innerHTML = "<span>"+d.rotulo+"</span><span class=\"n\">"+d.n+"</span>";
     revBox.appendChild(linha);
   });
+  /* Só mede: estes cartões continuam aparecendo nas revisões. O número é o que
+     falta para decidir se a espera entra de verdade (HISTORICO.md). */
+  const espera = emEspera();
+  const linhaEspera = (rotulo, n)=>{
+    const linha = document.createElement("div"); linha.className = "stat";
+    linha.innerHTML = "<span></span><span class=\"n\"></span>";
+    linha.children[0].textContent = rotulo;
+    linha.children[1].textContent = n;
+    revBox.appendChild(linha);
+  };
+  linhaEspera("Em espera, vencidas (ainda aparecem)", espera.vencidas+" de "+espera.total);
+  Object.keys(espera.porMateria).forEach(m=>{
+    const pm = espera.porMateria[m];
+    linhaEspera("· "+((MATERIAS[m]||{}).nome || m), pm.vencidas+" de "+pm.total);
+  });
 
   /* ranqueia pelo nível mais fino que a questão tem: o subtópico quando
      existe, senão o tópico. É onde dá para agir.
@@ -4837,6 +4855,7 @@ function zerarMateria(m){
      número volta a crescer sozinho quando a pessoa recomeçar a matéria. */
   E.materiasZeradas = E.materiasZeradas || {};
   E.materiasZeradas[m] = new Date().toISOString();
+  Object.keys(E.escada || {}).forEach(k=>{ if(k.indexOf(m+"|") === 0) delete E.escada[k]; });
   salvar();
   sincronizar();   // manda o marco pro servidor (com retentativa — ver sincronizarMateriasAtivas)
   ir("inicio");

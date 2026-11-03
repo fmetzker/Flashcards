@@ -341,6 +341,102 @@ function grauAberto(q){
   return grauDe(q) <= grauLiberado(q.m, q.t, q.s);
 }
 
+/* A escada só sobe. E.escada guarda, por recorte (matéria|tópico|subtópico), o
+   degrau mais alto que já abriu para a conta, e isso nunca volta atrás: errar um
+   cartão da base fecha cartão novo, como sempre, mas não desfaz o que já abriu.
+   Olhar só o estado de agora não serve: a fila é uma corrente, e um erro na
+   tabuada fecharia a Matemática inteira.
+
+   Hoje só MEDE: revisaoEmEspera() diz qual revisão ficaria em espera, e a tela
+   mostra o número. fila() continua entregando toda revisão vencida. */
+function chaveEscada(q){ return q.m + "|" + q.t + "|" + (q.s || ""); }
+let _cacheHistoria = {};
+
+/* Primeira vez de um recorte neste aparelho: o que já foi acertado alguma vez
+   conta, mesmo que tenha caído de caixa depois. É mais frouxo que grauLiberado()
+   de propósito: cartão que entrou no banco depois e ninguém respondeu não pode
+   apagar o que a pessoa já tinha percorrido. */
+function grauPelaHistoria(m, t, s){
+  const chave = m + "|" + t + "|" + (s || "");
+  if(chave in _cacheHistoria) return _cacheHistoria[chave];
+  return _cacheHistoria[chave] = calcularGrauPelaHistoria(m, t, s);
+}
+function calcularGrauPelaHistoria(m, t, s){
+  const porGrau = {};
+  BANCO.forEach(q=>{
+    if(q.m !== m || q.t !== t || (s && q.s !== s)) return;
+    (porGrau[grauDe(q)] = porGrau[grauDe(q)] || []).push(E.cartoes[q.id]);
+  });
+  const graus = Object.keys(porGrau).map(Number).sort((a,b)=>a-b);
+  const respondidos = g => porGrau[g].filter(Boolean);
+  const comResposta = graus.filter(g=> respondidos(g).length);
+  if(!comResposta.length) return graus[0] || 1;
+  const ultimo = comResposta[comResposta.length-1];
+  for(const g of graus){
+    if(g > ultimo) return g;
+    if(respondidos(g).some(c=> !(c.acertos >= 1))) return g;
+    if(g === ultimo && respondidos(g).length < porGrau[g].length) return g;
+  }
+  return graus[graus.length-1] + 1;
+}
+
+function basePelaHistoria(m, dep){
+  const t = typeof dep === "string" ? dep : dep.t;
+  const s = typeof dep === "string" ? undefined : dep.s;
+  if(!(s ? subtopicoPelaHistoria(m, t, s) : topicoPelaHistoria(m, t))) return false;
+  return grauPelaHistoria(m, t, s) > menorGrauExistente(m, t, s);
+}
+function topicoPelaHistoria(m, t){
+  const chave = "t|" + m + "|" + t;
+  if(chave in _cacheHistoria) return _cacheHistoria[chave];
+  return _cacheHistoria[chave] = (REQUISITOS[m + "|" + t] || []).every(dep=> basePelaHistoria(m, dep));
+}
+function subtopicoPelaHistoria(m, t, s){
+  const chave = "s|" + m + "|" + t + "|" + s;
+  if(chave in _cacheHistoria) return _cacheHistoria[chave];
+  return _cacheHistoria[chave] = topicoPelaHistoria(m, t)
+    && (REQUISITOS_SUB[m + "|" + t + "|" + s] || []).every(dep=> basePelaHistoria(m, dep));
+}
+
+function atualizarEscada(){
+  _cacheHistoria = {};
+  if(!E.escada) E.escada = {};
+  const vistos = {};
+  BANCO.forEach(q=>{
+    const k = chaveEscada(q);
+    if(vistos[k]) return;
+    vistos[k] = true;
+    const aberto = topicoAberto(q.m, q.t) && (!q.s || subtopicoAberto(q.m, q.t, q.s));
+    let grau = aberto ? grauLiberado(q.m, q.t, q.s) : 0;
+    if(!(k in E.escada)){
+      const abriu = q.s ? subtopicoPelaHistoria(q.m, q.t, q.s) : topicoPelaHistoria(q.m, q.t);
+      if(abriu) grau = Math.max(grau, grauPelaHistoria(q.m, q.t, q.s));
+    }
+    E.escada[k] = Math.max(E.escada[k] || 0, grau);
+  });
+}
+
+function revisaoEmEspera(q){
+  return !!E.cartoes[q.id] && !((E.escada && E.escada[chaveEscada(q)]) >= grauDe(q));
+}
+
+/* {total, vencidas, porMateria: {m: {total, vencidas}}} dos cartões já respondidos
+   que estão num trecho da escada que a conta nunca abriu. */
+function emEspera(){
+  limparCacheGrau();
+  atualizarEscada();
+  const h = hoje();
+  const r = {total:0, vencidas:0, porMateria:{}};
+  BANCO.forEach(q=>{
+    if(!revisaoEmEspera(q)) return;
+    const pm = r.porMateria[q.m] = r.porMateria[q.m] || {total:0, vencidas:0};
+    const vencida = E.cartoes[q.id].prox <= h;
+    r.total++; pm.total++;
+    if(vencida){ r.vencidas++; pm.vencidas++; }
+  });
+  return r;
+}
+
 /* união das matérias de TODOS os concursos inscritos, MAIS as matérias
    avulsas — não só do que está em foco. Seguir dois concursos precisa trazer
    o conteúdo dos dois para a fila, senão "seguir" não significa nada além de
@@ -572,6 +668,7 @@ function cmpId(a, b){ return a < b ? -1 : a > b ? 1 : 0; }
 function fila(){
   const h = hoje();
   limparCacheGrau();
+  atualizarEscada();
   const revisar = [], novas = [];
   BANCO.forEach(q=>{
     const c = E.cartoes[q.id];

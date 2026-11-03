@@ -808,6 +808,10 @@ Os invariantes, que não podem ser afrouxados:
 - **Trava só cartão NOVO.** Revisão vencida entra sempre, venha do degrau, do
   tópico ou do subtópico que vier. Travar revisão viraria um jeito de
   esconder justamente o que a pessoa já errou.
+  - **`E.escada` só mede, por enquanto.** Guarda o degrau mais alto que cada
+    recorte já abriu, e nunca desce. `emEspera()` conta as revisões de trecho que
+    a conta nunca abriu, e a tela Estatísticas mostra o número. `fila()` continua
+    entregando tudo: a decisão de esconder depende desse número (`HISTORICO.md`).
 - **Cartão sem `n` vale 1, e o degrau 1 nunca trava.** Enquanto o banco não
   estiver todo classificado, ligar o recurso não pode trancar o que ninguém
   classificou.

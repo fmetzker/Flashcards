@@ -366,4 +366,108 @@ module.exports = function (APP, t) {
       }
     }
   });
+
+  /* ---- a escada só sobe (CLAUDE.md, "Ordem de aprendizado") ---- */
+  t.grupo('a escada só sobe, e a espera por enquanto só mede');
+
+  const CERTO = { caixa: 3, acertos: 2, erros: 0, prox: '2099-01-01' };
+  const ORDEM = ['Multiplicação', 'Operações e expressões numéricas', 'Potenciação', 'Divisibilidade'];
+  const doSub = s => APP.BANCO.filter(q => q.m === 'matematica' && q.t === 'Aritmética' && q.s === s);
+  const baseDe = s => { const v = doSub(s); const g = Math.min(...v.map(APP.grauDe)); return v.filter(q => APP.grauDe(q) === g); };
+  const vencer = lista => lista.forEach(q => { APP.E.cartoes[q.id] = { ...CERTO }; });
+  const atualizar = () => { APP.limparCacheGrau(); APP.atualizarEscada(); };
+  const montarMat = () => APP.montar({ concursos: ['caaq-cdm'] });
+
+  t.teste('revisão de trecho que nunca abriu fica em espera, mas a fila ainda a entrega', async () => {
+    await montarMat();
+    const q = doSub('Radiciação')[0];
+    APP.E.cartoes[q.id] = { caixa: 2, acertos: 1, erros: 0, prox: APP.hoje() };
+    atualizar();
+    t.ok(APP.revisaoEmEspera(q), 'Radiciação nunca abriu nesta conta');
+    t.ok(APP.fila().revisar.includes(q.id), 'nesta fase a espera só mede: a fila não pode esconder');
+  });
+
+  t.teste('o trecho que abriu continua aberto depois de errar a base', async () => {
+    await montarMat();
+    vencer(baseDe('Multiplicação'));
+    atualizar();
+    t.ok(APP.subtopicoAberto('matematica', 'Aritmética', ORDEM[1]), 'Operações tinha que abrir');
+    const q = baseDe(ORDEM[1])[0];
+    APP.E.cartoes[q.id] = { caixa: 2, acertos: 1, erros: 0, prox: APP.hoje() };
+    atualizar();
+    t.ok(!APP.revisaoEmEspera(q), 'recém-aberto não fica em espera');
+    /* a pessoa erra um único cartão da tabuada */
+    APP.E.cartoes[baseDe('Multiplicação')[0].id] = { caixa: 1, acertos: 2, erros: 1, prox: APP.hoje() };
+    atualizar();
+    t.ok(!APP.subtopicoAberto('matematica', 'Aritmética', ORDEM[1]), 'cartão novo de Operações volta a travar');
+    t.ok(!APP.revisaoEmEspera(q), 'a revisão não pode ir para a espera por causa do erro na base');
+  });
+
+  t.teste('cartão novo na base não desfaz o que já abriu', async () => {
+    await montarMat();
+    vencer(baseDe('Multiplicação'));
+    atualizar();
+    const q = baseDe(ORDEM[1])[0];
+    APP.E.cartoes[q.id] = { caixa: 2, acertos: 1, erros: 0, prox: APP.hoje() };
+    /* do ponto de vista do motor, cartão novo na base é cartão sem resposta */
+    delete APP.E.cartoes[baseDe('Multiplicação')[0].id];
+    atualizar();
+    t.ok(!APP.revisaoEmEspera(q), 'a marca não pode cair');
+  });
+
+  t.teste('cartão acima do degrau alcançado fica em espera até o degrau abrir', async () => {
+    await montarMat();
+    vencer(baseDe('Multiplicação'));
+    atualizar();
+    const sub = doSub(ORDEM[1]);
+    const alto = sub.find(q => APP.grauDe(q) === Math.max(...sub.map(APP.grauDe)));
+    APP.E.cartoes[alto.id] = { caixa: 2, acertos: 1, erros: 0, prox: APP.hoje() };
+    atualizar();
+    t.ok(APP.revisaoEmEspera(alto), 'o degrau dele ainda não abriu');
+    sub.filter(q => APP.grauDe(q) < APP.grauDe(alto)).forEach(q => { APP.E.cartoes[q.id] = { ...CERTO }; });
+    atualizar();
+    t.ok(!APP.revisaoEmEspera(alto), 'abriu o degrau, sai da espera');
+  });
+
+  t.teste('a primeira leitura aceita o que já foi acertado alguma vez', async () => {
+    await montarMat();
+    /* acertou no passado e caiu para a caixa 1: pelo estado de agora estaria fechado */
+    baseDe('Multiplicação').forEach(q => { APP.E.cartoes[q.id] = { caixa: 1, acertos: 1, erros: 1, prox: APP.hoje() }; });
+    const q = baseDe(ORDEM[1])[0];
+    APP.E.cartoes[q.id] = { caixa: 2, acertos: 1, erros: 0, prox: APP.hoje() };
+    atualizar();
+    t.ok(!APP.subtopicoAberto('matematica', 'Aritmética', ORDEM[1]), 'pelo estado de agora, fechado');
+    t.ok(!APP.revisaoEmEspera(q), 'pela história, já abriu');
+  });
+
+  t.teste('a primeira leitura não conta o que só foi errado', async () => {
+    await montarMat();
+    baseDe('Multiplicação').forEach(q => { APP.E.cartoes[q.id] = { caixa: 1, acertos: 0, erros: 1, prox: APP.hoje() }; });
+    const q = baseDe(ORDEM[1])[0];
+    APP.E.cartoes[q.id] = { caixa: 2, acertos: 1, erros: 0, prox: APP.hoje() };
+    atualizar();
+    t.ok(APP.revisaoEmEspera(q), 'sem nenhum acerto na base, o trecho seguinte nunca abriu');
+  });
+
+  t.teste('a história só vale na primeira leitura de cada recorte', async () => {
+    await montarMat();
+    const q = baseDe(ORDEM[1])[0];
+    APP.E.cartoes[q.id] = { caixa: 2, acertos: 1, erros: 0, prox: APP.hoje() };
+    atualizar();
+    t.ok(APP.revisaoEmEspera(q), 'começa em espera');
+    baseDe('Multiplicação').forEach(x => { APP.E.cartoes[x.id] = { caixa: 1, acertos: 1, erros: 1, prox: APP.hoje() }; });
+    atualizar();
+    t.ok(APP.revisaoEmEspera(q), 'acerto em caixa 1 não abre mais nada: agora só o estado de verdade conta');
+  });
+
+  t.teste('emEspera conta por matéria, e separa o que já venceu', async () => {
+    await montarMat();
+    const [a, b] = doSub('Radiciação');
+    APP.E.cartoes[a.id] = { caixa: 2, acertos: 1, erros: 0, prox: APP.hoje() };
+    APP.E.cartoes[b.id] = { caixa: 2, acertos: 1, erros: 0, prox: '2099-01-01' };
+    const r = APP.emEspera();
+    t.igual(r.total, 2, 'total');
+    t.igual(r.vencidas, 1, 'vencidas');
+    t.igual(r.porMateria.matematica.vencidas, 1, 'por matéria');
+  });
 };
