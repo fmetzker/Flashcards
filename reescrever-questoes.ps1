@@ -38,34 +38,18 @@ function Id-Questao([string]$enunciado) {
 # preservado automaticamente — só é sobrescrito se a entrada do lote trouxer
 # 'eo'.
 #
-# Este lote troca três cartões de interpretação que só se respondiam com o
-# texto inteiro da prova (crônica de Rubem Braga, reportagem da 'Ruaologia')
-# por perguntas que se sustentam num trecho curto citado no enunciado
-# (PADRAO-DOS-CARTOES.md §1.9.10). O id antigo aponta para o novo, então quem
-# já estudava o cartão segue com o histórico.
+# Este lote tira do enunciado a definição que o próprio cartão cobra
+# (PADRAO-DOS-CARTOES.md §1.9.11): com ela ali, basta aplicar o que está
+# escrito, sem lembrar o que o termo significa. O id antigo aponta para o novo,
+# então quem já estudava o cartão segue com o histórico.
 
 $REESCRITAS = @{
-  'ebe2a93113' = @{
-    q = 'Na crônica ''Meu ideal seria escrever...'', Rubem Braga fala da moça ''que está doente, que sempre está doente e sempre está enlutada e sozinha naquela pequena casa cinzenta''. A cor cinzenta da casa sugere:'
-    o = @('a tristeza e o isolamento da moça doente, reclusa naquela casa', 'o material barato da construção, típico do bairro do autor', 'o tempo nublado do dia em que o autor escreveu a crônica', 'a velhice da moça, que já tem os cabelos grisalhos', 'a discrição de quem prefere não chamar atenção na rua')
-    c = 0
-    e = 'A cor da casa acompanha o retrato da moça no mesmo trecho: doente, enlutada, sozinha. O cinza, sem brilho, reforça essa tristeza e esse isolamento — é um detalhe descritivo com valor simbólico, não informação sobre a construção ou o tempo.'
-    eo = @('Correta: o cinza reforça o que o trecho já diz da moça — doente, enlutada, sozinha.', 'Errada: o trecho não fala de material nem de preço; a cor está ligada ao estado da moça.', 'Errada: o tempo do dia não aparece; o cinza é da casa, não do céu.', 'Errada: o trecho não diz a idade dela; enlutada é estar de luto, não ser velha.', 'Errada: discrição não aparece; o que o trecho destaca é doença, luto e solidão.')
-  }
-  '52b53bcb71' = @{
-    q = 'No fim da crônica ''Meu ideal seria escrever...'', o autor diz que contaria ter ouvido a história na rua, mas confessa: ''eu inventei toda a minha história em um só segundo, quando pensei na tristeza daquela moça que está doente''. O que motivou a história?'
-    o = @('a conversa de dois desconhecidos que ele ouviu na rua', 'a tristeza da moça doente que mora em seu bairro', 'o pedido de um jornal por uma história engraçada', 'a vontade de ver a história contada em vários países', 'a lembrança de uma história que ele ouviu na infância')
-    c = 1
-    e = 'O autor separa o que contaria aos outros (que ouviu a história de um desconhecido na rua) da verdade que esconde: inventou tudo num segundo, pensando na tristeza da moça doente. A motivação é ela — o desejo de fazê-la rir.'
-    eo = @('Errada: é o que ele diria a quem perguntasse; a verdade que ele esconde é outra.', 'Correta: ''quando pensei na tristeza daquela moça''.', 'Errada: o jornal aparece como lugar onde a moça leria a história, não como quem a pediu.', 'Errada: espalhar-se pelo mundo é um desejo sobre o efeito da história, não o que a motivou.', 'Errada: o trecho fala de invenção ''em um só segundo'', não de lembrança.')
-  }
-  'f6fdc99de3' = @{
-    q = 'No título de uma reportagem, ''"A rua não é um romance", afirma ex-sem teto e idealizador de Escola de Redução de Danos'', as aspas e o verbo ''afirma'' indicam que a frase entre aspas é:'
-    o = @('opinião do próprio jornalista sobre a vida na rua', 'paráfrase do jornalista, com palavras dele mesmo', 'fala do entrevistado, reproduzida pelo jornalista', 'trecho de um romance, citado de forma irônica', 'ditado popular, sem autor que se possa apontar')
-    c = 2
-    e = 'Aspas seguidas de um verbo de dizer (afirma, diz, revela) marcam discurso direto: a frase é de outra pessoa — aqui, do ex-sem-teto entrevistado — e o jornalista só a reproduz. É assim que a reportagem introduz vozes diferentes da sua.'
-    eo = @('Errada: o verbo ''afirma'' atribui a frase ao ex-sem-teto, não ao jornalista.', 'Errada: paráfrase reescreve com outras palavras e dispensa aspas; as aspas marcam as palavras exatas.', 'Correta: aspas + ''afirma'' = discurso direto do entrevistado.', 'Errada: ''romance'' aqui é idealização (a rua não é um romance), não um livro citado.', 'Errada: o verbo ''afirma'' tem sujeito: o ex-sem-teto do título.')
-  }
+  '5b79ea650a' = @{ q = 'Qual destas palavras é um substantivo epiceno?' }
+  '5e907da04e' = @{ q = 'Qual destas palavras é um substantivo deverbal?' }
+  'bb11bd8a05' = @{ q = 'Assinale o substantivo deverbal:' }
+  'ebc687dce5' = @{ q = 'O adjetivo ''marítimo'' é formado por qual processo?' }
+  '46f6dee24e' = @{ q = 'Pela classificação de Spaulding, que processamento exige um artigo crítico?' }
+  '30b6b12cfb' = @{ q = 'Um carro foi revendido por R$ 85.680,00, com prejuízo de 16% sobre o valor original. Qual foi o valor original do veículo?' }
 }
 
 # ---- o que fundir ------------------------------------------------------------

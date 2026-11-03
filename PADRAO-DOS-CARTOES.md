@@ -635,6 +635,24 @@ a um parágrafo numerado sem que ele ou as alternativas citem trecho nenhum.
 
 ---
 
+#### 1.9.11 O enunciado não traz a definição que o cartão cobra
+
+Se a pergunta é "qual destas palavras é um epiceno?", a definição não entra no
+enunciado: com ela ali, basta aplicar o que está escrito, sem lembrar o que o
+termo significa. Quem ainda não sabe a definição aprende no cartão dela, que vem
+antes na escada.
+
+- ✅ "Qual destas palavras é um substantivo epiceno?", com a definição em outro
+  cartão de nível 1.
+- ❌ "Substantivo epiceno é o que tem uma única forma para macho e fêmea (...).
+  Qual destas palavras é um epiceno?"
+- ❌ "Prejuízo de 16% (ou seja, vendeu por 84% do valor original)": o parêntese
+  entrega o passo que o exercício treina.
+
+Pode ficar o termo que o cartão não cobra e sem o qual a pergunta não se entende,
+como "cubo perfeito (isto é, P(x) = A(x + k)³)" num exercício de comparar
+coeficientes.
+
 ## 2. O que não fazer
 
 | Padrão | Por quê |
@@ -991,3 +1009,5 @@ Antes de dar o cartão por pronto:
       números do cartão? Ver 1.9.9.
 - [ ] Se veio de prova com texto, o enunciado traz o trecho de que a
       resposta depende? Ver 1.9.10.
+- [ ] O enunciado não traz a definição nem o passo que o cartão cobra? Ver
+      1.9.11.
