@@ -66,7 +66,8 @@ desenho do cartão em vez do fato. Três regras:
   validador aceita nela), ou um distrator ganha a mesma marca.
 - **Palavra absoluta só no distrator é pista invertida.** "Apenas", "somente",
   "exclusivamente", "nunca" e "sempre" viram atalho para eliminar alternativa,
-  igual à frase curta da seção de viés do `CLAUDE.md`.
+  igual à frase curta da seção de viés do `CLAUDE.md`. Só na correta é o mesmo
+  atalho ao contrário: se a correta precisa da palavra, um distrator também a leva.
 - **Definições do mesmo grupo concorrem entre si.** Quando um subtópico define
   tipos irmãos com o mesmo enunciado (divisões da gramática, tipos de advérbio,
   valores da preposição), o distrator é a definição correta do vizinho, com as
@@ -82,7 +83,9 @@ desenho do cartão em vez do fato. Três regras:
   distrator: elimina-se sem saber o que é lexicologia.
 
 O `validar` avisa, por matéria, a marca e a palavra absoluta que estão fora do
-acaso. É aviso, não erro: um cartão sozinho com parênteses é normal.
+acaso. É aviso, não erro: um cartão sozinho com parênteses é normal. Também não
+pede correção a marca que aparece só num distrator por ser sigla ou expressão
+matemática, como "(FGTS)" ou "f(0)".
 
 ### 1.4 A explicação ensina, não repete
 

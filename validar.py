@@ -953,6 +953,11 @@ def mede_vies(B):
     if baixas:
         avisos.append(f"palavra absoluta quase nunca é a correta: {', '.join(baixas)} "
                       "— ver PADRAO-DOS-CARTOES.md §1.3.1")
+    altas = [f"{mid} {v[1]}/{v[0]}" for mid, v in sorted(por_m.items())
+             if mid in ativas and v[0] >= 10 and v[1] / v[0] >= 0.5]
+    if altas:
+        avisos.append(f"palavra absoluta virou sinal da correta: {', '.join(altas)} "
+                      "— ver PADRAO-DOS-CARTOES.md §1.3.1")
 
     # o viés de letra só importa se o embaralhamento for removido
     fonte = open(HTML, encoding='utf-8').read()
