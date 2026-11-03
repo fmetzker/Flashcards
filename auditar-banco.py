@@ -224,6 +224,70 @@ VERIFICACOES = [
 
 # ------------------------------------------------------------------ relatório
 
+# §1.9: o cartão não cobra o que ainda não ensinou. Cada conceito aponta para o
+# trecho da fila que o ensina; subtópico None é o começo do tópico. Só matéria com
+# fila e com marca reconhecível no texto: a de Matemática é o símbolo.
+CONCEITOS = {'matematica': [
+    ('potência', 'Aritmética', 'Potenciação', r'[²³⁴⁵⁶⁷⁸⁹ⁿ]|\^|\bpotência'),
+    ('raiz', 'Aritmética', 'Radiciação', r'√|∛|\braiz (quadrada|cúbica)|(quadrado|cubo) perfeito|\bradical'),
+    ('porcentagem', 'Aritmética', 'Porcentagem', r'\d\s*%|por cento|porcentagem'),
+    ('fração', 'Aritmética', 'Frações', r'\bfraç|(?<![\d/.,])\d+/\d+(?![\d/])'),
+    ('MMC/MDC', 'Aritmética', 'MMC e MDC', r'\bMMC\b|\bMDC\b'),
+    ('proporção', 'Aritmética', 'Razão e proporção', r'\bproporç|\bproporcio'),
+    ('regra de três', 'Aritmética', 'Regra de três', r'regra de três'),
+    ('logaritmo', 'Álgebra', 'Equações logarítmicas', r'\blog[₀-₉ₐ(]|\blogaritm|\bln\b'),
+    ('função', 'Funções', None, r'\b[fg]\(x\)|\bP\(t\)|\bfunção (afim|quadrática|exponencial|logarítmica|que)|\ba função\b'),
+    ('trigonometria', 'Trigonometria', None, r'\bsen\b|\bcos\b|\bseno\b|\bcosseno\b'),
+    ('combinatória', 'Análise combinatória', None, r'\barranjo|\bcombinações?\b|\bpermutaç|\bfatorial'),
+    ('probabilidade', 'Probabilidade', None, r'\bprobabilidade'),
+    ('estatística', 'Estatística', None, r'\bmediana\b|\bmoda\b|\bdesvio padrão'),
+]}
+
+
+def _corrente(req):
+    """Devolve {item: posição} de uma fila {item: [anterior]}."""
+    anterior = {k: v[0] for k, v in req.items()}
+    pos = {}
+    for k in set(anterior) | set(anterior.values()):
+        n, atual = 0, k
+        while atual in anterior:
+            atual, n = anterior[atual], n + 1
+        pos[k] = n
+    return pos
+
+
+def fora_de_ordem(B):
+    """Cartão que usa um conceito ensinado só depois dele na fila. Devolve
+    [(id, matéria, recorte, conceito, 'cobra'|'cita', trecho)]: 'cobra' é enunciado
+    ou alternativa, 'cita' é só na explicação. Lista para ler: o símbolo pode ser
+    de passagem, e a marca não enxerga conceito escrito por extenso de outro jeito."""
+    achados = []
+    reqs = json.load(open(os.path.join(BANCO_DIR, 'requisitos.json'), encoding='utf-8'))['materias']
+    for m, conceitos in CONCEITOS.items():
+        topicos = _corrente(reqs[m]['requisitos'])
+        subs = {}
+        for chave, deps in (reqs[m].get('requisitos_subtopicos') or {}).items():
+            t, s = chave.split('|')
+            subs.setdefault(t, {})[s] = [deps[0]['s']]
+        subs = {t: _corrente(v) for t, v in subs.items()}
+        def lugar(t, s):
+            return (topicos.get(t, 0), subs.get(t, {}).get(s, 0) if s else -1)
+        for q in B:
+            if q['m'] != m:
+                continue
+            aqui = (topicos.get(q['t'], 0), subs.get(q['t'], {}).get(q.get('s'), 0))
+            cobrado = q['q'] + ' ' + ' '.join(q['o'])
+            citado = q.get('e', '') + ' ' + ' '.join(x for x in q.get('eo', []) if x)
+            for nome, t, s, padrao in conceitos:
+                if aqui >= lugar(t, s):
+                    continue
+                if re.search(padrao, cobrado):
+                    achados.append((q['id'], m, f"{q['t']}|{q.get('s', '')}", nome, 'cobra', q['q'][:90]))
+                elif re.search(padrao, citado):
+                    achados.append((q['id'], m, f"{q['t']}|{q.get('s', '')}", nome, 'cita', q['q'][:90]))
+    return achados
+
+
 def cobertura(B, nomes):
     """3.3 — quantos cartões por tópico, do menor para o maior."""
     por = collections.Counter((q['m'], q['t']) for q in B)
@@ -231,6 +295,7 @@ def cobertura(B, nomes):
 
 
 def main():
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
     listar = '--listar' in sys.argv
     csv_saida = None
     if '--csv' in sys.argv:
@@ -267,6 +332,17 @@ def main():
     for m in total_mat:
         n = por_mat.get(m, 0)
         print(f"    {nomes.get(m, m):42} {n:4} de gravidade ALTA de {total_mat[m]}")
+
+    fora = fora_de_ordem(B)
+    print("\n" + "=" * 66)
+    print("CONTEÚDO FORA DE ORDEM — usa o que a fila só ensina depois")
+    print("=" * 66)
+    por_conceito = collections.Counter((a[3], a[4]) for a in fora)
+    for nome in sorted({a[3] for a in fora}):
+        print(f"  {nome:18} cobra {por_conceito[(nome, 'cobra')]:3}   cita {por_conceito[(nome, 'cita')]:3}")
+    if listar:
+        for a in sorted(fora, key=lambda x: (x[4], x[3], x[2])):
+            print(f"  [{a[0]}] {a[4]} {a[3]} em {a[2]}\n        {a[5]}")
 
     print("\n" + "=" * 66)
     print("COBERTURA — os 12 tópicos com menos cartões")

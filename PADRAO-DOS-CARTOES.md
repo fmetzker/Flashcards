@@ -500,6 +500,9 @@ definição primeiro (`n=1`) e deixe o porquê em `n=2`. Termo de um tópico que
 só abre muito depois na fila (fator de potência dentro de Constituição do
 motor) não ganha cartão fora do lugar: a explicação o define em meia frase.
 
+O `auditar-banco` lista, em Matemática, o cartão que usa um conceito que a fila só ensina depois (raiz, potência, porcentagem, fração, logaritmo...).
+É lista para ler: a marca pode ser de passagem.
+
 #### 1.9.2 Fórmula vem com a origem de cada fator
 
 Fórmula cobrada só como "qual é a fórmula" é decorada e esquecida. Quando a
