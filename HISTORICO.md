@@ -550,8 +550,9 @@ matérias ativas, entre os cartões em que só uma alternativa tinha a marca, el
 a correta em 86% das vezes no travessão (31 de 36), 72% nos parênteses, 76% no
 exemplo e 62% nos dois-pontos, contra 20% do acaso. Palavra absoluta era o inverso:
 só 2,5% das 1.585 alternativas com "apenas", "nunca" e afins eram a correta. O
-travessão foi corrigido, os demais viraram aviso do `validar` e seguem como lista
-de trabalho. A trava que proibia mexer na correta passou a aceitar pontuação.
+travessão foi corrigido, os demais viraram aviso do `validar`. Português foi o
+primeiro a passar pela rodada inteira; as outras matérias seguem como lista de
+trabalho. A trava que proibia mexer na correta passou a aceitar pontuação.
 
 **Mapear o edital ao pé da letra cortou 67 de 127 questões de Português.** O
 mapeamento item-do-edital → tópico-do-banco é interpretação, não transcrição:
