@@ -544,6 +544,15 @@ por cima de regra que o validador reprova. É a origem da regra 9 do
 `CLAUDE.md` — só três scripts escrevem em `banco/*.json`, e todos rodam o
 validador de verdade antes.
 
+**A pontuação entregava a resposta (novembro/2026).** Numa revisão pelas fotos
+do app, um travessão só na alternativa correta chamou a atenção. Medido nas
+matérias ativas, entre os cartões em que só uma alternativa tinha a marca, ela era
+a correta em 86% das vezes no travessão (31 de 36), 72% nos parênteses, 76% no
+exemplo e 62% nos dois-pontos, contra 20% do acaso. Palavra absoluta era o inverso:
+só 2,5% das 1.585 alternativas com "apenas", "nunca" e afins eram a correta. O
+travessão foi corrigido, os demais viraram aviso do `validar` e seguem como lista
+de trabalho. A trava que proibia mexer na correta passou a aceitar pontuação.
+
 **Mapear o edital ao pé da letra cortou 67 de 127 questões de Português.** O
 mapeamento item-do-edital → tópico-do-banco é interpretação, não transcrição:
 os itens são categorias largas. Na dúvida, inclui.

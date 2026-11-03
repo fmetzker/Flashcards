@@ -1067,6 +1067,12 @@ ponto e vírgula, dois-pontos), porque a marca que só a correta tem também
 entrega a resposta; entre dígitos ela não pode mudar, porque ali faz parte do
 valor (`so_pontuacao_mudou()`).
 
+**A forma também é pista.** Marca que só a correta tem (travessão, parênteses,
+dois-pontos, exemplo) e palavra absoluta só nos distratores ("apenas", "nunca")
+deixam acertar sem saber o conteúdo. `validar.py` mede as duas por matéria, com a
+mesma conta da pista de comprimento, e avisa o que está fora do acaso. Regras em
+`PADRAO-DOS-CARTOES.md` §1.3.1.
+
 As alternativas são embaralhadas em tempo de execução (`embaralhaOrdem`), no
 estudo e no simulado — não reintroduzir ordem fixa.
 

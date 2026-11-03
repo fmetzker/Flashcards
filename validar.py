@@ -913,6 +913,47 @@ def mede_vies(B):
                           "pista invertida, dá pra eliminar uma alternativa de graça. "
                           "Corrigir enxugando o distrator que se destaca, não alongando a correta")
 
+    # A forma também entrega resposta. A conta é a mesma da pista de comprimento:
+    # entre os cartões em que só UMA alternativa tem a marca, quantas vezes ela é
+    # a correta (acaso = 20%). Um cartão sozinho com a marca não é erro, por isso
+    # só avisa, e a lista é para ler cartão a cartão.
+    marcas = (('travessão', r'[—–]'), ('parênteses', r'\('), ('dois-pontos', r':'),
+              ('ponto e vírgula', r';'), ('exemplo', r'(?i)\b(como em|por exemplo|ex\.)'))
+    print("  marca que só uma alternativa tem (é a correta em quantas):")
+    for nome, padrao in marcas:
+        por_m = {}
+        for q in B:
+            tem = [bool(re.search(padrao, x)) for x in q['o']]
+            if sum(tem) == 1:
+                p, a = por_m.get(q['m'], (0, 0))
+                por_m[q['m']] = (p + 1, a + tem[q['c']])
+        p = sum(v[0] for v in por_m.values())
+        a = sum(v[1] for v in por_m.values())
+        print(f"    {nome:<22} {a:>3}/{p:<4} {(a / p * 100) if p else 0:>5.1f}%")
+        altas = [f"{mid} {v[1]}/{v[0]}" for mid, v in sorted(por_m.items())
+                 if mid in ativas and v[0] >= 10 and v[1] / v[0] >= 0.5]
+        if altas:
+            avisos.append(f"{nome} entrega a correta (só ela tem a marca): {', '.join(altas)} "
+                          "— ver PADRAO-DOS-CARTOES.md §1.3.1")
+
+    # Palavra absoluta é a pista invertida: quem marca "nunca é a que tem apenas"
+    # elimina alternativa sem saber o conteúdo.
+    absolutas = r'(?i)\b(apenas|somente|exclusivamente|nunca|sempre)\b'
+    por_m = {}
+    for q in B:
+        for j, x in enumerate(q['o']):
+            if re.search(absolutas, x):
+                p, a = por_m.get(q['m'], (0, 0))
+                por_m[q['m']] = (p + 1, a + (j == q['c']))
+    p = sum(v[0] for v in por_m.values())
+    a = sum(v[1] for v in por_m.values())
+    print(f"  alternativa com palavra absoluta: {a}/{p} são a correta   [acaso 20%]")
+    baixas = [f"{mid} {v[1]}/{v[0]}" for mid, v in sorted(por_m.items())
+              if mid in ativas and v[0] >= 20 and v[1] / v[0] < 0.05]
+    if baixas:
+        avisos.append(f"palavra absoluta quase nunca é a correta: {', '.join(baixas)} "
+                      "— ver PADRAO-DOS-CARTOES.md §1.3.1")
+
     # o viés de letra só importa se o embaralhamento for removido
     fonte = open(HTML, encoding='utf-8').read()
     if 'embaralhaOrdem' not in fonte:

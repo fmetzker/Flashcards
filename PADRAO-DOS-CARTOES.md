@@ -54,6 +54,36 @@ Distrator absurdo não ensina nada e ainda entrega a resposta por eliminação.
 reescreva os *distratores*, nunca encurte a correta. Em boa parte dos casos,
 escreva pelo menos um distrator **mais longo** que a alternativa certa.
 
+### 1.3.1 Nem a forma nem o formato podem apontar a resposta
+
+Quem estuda aprende a reconhecer a alternativa pelo jeito dela, e aí revisa o
+desenho do cartão em vez do fato. Três regras:
+
+- **Marca que só a correta tem é pista.** Travessão, parênteses, dois-pontos ou
+  exemplo ("como em...") numa alternativa só. Entre os cartões em que só uma
+  alternativa tem a marca, ela deveria ser a correta em cerca de 20% das vezes.
+  Ou a marca sai da correta (trocar a pontuação é a única mudança que o
+  validador aceita nela), ou um distrator ganha a mesma marca.
+- **Palavra absoluta só no distrator é pista invertida.** "Apenas", "somente",
+  "exclusivamente", "nunca" e "sempre" viram atalho para eliminar alternativa,
+  igual à frase curta da seção de viés do `CLAUDE.md`.
+- **Definições do mesmo grupo concorrem entre si.** Quando um subtópico define
+  tipos irmãos com o mesmo enunciado (divisões da gramática, tipos de advérbio,
+  valores da preposição), o distrator é a definição correta do vizinho, com as
+  mesmas palavras, e a nota diz de quem ela é. Só acerta quem sabe qual definição
+  é de qual nome. Se a moldura do enunciado muda, ajuste só o verbo.
+
+  Não se aplica a cartão de "assinale a frase correta", em que as alternativas
+  são frases, nem a exercício.
+
+- ✅ `A lexicologia estuda:`, com as definições de morfologia, semântica, sintaxe
+  e fonologia nos distratores.
+- ❌ A mesma pergunta com "apenas a acentuação gráfica das palavras" como
+  distrator: elimina-se sem saber o que é lexicologia.
+
+O `validar` avisa, por matéria, a marca e a palavra absoluta que estão fora do
+acaso. É aviso, não erro: um cartão sozinho com parênteses é normal.
+
 ### 1.4 A explicação ensina, não repete
 
 A explicação existe para o momento em que a pessoa **errou**. Ela precisa dizer
@@ -931,6 +961,8 @@ Antes de dar o cartão por pronto:
       exercício de nível 2+, a pergunta certa é outra: o dado/cenário é
       genuinamente novo, ou só o rótulo mudou? Ver 1.5.2.)
 - [ ] Os 4 distratores são erros que alguém cometeria de verdade?
+- [ ] Nenhuma marca (travessão, parênteses, exemplo) só na correta, nenhum
+      "apenas" só nos distratores, e definições irmãs nos distratores? Ver 1.3.1.
 - [ ] Nenhum "todas as anteriores" / "apenas I e III"?
 - [ ] A alternativa certa **não** é a mais longa?
 - [ ] A explicação diz *por que*, não *qual*?
