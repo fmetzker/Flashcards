@@ -1062,7 +1062,10 @@ mesmo caminho de patch de sempre (regra 9 segue com três scripts). Os dois
 validadores reprovam patch de `o` em que a correta mude de texto ou de posição:
 `c` é índice, não texto, e reordenar as alternativas trocaria a resposta certa
 para todo mundo sem aparecer no diff. Sobra exatamente o que esta seção manda —
-mexer em distrator.
+mexer em distrator. A única exceção é pontuação da correta (travessão, vírgula,
+ponto e vírgula, dois-pontos), porque a marca que só a correta tem também
+entrega a resposta; entre dígitos ela não pode mudar, porque ali faz parte do
+valor (`so_pontuacao_mudou()`).
 
 As alternativas são embaralhadas em tempo de execução (`embaralhaOrdem`), no
 estudo e no simulado — não reintroduzir ordem fixa.

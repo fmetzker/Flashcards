@@ -1117,6 +1117,19 @@ def carrega_rascunho(B, caminho):
     return B
 
 
+def so_pontuacao_mudou(antes, depois):
+    """True se a correta segue a mesma, a menos de travessão e de vírgula, ponto
+    e vírgula ou dois-pontos. Entre dígitos a marca fica, porque ali ela é parte
+    do valor: "1,5" e "15" são respostas diferentes, e "3:4" é uma razão. Hífen e
+    meia-risca também ficam, porque em Matemática são sinal de menos."""
+    def nucleo(texto):
+        if not isinstance(texto, str):
+            return None
+        sem_marca = re.sub(r'—|(?<!\d)[,;:]|[,;:](?!\d)', ' ', texto)
+        return ' '.join(sem_marca.split())
+    return nucleo(antes) == nucleo(depois)
+
+
 def carrega_patches(B, caminho):
     """Aplica em memória, sobre cartão que JÁ EXISTE no banco, os campos que
     não entram no id: 'eo' (explicação por alternativa), 'n' (nível do cartão
@@ -1143,7 +1156,8 @@ def carrega_patches(B, caminho):
     mecânica e não documental: SE o patch não traz 'c' também, ele precisa
     devolver a correta IDÊNTICA e na MESMA posição — sobra exatamente o que a
     seção de viés do CLAUDE.md manda fazer, reescrever distrator, nunca
-    encurtar a correta. Quando a auditoria confirma que a resposta MARCADA
+    encurtar a correta. A única folga é a pontuação (so_pontuacao_mudou):
+    travessão só na correta também entrega a resposta. Quando a auditoria confirma que a resposta MARCADA
     está errada (não é viés, é erro de fato), 'c' pode ser corrigido — mas só
     junto com 'e' nova: a explicação antiga quase certamente não justifica a
     resposta nova, e um 'c' trocado sem 'e' reescrita vira cartão que aponta
@@ -1175,10 +1189,10 @@ def carrega_patches(B, caminho):
                 falhou = True
             elif 'c' not in p:
                 c = por_id[pid]['c']
-                if novo[c] != atual[c]:
+                if not so_pontuacao_mudou(atual[c], novo[c]):
                     erros.append(f"patches: id '{pid}': a alternativa correta (índice {c}) "
                                  "mudou de texto ou de posição — patch de 'o' sem 'c' só pode "
-                                 "reescrever distrator, nunca a correta")
+                                 "reescrever distrator ou trocar pontuação da correta")
                     falhou = True
             if not falhou:
                 por_id[pid]['o'] = novo

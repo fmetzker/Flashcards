@@ -35,8 +35,9 @@
 #       Ver PADRAO-DOS-CARTOES.md seção 1.4.1.
 #   n   nível do cartão dentro do tópico (1 a 9).
 #   o   as alternativas, para corrigir viés de comprimento reescrevendo
-#       DISTRATOR. Sem 'c' no mesmo patch, a correta tem de vir idêntica e na
-#       mesma posição: 'c' é índice, não texto, e trocar a ordem mudaria a
+#       DISTRATOR. Sem 'c' no mesmo patch, a correta tem de vir igual e na
+#       mesma posição, a menos de pontuação (travessão, vírgula, ponto e
+#       vírgula, dois-pontos): 'c' é índice, não texto, e trocar a ordem mudaria a
 #       resposta certa sem aparecer no diff. Quem reprova isso é o
 #       validar.py — mexeu na correta sem avisar, não grava. Mandando 'o',
 #       mande o 'eo' junto: eo[i] explica o[i], e distrator novo com
