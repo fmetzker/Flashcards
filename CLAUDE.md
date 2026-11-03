@@ -805,13 +805,17 @@ subtópico cai no recorte de tópico automaticamente.
 
 Os invariantes, que não podem ser afrouxados:
 
-- **Trava só cartão NOVO.** Revisão vencida entra sempre, venha do degrau, do
-  tópico ou do subtópico que vier. Travar revisão viraria um jeito de
-  esconder justamente o que a pessoa já errou.
-  - **`E.escada` só mede, por enquanto.** Guarda o degrau mais alto que cada
-    recorte já abriu, e nunca desce. `emEspera()` conta as revisões de trecho que
-    a conta nunca abriu, e a tela Estatísticas mostra o número. `fila()` continua
-    entregando tudo: a decisão de esconder depende desse número (`HISTORICO.md`).
+- **A trava atual vale só para cartão NOVO; a revisão só espera se o trecho nunca
+  abriu.** `E.escada` guarda o degrau mais alto que cada recorte já abriu, e nunca
+  desce: errar a base fecha cartão novo, mas não esconde revisão de trecho que já
+  abriu, senão um erro na tabuada esconderia a Matemática inteira. Revisão de
+  trecho que nunca abriu, como a de um cartão movido na escada, fica em espera:
+  fora de `fila()`, das sessões e do atraso (`revisaoEmEspera()`), e volta sozinha
+  quando o trecho abrir.
+  - **Matéria de prova a até `DIAS_SEM_ESPERA` (30) dias não espera.** Perto da
+    prova, esconder revisão custa mais do que seguir a ordem.
+  - **O Painel de desempenho não sabe da espera:** calcula pelo log do servidor,
+    que não conhece `E.escada`, e conta esses cartões como atrasados.
 - **Cartão sem `n` vale 1, e o degrau 1 nunca trava.** Enquanto o banco não
   estiver todo classificado, ligar o recurso não pode trancar o que ninguém
   classificou.
@@ -830,7 +834,7 @@ Os invariantes, que não podem ser afrouxados:
   valia para tópico: histórico espalhado (de antes da fila existir, ou de
   quando cabia estudar em qualquer ordem) não pode destravar o que vem depois
   sem ter passado pela base de verdade.
-- **O simulado ignora os três eixos.** Ele imita a prova, e a prova não
+- **O simulado ignora os três eixos e a espera.** Ele imita a prova, e a prova não
   respeita escada nenhuma.
 - **A trava não tem escape.** Tópico ou subtópico fechado não ganha botão
   Estudar; degrau fechado não é alcançável nem pelo atalho de "revisar

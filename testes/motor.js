@@ -82,6 +82,7 @@ module.exports = function (APP, t) {
     /* Atrasadas, Hoje, Amanhã, 2-7, 8-30, 31-120: as fronteiras são os
        próprios INTERVALOS do Leitner, e cada cartão entra em um só balde. */
     await APP.montar({ concursos: ['transpetro-mec'] });
+    APP.abrirEscada();
     const hoje = APP.hoje();
     const amostra = APP.BANCO.slice(0, 60);
     const distancias = [-9, -1, 0, 1, 3, 6, 12, 29, 45, 119];
@@ -104,6 +105,7 @@ module.exports = function (APP, t) {
        gravado antes de o teto dinâmico ser removido, que tem cartão de
        caixa alta com data curta — e é `prox` que fila() lê. */
     await APP.montar({ concursos: ['transpetro-mec'] });
+    APP.abrirEscada();
     const hoje = APP.hoje();
     const q = APP.BANCO[0];
     /* caixa 8 (nominalmente 120 dias) mas vencendo amanhã */

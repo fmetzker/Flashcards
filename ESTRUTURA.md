@@ -174,8 +174,9 @@ Migrações que rodam no boot: `migrarSessaoDoPerfil`, `migrarEstadoDoPerfil`,
 | `iniciarSessao` | modos `normal`, `filtro`, `erros` |
 | `registrar` | grava resposta, atualiza caixa, alimenta a fila de sync |
 
-**O invariante que nada pode quebrar:** trava e ordenação agem **só sobre
-`novas`**. `revisar` nunca é filtrado — revisão vencida sempre aparece.
+**O invariante que nada pode quebrar:** a trava do estado atual age **só sobre
+`novas`**. `revisar` só perde a revisão de trecho que a conta nunca abriu
+(`revisaoEmEspera()`, marca em `E.escada`, que nunca desce).
 
 ### 4.5 Telas
 

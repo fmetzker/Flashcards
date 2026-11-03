@@ -193,11 +193,11 @@ module.exports = function (APP, t) {
     esquecerTudo();
   });
 
-  t.grupo('a trava só vale para cartão NOVO');
+  t.grupo('a revisão só espera se o trecho nunca abriu');
 
-  t.teste('revisão vencida entra na fila mesmo com o tópico fechado', async () => {
-    /* O invariante mais importante da seção: "Travar revisão viraria um
-       jeito de esconder justamente o que a pessoa já errou." */
+  t.teste('revisão vencida de trecho já aberto entra na fila com o tópico fechado agora', async () => {
+    /* Fechar de novo por um erro na base não pode esconder o que a pessoa já
+       estudou: é o que sobrou da regra "trava só cartão novo". */
     await APP.montar({ concursos: ['transpetro-mec'] });
     const hoje = APP.hoje();
     const deFechado = APP.BANCO.filter(q => q.m === 'matematica' && q.t === 'Funções');
@@ -205,12 +205,15 @@ module.exports = function (APP, t) {
     t.ok(!APP.topicoAberto('matematica', 'Funções'), 'Funções tem que estar fechada');
 
     const tres = deFechado.slice(0, 3);
-    tres.forEach(q => { APP.E.cartoes[q.id] = { caixa: 2, acertos: 1, erros: 0, prox: hoje }; });
+    tres.forEach(q => {
+      APP.E.cartoes[q.id] = { caixa: 2, acertos: 1, erros: 0, prox: hoje };
+      APP.E.escada[APP.chaveEscada(q)] = APP.grauDe(q);
+    });
     APP.limparCacheGrau();
 
     const f = APP.fila();
     for (const q of tres) {
-      t.ok(f.revisar.includes(q.id), 'revisão vencida de tópico fechado tem que entrar na fila');
+      t.ok(f.revisar.includes(q.id), 'revisão de trecho que já abriu tem que entrar na fila');
     }
   });
 
@@ -368,7 +371,7 @@ module.exports = function (APP, t) {
   });
 
   /* ---- a escada só sobe (CLAUDE.md, "Ordem de aprendizado") ---- */
-  t.grupo('a escada só sobe, e a espera por enquanto só mede');
+  t.grupo('a escada só sobe');
 
   const CERTO = { caixa: 3, acertos: 2, erros: 0, prox: '2099-01-01' };
   const ORDEM = ['Multiplicação', 'Operações e expressões numéricas', 'Potenciação', 'Divisibilidade'];
@@ -378,13 +381,59 @@ module.exports = function (APP, t) {
   const atualizar = () => { APP.limparCacheGrau(); APP.atualizarEscada(); };
   const montarMat = () => APP.montar({ concursos: ['caaq-cdm'] });
 
-  t.teste('revisão de trecho que nunca abriu fica em espera, mas a fila ainda a entrega', async () => {
+  t.teste('revisão de trecho que nunca abriu não entra em nenhuma sessão', async () => {
+    await montarMat();
+    const q = doSub('Radiciação')[0];
+    APP.E.cartoes[q.id] = { caixa: 1, acertos: 1, erros: 1, prox: APP.hoje() };
+    atualizar();
+    t.ok(APP.revisaoEmEspera(q), 'Radiciação nunca abriu nesta conta');
+    t.ok(!APP.fila().revisar.includes(q.id), 'fila');
+    t.ok(!APP.montarLoteSessao('normal', null, new Set()).includes(q.id), 'sessão normal');
+    t.ok(!APP.montarLoteSessao('filtro', { m: 'matematica' }, new Set()).includes(q.id), 'estudo por matéria');
+    t.ok(!APP.montarLoteSessao('erros', null, new Set()).includes(q.id), 'caderno de erros');
+    const atraso = APP.revisoesPorDia().reduce((n, d) => n + d.n, 0);
+    t.igual(atraso, 0, 'não conta como atraso nem como vencimento');
+  });
+
+  t.teste('a revisão em espera volta quando o trecho abre', async () => {
+    await montarMat();
+    const q = baseDe(ORDEM[1])[0];
+    APP.E.cartoes[q.id] = { caixa: 2, acertos: 1, erros: 0, prox: APP.hoje() };
+    atualizar();
+    t.ok(!APP.fila().revisar.includes(q.id), 'ainda em espera');
+    vencer(baseDe('Multiplicação'));
+    t.ok(APP.fila().revisar.includes(q.id), 'o trecho abriu, a revisão volta');
+  });
+
+  t.teste('matéria de prova a até 30 dias não espera, e depois da prova volta a esperar', async () => {
     await montarMat();
     const q = doSub('Radiciação')[0];
     APP.E.cartoes[q.id] = { caixa: 2, acertos: 1, erros: 0, prox: APP.hoje() };
+    const prova = APP.INSCRITOS.find(c => c.blocos.some(b => b.materias.includes('matematica')));
+    const original = prova.data;
+    try {
+      prova.data = APP.somarDias(APP.hoje(), 30);
+      atualizar();
+      t.ok(!APP.revisaoEmEspera(q) && APP.fila().revisar.includes(q.id), 'a 30 dias, entrega');
+      prova.data = APP.somarDias(APP.hoje(), 31);
+      atualizar();
+      t.ok(APP.revisaoEmEspera(q), 'a 31 dias, espera');
+      prova.data = APP.somarDias(APP.hoje(), -1);
+      atualizar();
+      t.ok(APP.revisaoEmEspera(q), 'prova que já passou não protege nada');
+    } finally {
+      prova.data = original;
+    }
+  });
+
+  t.teste('a base da matéria nunca fica sem o que estudar', async () => {
+    /* começo da fila: não pode haver espera aqui, senão a conta trava */
+    await montarMat();
+    const q = baseDe('Multiplicação')[0];
+    APP.E.cartoes[q.id] = { caixa: 1, acertos: 0, erros: 1, prox: APP.hoje() };
     atualizar();
-    t.ok(APP.revisaoEmEspera(q), 'Radiciação nunca abriu nesta conta');
-    t.ok(APP.fila().revisar.includes(q.id), 'nesta fase a espera só mede: a fila não pode esconder');
+    t.ok(!APP.revisaoEmEspera(q), 'o começo da fila está sempre aberto');
+    t.ok(APP.fila().revisar.includes(q.id), 'e o erro nele volta');
   });
 
   t.teste('o trecho que abriu continua aberto depois de errar a base', async () => {

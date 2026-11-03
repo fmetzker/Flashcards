@@ -308,12 +308,12 @@ cache assume se ela demorar.
 
 ## Ordem de aprendizado
 
-**Medir antes de esconder revisão (novembro/2026).** Cartão movido para um trecho
-que a pessoa nunca abriu continuava voltando como revisão, porque a trava só vale
-para cartão novo. Travar pelo estado de agora não serve: a fila é uma corrente, e
-um erro na tabuada fecharia a Matemática inteira. Por isso `E.escada` só sobe. Como
-o progresso fica no aparelho e havia prova a menos de um mês, a primeira versão só
-mostra quantas revisões ficariam em espera, para decidir com o número na mão.
+**Revisão em espera (novembro/2026).** Cartão movido para um trecho que a pessoa
+nunca abriu continuava voltando como revisão, porque a trava só valia para cartão
+novo. Travar pelo estado de agora não serve: a fila é uma corrente, e um erro na
+tabuada fecharia a Matemática inteira. Por isso `E.escada` só sobe. A espera foi
+ligada a pedido do dono do projeto, antes de medir o número no aparelho, e matéria
+de prova a até 30 dias ficou de fora: havia prova a menos de um mês.
 
 **O grafo abria em leque; virou fila.** Até agosto/2026 `requisitos` era o
 próprio grafo de dependência de conceito, e "abrir um por vez" só valia entre

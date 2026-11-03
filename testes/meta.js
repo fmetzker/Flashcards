@@ -83,8 +83,8 @@ module.exports = function (APP, t) {
   });
 
   t.teste('a sessão respeita o escopo por subtópico (revisão vencida fora dele não entra)', async () => {
-    /* revisão vencida passa por cima da fila de pré-requisito — é o único
-       jeito de o cartão fora do escopo chegar até o filtro da sessão */
+    /* trecho já aberto na escada: é o único jeito de o cartão fora do escopo
+       chegar até o filtro da sessão */
     await APP.montar({ concursos: ['cfaq-moc-mom'] });
     const mat = bloco('matematica');
     t.ok(mat && mat.topicos && mat.topicos.some(x => x.includes('|')),
@@ -95,6 +95,8 @@ module.exports = function (APP, t) {
     const hoje = APP.hoje();
     APP.E.cartoes[fora.id] = { caixa: 1, acertos: 0, erros: 1, prox: hoje };
     APP.E.cartoes[dentro.id] = { caixa: 1, acertos: 0, erros: 1, prox: hoje };
+    APP.E.escada[APP.chaveEscada(fora)] = APP.grauDe(fora);
+    APP.E.escada[APP.chaveEscada(dentro)] = APP.grauDe(dentro);
     const lote = APP.montarLoteSessao('normal', null, new Set());
     t.ok(lote.includes(dentro.id), 'a revisão dentro do escopo tinha que entrar');
     t.ok(!lote.includes(fora.id), 'revisão de logaritmo entrou numa sessão do CFAQ (fora do escopo)');

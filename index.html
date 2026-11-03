@@ -2395,10 +2395,12 @@ function pintarGraficos(){
      na mesma varredura elimina a sobra. */
   const h = hoje(), totalBanco = BANCO.length;
   limparCacheGrau();
+  atualizarEscada();
   let novas = 0, revisar = 0, travadas = 0, emDia = 0;
   BANCO.forEach(q=>{
     const c = E.cartoes[q.id];
     if(!c){ if(grauAberto(q)) novas++; else travadas++; }
+    else if(revisaoEmEspera(q)) travadas++;
     else if(c.prox <= h) revisar++;
     else emDia++;
   });
@@ -3599,7 +3601,11 @@ function pintarStats(){
   pintarGraficos();
 
   let ac=0, tot=0, erros=0;
-  Object.values(E.cartoes).forEach(c2=>{ac+=c2.acertos;tot+=c2.acertos+c2.erros;if(c2.caixa<=2&&c2.erros>0)erros++;});
+  Object.keys(E.cartoes).forEach(id=>{
+    const c2=E.cartoes[id];
+    ac+=c2.acertos;tot+=c2.acertos+c2.erros;
+    if(c2.caixa<=2&&c2.erros>0&&!(porId[id]&&revisaoEmEspera(porId[id])))erros++;
+  });
   document.getElementById("n-banco").textContent = BANCO.length;
   document.getElementById("n-vistas").textContent = Object.keys(E.cartoes).length;
   document.getElementById("n-acuracia").textContent = tot? Math.round(ac/tot*100)+"%" : "–";
@@ -3629,8 +3635,8 @@ function pintarStats(){
     linha.innerHTML = "<span>"+d.rotulo+"</span><span class=\"n\">"+d.n+"</span>";
     revBox.appendChild(linha);
   });
-  /* Só mede: estes cartões continuam aparecendo nas revisões. O número é o que
-     falta para decidir se a espera entra de verdade (HISTORICO.md). */
+  /* Revisão de trecho que a conta nunca abriu: não entra nas sessões e volta
+     sozinha quando o trecho abrir (revisaoEmEspera, no motor.js). */
   const espera = emEspera();
   const linhaEspera = (rotulo, n)=>{
     const linha = document.createElement("div"); linha.className = "stat";
@@ -3639,7 +3645,7 @@ function pintarStats(){
     linha.children[1].textContent = n;
     revBox.appendChild(linha);
   };
-  linhaEspera("Em espera, vencidas (ainda aparecem)", espera.vencidas+" de "+espera.total);
+  linhaEspera("Em espera, vencidas (voltam quando o assunto abrir)", espera.vencidas+" de "+espera.total);
   Object.keys(espera.porMateria).forEach(m=>{
     const pm = espera.porMateria[m];
     linhaEspera("· "+((MATERIAS[m]||{}).nome || m), pm.vencidas+" de "+pm.total);

@@ -347,8 +347,11 @@ function grauAberto(q){
    Olhar só o estado de agora não serve: a fila é uma corrente, e um erro na
    tabuada fecharia a Matemática inteira.
 
-   Hoje só MEDE: revisaoEmEspera() diz qual revisão ficaria em espera, e a tela
-   mostra o número. fila() continua entregando toda revisão vencida. */
+   revisaoEmEspera() diz qual revisão aguarda: cartão já respondido num trecho
+   que a conta nunca abriu, como depois de mudar de lugar na escada. Ela não entra
+   nas sessões nem conta como atraso, e volta sozinha quando o trecho abrir.
+   Matéria de prova próxima não espera: esconder revisão perto da prova custa
+   mais do que seguir a ordem. */
 function chaveEscada(q){ return q.m + "|" + q.t + "|" + (q.s || ""); }
 let _cacheHistoria = {};
 
@@ -417,7 +420,17 @@ function atualizarEscada(){
 }
 
 function revisaoEmEspera(q){
-  return !!E.cartoes[q.id] && !((E.escada && E.escada[chaveEscada(q)]) >= grauDe(q));
+  if(!E.cartoes[q.id] || (E.escada && E.escada[chaveEscada(q)]) >= grauDe(q)) return false;
+  return !materiaComProvaProxima(q.m);
+}
+
+const DIAS_SEM_ESPERA = 30;
+function materiaComProvaProxima(m){
+  const h = diaUTC(hoje());
+  return INSCRITOS.some(c=>{
+    const dias = Math.round((diaUTC(c.data) - h) / 86400000);
+    return dias >= 0 && dias <= DIAS_SEM_ESPERA && c.blocos.some(b=> b.materias.indexOf(m) >= 0);
+  });
 }
 
 /* {total, vencidas, porMateria: {m: {total, vencidas}}} dos cartões já respondidos
@@ -673,9 +686,9 @@ function fila(){
   BANCO.forEach(q=>{
     const c = E.cartoes[q.id];
     /* cartão novo de degrau ainda fechado nem entra na fila: é o bloqueio da
-       escada. Revisão vencida entra sempre, venha de que degrau vier. */
+       escada. Revisão só fica de fora se o trecho dela nunca abriu. */
     if(!c){ if(grauAberto(q)) novas.push(q.id); }
-    else if(c.prox <= h) revisar.push(q.id);
+    else if(c.prox <= h && !revisaoEmEspera(q)) revisar.push(q.id);
   });
   /* ordenarRevisoes() manda na revisão; o id só entra quando todos os
      critérios dela empatam — e empatam muito: mesma caixa, mesmo degrau,
@@ -866,7 +879,7 @@ function montarLoteSessao(modo, filtro, excluir){
   if(modo==="erros"){
     /* sem sort por id, isto sairia na ordem em que os cartões entraram no
        E.cartoes — outra ordem acidental, ver cmpId() */
-    lista = Object.keys(E.cartoes).filter(id=>porId[id] && E.cartoes[id].caixa<=2 && E.cartoes[id].erros>0 && !excluir.has(id)).sort(cmpId);
+    lista = Object.keys(E.cartoes).filter(id=>porId[id] && E.cartoes[id].caixa<=2 && E.cartoes[id].erros>0 && !excluir.has(id) && !revisaoEmEspera(porId[id])).sort(cmpId);
   } else if(modo==="filtro"){
     /* uma matéria ou um tópico isolado: vale a mesma ordem do estudo normal —
        o que está vencido primeiro, depois o que nunca foi visto */
@@ -883,7 +896,7 @@ function montarLoteSessao(modo, filtro, excluir){
       /* mesma escada do estudo normal: estudar um tópico pela tela Matérias
          não pode ser um atalho para pular o degrau de baixo */
       if(!c){ if(grauAberto(x)) nov.push(x.id); }
-      else if(c.prox <= h) rev.push(x.id);
+      else if(c.prox <= h && !revisaoEmEspera(x)) rev.push(x.id);
     });
     rev = ordenarRevisoes(rev);   // mesma ordem do estudo normal
     nov.sort(cmpId);
@@ -1041,10 +1054,12 @@ function resumoPendencias(){
 function revisoesPorDia(){
   const inscritas = materiasInscritas();
   const h = diaUTC(hoje());
+  limparCacheGrau();
+  atualizarEscada();
   const b = {atrasadas:0, hoje:0, amanha:0, semana:0, mes:0, resto:0};
   Object.keys(E.cartoes).forEach(id=>{
     const x = porId[id];
-    if(!x || inscritas.indexOf(x.m) < 0) return;
+    if(!x || inscritas.indexOf(x.m) < 0 || revisaoEmEspera(x)) return;
     const diff = Math.round((diaUTC(E.cartoes[id].prox) - h) / 86400000);
     if(diff < 0) b.atrasadas++;
     else if(diff === 0) b.hoje++;

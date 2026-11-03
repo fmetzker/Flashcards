@@ -347,6 +347,7 @@ module.exports = function (APP, t) {
        "Estudar" e outra na tela Matérias. Caixas e tópicos variados para a
        chave inteira trabalhar, não só o id. */
     await APP.montar({ concursos: ['transpetro-mec'] });
+    APP.abrirEscada();
     const porTopico = {};
     APP.BANCO.filter(q => q.m === 'manutencao-mecanica')
       .forEach(q => { (porTopico[q.t] = porTopico[q.t] || []).push(q); });

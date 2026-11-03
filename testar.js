@@ -58,7 +58,7 @@ const FUNCOES = [
   'indexarRequisitos', 'topicoAberto', 'subtopicoAberto',
   'requisitosPendentes', 'requisitosPendentesSub', 'baseDominada',
   'grauDe', 'grauLiberado', 'grauAberto', 'menorGrauExistente', 'limparCacheGrau',
-  'atualizarEscada', 'revisaoEmEspera', 'emEspera', 'chaveEscada', 'grauPelaHistoria',
+  'atualizarEscada', 'revisaoEmEspera', 'emEspera', 'chaveEscada', 'grauPelaHistoria', 'materiaComProvaProxima',
   'profundidadeTopico', 'profundidadeSubtopico', 'porDesbloqueio', 'porDesbloqueioSub',
   'blocosDaMeta', 'noEscopo', 'progressoDoDia', 'progressoPorBloco',
   'feitasHoje', 'montarLoteSessao', 'agendarRepeticao', 'resumoDoBanco',
@@ -238,6 +238,10 @@ function carregarApp(opcoes = {}) {
     APP.limparCacheGrau();
     return APP;
   };
+
+  /* Teste cuja conduta não é a da espera: todo trecho já abriu. Sem isto, ele
+     dependeria de a prova do concurso estar perto, e quebraria com o calendário. */
+  APP.abrirEscada = () => { APP.BANCO.forEach(q => { APP.E.escada[APP.chaveEscada(q)] = 9; }); };
 
   /* "Uma matéria avulsa qualquer", tirada do materias.json na hora em vez de
      escrita no teste: excluir uma matéria (regra 12) não pode derrubar teste
