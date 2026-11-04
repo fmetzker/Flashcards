@@ -17,6 +17,20 @@ que o código já diz não vem: some.
 
 ---
 
+## Foco numa prova sem esquecer as outras (novembro/2026)
+
+O pedido veio de um plano novo de estudo: montar base para CAAQ-CDM, CAAQ-ELT e
+ASON ao mesmo tempo e, quando sair um edital, focar nas matérias daquela prova e
+só revisar o resto. O escopo existente fazia a primeira metade: ao escolher uma
+prova, a sessão montava apenas os blocos dela, e a revisão das outras matérias
+sumia até a pessoa abrir cada uma na tela Matérias ou fechar a meta do dia.
+
+Daí o bloco `soRevisao`. O primeiro desenho dava a ele a cota inteira do peso, e
+isso deixaria a meta impossível de fechar nos dias com pouca revisão vencida; por
+isso a cota para no que há para fazer. Dois filtros iniciais caíram porque os
+testes de mutação mostraram que não mudavam nada: a saída antecipada para um
+concurso só e um segundo filtro de bloco vazio.
+
 ## Revisão das explicações de Matemática (outubro/2026)
 
 Em 25/10, a partir de quatro cartões fotografados no app, o pedido foi ter em

@@ -357,4 +357,153 @@ module.exports = function (APP, t) {
     t.ok(APP.E.metasAnunciadas[h].blocos.includes(bloco('matematica').id), 'devia ter marcado o aviso de hoje');
     t.igual(APP.E.metasAnunciadas['2020-01-01'], undefined, 'um dia sem histórico não pode ter entrada nenhuma');
   });
+  t.grupo('meta — prova em foco, o resto só em revisão');
+
+  const vencer = (ids) => {
+    const h = APP.hoje();
+    ids.forEach(id => { APP.E.cartoes[id] = { caixa: 3, acertos: 2, erros: 0, prox: h }; });
+  };
+  const daMateria = (m, n) => APP.BANCO.filter(q => q.m === m).slice(0, n).map(q => q.id);
+  const novosDa = (lote, m) => lote.filter(id => APP.porId[id].m === m && !APP.E.cartoes[id]);
+  /* sem a fila, todo tópico abre: é o que faz o cartão novo chegar até o filtro
+     do foco, em vez de parar antes na trava de pré-requisito */
+  const semFila = async (fn) => {
+    const salvo = { REQ: APP.REQUISITOS, SUB: APP.REQUISITOS_SUB };
+    APP.REQUISITOS = {}; APP.REQUISITOS_SUB = {};
+    try { await fn(); } finally { APP.REQUISITOS = salvo.REQ; APP.REQUISITOS_SUB = salvo.SUB; }
+  };
+
+  t.teste('revisão de outra prova seguida entra na sessão; cartão novo dela não', async () => {
+    await APP.montar({ concursos: ['vr-enf-2026', 'caaq-cdm'] });
+    APP.abrirEscada();
+    const [id] = daMateria('enfermagem', 1);
+    vencer([id]);
+    APP.aplicarFoco('caaq-cdm');
+    t.ok(bloco('enfermagem') && bloco('enfermagem').soRevisao, 'Enfermagem devia virar bloco só de revisão');
+    const lote = APP.montarLoteSessao('normal', null, new Set());
+    t.ok(lote.includes(id), 'a revisão de Enfermagem tinha que entrar');
+    t.igual(novosDa(lote, 'enfermagem').length, 0, 'cartão novo de matéria fora do foco não pode entrar');
+    t.ok(novosDa(lote, 'matematica').length > 0, 'a prova em foco continua recebendo cartão novo');
+    const linha = APP.progressoPorBloco(APP.hoje()).find(b => b.nome === bloco('enfermagem').nome);
+    t.ok(linha.soRevisao, 'a tela precisa saber que o bloco é só de revisão');
+  });
+
+  t.teste('a cota só de revisão para no que há para fazer, e a soma segue em META_DIARIA', async () => {
+    await APP.montar({ concursos: ['vr-enf-2026', 'caaq-cdm'] });
+    APP.abrirEscada();
+    vencer(daMateria('enfermagem', 3));
+    APP.aplicarFoco('caaq-cdm');
+    t.igual(bloco('enfermagem').questoes, 3, 'cota maior que o vencido deixaria a meta impossível de fechar');
+    const soma = APP.BLOCOS_META.reduce((n, b) => n + b.questoes, 0);
+    t.igual(soma, APP.META_DIARIA, 'a sobra tem que voltar para os blocos da prova');
+  });
+
+  t.teste('revisão já feita hoje conta no limite: a cota não encolhe no meio do dia', async () => {
+    await APP.montar({ concursos: ['vr-enf-2026', 'caaq-cdm'] });
+    APP.abrirEscada();
+    vencer(daMateria('enfermagem', 1));
+    APP.E.diasMateria[APP.hoje()] = { enfermagem: 2 };
+    APP.aplicarFoco('caaq-cdm');
+    t.igual(bloco('enfermagem').questoes, 3, '2 feitas hoje + 1 vencida');
+  });
+
+  t.teste('matéria fora do foco sem nada vencido não ganha bloco nem cota', async () => {
+    await APP.montar({ concursos: ['vr-enf-2026', 'caaq-cdm'] });
+    APP.aplicarFoco('caaq-cdm');
+    t.ok(!bloco('enfermagem'), 'bloco vazio deixaria a meta impossível de fechar');
+    const soma = APP.BLOCOS_META.reduce((n, b) => n + b.questoes, 0);
+    t.igual(soma, APP.META_DIARIA);
+  });
+
+  t.teste('atraso grande fora do foco não toma a sessão da prova', async () => {
+    await APP.montar({ concursos: ['vr-enf-2026', 'caaq-cdm'] });
+    APP.abrirEscada();
+    vencer(daMateria('enfermagem', 200));
+    APP.aplicarFoco('caaq-cdm');
+    const bl = bloco('enfermagem');
+    t.igual(bl.peso, Math.min(bloco('portugues').peso, bloco('matematica').peso), 'peso do menor bloco da prova em foco');
+    t.ok(bl.questoes < APP.META_DIARIA / 2, `cota de ${bl.questoes} pesa como matéria principal`);
+    const lote = APP.montarLoteSessao('normal', null, new Set());
+    const deEnf = lote.filter(id => APP.porId[id].m === 'enfermagem').length;
+    t.ok(deEnf <= bl.questoes, `${deEnf} revisões passaram da cota ${bl.questoes}`);
+    t.ok(novosDa(lote, 'matematica').length > 0, 'o atraso expulsou o cartão novo da prova em foco');
+  });
+
+  t.teste('recorte da prova em foco vale para o cartão novo, não para a revisão de outra seguida', async () => {
+    /* CFAQ não cobra logaritmo; CDM cobra. Quem segue os dois não pode perder
+       o que já aprendeu de logaritmo por estar focado no CFAQ. */
+    await APP.montar({ concursos: ['cfaq-moc-mom', 'caaq-cdm'] });
+    await semFila(async () => {
+      APP.abrirEscada();
+      const log = APP.BANCO.find(q => q.t === 'Álgebra' && q.s === 'Equações logarítmicas');
+      t.ok(log, 'preciso de um cartão de logaritmo');
+      vencer([log.id]);
+      APP.aplicarFoco('cfaq-moc-mom');
+      const mat = bloco('matematica');
+      t.ok(!mat.soRevisao, 'Matemática está na prova em foco');
+      const lote = APP.montarLoteSessao('normal', null, new Set());
+      t.ok(lote.includes(log.id), 'a revisão de logaritmo tinha que entrar');
+      const novos = novosDa(lote, 'matematica');
+      t.ok(novos.length > 0, 'a prova em foco devia oferecer cartão novo de Matemática');
+      novos.forEach(id => t.ok(APP.noEscopo(mat.topicos, APP.porId[id]),
+        `cartão novo fora do recorte da prova em foco: ${APP.porId[id].t} / ${APP.porId[id].s}`));
+    });
+  });
+
+  t.teste('depois de fechar a meta, a revisão continua e o cartão novo segue só da prova em foco', async () => {
+    await APP.montar({ concursos: ['vr-enf-2026', 'caaq-cdm'] });
+    APP.abrirEscada();
+    const ids = daMateria('enfermagem', 2);
+    vencer(ids);
+    APP.aplicarFoco('caaq-cdm');
+    const h = APP.hoje();
+    APP.E.diasMateria[h] = {};
+    APP.BLOCOS_META.forEach(bl => { APP.E.diasMateria[h][bl.materias[0]] = bl.questoes; });
+    const lote = APP.montarLoteSessao('normal', null, new Set());
+    ids.forEach(id => t.ok(lote.includes(id), 'revisão vencida sumiu depois da meta'));
+    t.igual(novosDa(lote, 'enfermagem').length, 0, 'cartão novo fora do foco entrou depois da meta');
+    t.ok(novosDa(lote, 'matematica').length > 0, 'a prova em foco devia continuar oferecendo cartão novo');
+  });
+
+  t.teste('revisão já na sessão não abre vaga para cartão novo fora do foco', async () => {
+    /* ao reabastecer, o que já está na lista vem em `excluir`: a cota do bloco
+       continua aberta, e nada pode ocupar o lugar da revisão pendente */
+    await APP.montar({ concursos: ['vr-enf-2026', 'caaq-cdm'] });
+    APP.abrirEscada();
+    const [id] = daMateria('enfermagem', 1);
+    vencer([id]);
+    APP.aplicarFoco('caaq-cdm');
+    const lote = APP.montarLoteSessao('normal', null, new Set([id]));
+    t.igual(novosDa(lote, 'enfermagem').length, 0, 'cartão novo entrou no lugar da revisão excluída');
+  });
+
+  t.teste('com um concurso só, depois da meta o resto da matéria continua liberado', async () => {
+    await APP.montar({ concursos: ['cfaq-moc-mom'] });
+    await semFila(async () => {
+      APP.abrirEscada();
+      APP.aplicarFoco('cfaq-moc-mom');
+      const h = APP.hoje();
+      APP.E.diasMateria[h] = {};
+      APP.BLOCOS_META.forEach(bl => { APP.E.diasMateria[h][bl.materias[0]] = bl.questoes; });
+      const lote = APP.montarLoteSessao('normal', null, new Set());
+      t.ok(lote.some(id => APP.porId[id].s === 'Equações logarítmicas'),
+        'o foco só restringe cartão novo quando há outra prova seguida');
+    });
+  });
+
+  t.teste('sem foco nada é só de revisão, e com um concurso só o foco não muda nada', async () => {
+    await APP.montar({ concursos: ['vr-enf-2026', 'caaq-cdm'] });
+    APP.abrirEscada();
+    vencer(daMateria('enfermagem', 1));
+    APP.aplicarFoco(null);
+    t.ok(APP.BLOCOS_META.every(b => !b.soRevisao), 'sem foco todas as matérias recebem cartão novo');
+
+    await APP.montar({ concursos: ['cfaq-moc-mom'] });
+    APP.abrirEscada();
+    const fora = APP.BANCO.find(q => q.t === 'Álgebra' && q.s === 'Equações logarítmicas');
+    vencer([fora.id]);
+    APP.aplicarFoco('cfaq-moc-mom');
+    const lote = APP.montarLoteSessao('normal', null, new Set());
+    t.ok(!lote.includes(fora.id), 'sem outra prova seguida, o que está fora do recorte continua fora');
+  });
 };

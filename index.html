@@ -829,7 +829,7 @@ function aplicarFoco(id){
   CONCURSO = escolhido || provaMaisProxima() || (INSCRITOS.length ? INSCRITOS[0] : null);
   E.concursoAtivo = CONCURSO ? CONCURSO.id : null;
   BLOCOS = CONCURSO ? CONCURSO.blocos : [];
-  BLOCOS_META = blocosDaMeta(escolhido ? [escolhido] : INSCRITOS);
+  BLOCOS_META = escolhido ? blocosDoFoco(escolhido) : blocosDaMeta(INSCRITOS);
   /* meta diária é sempre META_DIARIA (motor.js) — fixa, não depende de
      quantos concursos/matérias avulsas a conta segue nem do escopo
      escolhido. blocosDaMeta() já rateia essa constante entre as matérias
@@ -2275,7 +2275,7 @@ function pintarInicio(){
     linha.style.cssText = "display:flex;align-items:center;gap:9px;font-size:12.5px;margin-top:6px;color:var(--tinta2)";
     const nome = document.createElement("span");
     nome.style.cssText = "flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
-    nome.textContent = b.nome + (b.avulsa ? " · avulsa" : "");
+    nome.textContent = b.nome + (b.avulsa ? " · avulsa" : b.soRevisao ? " · só revisão" : "");
     const mini = document.createElement("span");
     mini.style.cssText = "flex:0 0 54px;height:5px;background:#E7ECE8;border-radius:99px;overflow:hidden";
     const dentro = document.createElement("i");

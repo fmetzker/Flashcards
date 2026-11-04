@@ -167,6 +167,63 @@ function blocosDaMeta(lista){
   });
 }
 
+/* Meta com uma prova em foco: a cota de cartão novo é só da prova escolhida,
+   mas o que a pessoa já aprendeu para as outras provas seguidas continua
+   voltando, senão seria esquecido justamente enquanto ela estuda para outra.
+
+   Matéria seguida fora do foco vira bloco `soRevisao`, com o peso do menor
+   bloco da prova em foco (mesma regra da avulsa: nunca pesa mais que matéria
+   que cai na prova). A cota dele para no que existe para fazer hoje: cota sem
+   cartão nenhum deixaria a meta impossível de fechar, então o que sobra volta
+   para os blocos da prova, a soma continua em META_DIARIA e o bloco sem nada
+   para fazer hoje nem aparece.
+
+   `topicosRevisao` é o escopo da união dos seguidos. Dentro de uma matéria
+   que está no foco, o recorte da prova (`topicos`) segue mandando no cartão
+   novo, mas a revisão do que outra prova seguida cobra também entra. */
+function blocosDoFoco(foco){
+  const doFoco = blocosDaMeta([foco]);
+  const uniao = blocosDaMeta(INSCRITOS);
+  const naUniao = m => uniao.find(b=> b.materias[0] === m);
+  const noFoco = m => doFoco.some(b=> b.materias[0] === m);
+
+  const feitasHoje = E.diasMateria[hoje()] || {};
+  const vencidas = {};
+  fila().revisar.forEach(id=>{
+    const x = porId[id], bl = x && naUniao(x.m);
+    if(bl && noEscopo(bl.topicos, x)) vencidas[x.m] = (vencidas[x.m] || 0) + 1;
+  });
+
+  const menorPeso = Math.min.apply(null, doFoco.map(b=> b.peso));
+  const fora = uniao.filter(b=> !noFoco(b.materias[0])).map(b=>{
+    const m = b.materias[0];
+    return Object.assign({}, b, {peso: menorPeso, soRevisao: true,
+                                 limite: (feitasHoje[m] || 0) + (vencidas[m] || 0)});
+  });
+
+  const ordem = m => { const i = ORDEM_MATERIAS.indexOf(m); return i < 0 ? Infinity : i; };
+  const todos = doFoco.concat(fora).sort((a,b)=> ordem(a.materias[0]) - ordem(b.materias[0]));
+
+  /* Rateia, prende quem passou do limite e rateia de novo o resto entre os
+     outros: soltar a sobra de um bloco pode empurrar outro para além do dele. */
+  const presa = {};
+  let cotas, mudou;
+  do{
+    const pesos = todos.map((b,i)=> i in presa ? 0 : b.peso);
+    const usado = Object.keys(presa).reduce((n,i)=> n + presa[i], 0);
+    cotas = apportion(pesos, META_DIARIA - usado);
+    mudou = false;
+    todos.forEach((b,i)=>{
+      if(b.soRevisao && !(i in presa) && cotas[i] > b.limite){ presa[i] = b.limite; mudou = true; }
+    });
+  }while(mudou);
+
+  return todos.map((b,i)=> Object.assign({}, b, {
+    questoes: i in presa ? presa[i] : cotas[i],
+    topicosRevisao: naUniao(b.materias[0]).topicos
+  })).filter(b=> !b.soRevisao || b.questoes > 0);
+}
+
 /* prova mais próxima entre os inscritos — é ela que representa o conjunto
    quando não há escopo escolhido (cabeçalho e contagem regressiva) */
 function provaMaisProxima(){
@@ -741,7 +798,8 @@ function progressoPorBloco(k){
     nome: bl.nome,
     feitas: bl.materias.reduce((n,m)=> n + (porMat[m]||0), 0),
     cota: bl.questoes,
-    avulsa: bl.id.indexOf("avulsa@") === 0
+    avulsa: bl.id.indexOf("avulsa@") === 0,
+    soRevisao: !!bl.soRevisao
   }));
 }
 
@@ -927,12 +985,17 @@ function montarLoteSessao(modo, filtro, excluir){
        individualmente, como sempre foi). */
     const areas = BLOCOS_META.map((bl,i)=>{
       const falta = Math.max(0, bl.questoes - Math.min(porBloco[i].feitas, bl.questoes));
-      const daArea = id => {
+      const daArea = topicos => id => {
         const x = porId[id];
         if(!x || excluir.has(id) || bl.materias.indexOf(x.m) < 0) return false;
-        return noEscopo(bl.topicos, x);
+        return noEscopo(topicos, x);
       };
-      return {falta, rev: q.revisar.filter(daArea), nov: q.novas.filter(daArea)};
+      /* escopo próprio da revisão só existe com prova em foco: ver blocosDoFoco() */
+      const rev = q.revisar.filter(daArea("topicosRevisao" in bl ? bl.topicosRevisao : bl.topicos));
+      /* bloco só de revisão não empresta capacidade da prova em foco: é o que
+         impede um atraso grande em outra matéria de engolir a sessão da prova */
+      if(bl.soRevisao) return {falta, rev: rev.slice(0, falta), nov: []};
+      return {falta, rev, nov: q.novas.filter(daArea(bl.topicos))};
     });
     const capacidade = areas.reduce((n,a)=> n + a.falta, 0);
 
@@ -985,7 +1048,14 @@ function montarLoteSessao(modo, filtro, excluir){
        de bater a meta", real, não adiantado. Termina de vez só quando isto
        também vier vazio. */
     if(lista.length===0){
-      lista = q.revisar.filter(id=>!excluir.has(id)).concat(q.novas.filter(id=>!excluir.has(id)));
+      /* com prova em foco entre várias seguidas, cartão novo continua sendo só
+         dela, mesmo depois da meta; a revisão segue vindo de tudo */
+      const foco = INSCRITOS.length > 1 ? INSCRITOS.find(c=> c.id === E.escopoEstudo) : null;
+      const blocosNovo = foco ? blocosDaMeta([foco]) : null;
+      const novoPermitido = id => !blocosNovo || blocosNovo.some(b=>
+        b.materias.indexOf(porId[id].m) >= 0 && noEscopo(b.topicos, porId[id]));
+      lista = q.revisar.filter(id=>!excluir.has(id))
+        .concat(q.novas.filter(id=> !excluir.has(id) && novoPermitido(id)));
     }
   }
   return lista;

@@ -353,7 +353,10 @@ que não podem ser confundidas:
   para a dele. É o seletor da tela inicial, que só aparece com mais de um
   inscrito. Muda `BLOCOS_META`, a meta e a sessão; **não** muda o banco
   carregado, por isso trocar o escopo (`aplicarFoco()`) só repinta, enquanto
-  **mudar a lista de inscritos recarrega**.
+  **mudar a lista de inscritos recarrega**. **Com escopo, cartão novo é só da
+  prova escolhida, mas a revisão do resto continua** (`blocosDoFoco()`, ver
+  "Meta e progresso do dia"): quem foca numa prova não pode esquecer o que já
+  aprendeu para as outras.
 - `CONCURSO` / `E.concursoAtivo` — **qual prova**: simulado, regra de
   aprovação, contagem regressiva, alerta de bloco fraco. Com escopo, é o
   escolhido; sem escopo, é a **prova mais próxima** entre os inscritos
@@ -693,6 +696,19 @@ escopo restrito a um só ou com todos.
   inscritos não conta; excedente de um bloco não compensa outro.
 - `iniciarSessao("normal")` monta a sessão respeitando essas cotas **e** o
   escopo de tópicos — não sorteia matéria nem tópico que depois não conta.
+- **Com prova em foco, o que ela não cobra vira só revisão** (`blocosDoFoco()`).
+  Matéria seguida fora do foco ganha um bloco `soRevisao`, sem cartão novo, nem
+  depois de fechar a meta.
+  - O peso dele é o do menor bloco da prova em foco, a mesma regra da avulsa, e
+    a revisão dele não passa da cota: atraso grande em outra matéria não pode
+    expulsar a prova em foco da sessão. O excedente fica para depois da meta.
+  - A cota para em `feitas hoje + vencidas`, e a sobra volta para os blocos da
+    prova. Cota sem cartão para fazer deixaria a meta impossível de fechar; sem
+    nada vencido, o bloco nem aparece. A soma segue em `META_DIARIA`.
+  - Dentro de matéria que está no foco, o recorte da prova (`topicos`) manda no
+    cartão novo, e `topicosRevisao` (o escopo da união dos seguidos) manda na
+    revisão. Essa revisão usa a cota do próprio bloco.
+  - Com um concurso só, ou sem foco, nada disso muda a sessão.
 - A **gravação** não filtra pelo foco (`registrar()`/`aplicarEventoRemoto()`
   gravam sempre); o filtro é só na **leitura**, porque quem alterna o foco
   precisa do histórico certo para os dois concursos.

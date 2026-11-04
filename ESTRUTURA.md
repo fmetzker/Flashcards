@@ -134,7 +134,7 @@ vivem no ambiente léxico global, compartilhado entre `<script>` clássicos.
 | `carregarConfig` | concursos, matérias, `topicos.json`, `requisitos.json` |
 | `indexarRequisitos` | achata `requisitos.json` em `REQUISITOS` (tópico) e `REQUISITOS_SUB` (subtópico) |
 | `carregarBanco` | carrega só as matérias inscritas |
-| `blocosDaMeta` / `aplicarFoco` | monta `BLOCOS_META` e a meta do dia |
+| `blocosDaMeta` / `blocosDoFoco` / `aplicarFoco` | monta `BLOCOS_META` e a meta do dia; com prova em foco, o resto vira bloco só de revisão |
 | `provaMaisProxima` | define `CONCURSO` quando não há escopo |
 
 ### 4.2 Conta, sessão e sincronismo
