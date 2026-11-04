@@ -1,14 +1,60 @@
 [
-{"id":"portugues","nome":"Língua Portuguesa"},
-{"id":"matematica","nome":"Matemática"},
-{"id":"ingles","nome":"Língua Inglesa"},
-{"id":"sus","nome":"Legislação do SUS"},
-{"id":"enfermagem","nome":"Enfermagem"},
-{"id":"enfermagem-trabalho","nome":"Enfermagem do Trabalho","avulsa":true},
-{"id":"maritimo-maquinas","nome":"Máquinas e Prática Marítima","avulsa":true},
-{"id":"manutencao-mecanica","nome":"Manutenção Mecânica"},
-{"id":"comandos-eletricos","nome":"Comandos Elétricos","avulsa":true},
-{"id":"maquinas-eletricas","nome":"Máquinas Elétricas","avulsa":true},
-{"id":"manutencao-eletrica","nome":"Manutenção Elétrica","avulsa":true},
-{"id":"saude-publica","nome":"Saúde Pública","avulsa":true}
+  {
+    "id": "portugues",
+    "nome": "Língua Portuguesa"
+  },
+  {
+    "id": "matematica",
+    "nome": "Matemática"
+  },
+  {
+    "id": "ingles",
+    "nome": "Língua Inglesa"
+  },
+  {
+    "id": "fisica",
+    "nome": "Física"
+  },
+  {
+    "id": "sus",
+    "nome": "Legislação do SUS"
+  },
+  {
+    "id": "enfermagem",
+    "nome": "Enfermagem"
+  },
+  {
+    "id": "enfermagem-trabalho",
+    "nome": "Enfermagem do Trabalho",
+    "avulsa": true
+  },
+  {
+    "id": "maritimo-maquinas",
+    "nome": "Máquinas e Prática Marítima",
+    "avulsa": true
+  },
+  {
+    "id": "manutencao-mecanica",
+    "nome": "Manutenção Mecânica"
+  },
+  {
+    "id": "comandos-eletricos",
+    "nome": "Comandos Elétricos",
+    "avulsa": true
+  },
+  {
+    "id": "maquinas-eletricas",
+    "nome": "Máquinas Elétricas",
+    "avulsa": true
+  },
+  {
+    "id": "manutencao-eletrica",
+    "nome": "Manutenção Elétrica",
+    "avulsa": true
+  },
+  {
+    "id": "saude-publica",
+    "nome": "Saúde Pública",
+    "avulsa": true
+  }
 ]

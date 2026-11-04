@@ -17,6 +17,17 @@ que o código já diz não vem: some.
 
 ---
 
+## Base para CDM, ELT e ASON (novembro/2026)
+
+A prova de ASON de 2026 mudou o desenho do preparatório. CDM e ELT cobram 3º ano
+do médio, mas o ASON cobra Cálculo, Álgebra Linear e Física universitária, que o
+banco não tinha. A primeira ideia era Cálculo como matéria separada; ficou no fim
+da fila de Matemática, porque assim a própria fila segura o conteúdo até a base
+estar dominada, sem código novo, e um recorte mantém CDM e ELT fora dele.
+
+O ASON só foi cadastrado depois de existirem Cálculo e um primeiro lote de Física:
+matéria sem cartão com cota na meta deixaria o dia impossível de fechar.
+
 ## Foco numa prova sem esquecer as outras (novembro/2026)
 
 O pedido veio de um plano novo de estudo: montar base para CAAQ-CDM, CAAQ-ELT e

@@ -49,6 +49,7 @@ corrigir `q` exige `reescrever-questoes.ps1` (regra 5 do `CLAUDE.md`).
 | `requisitos` | `banco/requisitos.json` | a FILA de tópicos (corrente linear): **trava** cada tópico até a base do ANTERIOR da fila estar dominada — abre um por vez |
 | `requisitos_subtopicos` | `banco/requisitos.json` | a mesma fila um nível mais fundo, dentro de um tópico grande: **trava** cada subtópico (sempre `{t,s}`) até a base do anterior estar dominada |
 | `requisitos_conceituais` (+`_subtopicos`) | `banco/requisitos.json` | **não trava nada** — o grafo de dependência real, contra o qual `validar.py` prova que a fila não contraria o conteúdo |
+| `trava_externa` | `banco/requisitos.json` | **trava** a matéria inteira até a base de um tópico de outra matéria estar dominada |
 | `n` | no cartão | **trava** degrau dentro do tópico |
 
 ---

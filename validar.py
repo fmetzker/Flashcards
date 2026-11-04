@@ -152,6 +152,12 @@ def valida_concursos(B):
                     erros.append(f"concurso [{rot}]: matéria '{mid}' aparece em mais de um bloco")
                 usadas.add(mid)
                 disp += por_materia[mid]
+            # Recorte só do simulado (opcional): a prova cobra menos do que é preciso
+            # estudar para chegar nela. Grafia errada esvaziaria o simulado em silêncio.
+            for t in bl.get('topicosSimulado') or []:
+                if t not in {q['t'] for q in B if q['m'] in bl.get('materias', [])}:
+                    erros.append(f"concurso [{rot}], bloco '{bl['id']}': tópico '{t}' de "
+                                 "topicosSimulado não existe no banco das matérias deste bloco")
             # Escopo de tópicos do bloco (opcional): restringe quais tópicos da
             # matéria caem NESTE concurso. Tópico escrito errado aqui não daria
             # erro visível — só sumiria em silêncio da sessão de estudo, que é
@@ -422,7 +428,7 @@ def valida_requisitos(B, materias):
         externa = dado.get('trava_externa')
         if externa:
             alvo = externa.get('m')
-            if alvo == mid or alvo not in materias:
+            if alvo == mid or alvo not in ids_mat:
                 erros.append(f"requisitos.json: matéria '{mid}': trava_externa aponta para a matéria "
                              f"'{alvo}', que não existe ou é ela mesma")
             elif externa.get('t') not in {q['t'] for q in B if q['m'] == alvo}:

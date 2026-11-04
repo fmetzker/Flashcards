@@ -125,6 +125,65 @@
       }
     },
     {
+      "id": "ason",
+      "tipo": "processo-seletivo",
+      "cargo": "Segundo Oficial de Náutica (ASON)",
+      "orgao": "Marinha do Brasil — CIAGA",
+      "banca": "CIAGA",
+      "edital": "PS ASON-01 e 02/2026, edital de 12/01/2026 com a errata ALT1, que só muda datas de inscrição e pagamento (a prova foi em 29/03/2026; data abaixo é provisória até sair o edital novo). Duas provas de 20 questões, humanas (Português e Inglês) e exatas (Matemática e Física), com 10 questões por disciplina, 5 pontos cada e 4 horas no total (itens 9.1 a 9.7). Exige curso superior concluído, em qualquer área reconhecida pelo MEC (item 3b), com o diploma entregue na 4ª etapa (item 18.3). Programa: Anexo II, lido em cópia do edital original publicada no QConcursos, porque o PDF da versão ALT1 veio sem anexos.",
+      "data": "2027-03-28",
+      "inicio": "2026-11-04",
+      "duracaoMin": 240,
+      "blocos": [
+        {
+          "id": "port",
+          "nome": "Português",
+          "questoes": 10,
+          "materias": [
+            "portugues"
+          ]
+        },
+        {
+          "id": "ing",
+          "nome": "Inglês",
+          "questoes": 10,
+          "materias": [
+            "ingles"
+          ]
+        },
+        {
+          "id": "mat",
+          "nome": "Matemática",
+          "questoes": 10,
+          "materias": [
+            "matematica"
+          ],
+          "topicosSimulado": [
+            "Funções",
+            "Matrizes",
+            "Vetores",
+            "Limites",
+            "Derivadas",
+            "Integrais"
+          ],
+          "_topicosSimulado": "O estudo usa a matéria inteira, porque Cálculo só abre depois da base. O simulado imita a prova, que cobra só o Anexo II: Cálculo, Álgebra Linear e Cálculo Numérico."
+        },
+        {
+          "id": "fis",
+          "nome": "Física",
+          "questoes": 10,
+          "materias": [
+            "fisica"
+          ]
+        }
+      ],
+      "aprovacao": {
+        "minimoTotal": 1,
+        "nenhumBlocoZerado": false,
+        "desempate": "Classificatório pela soma das notas de humanas e exatas; elimina quem zerar uma dessas duas provas, e não uma disciplina isolada (item 9.5). São convocados para as etapas seguintes os classificados em número igual a três vezes as vagas (item 12.4). Em caso de empate, vale a maior nota em exatas, depois em humanas, depois a maior idade, e por fim sorteio (item 12.2)."
+      }
+    },
+    {
       "id": "cfaq-moc-mom",
       "tipo": "processo-seletivo",
       "cargo": "Moço de Convés / Moço de Máquinas (CFAQ)",

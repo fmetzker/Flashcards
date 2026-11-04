@@ -30,6 +30,8 @@ module.exports = function (APP, t) {
     for (const mid of APP.ORDEM_MATERIAS) {
       const topicos = [...new Set(APP.BANCO.filter(q => q.m === mid).map(q => q.t))];
       if (!topicos.length) continue;
+      /* a matéria que declara esperar a base de outra fica fechada de propósito */
+      if (APP.travaExternaPendente(mid)) continue;
       const abertos = topicos.filter(tt => APP.topicoAberto(mid, tt));
       t.ok(abertos.length > 0, `${mid} não tem NENHUM tópico aberto — ninguém consegue começar`);
     }

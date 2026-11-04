@@ -102,6 +102,19 @@ module.exports = function (APP, t) {
     t.ok(!lote.includes(fora.id), 'revisão de logaritmo entrou numa sessão do CFAQ (fora do escopo)');
   });
 
+  t.teste('topicosSimulado recorta o simulado sem recortar o estudo', async () => {
+    await APP.montar({ concursos: ['caaq-cdm'] });
+    const mat = APP.BLOCOS.find(b => b.materias.includes('matematica'));
+    const salvo = { topicos: mat.topicos, sim: mat.topicosSimulado };
+    try {
+      mat.topicos = undefined;
+      mat.topicosSimulado = ['Trigonometria'];
+      APP.aplicarFoco(null);
+      for (const id of APP.sorteia(mat)) t.igual(APP.porId[id].t, 'Trigonometria', 'simulado fora do recorte');
+      t.ok(APP.fila().novas.some(id => APP.porId[id].t === 'Aritmética'), 'o estudo não pode perder a base');
+    } finally { mat.topicos = salvo.topicos; mat.topicosSimulado = salvo.sim; }
+  });
+
   t.teste('o simulado sorteia só dentro do escopo do bloco', async () => {
     /* o simulado imita a prova: um simulado de 9º ano não pode trazer
        logaritmo nem tabela-verdade só porque estão na mesma matéria */

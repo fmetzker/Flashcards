@@ -4894,6 +4894,34 @@
           "Estratégia Saúde da Família e território"
         ]
       }
+    },
+    "fisica": {
+      "criterio": "A fila acompanha a ordem do Anexo II do ASON: mecânica primeiro, porque força e energia são a linguagem do resto; depois oscilações, fluidos, termodinâmica e ondas, que aplicam mecânica; e eletromagnetismo no fim, do campo elétrico aos circuitos de corrente alternada.",
+      "requisitos": {},
+      "criterio_conceitual": "Cada aresta segue a dependência real: um assunto só exige outro quando usa a grandeza definida nele.",
+      "requisitos_conceituais": {},
+      "criterio_subtopicos": "Dentro de cada tópico, as grandezas e leis vêm antes das aplicações em que são usadas.",
+      "requisitos_subtopicos": {
+        "Dinâmica|Trabalho e energia": [
+          {
+            "t": "Dinâmica",
+            "s": "Leis de Newton"
+          }
+        ]
+      },
+      "requisitos_conceituais_subtopicos": {
+        "Dinâmica|Trabalho e energia": [
+          {
+            "t": "Dinâmica",
+            "s": "Leis de Newton"
+          }
+        ]
+      },
+      "trava_externa": {
+        "m": "matematica",
+        "t": "Integrais",
+        "criterio": "O programa de Física do ASON é de nível universitário: trabalho de força variável, potencial de distribuições de carga e leis de Ampère e Faraday usam derivada e integral. Pedido de quem estuda: só começar Física com a base de Matemática pronta."
+      }
     }
   }
 }

@@ -3474,7 +3474,8 @@ const totalProva = () => BLOCOS.reduce((s,b)=>s+b.questoes, 0);
 /* só o que cai NESTA prova: o simulado imita a prova, e o escopo do bloco
    (noEscopo) é o recorte do edital — sem ele, um simulado de 9º ano sorteava
    logaritmo e tabela-verdade da mesma matéria */
-const daProva = (bl, q) => blocoDe(q)===bl.id && noEscopo(bl.topicos, q);
+/* `topicosSimulado`: a prova cobra menos do que é preciso estudar para chegar nela */
+const daProva = (bl, q) => blocoDe(q)===bl.id && noEscopo(bl.topicosSimulado || bl.topicos, q);
 const disponivel = bl => BANCO.filter(q=>daProva(bl, q)).length;
 
 function pintarSimuladoInicio(){

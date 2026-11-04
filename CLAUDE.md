@@ -18,9 +18,10 @@
 > era assim", "descoberto em setembro") vai para o histórico.
 
 Aplicativo web de questões com repetição espaçada, contas e banco
-colaborativo. Hoje atende quatro concursos: Enfermeiro/Volta Redonda (edital
+colaborativo. Hoje atende cinco concursos: Enfermeiro/Volta Redonda (edital
 003/2026-SMA, prova reaplicada em 29/11/2026), CAAQ-CDM e CAAQ-ELT/Marinha (mesma
-estrutura de prova, datas provisórias até os editais novos) e CFAQ-MOC/MOM/Marinha
+estrutura de prova, datas provisórias até os editais novos), ASON/Marinha (nível
+superior, data provisória) e CFAQ-MOC/MOM/Marinha
 (Moço de Convés e Moço de Máquinas, mesma prova; **pré-edital**, com base
 nas Normas CPES 2026 enquanto a Capitania da conta não abre o PS). Novo
 concurso é editar `concursos.json` — não exige mexer no código.
@@ -195,7 +196,7 @@ no Safari do iPhone sem nenhuma etapa de compilação.
     `enfermagem-trabalho` estão marcadas `"avulsa": true` em
     `banco/materias.json`: continuam sem concurso atrás, mas são conteúdo
     avulso de propósito, à disposição de quem quiser seguir sem prova
-    nenhuma. `manutencao-mecanica` e `ingles` ficaram **inativas** (nem
+    nenhuma. `manutencao-mecanica` ficou **inativa** (nem
     concurso, nem avulsa) — e `testes/concursos-fixture.json` guarda o
     `transpetro-mec` só como cenário dos testes do motor, nunca do app.
     Matéria sem concurso ativo **e** sem avulsa declarada não é estudada automaticamente por
@@ -682,6 +683,11 @@ escopo restrito a um só ou com todos.
   - Ao deduplicar, o escopo é **união**, não o do bloco vencedor: se um
     concurso restringe e outro não, quem segue os dois estuda a matéria
     inteira. União é o que garante não estudar de menos.
+  - `blocos[].topicosSimulado` recorta só o simulado. No ASON, a Matemática do
+    estudo é a matéria inteira, porque Cálculo só abre depois da base, mas o
+    simulado sorteia só o que o Anexo II cobra. Recortar o estudo do mesmo jeito
+    prenderia quem segue só o ASON: a base ficaria fora da sessão, e Cálculo
+    nunca abriria.
   - O mapeamento item-do-edital → tópico-do-banco é **interpretação**, não
     transcrição (os itens são categorias largas). Na dúvida, **inclui**:
     acentuação entra em "ortografia oficial", pronomes em "classes de
@@ -804,6 +810,14 @@ tópico sem nenhuma entrada aqui continua com todos os subtópicos abertos
 assim que ele mesmo abrir: é opcional em cima de opcional. A ordem pedagógica
 de onde essa fila saiu (subtópicos irmãos em **ondas**) fica registrada em
 `requisitos_conceituais_subtopicos`, conferida contra a fila do mesmo jeito.
+
+**Uma matéria inteira pode esperar a base de outra: `trava_externa`.** É a
+exceção à fila por matéria, para o caso em que o conteúdo todo pressupõe outra
+matéria, como a Física do ASON, que espera `matematica`/`Integrais`. A matéria
+fica fechada e sem cota na meta (`travaExternaPendente()`), e a trava cai para
+sempre no primeiro cartão respondido: errar a base depois não esconde matéria em
+andamento. Sem a matéria exigida carregada não há como medir, e a trava não vale.
+Excluir a matéria exigida reprova no `validar` até a trava sair (regra 12).
 
 **Não existe nível ENTRE tópicos. Nível é uma noção só.** Quem decide o que
 abre é a fila; qualquer camada por cima dela é rótulo decorativo que a tela

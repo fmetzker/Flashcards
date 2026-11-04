@@ -142,6 +142,22 @@
         "Diagnóstico de falhas",
         "Manutenção preventiva e preditiva"
       ]
+    },
+    "fisica": {
+      "fonte": "Edital PS ASON-01 e 02/2026, Anexo II, III. Física. Os itens foram agrupados em tópicos do banco, sem acrescentar assunto.",
+      "topicos": [
+        "Dinâmica",
+        "Estática",
+        "Oscilações",
+        "Fluidos",
+        "Termodinâmica",
+        "Ondas",
+        "Eletrostática",
+        "Capacitância",
+        "Circuitos de corrente contínua",
+        "Campo magnético",
+        "Circuitos de corrente alternada"
+      ]
     }
   }
 }
