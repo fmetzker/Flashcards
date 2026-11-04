@@ -42,7 +42,7 @@
       "cargo": "Condutor de Máquinas",
       "orgao": "Marinha do Brasil — CIAGA",
       "banca": "CIAGA",
-      "edital": "PS CAAQ-CDM (edital 01/2025 já venceu — prova era 12/03/2025; data abaixo é provisória até sair o edital novo)",
+      "edital": "PS CAAQ-CDM (edital 01/2025 já venceu — prova era 12/03/2025; data abaixo é provisória até sair o edital novo). Exame em nível de 3º ano do ensino médio, 10 questões de Português e 10 de Matemática, 2 horas (itens 7.1 a 7.6). Aceita técnico em Construção Naval, Fabricação Mecânica, Eletromecânica, Máquinas Navais, Mecânica, Metalurgia, Manutenção de Aeronaves ou Mecatrônica (item 3.1.2).",
       "data": "2027-03-12",
       "inicio": "2027-01-06",
       "duracaoMin": 120,
@@ -57,13 +57,71 @@
           "id": "mat",
           "nome": "Matemática",
           "questoes": 10,
-          "materias": ["matematica"]
+          "materias": ["matematica"],
+          "topicos": [
+            "Aritmética",
+            "Álgebra",
+            "Funções",
+            "Matrizes",
+            "Geometria",
+            "Trigonometria",
+            "Vetores",
+            "Análise combinatória",
+            "Probabilidade",
+            "Estatística",
+            "Lógica"
+          ],
+          "_topicos": "Nível de 3º ano do ensino médio (item 7.1): fica de fora o conteúdo de nível superior que a Matemática do banco passou a ter para o ASON (Cálculo, Álgebra Linear avançada e Cálculo Numérico), que este edital não cobra."
         }
       ],
       "aprovacao": {
         "minimoTotal": 1,
         "nenhumBlocoZerado": true,
         "desempate": "Classificatório por soma das notas; em caso de empate, vale primeiro a maior nota em Matemática, depois em Português, depois a maior idade, e por fim sorteio (item 10.2 do edital)."
+      }
+    },
+    {
+      "id": "caaq-elt",
+      "tipo": "processo-seletivo",
+      "cargo": "Eletricista (CAAQ-ELT)",
+      "orgao": "Marinha do Brasil — CIAGA",
+      "banca": "CIAGA",
+      "edital": "PS CAAQ-ELT-01/2026, edital de 17/12/2025 (a prova foi em 08/03/2026; data abaixo é provisória até sair o edital novo). Exame em nível de 3º ano do ensino médio, 10 questões de Português e 10 de Matemática, 3 horas (itens 9.1 a 9.5). Aceita técnico em Eletroeletrônica, Eletrotécnica, Eletrônica, Eletromecânica, Automação Industrial ou Mecatrônica (item 3.2). O Anexo II desse edital não foi localizado: a árvore de conteúdo não é transcrita dele, e o recorte vem do nível declarado no item 9.1 e das provas de ELT de 2022 a 2026.",
+      "data": "2027-03-07",
+      "inicio": "2026-11-04",
+      "duracaoMin": 180,
+      "blocos": [
+        {
+          "id": "port",
+          "nome": "Português",
+          "questoes": 10,
+          "materias": ["portugues"]
+        },
+        {
+          "id": "mat",
+          "nome": "Matemática",
+          "questoes": 10,
+          "materias": ["matematica"],
+          "topicos": [
+            "Aritmética",
+            "Álgebra",
+            "Funções",
+            "Matrizes",
+            "Geometria",
+            "Trigonometria",
+            "Vetores",
+            "Análise combinatória",
+            "Probabilidade",
+            "Estatística",
+            "Lógica"
+          ],
+          "_topicos": "Nível de 3º ano do ensino médio (item 9.1): fica de fora o conteúdo de nível superior que a Matemática do banco passou a ter para o ASON (Cálculo, Álgebra Linear avançada e Cálculo Numérico), que este edital não cobra."
+        }
+      ],
+      "aprovacao": {
+        "minimoTotal": 1,
+        "nenhumBlocoZerado": true,
+        "desempate": "Classificatório por soma das notas; em caso de empate, vale primeiro a maior nota em Matemática, depois em Português, depois a maior idade, e por fim sorteio (item 12.2 do edital)."
       }
     },
     {

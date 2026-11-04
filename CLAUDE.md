@@ -18,8 +18,9 @@
 > era assim", "descoberto em setembro") vai para o histórico.
 
 Aplicativo web de questões com repetição espaçada, contas e banco
-colaborativo. Hoje atende três concursos: Enfermeiro/Volta Redonda (edital
-003/2026-SMA, prova reaplicada em 29/11/2026), CAAQ-CDM/Marinha e CFAQ-MOC/MOM/Marinha
+colaborativo. Hoje atende quatro concursos: Enfermeiro/Volta Redonda (edital
+003/2026-SMA, prova reaplicada em 29/11/2026), CAAQ-CDM e CAAQ-ELT/Marinha (mesma
+estrutura de prova, datas provisórias até os editais novos) e CFAQ-MOC/MOM/Marinha
 (Moço de Convés e Moço de Máquinas, mesma prova; **pré-edital**, com base
 nas Normas CPES 2026 enquanto a Capitania da conta não abre o PS). Novo
 concurso é editar `concursos.json` — não exige mexer no código.
