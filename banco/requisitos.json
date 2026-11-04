@@ -5119,9 +5119,71 @@
     },
     "fisica": {
       "criterio": "A fila acompanha a ordem do Anexo II do ASON: mecânica primeiro, porque força e energia são a linguagem do resto; depois oscilações, fluidos, termodinâmica e ondas, que aplicam mecânica; e eletromagnetismo no fim, do campo elétrico aos circuitos de corrente alternada.",
-      "requisitos": {},
+      "requisitos": {
+        "Estática": [
+          "Dinâmica"
+        ],
+        "Oscilações": [
+          "Estática"
+        ],
+        "Fluidos": [
+          "Oscilações"
+        ],
+        "Termodinâmica": [
+          "Fluidos"
+        ],
+        "Ondas": [
+          "Termodinâmica"
+        ],
+        "Eletrostática": [
+          "Ondas"
+        ],
+        "Capacitância": [
+          "Eletrostática"
+        ],
+        "Circuitos de corrente contínua": [
+          "Capacitância"
+        ],
+        "Campo magnético": [
+          "Circuitos de corrente contínua"
+        ],
+        "Circuitos de corrente alternada": [
+          "Campo magnético"
+        ]
+      },
       "criterio_conceitual": "Cada aresta segue a dependência real: um assunto só exige outro quando usa a grandeza definida nele.",
-      "requisitos_conceituais": {},
+      "requisitos_conceituais": {
+        "Estática": [
+          "Dinâmica"
+        ],
+        "Oscilações": [
+          "Dinâmica"
+        ],
+        "Fluidos": [
+          "Dinâmica"
+        ],
+        "Termodinâmica": [
+          "Dinâmica"
+        ],
+        "Ondas": [
+          "Oscilações"
+        ],
+        "Eletrostática": [
+          "Dinâmica"
+        ],
+        "Capacitância": [
+          "Eletrostática"
+        ],
+        "Circuitos de corrente contínua": [
+          "Eletrostática"
+        ],
+        "Campo magnético": [
+          "Circuitos de corrente contínua"
+        ],
+        "Circuitos de corrente alternada": [
+          "Campo magnético"
+        ]
+      },
       "criterio_subtopicos": "Dentro de cada tópico, as grandezas e leis vêm antes das aplicações em que são usadas.",
       "requisitos_subtopicos": {
         "Dinâmica|Trabalho e energia": [

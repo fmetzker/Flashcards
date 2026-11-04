@@ -181,6 +181,11 @@ module.exports = function (APP, t) {
       const temFila = topicos.some(tt => (APP.REQUISITOS[mid + '|' + tt] || []).length);
       if (!temFila) continue;                    // matéria sem fila declarada: fora do escopo
       esquecerTudo();
+      /* matéria que espera a base de outra: a fila dela começa com a base pronta */
+      const externa = APP.REQ_MATERIA[mid] && APP.REQ_MATERIA[mid].trava_externa;
+      if (externa) {
+        for (const tt of new Set(APP.BANCO.filter(q => q.m === externa.m).map(q => q.t))) dominar(externa.m, tt);
+      }
       const vistos = new Set();
       for (let passo = 0; passo <= topicos.length; passo++) {
         const novos = topicos.filter(tt => APP.topicoAberto(mid, tt) && !vistos.has(tt));
