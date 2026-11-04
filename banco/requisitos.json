@@ -1783,7 +1783,7 @@
       }
     },
     "ingles": {
-      "criterio": "A fila vai de gramática a leitura. (1-3) o verbo: Verb Tenses primeiro, porque modal verb muda a forma do verbo principal e voz passiva é o tempo verbal de 'to be' no particípio — Modal Verbs e Passive Voice vêm logo atrás. (4-5) o resto da gramática: Connectors e Comparatives and Superlatives. (6-7) vocabulário: Vocabulary in Context e False Cognates. (8) Reading Comprehension por último, como culminância: é o único tópico que exige três bases ao mesmo tempo (tempo verbal, conectivo lógico e vocabulário em contexto), que é o que um texto real mistura.",
+      "criterio": "A fila vai de gramática a leitura. (1-3) o verbo: Verb Tenses primeiro, porque modal verb muda a forma do verbo principal e voz passiva é o tempo verbal de 'to be' no particípio — Modal Verbs e Passive Voice vêm logo atrás. (4-5) o resto da gramática: Connectors e Comparatives and Superlatives. (6-7) vocabulário: Vocabulary in Context e False Cognates. (8) Reading Comprehension por último, como culminância: é o único tópico que exige três bases ao mesmo tempo (tempo verbal, conectivo lógico e vocabulário em contexto), que é o que um texto real mistura. Depois da leitura geral vem o que o Anexo II do ASON pede a mais: formas verbais, gerúndio e infinitivo, condicionais e discurso indireto, phrasal verbs e preposições, classes de palavras e formação de palavras, com o vocabulário marítimo por último, porque ele se apoia em todo o resto.",
       "requisitos": {
         "Modal Verbs": [
           "Verb Tenses"
@@ -1805,9 +1805,30 @@
         ],
         "Reading Comprehension": [
           "False Cognates"
+        ],
+        "Verb Forms": [
+          "Reading Comprehension"
+        ],
+        "Gerunds and Infinitives": [
+          "Verb Forms"
+        ],
+        "Conditionals and Reported Speech": [
+          "Gerunds and Infinitives"
+        ],
+        "Phrasal Verbs and Prepositions": [
+          "Conditionals and Reported Speech"
+        ],
+        "Word Classes": [
+          "Phrasal Verbs and Prepositions"
+        ],
+        "Word Formation": [
+          "Word Classes"
+        ],
+        "Maritime Vocabulary": [
+          "Word Formation"
         ]
       },
-      "criterio_conceitual": "Verb Tenses é a base: modal verb muda a forma do verbo principal, e voz passiva é o tempo verbal de 'to be' aplicado ao particípio — os dois pressupõem already saber conjugar nos tempos verbais. Reading Comprehension exige três bases ao mesmo tempo (Verb Tenses, Connectors e Vocabulary in Context) porque um texto real mistura tempo verbal, conectivos lógicos e vocabulário em contexto — não dá para treinar compreensão de texto sem já ter alguma base nos três. Cinco tópicos não dependem de conceito nenhum outro, e por isso não aparecem no grafo: Verb Tenses, Comparatives and Superlatives, Connectors, False Cognates e Vocabulary in Context. Em que ordem são estudados é decisão da fila: ver 'criterio'.",
+      "criterio_conceitual": "Verb Tenses é a base: modal verb muda a forma do verbo principal, e voz passiva é o tempo verbal de 'to be' aplicado ao particípio — os dois pressupõem already saber conjugar nos tempos verbais. Reading Comprehension exige três bases ao mesmo tempo (Verb Tenses, Connectors e Vocabulary in Context) porque um texto real mistura tempo verbal, conectivos lógicos e vocabulário em contexto — não dá para treinar compreensão de texto sem já ter alguma base nos três. Cinco tópicos não dependem de conceito nenhum outro, e por isso não aparecem no grafo: Verb Tenses, Comparatives and Superlatives, Connectors, False Cognates e Vocabulary in Context. Em que ordem são estudados é decisão da fila: ver 'criterio'. Gerund e condicionais usam as formas dos tempos verbais; o vocabulário marítimo é vocabulário em contexto aplicado a um domínio.",
       "requisitos_conceituais": {
         "Modal Verbs": [
           "Verb Tenses"
@@ -1818,6 +1839,15 @@
         "Reading Comprehension": [
           "Verb Tenses",
           "Connectors",
+          "Vocabulary in Context"
+        ],
+        "Gerunds and Infinitives": [
+          "Verb Tenses"
+        ],
+        "Conditionals and Reported Speech": [
+          "Verb Tenses"
+        ],
+        "Maritime Vocabulary": [
           "Vocabulary in Context"
         ]
       },
