@@ -418,6 +418,20 @@ def valida_requisitos(B, materias):
         if req_conc or req_sub_conc:
             checa_grafo('requisitos_conceituais', req_conc, req_sub_conc)
 
+        # =========== trava_externa: a matéria espera a base de outra ===========
+        externa = dado.get('trava_externa')
+        if externa:
+            alvo = externa.get('m')
+            if alvo == mid or alvo not in materias:
+                erros.append(f"requisitos.json: matéria '{mid}': trava_externa aponta para a matéria "
+                             f"'{alvo}', que não existe ou é ela mesma")
+            elif externa.get('t') not in {q['t'] for q in B if q['m'] == alvo}:
+                erros.append(f"requisitos.json: matéria '{mid}': trava_externa exige o tópico "
+                             f"'{externa.get('t')}', que não existe em '{alvo}'")
+            if not externa.get('criterio'):
+                erros.append(f"requisitos.json: matéria '{mid}': trava_externa sem 'criterio' — por que "
+                             f"esta matéria espera a outra?")
+
         # =========== a FILA precisa ser uma corrente linear ===========
         # É o que faz abrir UM tópico por vez (ver '_a_fila' no arquivo).
         # Devolve a ordem da fila, ou None se ela não for uma corrente.

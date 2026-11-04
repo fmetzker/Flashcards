@@ -134,6 +134,10 @@ function blocosDaMeta(lista){
     }
     escopo[m] = null;
   });
+  /* matéria que ainda espera a base de outra não tem o que oferecer: com cota,
+     a meta do dia nunca fecharia, então a fatia dela fica com as outras */
+  limparCacheGrau();
+  Object.keys(porMateria).forEach(m=>{ if(travaExternaPendente(m)) delete porMateria[m]; });
   if(!Object.keys(porMateria).length) return [];   // nada seguido: nenhum peso pra ratear
   /* ORDEM_MATERIAS só decide a ORDEM de exibição — nunca quais matérias
      entram. Antes esta linha era `ORDEM_MATERIAS.filter(...)`, e quando a
@@ -317,6 +321,7 @@ function grauLiberado(m, t, s){
 /* o cache vale por montagem de fila: responder um cartão muda o que está
    liberado, e a fila é remontada a cada sessão */
 function limparCacheGrau(){
+  for(const k in _cacheTrava) delete _cacheTrava[k];
   for(const k in _cacheGrau) delete _cacheGrau[k];
   for(const k in _cacheMenorGrau) delete _cacheMenorGrau[k];
 }
@@ -365,7 +370,25 @@ function requisitosPendentes(m, t){
   return req.filter(dep=> !baseDominada(m, dep));
 }
 
-function topicoAberto(m, t){ return requisitosPendentes(m, t).length === 0; }
+function topicoAberto(m, t){ return !travaExternaPendente(m) && requisitosPendentes(m, t).length === 0; }
+
+/* Matéria inteira que espera a base de OUTRA matéria: `trava_externa` em
+   requisitos.json, como a Física universitária, que usa derivada e integral.
+   A fila continua sendo por matéria; isto só decide quando ela começa.
+
+   Vale até a pessoa responder o primeiro cartão da matéria: errar depois um
+   cartão da base não pode esconder uma matéria já em andamento. Sem a matéria
+   exigida carregada, não há como medir a base, e a trava não se aplica. */
+const _cacheTrava = {};
+function travaExternaPendente(m){
+  if(m in _cacheTrava) return _cacheTrava[m];
+  const tr = REQ_MATERIA[m] && REQ_MATERIA[m].trava_externa;
+  let pendente = null;
+  if(tr && BANCO.some(q=> q.m === tr.m) && !BANCO.some(q=> q.m === m && E.cartoes[q.id])
+     && !baseDominada(tr.m, tr.t)) pendente = tr;
+  _cacheTrava[m] = pendente;
+  return pendente;
+}
 
 function requisitosPendentesSub(m, t, s){
   const req = REQUISITOS_SUB[m + "|" + t + "|" + s];

@@ -506,4 +506,59 @@ module.exports = function (APP, t) {
     const lote = APP.montarLoteSessao('normal', null, new Set());
     t.ok(!lote.includes(fora.id), 'sem outra prova seguida, o que está fora do recorte continua fora');
   });
+  t.grupo('meta — matéria que espera a base de outra');
+
+  /* a trava é dado, não nome de matéria: aqui Português espera a Aritmética */
+  const comTrava = async (fn) => {
+    const salvo = APP.REQ_MATERIA.portugues;
+    APP.REQ_MATERIA.portugues = Object.assign({}, salvo, { trava_externa: { m: 'matematica', t: 'Aritmética', criterio: 'teste' } });
+    try { await fn(); } finally { APP.REQ_MATERIA.portugues = salvo; APP.limparCacheGrau(); }
+  };
+  /* todo subtópico precisa estar dominado: a fila de subtópicos também trava */
+  const dominar = (m, t) => {
+    APP.BANCO.filter(q => q.m === m && q.t === t).forEach(q => {
+      APP.E.cartoes[q.id] = { caixa: 3, acertos: 2, erros: 0, prox: '2099-01-01' };
+    });
+  };
+
+  t.teste('enquanto a base não vem, a matéria não abre nem recebe cota', async () => {
+    await APP.montar({ concursos: ['caaq-cdm'] });
+    await comTrava(async () => {
+      APP.limparCacheGrau();
+      APP.aplicarFoco(null);
+      t.ok(!bloco('portugues'), 'matéria travada com cota deixaria a meta impossível de fechar');
+      t.igual(APP.BLOCOS_META.reduce((n, b) => n + b.questoes, 0), APP.META_DIARIA);
+      t.ok(!APP.fila().novas.some(id => APP.porId[id].m === 'portugues'), 'cartão novo de matéria travada entrou na fila');
+    });
+  });
+
+  t.teste('dominar a base abre a matéria', async () => {
+    await APP.montar({ concursos: ['caaq-cdm'] });
+    await comTrava(async () => {
+      dominar('matematica', 'Aritmética');
+      APP.limparCacheGrau();
+      APP.aplicarFoco(null);
+      t.ok(bloco('portugues'), 'com a base dominada, a matéria devia ganhar cota');
+      t.ok(APP.fila().novas.some(id => APP.porId[id].m === 'portugues'), 'com a base dominada, devia haver cartão novo');
+    });
+  });
+
+  t.teste('matéria já em andamento não volta a travar', async () => {
+    await APP.montar({ concursos: ['caaq-cdm'] });
+    await comTrava(async () => {
+      const q = APP.BANCO.find(x => x.m === 'portugues');
+      APP.E.cartoes[q.id] = { caixa: 1, acertos: 0, erros: 1, prox: APP.hoje() };
+      APP.limparCacheGrau();
+      APP.aplicarFoco(null);
+      t.ok(bloco('portugues'), 'errar a base depois não pode esconder a matéria em andamento');
+    });
+  });
+
+  t.teste('sem a matéria exigida no banco, a trava não se aplica', async () => {
+    await APP.montar({ concursos: ['caaq-cdm'], materias: ['portugues'] });
+    await comTrava(async () => {
+      APP.limparCacheGrau();
+      t.igual(APP.travaExternaPendente('portugues'), null, 'sem a base carregada não há como medir, e a matéria ficaria presa para sempre');
+    });
+  });
 };

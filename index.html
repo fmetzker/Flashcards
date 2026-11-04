@@ -2480,6 +2480,8 @@ const abaTopicos = {};
 function travaDoTopico(mid, t, dt, temSub){
   /* pré-requisito vem primeiro: enquanto ele não é cumprido, o tópico inteiro
      está fechado e o estado interno da escada é irrelevante */
+  const externa = travaExternaPendente(mid);
+  if(externa) return {tipo:"requisito", faltam:[(MATERIAS[externa.m] ? MATERIAS[externa.m].nome : externa.m)+": "+externa.t]};
   const pend = requisitosPendentes(mid, t);
   if(pend.length) return {tipo:"requisito", faltam:pend};
   if(temSub || !dt || !dt.graus) return null;

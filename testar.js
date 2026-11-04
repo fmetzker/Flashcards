@@ -60,7 +60,7 @@ const FUNCOES = [
   'grauDe', 'grauLiberado', 'grauAberto', 'menorGrauExistente', 'limparCacheGrau',
   'atualizarEscada', 'revisaoEmEspera', 'emEspera', 'chaveEscada', 'grauPelaHistoria', 'materiaComProvaProxima',
   'profundidadeTopico', 'profundidadeSubtopico', 'porDesbloqueio', 'porDesbloqueioSub',
-  'blocosDaMeta', 'noEscopo', 'progressoDoDia', 'progressoPorBloco',
+  'blocosDaMeta', 'noEscopo', 'travaExternaPendente', 'progressoDoDia', 'progressoPorBloco',
   'feitasHoje', 'montarLoteSessao', 'agendarRepeticao', 'resumoDoBanco',
   'materiasInscritas', 'provaMaisProxima', 'blocoDe', 'embaralhaOrdem',
   'revisoesPorDia', 'resumoPendencias', 'aplicarFoco', 'carregarConfig', 'carregarBancoParcial',
