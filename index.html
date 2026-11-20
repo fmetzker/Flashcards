@@ -1089,6 +1089,13 @@ async function atualizarUniaoDeMaterias(){
   salvar();
   limparCacheGrau();
   aplicarFoco(E.escopoEstudo);
+  /* Na primeira escolha de concurso, o boot para na tela de escolha e não passa
+     por carregarBancoEmFases(), que é quem liga estas marcas. Sem elas, a tela
+     inicial fica em "Carregando questões..." e Matérias e Estatísticas esperam
+     para sempre, mesmo com o banco inteiro já em BANCO. */
+  BANCO_FOCO_PRONTO = true;
+  BANCO_PRONTO = true;
+  AGUARDANDO_BANCO_PRONTO.splice(0).forEach(fn=>fn());
   repintarTelasQueDependemDoBanco();
   sincronizar();   // materias_ativas mudou; sincronizar() manda em seguida (ver comentário nela)
 }
