@@ -5208,13 +5208,22 @@
       }
     },
     "guarda-municipal": {
-      "criterio": "Fila de ORDEM DE ENSINO, não de dependência de conceito (ver '_a_fila'). Abre pelo Estatuto Geral das Guardas Municipais, porque é a lei que diz o que a guarda é, o que ela pode fazer e como responde, e situa todo o resto. Uso da força vem logo depois, porque o uso progressivo da força já aparece como princípio do Estatuto (art. 3º, V) e é o que a Lei 13.060/2014 e o Decreto 12.341/2024 detalham. Depois vem o Direito Penal na ordem do próprio Código: a parte geral (aplicação da lei penal, fato típico, exclusão da ilicitude, imputabilidade e concurso de pessoas) antes dos crimes em espécie, porque tentativa, dolo, culpa e legítima defesa são usados para entender cada crime. Os crimes seguem a ordem do Código (pessoa, patrimônio, Administração Pública). O Processo Penal vem em seguida, na ordem em que a ocorrência acontece: quem investiga (inquérito), como se preserva a prova (cadeia de custódia), quando se pode revistar (busca), como se prende (flagrante) e como se conduz o preso (algemas). As leis penais especiais vêm por último, porque pressupõem a parte geral: Estatuto do Desarmamento, com o porte do guarda e os crimes com arma, e Abuso de autoridade, que pune o agente que excede tudo o que veio antes. Tortura vem logo depois do abuso, pelo mesmo motivo: é o crime do agente que usa a força contra quem está sob seu poder. Em seguida, as leis dos grupos que a abordagem precisa tratar com cuidado próprio (mulher em violência doméstica, vítima de racismo, criança e adolescente), e por fim os Juizados Especiais, onde termina boa parte das ocorrências menores, e os crimes ambientais. Os demais tópicos do Anexo II entram na fila quando ganharem cartão.",
+      "criterio": "Fila de ORDEM DE ENSINO, não de dependência de conceito (ver '_a_fila'). Abre pelo Estatuto Geral das Guardas Municipais, porque é a lei que diz o que a guarda é, o que ela pode fazer e como responde, e situa todo o resto. Uso da força vem logo depois, porque o uso progressivo da força já aparece como princípio do Estatuto (art. 3º, V) e é o que a Lei 13.060/2014 e o Decreto 12.341/2024 detalham. Os Direitos Humanos de base (como um tratado entra no ordenamento, a Declaração Universal e o Pacto de São José) vêm antes do Direito Penal, porque presunção de inocência, proibição da tortura e apresentação do preso ao juiz são o pano de fundo de tudo o que se segue. Depois vem o Direito Penal na ordem do próprio Código: a parte geral (aplicação da lei penal, fato típico, exclusão da ilicitude, imputabilidade e concurso de pessoas) antes dos crimes em espécie, porque tentativa, dolo, culpa e legítima defesa são usados para entender cada crime. Os crimes seguem a ordem do Código (pessoa, patrimônio, Administração Pública). O Processo Penal vem em seguida, na ordem em que a ocorrência acontece: quem investiga (inquérito), como se preserva a prova (cadeia de custódia), quando se pode revistar (busca), como se prende (flagrante) e como se conduz o preso (algemas). As leis penais especiais vêm por último, porque pressupõem a parte geral: Estatuto do Desarmamento, com o porte do guarda e os crimes com arma, e Abuso de autoridade, que pune o agente que excede tudo o que veio antes. Tortura vem logo depois do abuso, pelo mesmo motivo: é o crime do agente que usa a força contra quem está sob seu poder. Em seguida, as leis dos grupos que a abordagem precisa tratar com cuidado próprio (mulher em violência doméstica, vítima de racismo, população em situação de rua, criança e adolescente), e por fim os Juizados Especiais, onde termina boa parte das ocorrências menores, o trânsito e os crimes ambientais. Os demais tópicos do Anexo II entram na fila quando ganharem cartão.",
       "requisitos": {
         "Uso da força": [
           "Estatuto Geral das Guardas Municipais"
         ],
-        "Aplicação da lei penal": [
+        "Teoria geral dos direitos humanos": [
           "Uso da força"
+        ],
+        "Declaração Universal dos Direitos Humanos": [
+          "Teoria geral dos direitos humanos"
+        ],
+        "Pacto de São José da Costa Rica": [
+          "Declaração Universal dos Direitos Humanos"
+        ],
+        "Aplicação da lei penal": [
+          "Pacto de São José da Costa Rica"
         ],
         "Fato típico": [
           "Aplicação da lei penal"
@@ -5264,14 +5273,20 @@
         "Racismo e injúria racial": [
           "Violência doméstica contra a mulher"
         ],
-        "Estatuto da Criança e do Adolescente": [
+        "População em situação de rua": [
           "Racismo e injúria racial"
+        ],
+        "Estatuto da Criança e do Adolescente": [
+          "População em situação de rua"
         ],
         "Juizados Especiais": [
           "Estatuto da Criança e do Adolescente"
         ],
-        "Crimes ambientais": [
+        "Trânsito": [
           "Juizados Especiais"
+        ],
+        "Crimes ambientais": [
+          "Trânsito"
         ]
       }
     }
