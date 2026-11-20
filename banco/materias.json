@@ -56,5 +56,17 @@
     "id": "saude-publica",
     "nome": "Saúde Pública",
     "avulsa": true
+  },
+  {
+    "id": "direito-adm-const",
+    "nome": "Direito Administrativo e Constitucional"
+  },
+  {
+    "id": "informatica",
+    "nome": "Informática"
+  },
+  {
+    "id": "guarda-municipal",
+    "nome": "Guarda Civil Municipal"
   }
 ]

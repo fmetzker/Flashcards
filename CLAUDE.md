@@ -18,12 +18,14 @@
 > era assim", "descoberto em setembro") vai para o histórico.
 
 Aplicativo web de questões com repetição espaçada, contas e banco
-colaborativo. Hoje atende cinco concursos: Enfermeiro/Volta Redonda (edital
+colaborativo. Hoje atende seis concursos: Enfermeiro/Volta Redonda (edital
 003/2026-SMA, prova reaplicada em 29/11/2026), CAAQ-CDM e CAAQ-ELT/Marinha (mesma
 estrutura de prova, datas provisórias até os editais novos), ASON/Marinha (nível
-superior, data provisória) e CFAQ-MOC/MOM/Marinha
+superior, data provisória), CFAQ-MOC/MOM/Marinha
 (Moço de Convés e Moço de Máquinas, mesma prova; **pré-edital**, com base
-nas Normas CPES 2026 enquanto a Capitania da conta não abre o PS). Novo
+nas Normas CPES 2026 enquanto a Capitania da conta não abre o PS) e Guarda
+Civil Municipal/Angra dos Reis (edital 01/2026, IDIB, prova prevista para
+24/01/2027). Novo
 concurso é editar `concursos.json` — não exige mexer no código.
 
 Os cargos da Transpetro (Moço de Máquinas, Enfermagem do Trabalho e
@@ -322,8 +324,10 @@ PY
 
 Um fato sobre matérias que **não** sai de contagem nenhuma:
 
-- **`matematica` tem o tópico `Lógica`, que não consta do Anexo IV.** Fica no
-  banco por ser útil, mas está fora do escopo declarado do concurso.
+- **`matematica` tem o tópico `Lógica`, que só o GCM de Angra cobra inteiro**
+  (o CFAQ recorta Conjuntos e Sequências lógicas). Por isso ele fica no fim da
+  fila, e quem segue o GCM o alcança pelo recorte (ver "Escopo de tópicos por
+  bloco").
 
 Dentro delas, dois níveis: **tópico** (Imunização, Urgência, Saúde da Mulher)
 e **subtópico** (Rede de frio, Calendário vacinal). Português e SUS param no
@@ -342,6 +346,12 @@ dizendo de qual edital a árvore foi transcrita — o validador barra sem.
 duração, blocos (nome, quantas questões, quais matérias) e regra de
 aprovação. Uma matéria não pode aparecer em dois blocos do mesmo concurso; o
 validador barra.
+
+**`blocos[].pontos` é quanto vale cada questão do bloco**, quando o edital dá
+peso diferente por área (no GCM de Angra, 2 nos Conhecimentos Específicos e 1
+no resto). Sem o campo vale 1. Com ele, `minimoTotal` passa a ser contado em
+pontos no simulado (`finalizarSimulado()`), como o edital conta. O peso da
+meta do dia continua sendo `questoes`, e o campo não mexe nisso.
 
 **Uma conta pode seguir mais de um concurso ao mesmo tempo.** Duas noções
 que não podem ser confundidas:
@@ -686,8 +696,18 @@ escopo restrito a um só ou com todos.
   - `blocos[].topicosSimulado` recorta só o simulado. No ASON, a Matemática do
     estudo é a matéria inteira, porque Cálculo só abre depois da base, mas o
     simulado sorteia só o que o Anexo II cobra. Recortar o estudo do mesmo jeito
-    prenderia quem segue só o ASON: a base ficaria fora da sessão, e Cálculo
-    nunca abriria.
+    tiraria a base da sessão de quem segue só o ASON, e Cálculo abriria sem ela,
+    porque o que fica fora do recorte é transparente na fila (ver abaixo).
+  - **A fila respeita o recorte.** Dentro do recorte, o trecho que fica fora é
+    transparente: o requisito passa para o anterior da fila que cai no recorte,
+    e um requisito recortado pela metade tem a base medida só nos cartões do
+    recorte (`requisitosDaFila()`, `cartoesDoTrecho()`). Sem isso, o que está fora
+    nunca entra na sessão e segura o resto: no GCM de Angra, Lógica fica no fim
+    da fila de Matemática, e nenhum cartão do recorte abria. Trecho fora do
+    recorte e matéria sem recorte seguem a fila de sempre. O recorte é a união
+    dos seguidos e não muda com a prova em foco. `testes/requisitos.js` simula
+    cada concurso recortado do zero e reprova se o recorte não for alcançado
+    todo, um trecho por vez.
   - O mapeamento item-do-edital → tópico-do-banco é **interpretação**, não
     transcrição (os itens são categorias largas). Na dúvida, **inclui**:
     acentuação entra em "ortografia oficial", pronomes em "classes de
@@ -695,6 +715,10 @@ escopo restrito a um só ou com todos.
     Português por engano.
   - `validar` confere cada tópico declarado contra o banco — tópico com
     grafia errada some silenciosamente da sessão, que é pior que um erro.
+- **Matéria que chegou sem nenhum cartão não ganha cota** (`blocosDaMeta()`,
+  via `CARTOES_CARREGADOS`), como a de um concurso cadastrado antes de o banco
+  ser escrito: com cota, a meta nunca fecharia. A fatia dela vai para as outras.
+  Matéria que ainda não carregou mantém a cota, porque não dá para saber.
 - `E.diasMateria[dia][materia]` guarda respostas **por matéria** (não por
   bloco: id de bloco é por concurso, guardar por bloco quebraria ao trocar
   o foco).

@@ -744,6 +744,8 @@ let AGUARDANDO_BANCO_PRONTO = [];
    o bloqueio de tela inteira que BANCO_PRONTO=false faz no primeiro boot. */
 let MATERIAS_CARREGANDO = new Set();
 const porId = {}, MATERIAS = {}, blocoDaMateria = {};
+/* matéria -> quantos cartões chegaram; ausente = ainda não carregou (blocosDaMeta) */
+const CARTOES_CARREGADOS = {};
 
 /* fetch() sozinho não tem timeout: numa conexão ruim (não caída, só muito
    lenta), a promessa fica pendurada indefinidamente sem nunca rejeitar. Como
@@ -995,6 +997,7 @@ async function carregarBancoParcial(lista, aoCadaUma){
   if(!lista.length) return;
   await Promise.all(lista.map(m => pega("banco/"+m+".json").then(qs=>{
     BANCO = BANCO.concat(qs);
+    CARTOES_CARREGADOS[m] = qs.length;
     qs.forEach(q=>{ porId[q.id] = q; if(q.img) aquecerFigura(q.img); });
     if(aoCadaUma) aoCadaUma(m);
   })));
@@ -3492,8 +3495,8 @@ function pintarSimuladoInicio(){
     const b=document.createElement("span"); b.className="n"; b.textContent=val;
     d.appendChild(a); d.appendChild(b); comp.appendChild(d);
   };
-  BLOCOS.forEach(bl=>linha(bl.nome, bl.questoes));
-  linha("Aprovação", CONCURSO.aprovacao.minimoTotal +
+  BLOCOS.forEach(bl=>linha(bl.nome, bl.questoes + (pontosDe(bl) > 1 ? " × " + pontosDe(bl) + " pontos" : "")));
+  linha("Aprovação", CONCURSO.aprovacao.minimoTotal + (provaComPeso() ? " pontos" : "") +
     (CONCURSO.aprovacao.nenhumBlocoZerado ? " + nenhum bloco zerado" : ""));
 
   const falta = BLOCOS.filter(bl=>disponivel(bl) < bl.questoes)
@@ -3549,19 +3552,27 @@ function mostrarSim(){
   if(SIM.pos < SIM.lista.length-1) b("Próxima", ()=>{SIM.pos++;mostrarSim();});
   else b("Entregar prova", finalizarSimulado, "verde");
 }
+/* `pontos` do bloco é quanto vale cada questão dele (o edital do GCM de Angra dá
+   2 nos Conhecimentos Específicos e 1 no resto). Sem o campo, vale 1, e
+   `minimoTotal` continua sendo número de acertos, como sempre foi. */
+const pontosDe = bl => (bl && bl.pontos) || 1;
+const provaComPeso = () => BLOCOS.some(bl=> pontosDe(bl) !== 1);
+
 function finalizarSimulado(){
   clearInterval(timer);
   const por = {};
   BLOCOS.forEach(bl=>{ por[bl.id] = {a:0, t:0}; });
-  let acertos=0;
+  let acertos=0, pontos=0, pontosMax=0;
   SIM.lista.forEach((id,k)=>{
     const q=porId[id], b=blocoDe(q); por[b].t++;
+    const vale = pontosDe(BLOCOS.find(bl=> bl.id===b));
+    pontosMax += vale;
     const escolha = SIM.respostas[k];
-    if(escolha!==null && SIM.perms[k][escolha]===q.c){ acertos++; por[b].a++; }
+    if(escolha!==null && SIM.perms[k][escolha]===q.c){ acertos++; pontos += vale; por[b].a++; }
   });
   const regra = CONCURSO.aprovacao;
   const zerou = BLOCOS.some(bl=>por[bl.id].t>0 && por[bl.id].a===0);
-  const aprovado = acertos >= regra.minimoTotal && !(regra.nenhumBlocoZerado && zerou);
+  const aprovado = pontos >= regra.minimoTotal && !(regra.nenhumBlocoZerado && zerou);
   const simulado = {id:uuidv4(), data:hoje(), acertos, total:SIM.lista.length, concurso:CONCURSO.id};
   E.simulados.push(simulado);
   if(supaConfigurado() && SESSAO){
@@ -3574,7 +3585,8 @@ function finalizarSimulado(){
   c.innerHTML =
     '<div class="'+(aprovado?"alerta ok":"alerta")+'" style="margin-top:16px">'+
     (aprovado ? "Aprovado nas regras do edital: " : "Reprovado nas regras do edital: ")+
-    acertos+" de "+SIM.lista.length+(zerou?" — e há bloco zerado.":".")+'</div>'+
+    (provaComPeso() ? pontos+" de "+pontosMax+" pontos ("+acertos+" de "+SIM.lista.length+" questões)"
+                    : acertos+" de "+SIM.lista.length)+(zerou?" — e há bloco zerado.":".")+'</div>'+
     '<div class="card">'+
       BLOCOS.map(bl=>'<div class="stat"><span>'+bl.nome+'</span><span class="n">'+por[bl.id].a+"/"+por[bl.id].t+'</span></div>').join("")+
     '</div>'+

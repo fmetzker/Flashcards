@@ -17,6 +17,24 @@ que o código já diz não vem: some.
 
 ---
 
+## Recorte do edital na fila (novembro/2026)
+
+Apareceu ao cadastrar o GCM de Angra dos Reis, cujo Raciocínio Lógico recorta a
+Matemática em Lógica, contagem, probabilidade e quatro subtópicos de Aritmética.
+Simulando alguém que segue só essa prova e acerta tudo, nenhum cartão do recorte
+abria: Lógica fica no fim da fila, atrás de Álgebra, Funções e do Cálculo do ASON,
+e os subtópicos de Aritmética ficam atrás de outros que a prova não cobra. Como o
+que está fora do recorte nunca entra na sessão, a base dele nunca era dominada.
+
+O CFAQ já tinha o mesmo defeito sem ninguém notar: Juros, fora do recorte dele,
+segurava o resto da Aritmética, e quem seguia só o CFAQ empacava ali, com 473 dos
+976 cartões do recorte alcançáveis. A fila passou a tratar o trecho fora do
+recorte como transparente.
+
+O mesmo cadastro trouxe três matérias sem cartão nenhum, e a meta reservava 38 das
+50 questões do dia para elas. Matéria vazia saiu do rateio, em vez de se repetir o
+caminho do ASON, que só foi cadastrado depois de ter cartão.
+
 ## Base para CDM, ELT e ASON (novembro/2026)
 
 A prova de ASON de 2026 mudou o desenho do preparatório. CDM e ELT cobram 3º ano

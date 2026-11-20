@@ -32,6 +32,22 @@ module.exports = function (APP, t) {
     t.igual(vistas.length, new Set(vistas).size, 'matéria repetida em dois blocos da meta');
   });
 
+  t.teste('matéria que chegou sem nenhum cartão não ganha cota na meta', async () => {
+    /* Concurso recém-cadastrado, com o banco de uma matéria ainda por
+       escrever: com cota, a meta do dia nunca fecharia. A que ainda não
+       chegou mantém a cota, porque antes de carregar não dá para saber. */
+    const c = APP.CONCURSOS.find(x => x.blocos.length > 1);
+    await APP.montar({ concursos: [c.id] });
+    const m = APP.BLOCOS_META.map(b => b.materias[0]).find(x => APP.BANCO.some(q => q.m === x));
+    t.ok(m, 'preciso de uma matéria com cartão e com cota');
+    APP.CARTOES_CARREGADOS[m] = 0;
+    const meta = APP.blocosDaMeta(APP.INSCRITOS);
+    t.ok(!meta.some(b => b.materias[0] === m), `${m} vazia ficou com cota`);
+    t.igual(meta.reduce((n, b) => n + b.questoes, 0), APP.META_DIARIA, 'a sobra tem que ir para as outras');
+    delete APP.CARTOES_CARREGADOS[m];
+    t.ok(APP.blocosDaMeta(APP.INSCRITOS).some(b => b.materias[0] === m), 'matéria que ainda não chegou perdeu a cota');
+  });
+
   t.grupo('meta — escopo de tópicos');
 
   t.teste('escopo de tópicos é UNIÃO, não o do bloco vencedor', async () => {

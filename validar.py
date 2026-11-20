@@ -186,7 +186,15 @@ def valida_concursos(B):
             if disp < bl['questoes']:
                 avisos.append(f"concurso [{rot}], bloco '{bl['nome']}': o banco tem {disp} "
                               f"questões para {bl['questoes']} da prova")
-        total = sum(bl.get('questoes', 0) for bl in c.get('blocos', []))
+        # `pontos` é quanto vale cada questão do bloco (padrão 1): com ele,
+        # minimoTotal é contado em pontos, como faz finalizarSimulado()
+        for bl in c.get('blocos', []):
+            if 'pontos' in bl and not (isinstance(bl['pontos'], (int, float))
+                                       and not isinstance(bl['pontos'], bool) and bl['pontos'] > 0):
+                erros.append(f"concurso [{rot}], bloco '{bl.get('id')}': 'pontos' precisa ser "
+                             "um número positivo (quanto vale cada questão)")
+        total = sum(bl.get('questoes', 0) * (bl.get('pontos') or 1) for bl in c.get('blocos', [])
+                    if isinstance(bl.get('pontos', 1), (int, float)))
         if c.get('aprovacao', {}).get('minimoTotal', 0) > total:
             erros.append(f"concurso [{rot}]: mínimo para aprovação "
                          f"({c['aprovacao']['minimoTotal']}) é maior que o total da prova ({total})")

@@ -48,14 +48,14 @@ const GLOBAIS_LET = [
 const GLOBAIS_CONST = [
   'porId', 'MATERIAS', 'blocoDaMateria', 'INTERVALOS', 'CAIXA_MAX',
   'META_MATERIA_AVULSA', 'META_DIARIA', 'RODADA', 'FUSO_BRASILIA',
-  'CHAVE', 'MAX_EVENTOS_PROPRIOS',
+  'CHAVE', 'MAX_EVENTOS_PROPRIOS', 'CARTOES_CARREGADOS',
 ];
 /* As funções puras do motor — nenhuma toca DOM nem localStorage. */
 const FUNCOES = [
   'hoje', 'diaUTC', 'somarDias', 'proximaData', 'diasAteMaisProxima',
   'caixaDepois', 'previsaoRevisao',
   'prioridade', 'ordenarRevisoes', 'fila', 'apportion', 'cmpId',
-  'indexarRequisitos', 'topicoAberto', 'subtopicoAberto',
+  'indexarRequisitos', 'topicoAberto', 'subtopicoAberto', 'recorteDaFila', 'requisitosDaFila',
   'requisitosPendentes', 'requisitosPendentesSub', 'baseDominada',
   'grauDe', 'grauLiberado', 'grauAberto', 'menorGrauExistente', 'limparCacheGrau',
   'atualizarEscada', 'revisaoEmEspera', 'emEspera', 'chaveEscada', 'grauPelaHistoria', 'materiaComProvaProxima',
@@ -225,6 +225,7 @@ function carregarApp(opcoes = {}) {
     if (!APP.CONCURSOS.length) await APP.carregarConfig();
     APP.BANCO = [];
     for (const k of Object.keys(APP.porId)) delete APP.porId[k];
+    for (const k of Object.keys(APP.CARTOES_CARREGADOS)) delete APP.CARTOES_CARREGADOS[k];
     APP.E.cartoes = cartoes;
     APP.E.dias = {}; APP.E.diasTotal = {}; APP.E.diasCertas = {}; APP.E.diasMateria = {};
     APP.E.concursos = concursos;

@@ -71,7 +71,7 @@
       ]
     },
     "matematica": {
-      "fonte": "Transpetro, Edital nº 03 - TRANSPETRO/PSP/TERRA/NÍVEL MÉDIO-2026.3, ANEXO IV, CONHECIMENTOS BÁSICOS - MATEMÁTICA (10 itens, iguais para todas as 18 ênfases). Os itens do edital foram MAPEADOS para os nomes de tópico que o banco já usa, não transcritos ao pé da letra: 'conjuntos numéricos / razão e proporção / porcentagem / matemática financeira' caem em Aritmética (que já tem cartão de regra de três, desconto sucessivo, juros simples e juros compostos); 'equações e sistemas lineares' em Álgebra; 'geometria plana e espacial' em Geometria (que já tem área e volume). Análise combinatória, Probabilidade e Estatística ganharam cartão (7, 6 e 6, respectivamente), fechando a lacuna que existia. 'Lógica', que o banco tem, fica fora porque não consta deste conteúdo programático. Matrizes e Vetores foram acrescentados à lista de tópicos por cobrirem conteúdo do Anexo II — PS CAAQ-CDM-01/2025 (nível superior/oficial, pasta 3 das provas antigas), que a árvore original (nível médio, Transpetro) não previa; não têm 'fonte' própria porque a árvore inteira já é mapeada, não transcrita ao pé da letra — mesmo critério usado para os demais. (Geometria analítica e Progressões, também cobradas nessa pasta, já existiam como subtópico de Geometria e de Aritmética, respectivamente — não precisaram de tópico novo.) 'Multiplicação' (a tabuada) virou subtópico de Aritmética em agosto/2026 — não é item do edital, mas também não é tópico irmão dela: pedido explícito foi fundir, reorganizando a escada de pré-requisitos em volta disso (ver banco/requisitos.json, requisitos_subtopicos). Limites e os tópicos seguintes da fila vêm do Anexo II do Edital PS ASON-01 e 02/2026 (I. Matemática), mapeados para nomes de tópico do banco.",
+      "fonte": "Transpetro, Edital nº 03 - TRANSPETRO/PSP/TERRA/NÍVEL MÉDIO-2026.3, ANEXO IV, CONHECIMENTOS BÁSICOS - MATEMÁTICA (10 itens, iguais para todas as 18 ênfases). Os itens do edital foram MAPEADOS para os nomes de tópico que o banco já usa, não transcritos ao pé da letra: 'conjuntos numéricos / razão e proporção / porcentagem / matemática financeira' caem em Aritmética (que já tem cartão de regra de três, desconto sucessivo, juros simples e juros compostos); 'equações e sistemas lineares' em Álgebra; 'geometria plana e espacial' em Geometria (que já tem área e volume). Análise combinatória, Probabilidade e Estatística ganharam cartão (7, 6 e 6, respectivamente), fechando a lacuna que existia. 'Lógica', que o banco tem, fica fora porque não consta deste conteúdo programático. Matrizes e Vetores foram acrescentados à lista de tópicos por cobrirem conteúdo do Anexo II — PS CAAQ-CDM-01/2025 (nível superior/oficial, pasta 3 das provas antigas), que a árvore original (nível médio, Transpetro) não previa; não têm 'fonte' própria porque a árvore inteira já é mapeada, não transcrita ao pé da letra — mesmo critério usado para os demais. (Geometria analítica e Progressões, também cobradas nessa pasta, já existiam como subtópico de Geometria e de Aritmética, respectivamente — não precisaram de tópico novo.) 'Multiplicação' (a tabuada) virou subtópico de Aritmética em agosto/2026 — não é item do edital, mas também não é tópico irmão dela: pedido explícito foi fundir, reorganizando a escada de pré-requisitos em volta disso (ver banco/requisitos.json, requisitos_subtopicos). Limites e os tópicos seguintes da fila vêm do Anexo II do Edital PS ASON-01 e 02/2026 (I. Matemática), mapeados para nomes de tópico do banco. Lógica entrou na árvore pelo Anexo II do Edital nº 01/2026 do GCM de Angra dos Reis (Raciocínio Lógico-Matemático: proposições, conectivos, tabelas-verdade, equivalências, quantificadores, diagramas lógicos, argumentos e sequências lógicas).",
       "topicos": [
         "Aritmética",
         "Álgebra",
@@ -91,7 +91,8 @@
         "Sequências e séries",
         "Equações diferenciais",
         "Álgebra Linear",
-        "Cálculo Numérico"
+        "Cálculo Numérico",
+        "Lógica"
       ]
     },
     "enfermagem-trabalho": {
@@ -170,6 +171,77 @@
         "Circuitos de corrente contínua",
         "Campo magnético",
         "Circuitos de corrente alternada"
+      ]
+    },
+    "direito-adm-const": {
+      "fonte": "Edital nº 01/2026 do concurso de Guarda Civil Municipal de Angra dos Reis (IDIB), Anexo II, Noções de Direito Administrativo e Noções de Direito Constitucional, que a prova cobra como uma disciplina só (item 14.1). Cada tópico é um item do Anexo, na ordem dele. Livro Azul das Guardas Municipais e Lei 13.675/2015 (Susp) vêm listados dentro de Direito Constitucional e ficam aqui pelo mesmo motivo.",
+      "topicos": [
+        "Organização da Administração Pública",
+        "Princípios da Administração Pública",
+        "Poderes administrativos",
+        "Poder de polícia",
+        "Abuso de poder",
+        "Atos administrativos",
+        "Agentes públicos",
+        "Regime Jurídico Único de Angra dos Reis",
+        "Responsabilidade civil do Estado",
+        "Bens públicos",
+        "Improbidade administrativa",
+        "Princípios fundamentais",
+        "Direitos e deveres individuais e coletivos",
+        "Organização político-administrativa",
+        "Segurança pública na Constituição",
+        "Patrimônio cultural e meio ambiente",
+        "Atividades nucleares",
+        "Legislação federal do setor nuclear",
+        "Livro Azul das Guardas Municipais",
+        "Sistema Único de Segurança Pública"
+      ]
+    },
+    "informatica": {
+      "fonte": "Edital nº 01/2026 do concurso de Guarda Civil Municipal de Angra dos Reis (IDIB), Anexo II, Noções de Informática. Cada tópico é um item do Anexo, na ordem dele.",
+      "topicos": [
+        "Hardware, software e armazenamento",
+        "Windows 10 e 11",
+        "Editor de texto e planilha",
+        "Internet, correio eletrônico e nuvem",
+        "Segurança da informação",
+        "Proteção de dados pessoais"
+      ]
+    },
+    "guarda-municipal": {
+      "fonte": "Edital nº 01/2026 do concurso de Guarda Civil Municipal de Angra dos Reis (IDIB), Anexo II, Conhecimentos Específicos — Guarda Civil Municipal: Noções de Direitos Humanos, Noções de Direito Penal e Processual Penal e Legislação Extravagante, cobradas juntas em 20 questões (item 14.1). Cada tópico é um item do Anexo, na ordem dele. O uso da força aparece duas vezes no Anexo (Portaria MJSP 855/2025 em Direitos Humanos; Lei 13.060/2014 e Decreto 12.341/2024 na Legislação Extravagante) e fica num tópico só, para não haver dois cartões do mesmo fato.",
+      "topicos": [
+        "Teoria geral dos direitos humanos",
+        "Declaração Universal dos Direitos Humanos",
+        "Pacto de São José da Costa Rica",
+        "Regras de Bangkok",
+        "Proibição da tortura",
+        "Parâmetros internacionais da atuação policial",
+        "Uso da força",
+        "Racismo e injúria racial",
+        "Violência doméstica contra a mulher",
+        "População em situação de rua",
+        "Aplicação da lei penal",
+        "Fato típico",
+        "Exclusão da ilicitude",
+        "Imputabilidade e concurso de pessoas",
+        "Crimes contra a pessoa",
+        "Crimes contra o patrimônio",
+        "Crimes contra a Administração Pública",
+        "Inquérito policial",
+        "Cadeia de custódia",
+        "Busca pessoal e domiciliar",
+        "Prisão em flagrante",
+        "Uso de algemas",
+        "Estatuto Geral das Guardas Municipais",
+        "Lei da Guarda Civil Municipal de Angra dos Reis",
+        "Estatuto do Desarmamento",
+        "Abuso de autoridade",
+        "Juizados Especiais",
+        "Trânsito",
+        "Estatuto da Criança e do Adolescente",
+        "Crimes ambientais"
       ]
     }
   }

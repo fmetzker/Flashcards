@@ -138,6 +138,10 @@ function blocosDaMeta(lista){
      a meta do dia nunca fecharia, então a fatia dela fica com as outras */
   limparCacheGrau();
   Object.keys(porMateria).forEach(m=>{ if(travaExternaPendente(m)) delete porMateria[m]; });
+  /* matéria que já chegou e não tem cartão nenhum, como a de um concurso recém-
+     cadastrado com o banco ainda por escrever, também não tem o que oferecer.
+     Só a que já CHEGOU: antes de carregar, não dá para saber se está vazia. */
+  Object.keys(porMateria).forEach(m=>{ if(CARTOES_CARREGADOS[m] === 0) delete porMateria[m]; });
   if(!Object.keys(porMateria).length) return [];   // nada seguido: nenhum peso pra ratear
   /* ORDEM_MATERIAS só decide a ORDEM de exibição — nunca quais matérias
      entram. Antes esta linha era `ORDEM_MATERIAS.filter(...)`, e quando a
@@ -198,7 +202,7 @@ function blocosDoFoco(foco){
     if(bl && noEscopo(bl.topicos, x)) vencidas[x.m] = (vencidas[x.m] || 0) + 1;
   });
 
-  const menorPeso = Math.min.apply(null, doFoco.map(b=> b.peso));
+  const menorPeso = doFoco.length ? Math.min.apply(null, doFoco.map(b=> b.peso)) : META_MATERIA_AVULSA;
   const fora = uniao.filter(b=> !noFoco(b.materias[0])).map(b=>{
     const m = b.materias[0];
     return Object.assign({}, b, {peso: menorPeso, soRevisao: true,
@@ -297,13 +301,11 @@ const _cacheGrau = {};
    de incrementar 1 por 1 corrige isso e também sobrevive a um buraco no
    meio (nível 1 e 3 sem nível 2) — no caso comum, sem buraco nenhum, o
    resultado é idêntico ao de sempre. */
-function grauLiberado(m, t, s){
-  const chave = m + "|" + t + "|" + (s || "");
+function grauLiberado(m, t, s, noRecorte){
+  const chave = m + "|" + t + "|" + (s || "") + (noRecorte ? "|recorte" : "");
   if(chave in _cacheGrau) return _cacheGrau[chave];
   const porGrau = {};
-  BANCO.forEach(q=>{
-    if(q.m !== m || q.t !== t) return;
-    if(s && q.s !== s) return;
+  cartoesDoTrecho(m, t, s, noRecorte).forEach(q=>{
     (porGrau[grauDe(q)] = porGrau[grauDe(q)] || []).push(q.id);
   });
   const graus = Object.keys(porGrau).map(Number).sort((a,b)=>a-b);
@@ -321,6 +323,8 @@ function grauLiberado(m, t, s){
 /* o cache vale por montagem de fila: responder um cartão muda o que está
    liberado, e a fila é remontada a cada sessão */
 function limparCacheGrau(){
+  for(const k in _cacheRecorte) delete _cacheRecorte[k];
+  for(const k in _cacheFila) delete _cacheFila[k];
   for(const k in _cacheTrava) delete _cacheTrava[k];
   for(const k in _cacheGrau) delete _cacheGrau[k];
   for(const k in _cacheMenorGrau) delete _cacheMenorGrau[k];
@@ -337,20 +341,99 @@ function limparCacheGrau(){
    um subtópico só com nível 2 e 3, ficava travado para sempre). */
 const _cacheMenorGrau = {};
 
-function menorGrauExistente(m, t, s){
-  const chave = m + "|" + t + "|" + (s || "");
+function menorGrauExistente(m, t, s, noRecorte){
+  const chave = m + "|" + t + "|" + (s || "") + (noRecorte ? "|recorte" : "");
   if(chave in _cacheMenorGrau) return _cacheMenorGrau[chave];
   let menor = null;
-  BANCO.forEach(q=>{
-    if(q.m !== m || q.t !== t) return;
-    if(s && q.s !== s) return;
+  cartoesDoTrecho(m, t, s, noRecorte).forEach(q=>{
     const g = grauDe(q);
     if(menor === null || g < menor) menor = g;
   });
   return _cacheMenorGrau[chave] = (menor === null ? 1 : menor);
 }
 
-function baseDominada(m, dep){
+/* O recorte do edital vale também na FILA.
+
+   Prova que recorta a matéria (`blocos[].topicos`) estuda só parte dela, mas a
+   fila é da matéria inteira: no GCM de Angra, Lógica é o último tópico da fila de
+   Matemática, atrás de Álgebra, Funções e Cálculo, que essa prova não cobra. Quem
+   seguia só ela nunca abria Lógica, porque o que vinha antes nunca entrava na
+   sessão. O mesmo prendia o CFAQ: Juros, fora do recorte, segurava a Aritmética.
+
+   Por isso, num trecho DENTRO do recorte, o que está fora fica transparente: o
+   requisito passa para o anterior da fila que cai no recorte, e um requisito
+   recortado pela metade (Aritmética, de que o GCM cobra quatro subtópicos) tem a
+   base medida só nos cartões do recorte. Trecho fora do recorte segue a fila de
+   sempre, e matéria sem recorte nenhum também: nada muda para elas.
+
+   O recorte é a união dos concursos seguidos, a mesma de blocosDaMeta(). Não muda
+   com a prova em foco: a ordem de estudo não pode andar para trás a cada troca. */
+const _cacheRecorte = {}, _cacheFila = {};
+function recorteDaFila(m){
+  if(m in _cacheRecorte) return _cacheRecorte[m];
+  let r;                                       // undefined = matéria fora de todo concurso
+  if((E.materiasAvulsas || []).indexOf(m) >= 0) r = null;
+  else INSCRITOS.forEach(c=> (c.blocos || []).forEach(bl=>{
+    if((bl.materias || []).indexOf(m) < 0 || r === null) return;
+    if(!bl.topicos || !bl.topicos.length){ r = null; return; }
+    r = r || [];
+    bl.topicos.forEach(t=>{ if(r.indexOf(t) < 0) r.push(t); });
+  }));
+  return _cacheRecorte[m] = (r === undefined ? null : r);
+}
+
+/* Os cartões em que se mede a base de um trecho. Recortado pela metade, só os do
+   recorte; sem nenhum cartão no recorte, todos, que é a conta de sempre. */
+function cartoesDoTrecho(m, t, s, noRecorte){
+  const todos = BANCO.filter(q=> q.m === m && q.t === t && (!s || q.s === s));
+  if(!noRecorte) return todos;
+  const r = recorteDaFila(m);
+  const dentro = todos.filter(q=> noEscopo(r, q));
+  return dentro.length ? dentro : todos;
+}
+
+/* O trecho (tópico, ou {t,s}) tem cartão no recorte da matéria? Falso também
+   quando a matéria não tem recorte: aí não há o que pular. */
+function filaRecortada(m, dep){
+  const r = recorteDaFila(m);
+  if(r === null) return false;
+  const t = typeof dep === "string" ? dep : dep.t;
+  const s = typeof dep === "string" ? undefined : dep.s;
+  const chave = "r|" + m + "|" + t + "|" + (s || "");
+  if(chave in _cacheFila) return _cacheFila[chave];
+  return _cacheFila[chave] = BANCO.some(q=> q.m === m && q.t === t && (!s || q.s === s) && noEscopo(r, q));
+}
+
+/* Requisitos que valem para o trecho: os da fila, com o que está fora do recorte
+   trocado pelo que ELE exigia, até achar algo do recorte ou o começo da fila. */
+function requisitosDaFila(m, t){
+  const chave = "t|" + m + "|" + t;
+  if(chave in _cacheFila) return _cacheFila[chave];
+  const deps = REQUISITOS[m + "|" + t] || [];
+  return _cacheFila[chave] = filaRecortada(m, t) ? pularForaDoRecorte(m, deps, {}) : deps;
+}
+function requisitosDaFilaSub(m, t, s){
+  const chave = "s|" + m + "|" + t + "|" + s;
+  if(chave in _cacheFila) return _cacheFila[chave];
+  const deps = REQUISITOS_SUB[m + "|" + t + "|" + s] || [];
+  return _cacheFila[chave] = filaRecortada(m, {t, s}) ? pularForaDoRecorte(m, deps, {}) : deps;
+}
+function pularForaDoRecorte(m, deps, vistos){
+  const valem = [];
+  deps.forEach(dep=>{
+    if(filaRecortada(m, dep)){ valem.push(dep); return; }
+    const t = typeof dep === "string" ? dep : dep.t;
+    const s = typeof dep === "string" ? undefined : dep.s;
+    const k = t + "|" + (s || "");
+    if(vistos[k]) return;                      // ciclo já é barrado pelo validar; isto só não trava
+    vistos[k] = true;
+    const antes = s ? (REQUISITOS_SUB[m + "|" + t + "|" + s] || []) : (REQUISITOS[m + "|" + t] || []);
+    pularForaDoRecorte(m, antes, vistos).forEach(d=> valem.push(d));
+  });
+  return valem;
+}
+
+function baseDominada(m, dep, noRecorte){
   const t = typeof dep === "string" ? dep : dep.t;
   const s = typeof dep === "string" ? undefined : dep.s;
   /* {t,s}: a barra a vencer é a do SUBTÓPICO exigido (que já inclui, por
@@ -360,14 +443,13 @@ function baseDominada(m, dep){
      escada existir) abriria o que depende dele sem ter passado pela cadeia. */
   if(s){ if(!subtopicoAberto(m, t, s)) return false; }
   else{ if(!topicoAberto(m, t)) return false; }
-  return grauLiberado(m, t, s) > menorGrauExistente(m, t, s);
+  return grauLiberado(m, t, s, noRecorte) > menorGrauExistente(m, t, s, noRecorte);
 }
 
 /* Requisitos que ainda faltam para este tópico abrir; vazio = aberto. */
 function requisitosPendentes(m, t){
-  const req = REQUISITOS[m + "|" + t];
-  if(!req || !req.length) return [];
-  return req.filter(dep=> !baseDominada(m, dep));
+  const noRecorte = filaRecortada(m, t);
+  return requisitosDaFila(m, t).filter(dep=> !baseDominada(m, dep, noRecorte));
 }
 
 function topicoAberto(m, t){ return !travaExternaPendente(m) && requisitosPendentes(m, t).length === 0; }
@@ -391,9 +473,8 @@ function travaExternaPendente(m){
 }
 
 function requisitosPendentesSub(m, t, s){
-  const req = REQUISITOS_SUB[m + "|" + t + "|" + s];
-  if(!req || !req.length) return [];
-  return req.filter(dep=> !baseDominada(m, dep));
+  const noRecorte = filaRecortada(m, {t, s});
+  return requisitosDaFilaSub(m, t, s).filter(dep=> !baseDominada(m, dep, noRecorte));
 }
 
 /* subtópico só abre se o TÓPICO dele já estiver aberto — a trava por
@@ -439,15 +520,14 @@ let _cacheHistoria = {};
    conta, mesmo que tenha caído de caixa depois. É mais frouxo que grauLiberado()
    de propósito: cartão que entrou no banco depois e ninguém respondeu não pode
    apagar o que a pessoa já tinha percorrido. */
-function grauPelaHistoria(m, t, s){
-  const chave = m + "|" + t + "|" + (s || "");
+function grauPelaHistoria(m, t, s, noRecorte){
+  const chave = m + "|" + t + "|" + (s || "") + (noRecorte ? "|recorte" : "");
   if(chave in _cacheHistoria) return _cacheHistoria[chave];
-  return _cacheHistoria[chave] = calcularGrauPelaHistoria(m, t, s);
+  return _cacheHistoria[chave] = calcularGrauPelaHistoria(m, t, s, noRecorte);
 }
-function calcularGrauPelaHistoria(m, t, s){
+function calcularGrauPelaHistoria(m, t, s, noRecorte){
   const porGrau = {};
-  BANCO.forEach(q=>{
-    if(q.m !== m || q.t !== t || (s && q.s !== s)) return;
+  cartoesDoTrecho(m, t, s, noRecorte).forEach(q=>{
     (porGrau[grauDe(q)] = porGrau[grauDe(q)] || []).push(E.cartoes[q.id]);
   });
   const graus = Object.keys(porGrau).map(Number).sort((a,b)=>a-b);
@@ -463,22 +543,24 @@ function calcularGrauPelaHistoria(m, t, s){
   return graus[graus.length-1] + 1;
 }
 
-function basePelaHistoria(m, dep){
+function basePelaHistoria(m, dep, noRecorte){
   const t = typeof dep === "string" ? dep : dep.t;
   const s = typeof dep === "string" ? undefined : dep.s;
   if(!(s ? subtopicoPelaHistoria(m, t, s) : topicoPelaHistoria(m, t))) return false;
-  return grauPelaHistoria(m, t, s) > menorGrauExistente(m, t, s);
+  return grauPelaHistoria(m, t, s, noRecorte) > menorGrauExistente(m, t, s, noRecorte);
 }
 function topicoPelaHistoria(m, t){
   const chave = "t|" + m + "|" + t;
   if(chave in _cacheHistoria) return _cacheHistoria[chave];
-  return _cacheHistoria[chave] = (REQUISITOS[m + "|" + t] || []).every(dep=> basePelaHistoria(m, dep));
+  const noRecorte = filaRecortada(m, t);
+  return _cacheHistoria[chave] = requisitosDaFila(m, t).every(dep=> basePelaHistoria(m, dep, noRecorte));
 }
 function subtopicoPelaHistoria(m, t, s){
   const chave = "s|" + m + "|" + t + "|" + s;
   if(chave in _cacheHistoria) return _cacheHistoria[chave];
+  const noRecorte = filaRecortada(m, {t, s});
   return _cacheHistoria[chave] = topicoPelaHistoria(m, t)
-    && (REQUISITOS_SUB[m + "|" + t + "|" + s] || []).every(dep=> basePelaHistoria(m, dep));
+    && requisitosDaFilaSub(m, t, s).every(dep=> basePelaHistoria(m, dep, noRecorte));
 }
 
 function atualizarEscada(){

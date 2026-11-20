@@ -526,4 +526,82 @@ module.exports = function (APP, t) {
     t.igual(r.vencidas, 1, 'vencidas');
     t.igual(r.porMateria.matematica.vencidas, 1, 'por matéria');
   });
+  t.grupo('fila com recorte do edital');
+
+  /* Põe em caixa >= 2 o nível mais baixo do recorte, só dos cartões DENTRO
+     dele: quem segue a prova nunca recebe os outros. */
+  function dominarNoRecorte(m, tt, r, s) {
+    const alvo = APP.BANCO.filter(q => q.m === m && q.t === tt && (!s || q.s === s) && APP.noEscopo(r, q));
+    const menor = Math.min(...alvo.map(q => APP.grauDe(q)));
+    alvo.filter(q => APP.grauDe(q) === menor)
+      .forEach(q => { APP.E.cartoes[q.id] = { caixa: 3, acertos: 2, erros: 0, prox: '2099-01-01' }; });
+    APP.limparCacheGrau();
+  }
+
+  t.teste('quem segue só uma prova que recorta a matéria alcança todo o recorte, um trecho por vez', async () => {
+    /* O que está fora do recorte nunca entra na sessão. Enquanto a fila não
+       sabia disso, ele segurava o resto: no GCM de Angra, nenhum cartão de
+       Matemática do recorte abria, e no CFAQ, Juros prendia a Aritmética. */
+    const comRecorte = APP.CONCURSOS.filter(c => c.blocos.some(b => b.topicos && b.topicos.length));
+    t.ok(comRecorte.length > 0, 'o teste precisa de ao menos um concurso com recorte');
+    for (const c of comRecorte) {
+      await APP.montar({ concursos: [c.id] });
+      for (const m of new Set(c.blocos.filter(b => b.topicos && b.topicos.length).flatMap(b => b.materias))) {
+        const r = APP.recorteDaFila(m);
+        if (r === null) continue;                  // outro bloco abre a matéria inteira
+        const dentro = APP.BANCO.filter(q => q.m === m && APP.noEscopo(r, q));
+        const topicos = [...new Set(dentro.map(q => q.t))];
+        esquecerTudo();
+        const vistos = new Set();
+        for (let passo = 0; passo <= topicos.length; passo++) {
+          const novos = topicos.filter(tt => APP.topicoAberto(m, tt) && !vistos.has(tt));
+          t.ok(novos.length <= 1, `${c.id}/${m}: ${novos.length} tópicos do recorte abriram juntos (${novos.join(', ')})`);
+          if (!novos.length) break;
+          vistos.add(novos[0]);
+          dominarNoRecorte(m, novos[0], r);
+        }
+        t.igual([...topicos].filter(tt => !vistos.has(tt)), [], `${c.id}/${m}: a fila não alcança estes tópicos do recorte`);
+        /* e dentro de cada tópico, todo subtópico do recorte */
+        for (const tt of topicos) {
+          const subs = [...new Set(dentro.filter(q => q.t === tt && q.s).map(q => q.s))];
+          const abertos = new Set();
+          for (let passo = 0; passo <= subs.length; passo++) {
+            const novos = subs.filter(s => APP.subtopicoAberto(m, tt, s) && !abertos.has(s));
+            if (!novos.length) break;
+            novos.forEach(s => { abertos.add(s); dominarNoRecorte(m, tt, r, s); });
+          }
+          t.igual(subs.filter(s => !abertos.has(s)), [], `${c.id}/${m}/${tt}: a fila não alcança estes subtópicos do recorte`);
+        }
+      }
+    }
+    esquecerTudo();
+  });
+
+  t.teste('trecho fora do recorte, e matéria sem recorte, seguem a fila de sempre', async () => {
+    /* O atalho vale só para o que a prova cobra: o resto da matéria continua
+       abrindo um tópico por vez, na ordem de requisitos.json. */
+    const iguais = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    let conferidos = 0;
+    for (const c of APP.CONCURSOS.filter(c => c.blocos.some(b => b.topicos && b.topicos.length))) {
+      await APP.montar({ concursos: [c.id] });
+      for (const m of new Set(c.blocos.flatMap(b => b.materias))) {
+        const r = APP.recorteDaFila(m);
+        if (r === null) continue;
+        for (const tt of new Set(APP.BANCO.filter(q => q.m === m).map(q => q.t))) {
+          if (APP.BANCO.some(q => q.m === m && q.t === tt && APP.noEscopo(r, q))) continue;
+          const crua = APP.REQUISITOS[m + '|' + tt] || [];
+          t.ok(iguais(APP.requisitosDaFila(m, tt), crua), `${c.id}/${m}/${tt}: fora do recorte, a fila mudou`);
+          conferidos++;
+        }
+      }
+    }
+    t.ok(conferidos > 0, 'o teste precisa de ao menos um tópico fora de recorte');
+
+    await APP.montar({ materias: APP.ORDEM_MATERIAS });   // sem concurso: recorte nenhum
+    for (const chave of Object.keys(APP.REQUISITOS)) {
+      const [m, tt] = [chave.slice(0, chave.indexOf('|')), chave.slice(chave.indexOf('|') + 1)];
+      t.igual(APP.recorteDaFila(m), null, `${m} não devia ter recorte`);
+      t.ok(iguais(APP.requisitosDaFila(m, tt), APP.REQUISITOS[chave]), `${chave}: sem recorte, a fila mudou`);
+    }
+  });
 };

@@ -288,6 +288,65 @@
         "nenhumBlocoZerado": true,
         "desempate": "Classificatório pela média das provas de Português e Matemática, exigida nota maior que zero em cada uma; em caso de empate, vale primeiro quem já é aquaviário (maior experiência comprovada) e depois a maior idade (itens 10.1 e 10.2 das Normas CPES 2026)."
       }
+    },
+    {
+      "id": "angra-gcm-2026",
+      "tipo": "concurso-publico",
+      "cargo": "Guarda Civil Municipal",
+      "orgao": "Angra dos Reis — Secretaria de Segurança Pública",
+      "banca": "IDIB",
+      "edital": "Edital nº 01/2026, de 18/11/2026. Prova objetiva de 60 questões com 5 alternativas: Conhecimentos Gerais (Português 10, Raciocínio Lógico-Matemático 5, Noções de Direito Administrativo e Constitucional 20 e Informática 5, 1 ponto cada) e Conhecimentos Específicos (20 questões, 2 pontos cada), 80 pontos no total (item 14.1). A redação é aplicada no mesmo turno, e as 5 horas de duração valem para as duas provas (item 16.1). Data prevista no Anexo V, que o próprio edital diz poder mudar. Inspeção de saúde, TAF, avaliação psicológica, investigação social e curso de formação ficam fora do app. Programa: Anexo II.",
+      "data": "2027-01-24",
+      "inicio": "2026-11-18",
+      "duracaoMin": 300,
+      "blocos": [
+        {
+          "id": "lp",
+          "nome": "Língua Portuguesa",
+          "questoes": 10,
+          "materias": ["portugues"]
+        },
+        {
+          "id": "rlm",
+          "nome": "Raciocínio Lógico-Matemático",
+          "questoes": 5,
+          "materias": ["matematica"],
+          "topicos": [
+            "Lógica",
+            "Análise combinatória",
+            "Probabilidade",
+            "Aritmética|Razão e proporção",
+            "Aritmética|Regra de três",
+            "Aritmética|Porcentagem",
+            "Aritmética|Sequências numéricas"
+          ],
+          "_topicos": "Anexo II, Raciocínio Lógico-Matemático: proposições, conectivos, tabela-verdade, equivalências e negação, quantificadores e diagramas lógicos, validade de argumentos e sequências lógicas cabem no tópico Lógica inteiro, incluindo Conjuntos (os diagramas) e Associação lógica. Contagem e probabilidade elementar são Análise combinatória e Probabilidade. Dos problemas aritméticos, o edital cita razão e proporção, regra de três simples e composta e porcentagem, e as sequências de números entram por Sequências numéricas. O resto da Aritmética e da Matemática não é cobrado."
+        },
+        {
+          "id": "dir",
+          "nome": "Noções de Direito Administrativo e Constitucional",
+          "questoes": 20,
+          "materias": ["direito-adm-const"]
+        },
+        {
+          "id": "inf",
+          "nome": "Noções de Informática",
+          "questoes": 5,
+          "materias": ["informatica"]
+        },
+        {
+          "id": "esp",
+          "nome": "Conhecimentos específicos",
+          "questoes": 20,
+          "pontos": 2,
+          "materias": ["guarda-municipal"]
+        }
+      ],
+      "aprovacao": {
+        "minimoTotal": 40,
+        "nenhumBlocoZerado": true,
+        "desempate": "Aprovado com pelo menos 50% dos 80 pontos, 1 ponto em cada disciplina de Conhecimentos Gerais e 2 pontos em Conhecimentos Específicos, ou seja, nenhum bloco zerado (item 14.6). A nota final soma prova objetiva, redação e curso de formação (item 25.1). Em caso de empate, vale primeiro a idade de 60 anos ou mais, depois a maior nota em Conhecimentos Específicos, em Direito Administrativo e Constitucional, em Português, em Raciocínio Lógico-Matemático e em Informática, depois a maior idade e o exercício da função de jurado (item 25.3)."
+      }
     }
   ]
 }
