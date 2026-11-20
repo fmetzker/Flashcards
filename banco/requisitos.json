@@ -5206,6 +5206,20 @@
         "t": "Integrais",
         "criterio": "O programa de Física do ASON é de nível universitário: trabalho de força variável, potencial de distribuições de carga e leis de Ampère e Faraday usam derivada e integral. Pedido de quem estuda: só começar Física com a base de Matemática pronta."
       }
+    },
+    "guarda-municipal": {
+      "criterio": "Fila de ORDEM DE ENSINO, não de dependência de conceito (ver '_a_fila'). Abre pelo Estatuto Geral das Guardas Municipais, porque é a lei que diz o que a guarda é, o que ela pode fazer e como responde, e situa todo o resto. Uso da força vem logo depois, porque o uso progressivo da força já aparece como princípio do Estatuto (art. 3º, V) e é o que a Lei 13.060/2014 e o Decreto 12.341/2024 detalham. Estatuto do Desarmamento segue, porque a arma de fogo é o último nível da força e o porte do guarda depende dessa lei. Abuso de autoridade fecha a fila por ser a lei penal que pune o agente que excede tudo o que veio antes. Os demais tópicos do Anexo II entram na fila quando ganharem cartão.",
+      "requisitos": {
+        "Uso da força": [
+          "Estatuto Geral das Guardas Municipais"
+        ],
+        "Estatuto do Desarmamento": [
+          "Uso da força"
+        ],
+        "Abuso de autoridade": [
+          "Estatuto do Desarmamento"
+        ]
+      }
     }
   }
 }
