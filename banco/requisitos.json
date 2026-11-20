@@ -5208,13 +5208,19 @@
       }
     },
     "guarda-municipal": {
-      "criterio": "Fila de ORDEM DE ENSINO, não de dependência de conceito (ver '_a_fila'). Abre pelo Estatuto Geral das Guardas Municipais, porque é a lei que diz o que a guarda é, o que ela pode fazer e como responde, e situa todo o resto. Uso da força vem logo depois, porque o uso progressivo da força já aparece como princípio do Estatuto (art. 3º, V) e é o que a Lei 13.060/2014 e o Decreto 12.341/2024 detalham. Os Direitos Humanos de base (como um tratado entra no ordenamento, a Declaração Universal e o Pacto de São José) vêm antes do Direito Penal, porque presunção de inocência, proibição da tortura e apresentação do preso ao juiz são o pano de fundo de tudo o que se segue. Depois vem o Direito Penal na ordem do próprio Código: a parte geral (aplicação da lei penal, fato típico, exclusão da ilicitude, imputabilidade e concurso de pessoas) antes dos crimes em espécie, porque tentativa, dolo, culpa e legítima defesa são usados para entender cada crime. Os crimes seguem a ordem do Código (pessoa, patrimônio, Administração Pública). O Processo Penal vem em seguida, na ordem em que a ocorrência acontece: quem investiga (inquérito), como se preserva a prova (cadeia de custódia), quando se pode revistar (busca), como se prende (flagrante) e como se conduz o preso (algemas). As leis penais especiais vêm por último, porque pressupõem a parte geral: Estatuto do Desarmamento, com o porte do guarda e os crimes com arma, e Abuso de autoridade, que pune o agente que excede tudo o que veio antes. Tortura vem logo depois do abuso, pelo mesmo motivo: é o crime do agente que usa a força contra quem está sob seu poder. Em seguida, as leis dos grupos que a abordagem precisa tratar com cuidado próprio (mulher em violência doméstica, vítima de racismo, população em situação de rua, criança e adolescente), e por fim os Juizados Especiais, onde termina boa parte das ocorrências menores, o trânsito e os crimes ambientais. Os demais tópicos do Anexo II entram na fila quando ganharem cartão.",
+      "criterio": "Fila de ORDEM DE ENSINO, não de dependência de conceito (ver '_a_fila'). Abre pelo Estatuto Geral das Guardas Municipais, porque é a lei que diz o que a guarda é, o que ela pode fazer e como responde, e situa todo o resto. A lei da GCMAR (Lei Municipal 2.872/2012, com a redação da Lei 4.049/2022) vem logo depois, porque aplica o Estatuto à guarda de Angra dos Reis. Uso da força vem logo depois, porque o uso progressivo da força já aparece como princípio do Estatuto (art. 3º, V) e é o que a Lei 13.060/2014 e o Decreto 12.341/2024 detalham. Os parâmetros da ONU para a atuação policial (Código de Conduta de 1979 e Princípios Básicos de 1990) vêm em seguida, porque são a origem internacional dessas mesmas regras. Os Direitos Humanos de base (como um tratado entra no ordenamento, a Declaração Universal e o Pacto de São José) vêm antes do Direito Penal, porque presunção de inocência, proibição da tortura e apresentação do preso ao juiz são o pano de fundo de tudo o que se segue. Depois vem o Direito Penal na ordem do próprio Código: a parte geral (aplicação da lei penal, fato típico, exclusão da ilicitude, imputabilidade e concurso de pessoas) antes dos crimes em espécie, porque tentativa, dolo, culpa e legítima defesa são usados para entender cada crime. Os crimes seguem a ordem do Código (pessoa, patrimônio, Administração Pública). O Processo Penal vem em seguida, na ordem em que a ocorrência acontece: quem investiga (inquérito), como se preserva a prova (cadeia de custódia), quando se pode revistar (busca), como se prende (flagrante) e como se conduz o preso (algemas), e as Regras de Bangkok, que tratam da presa mulher em revista, contenção e custódia. As leis penais especiais vêm por último, porque pressupõem a parte geral: Estatuto do Desarmamento, com o porte do guarda e os crimes com arma, e Abuso de autoridade, que pune o agente que excede tudo o que veio antes. Tortura vem logo depois do abuso, pelo mesmo motivo: é o crime do agente que usa a força contra quem está sob seu poder. Em seguida, as leis dos grupos que a abordagem precisa tratar com cuidado próprio (mulher em violência doméstica, vítima de racismo, população em situação de rua, criança e adolescente), e por fim os Juizados Especiais, onde termina boa parte das ocorrências menores, o trânsito e os crimes ambientais.",
       "requisitos": {
-        "Uso da força": [
+        "Lei da Guarda Civil Municipal de Angra dos Reis": [
           "Estatuto Geral das Guardas Municipais"
         ],
-        "Teoria geral dos direitos humanos": [
+        "Uso da força": [
+          "Lei da Guarda Civil Municipal de Angra dos Reis"
+        ],
+        "Parâmetros internacionais da atuação policial": [
           "Uso da força"
+        ],
+        "Teoria geral dos direitos humanos": [
+          "Parâmetros internacionais da atuação policial"
         ],
         "Declaração Universal dos Direitos Humanos": [
           "Teoria geral dos direitos humanos"
@@ -5258,8 +5264,11 @@
         "Uso de algemas": [
           "Prisão em flagrante"
         ],
-        "Estatuto do Desarmamento": [
+        "Regras de Bangkok": [
           "Uso de algemas"
+        ],
+        "Estatuto do Desarmamento": [
+          "Regras de Bangkok"
         ],
         "Abuso de autoridade": [
           "Estatuto do Desarmamento"
