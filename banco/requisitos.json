@@ -5208,13 +5208,49 @@
       }
     },
     "guarda-municipal": {
-      "criterio": "Fila de ORDEM DE ENSINO, não de dependência de conceito (ver '_a_fila'). Abre pelo Estatuto Geral das Guardas Municipais, porque é a lei que diz o que a guarda é, o que ela pode fazer e como responde, e situa todo o resto. Uso da força vem logo depois, porque o uso progressivo da força já aparece como princípio do Estatuto (art. 3º, V) e é o que a Lei 13.060/2014 e o Decreto 12.341/2024 detalham. Estatuto do Desarmamento segue, porque a arma de fogo é o último nível da força e o porte do guarda depende dessa lei. Abuso de autoridade fecha a fila por ser a lei penal que pune o agente que excede tudo o que veio antes. Os demais tópicos do Anexo II entram na fila quando ganharem cartão.",
+      "criterio": "Fila de ORDEM DE ENSINO, não de dependência de conceito (ver '_a_fila'). Abre pelo Estatuto Geral das Guardas Municipais, porque é a lei que diz o que a guarda é, o que ela pode fazer e como responde, e situa todo o resto. Uso da força vem logo depois, porque o uso progressivo da força já aparece como princípio do Estatuto (art. 3º, V) e é o que a Lei 13.060/2014 e o Decreto 12.341/2024 detalham. Depois vem o Direito Penal na ordem do próprio Código: a parte geral (aplicação da lei penal, fato típico, exclusão da ilicitude, imputabilidade e concurso de pessoas) antes dos crimes em espécie, porque tentativa, dolo, culpa e legítima defesa são usados para entender cada crime. Os crimes seguem a ordem do Código (pessoa, patrimônio, Administração Pública). O Processo Penal vem em seguida, na ordem em que a ocorrência acontece: quem investiga (inquérito), como se preserva a prova (cadeia de custódia), quando se pode revistar (busca), como se prende (flagrante) e como se conduz o preso (algemas). As leis penais especiais vêm por último, porque pressupõem a parte geral: Estatuto do Desarmamento, com o porte do guarda e os crimes com arma, e Abuso de autoridade, que pune o agente que excede tudo o que veio antes. Os demais tópicos do Anexo II entram na fila quando ganharem cartão.",
       "requisitos": {
         "Uso da força": [
           "Estatuto Geral das Guardas Municipais"
         ],
-        "Estatuto do Desarmamento": [
+        "Aplicação da lei penal": [
           "Uso da força"
+        ],
+        "Fato típico": [
+          "Aplicação da lei penal"
+        ],
+        "Exclusão da ilicitude": [
+          "Fato típico"
+        ],
+        "Imputabilidade e concurso de pessoas": [
+          "Exclusão da ilicitude"
+        ],
+        "Crimes contra a pessoa": [
+          "Imputabilidade e concurso de pessoas"
+        ],
+        "Crimes contra o patrimônio": [
+          "Crimes contra a pessoa"
+        ],
+        "Crimes contra a Administração Pública": [
+          "Crimes contra o patrimônio"
+        ],
+        "Inquérito policial": [
+          "Crimes contra a Administração Pública"
+        ],
+        "Cadeia de custódia": [
+          "Inquérito policial"
+        ],
+        "Busca pessoal e domiciliar": [
+          "Cadeia de custódia"
+        ],
+        "Prisão em flagrante": [
+          "Busca pessoal e domiciliar"
+        ],
+        "Uso de algemas": [
+          "Prisão em flagrante"
+        ],
+        "Estatuto do Desarmamento": [
+          "Uso de algemas"
         ],
         "Abuso de autoridade": [
           "Estatuto do Desarmamento"
