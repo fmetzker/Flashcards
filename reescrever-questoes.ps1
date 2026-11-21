@@ -44,6 +44,15 @@ function Id-Questao([string]$enunciado) {
 # então quem já estudava o cartão segue com o histórico.
 
 $REESCRITAS = @{
+  # Raiva: a Nota Técnica nº 8/2022-CGZV/DEIDT/SVS/MS reduziu a pré-exposição a duas doses (dias 0 e 7)
+  'a734f5641e' = @{
+    q  = 'No esquema vigente do PNI, a profilaxia pré-exposição da raiva humana, indicada a pessoas com risco ocupacional, é feita com:'
+    o  = @('Dose única', 'Duas doses, nos dias 0 e 7', 'Três doses, nos dias 0, 7 e 21 ou 28', 'Quatro doses, nos dias 0, 3, 7 e 14', 'Cinco doses mensais')
+    c  = 1
+    f  = 'Nota Técnica nº 8/2022-CGZV/DEIDT/SVS/MS (atualização do protocolo de profilaxia da raiva humana)'
+    e  = 'Desde a Nota Técnica nº 8/2022, a pré-exposição é feita com duas doses, nos dias 0 e 7, por via intradérmica ou intramuscular. O esquema de três doses (0, 7 e 21 ou 28) é o antigo; quatro doses (0, 3, 7 e 14) é a pós-exposição.'
+    eo = @('Errada: uma dose só não basta para a proteção prévia; o esquema tem mais de uma aplicação.', 'Correta: duas doses, nos dias 0 e 7, desde a Nota Técnica nº 8/2022.', 'Errada: esse era o esquema antigo, substituído em 2022 pelo de duas doses.', 'Errada: dias 0, 3, 7 e 14 é o esquema da pós-exposição, depois do acidente.', 'Errada: não existe esquema mensal na profilaxia da raiva.')
+  }
   # Lei 8.142: o art. 2º não foi vetado (ele aloca os recursos do FNS); o cartão passa a cobrar o art. 1º, §5º
   '81fcebc5a2' = @{
     q  = 'Segundo a Lei nº 8.142/1990, a organização e as normas de funcionamento das Conferências e dos Conselhos de Saúde são definidas em:'
