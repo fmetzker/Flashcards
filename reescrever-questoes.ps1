@@ -64,6 +64,7 @@ $FUNDIR = @{
   '987ac9721a' = '83c9849b77'   # torcedores: 23 + 23 + 15 − 6 − 5 = 50
   '9cabb3e314' = 'ba0f491a67'   # convés triangular 8-5-5, área 12 m²
   '161f7c8b41' = '7d830969dd'   # (x² − 4)/(x − 2) = x + 2
+  '9a52e7d3fe' = '130ea26807'   # população de rua: princípio do atendimento humanizado (art. 5º, IV)
 }
 
 # ---- aplica ------------------------------------------------------------------
