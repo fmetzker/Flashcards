@@ -5360,6 +5360,26 @@
           "Atividades nucleares"
         ]
       }
+    },
+    "informatica": {
+      "criterio": "Fila de ORDEM DE ENSINO, não de dependência de conceito (ver '_a_fila'). Segue a ordem do Anexo II, que já vai do concreto para o abstrato: primeiro o computador (peças, programas e onde os dados ficam guardados), depois o sistema operacional que o controla, os aplicativos de escritório que rodam nele, a rede que liga tudo, os cuidados de segurança dessa rede e, por último, a proteção legal dos dados pessoais, que pressupõe saber o que é um dado e como ele vaza.",
+      "requisitos": {
+        "Windows 10 e 11": [
+          "Hardware, software e armazenamento"
+        ],
+        "Editor de texto e planilha": [
+          "Windows 10 e 11"
+        ],
+        "Internet, correio eletrônico e nuvem": [
+          "Editor de texto e planilha"
+        ],
+        "Segurança da informação": [
+          "Internet, correio eletrônico e nuvem"
+        ],
+        "Proteção de dados pessoais": [
+          "Segurança da informação"
+        ]
+      }
     }
   }
 }
