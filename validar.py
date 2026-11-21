@@ -140,6 +140,27 @@ def valida_concursos(B):
             erros.append(f"concurso [{rot}]: data '{c.get('data')}' fora do formato AAAA-MM-DD")
         usadas = set()
         for bl in c.get('blocos', []):
+            # Bloco `discursiva` (prova de redação): não tem questão para
+            # sortear nem nota a somar no simulado. Entra na meta com o peso
+            # do menor bloco objetivo (blocosDaMeta, motor.js). Campo de prova
+            # objetiva nele seria número que o edital não dá (regra 11).
+            if bl.get('discursiva'):
+                if not all(k in bl for k in ('id', 'nome')) or not bl.get('materias'):
+                    erros.append(f"concurso [{rot}]: bloco discursivo incompleto (precisa de id, nome e materias)")
+                for k in ('questoes', 'pontos', 'topicos', 'topicosSimulado'):
+                    if k in bl:
+                        erros.append(f"concurso [{rot}], bloco '{bl.get('id')}': bloco discursivo "
+                                     f"não leva '{k}' — não tem questão objetiva")
+                if not any(b.get('questoes', 0) > 0 for b in c.get('blocos', [])):
+                    erros.append(f"concurso [{rot}]: bloco discursivo sem nenhum bloco objetivo "
+                                 "para lhe dar o peso")
+                for mid in bl.get('materias', []):
+                    if mid not in nome_materia:
+                        erros.append(f"concurso [{rot}], bloco '{bl.get('id')}': matéria inexistente '{mid}'")
+                    elif mid in usadas:
+                        erros.append(f"concurso [{rot}]: matéria '{mid}' aparece em mais de um bloco")
+                    usadas.add(mid)
+                continue
             if not all(k in bl for k in ('id', 'nome', 'questoes')):
                 erros.append(f"concurso [{rot}]: bloco incompleto (precisa de id, nome e questoes)")
                 continue

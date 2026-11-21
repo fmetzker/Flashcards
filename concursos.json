@@ -340,6 +340,13 @@
           "questoes": 20,
           "pontos": 2,
           "materias": ["guarda-municipal"]
+        },
+        {
+          "id": "red",
+          "nome": "Prova de Redação",
+          "discursiva": true,
+          "materias": ["redacao"],
+          "_discursiva": "Item 15 do edital: redação dissertativo-argumentativa de 20 a 30 linhas, nota de 0 a 30, eliminatória abaixo de 50%. Não tem questão objetiva, então fica fora do simulado e da regra de aprovação acima; na meta, entra com o peso do menor bloco objetivo."
         }
       ],
       "aprovacao": {

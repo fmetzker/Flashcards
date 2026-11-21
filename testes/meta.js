@@ -195,6 +195,29 @@ module.exports = function (APP, t) {
     }
   });
 
+  t.grupo('meta — bloco discursivo (prova de redação)');
+
+  t.teste('bloco discursivo pesa o menor bloco objetivo e fica fora de BLOCOS (simulado)', async () => {
+    /* A prova de redação não tem questão: inventar uma quantidade para ela
+       seria pôr no concurso um número que o edital não dá. Entra na meta com
+       o peso do menor bloco objetivo do mesmo concurso (a regra da avulsa) e
+       fica fora de BLOCOS, que é a prova objetiva: simulado, aprovação,
+       alerta de bloco fraco. */
+    const c = APP.CONCURSOS.find(x => x.blocos.some(b => b.discursiva));
+    if (!c) return;
+    const disc = c.blocos.find(b => b.discursiva);
+    const menor = Math.min(...c.blocos.filter(b => b.questoes > 0).map(b => b.questoes));
+    await APP.montar({ concursos: [c.id] });
+    for (const m of disc.materias) {
+      const b = bloco(m);
+      t.ok(b, `${m} (bloco discursivo) devia entrar na meta`);
+      if (b) t.igual(b.peso, menor, `${m} pesa ${b.peso}, devia pesar o menor bloco objetivo (${menor})`);
+    }
+    t.ok(!APP.BLOCOS.some(b => b.discursiva), 'bloco discursivo não pode entrar em BLOCOS (iria para o simulado)');
+    t.igual(APP.BLOCOS.length, c.blocos.length - c.blocos.filter(b => b.discursiva).length,
+      'BLOCOS devia ter todos os blocos objetivos');
+  });
+
   t.grupo('meta — rateio proporcional (apportion)');
 
   t.teste('sempre soma exatamente o total pedido', () => {

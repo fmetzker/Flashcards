@@ -92,9 +92,15 @@ function blocosDaMeta(lista){
   const fonte = (lista && lista.length) ? lista
               : (INSCRITOS.length ? INSCRITOS : (CONCURSO ? [CONCURSO] : []));
   fonte.forEach(c=>{
+    /* Bloco `discursiva` (a prova de redação) não tem questões: entra na meta
+       com o peso do MENOR bloco objetivo do mesmo concurso, a mesma regra da
+       matéria avulsa logo abaixo. Inventar um número de questões para ele
+       seria pôr no concurso algo que o edital não diz (regra 11). */
+    const objetivos = (c.blocos||[]).filter(b=> b.questoes > 0).map(b=> b.questoes);
+    const pesoDiscursiva = objetivos.length ? Math.min.apply(null, objetivos) : META_MATERIA_AVULSA;
     (c.blocos||[]).forEach(bl=>{
       (bl.materias||[]).forEach(m=>{
-        const cota = bl.questoes || 0;
+        const cota = bl.discursiva ? pesoDiscursiva : (bl.questoes || 0);
         if(!porMateria[m] || cota > porMateria[m].questoes){
           porMateria[m] = {id: bl.id, nome: bl.nome, questoes: cota, materias: [m]};
         }

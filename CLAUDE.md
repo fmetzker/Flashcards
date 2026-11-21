@@ -353,6 +353,17 @@ no resto). Sem o campo vale 1. Com ele, `minimoTotal` passa a ser contado em
 pontos no simulado (`finalizarSimulado()`), como o edital conta. O peso da
 meta do dia continua sendo `questoes`, e o campo não mexe nisso.
 
+**`blocos[].discursiva` é a prova de redação.** Bloco sem `questoes` (nem
+`pontos`, `topicos` ou `topicosSimulado`, que o validador barra), porque a
+prova discursiva não tem questão objetiva e inventar uma quantidade violaria a
+regra 11. Na meta, `blocosDaMeta()` dá a ele o peso do MENOR bloco objetivo do
+mesmo concurso (a regra da avulsa). Fora dela, não existe: `aplicarFoco()`
+tira o bloco de `BLOCOS`, então ele não entra no simulado, na regra de
+aprovação nem no alerta de bloco fraco. Quem usa hoje é o GCM de Angra, com a
+matéria `redacao` (regras e critérios do item 15 do edital, texto
+dissertativo-argumentativo e Redação oficial, que o edital cobra em
+Português mas mora aqui para reunir a escrita formal num lugar só).
+
 **Uma conta pode seguir mais de um concurso ao mesmo tempo.** Duas noções
 que não podem ser confundidas:
 

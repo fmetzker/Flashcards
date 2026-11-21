@@ -209,6 +209,15 @@
         "Proteção de dados pessoais"
       ]
     },
+    "redacao": {
+      "fonte": "Edital nº 01/2026 do concurso de Guarda Civil Municipal de Angra dos Reis (IDIB): item 15 (Da Prova Escrita de Redação), de onde saem as regras da prova, os critérios de correção e o tipo de texto pedido (dissertativo-argumentativo); e Anexo II, Língua Portuguesa, item Redação oficial (Manual de Redação da Presidência da República, 3ª ed., 2018). Redação oficial é cobrada na prova objetiva de Português, mas fica nesta matéria para reunir tudo o que é escrita formal num lugar só.",
+      "topicos": [
+        "Regras da prova de redação",
+        "Critérios de correção",
+        "Texto dissertativo-argumentativo",
+        "Redação oficial"
+      ]
+    },
     "guarda-municipal": {
       "fonte": "Edital nº 01/2026 do concurso de Guarda Civil Municipal de Angra dos Reis (IDIB), Anexo II, Conhecimentos Específicos — Guarda Civil Municipal: Noções de Direitos Humanos, Noções de Direito Penal e Processual Penal e Legislação Extravagante, cobradas juntas em 20 questões (item 14.1). Cada tópico é um item do Anexo, na ordem dele. O uso da força aparece duas vezes no Anexo (Portaria MJSP 855/2025 em Direitos Humanos; Lei 13.060/2014 e Decreto 12.341/2024 na Legislação Extravagante) e fica num tópico só, para não haver dois cartões do mesmo fato.",
       "topicos": [

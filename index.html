@@ -830,7 +830,10 @@ function aplicarFoco(id){
      próxima, que é a que aperta primeiro; sem NENHUM concurso inscrito, null. */
   CONCURSO = escolhido || provaMaisProxima() || (INSCRITOS.length ? INSCRITOS[0] : null);
   E.concursoAtivo = CONCURSO ? CONCURSO.id : null;
-  BLOCOS = CONCURSO ? CONCURSO.blocos : [];
+  /* BLOCOS é a prova OBJETIVA: simulado, regra de aprovação, alerta de bloco
+     fraco. O bloco `discursiva` (prova de redação) conta na meta, por
+     blocosDaMeta(), mas não tem questão para sortear nem nota a somar. */
+  BLOCOS = CONCURSO ? CONCURSO.blocos.filter(b=> !b.discursiva) : [];
   BLOCOS_META = escolhido ? blocosDoFoco(escolhido) : blocosDaMeta(INSCRITOS);
   /* meta diária é sempre META_DIARIA (motor.js) — fixa, não depende de
      quantos concursos/matérias avulsas a conta segue nem do escopo
@@ -959,9 +962,9 @@ async function carregarConfig(){
    Opcional em cima de opcional: tópico sem entrada aqui continua com todos
    os subtópicos abertos assim que ele mesmo abrir. */
 
-/* matérias do concurso EM FOCO (BLOCOS já é CONCURSO.blocos — ver
-   aplicarFoco) — é o que a pessoa vai estudar/simular agora, então é o que
-   carrega primeiro. Vazio antes de aplicarFoco() rodar (ex.: exigeLogin).
+/* matérias do concurso EM FOCO (todos os blocos de CONCURSO, inclusive o
+   discursivo, que BLOCOS deixa de fora — ver aplicarFoco) — é o que a pessoa
+   vai estudar/simular agora, então é o que carrega primeiro. Vazio antes de aplicarFoco() rodar (ex.: exigeLogin).
 
    Sem concurso nenhum em foco (só matérias avulsas, ou nada ainda), as
    avulsas viram o "foco" de carregamento — são a única coisa que a pessoa
@@ -969,7 +972,7 @@ async function carregarConfig(){
    matéria do concurso em foco chegaria. */
 function materiasDoFoco(){
   const usadas = {};
-  BLOCOS.forEach(b=> b.materias.forEach(m=>{ usadas[m] = true; }));
+  (CONCURSO ? CONCURSO.blocos : []).forEach(b=> b.materias.forEach(m=>{ usadas[m] = true; }));
   const doFoco = ORDEM_MATERIAS.filter(m=>usadas[m]);
   return doFoco.length ? doFoco : ORDEM_MATERIAS.filter(m=>E.materiasAvulsas.indexOf(m)>=0);
 }
@@ -2304,7 +2307,7 @@ function pintarInicio(){
 
   /* fila() e o alerta de bloco fraco olham BANCO — só as matérias do foco
      bastam pros dois (revisão/novas do concurso em foco; bloco fraco também
-     é só de BLOCOS, que é CONCURSO.blocos). Enquanto isso não chega, mostra
+     é só de BLOCOS, a prova objetiva de CONCURSO). Enquanto isso não chega, mostra
      que está carregando em vez de contar um banco vazio como "zero pendências". */
   if(BANCO_FOCO_PRONTO){
     const q = fila();

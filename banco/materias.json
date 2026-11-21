@@ -68,5 +68,9 @@
   {
     "id": "guarda-municipal",
     "nome": "Guarda Civil Municipal"
+  },
+  {
+    "id": "redacao",
+    "nome": "Redação"
   }
 ]

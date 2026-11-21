@@ -65,6 +65,23 @@ $FUNDIR = @{
   '9cabb3e314' = 'ba0f491a67'   # convés triangular 8-5-5, área 12 m²
   '161f7c8b41' = '7d830969dd'   # (x² − 4)/(x − 2) = x + 2
   '9a52e7d3fe' = '130ea26807'   # população de rua: princípio do atendimento humanizado (art. 5º, IV)
+  'b0605969a2' = 'ed4e25da4d'   # Redação oficial: de portugues para redacao
+  'bcd3e5c513' = '05b90caa73'   # Redação oficial: de portugues para redacao
+  '9f8d50b734' = 'e7fc915e3e'   # Redação oficial: de portugues para redacao
+  'ba71c4ad3e' = '531224f7cd'   # Redação oficial: de portugues para redacao
+  'c1bc294d91' = '318eeadc4f'   # Redação oficial: de portugues para redacao
+  '85bcd3c0ab' = 'ce0073e2c2'   # Redação oficial: de portugues para redacao
+  'ca36668c71' = '46134c6c30'   # Redação oficial: de portugues para redacao
+  'd17c5821b5' = '7591b86673'   # Redação oficial: de portugues para redacao
+  '3191e94801' = '7addaa2e41'   # Redação oficial: de portugues para redacao
+  'ae0499d823' = '6f8fd67fe6'   # Redação oficial: de portugues para redacao
+  'b8b4716962' = '14db9add24'   # Redação oficial: de portugues para redacao
+  '1b3e78eae9' = 'eb13dd4ff2'   # Redação oficial: de portugues para redacao
+  '510c7084f8' = '6591c96a78'   # Redação oficial: de portugues para redacao
+  '2044a20fdd' = 'e1c243fb44'   # Redação oficial: de portugues para redacao
+  'e935a86616' = 'e9395a1dba'   # Redação oficial: de portugues para redacao
+  'abf98989a3' = '906d1bb983'   # Redação oficial: de portugues para redacao
+  'd695d05d5f' = 'e1de2bcafa'   # Redação oficial: de portugues para redacao
 }
 
 # ---- aplica ------------------------------------------------------------------
