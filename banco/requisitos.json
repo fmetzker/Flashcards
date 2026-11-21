@@ -5298,6 +5298,68 @@
           "Trânsito"
         ]
       }
+    },
+    "direito-adm-const": {
+      "criterio": "Fila de ORDEM DE ENSINO, não de dependência de conceito (ver '_a_fila'). Abre pela base constitucional: princípios fundamentais, direitos individuais e organização do Estado, porque o resto da matéria usa essas noções (autonomia do Município, devido processo, legalidade). A segurança pública vem logo depois porque é o centro do cargo: o art. 144 da Constituição, a Lei do Susp, que põe a guarda entre os integrantes operacionais, e o Livro Azul, que orienta a guarda dentro desse sistema. Em seguida o Direito Administrativo, do geral para o particular: quem é a Administração, que princípios a regem, que poderes ela tem (com o poder de polícia, que é o dia a dia da guarda, e o abuso, que é o limite desses poderes), o ato que ela produz, quem age por ela (agentes, e o regime jurídico de Angra dos Reis), por quais danos responde, os bens que protege e, por último, a improbidade, que pune o agente desonesto e pressupõe tudo o que veio antes. Fecha com patrimônio cultural e meio ambiente e com o setor nuclear, temas próprios de Angra dos Reis: a Constituição primeiro, as leis federais do setor depois.",
+      "requisitos": {
+        "Direitos e deveres individuais e coletivos": [
+          "Princípios fundamentais"
+        ],
+        "Organização político-administrativa": [
+          "Direitos e deveres individuais e coletivos"
+        ],
+        "Segurança pública na Constituição": [
+          "Organização político-administrativa"
+        ],
+        "Sistema Único de Segurança Pública": [
+          "Segurança pública na Constituição"
+        ],
+        "Livro Azul das Guardas Municipais": [
+          "Sistema Único de Segurança Pública"
+        ],
+        "Organização da Administração Pública": [
+          "Livro Azul das Guardas Municipais"
+        ],
+        "Princípios da Administração Pública": [
+          "Organização da Administração Pública"
+        ],
+        "Poderes administrativos": [
+          "Princípios da Administração Pública"
+        ],
+        "Poder de polícia": [
+          "Poderes administrativos"
+        ],
+        "Abuso de poder": [
+          "Poder de polícia"
+        ],
+        "Atos administrativos": [
+          "Abuso de poder"
+        ],
+        "Agentes públicos": [
+          "Atos administrativos"
+        ],
+        "Regime Jurídico Único de Angra dos Reis": [
+          "Agentes públicos"
+        ],
+        "Responsabilidade civil do Estado": [
+          "Regime Jurídico Único de Angra dos Reis"
+        ],
+        "Bens públicos": [
+          "Responsabilidade civil do Estado"
+        ],
+        "Improbidade administrativa": [
+          "Bens públicos"
+        ],
+        "Patrimônio cultural e meio ambiente": [
+          "Improbidade administrativa"
+        ],
+        "Atividades nucleares": [
+          "Patrimônio cultural e meio ambiente"
+        ],
+        "Legislação federal do setor nuclear": [
+          "Atividades nucleares"
+        ]
+      }
     }
   }
 }
