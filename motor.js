@@ -632,6 +632,27 @@ function materiasInscritas(){
 
 const blocoDe = q => blocoDaMateria[q.m];
 
+/* Resumo de estudo (banco/resumos/<matéria>.json): texto curto que ensina o
+   tópico ou o subtópico ANTES do primeiro cartão novo dele. RESUMOS
+   (index.html) é {chave: entrada}, chave "matéria|tópico" ou
+   "matéria|tópico|subtópico". E.resumosLidos guarda o dia em que cada um foi
+   lido.
+
+   Aparece uma vez, só antes de cartão NOVO: revisão já pressupõe o assunto
+   visto, e reler é o jeito menos eficiente de estudar — o resumo é porta de
+   entrada, a recordação continua sendo dos cartões. O do tópico vem antes do
+   do subtópico: primeiro o mapa, depois o detalhe. Nunca trava nada: quem
+   pula segue estudando, e o texto continua na tela Matérias. */
+const chaveResumo = (m, t, s) => m + "|" + t + (s ? "|" + s : "");
+function resumoPendente(q){
+  if(!q || E.cartoes[q.id]) return null;
+  const lidos = E.resumosLidos || {};
+  const candidatas = [chaveResumo(q.m, q.t)];
+  if(q.s) candidatas.push(chaveResumo(q.m, q.t, q.s));
+  for(const k of candidatas) if(RESUMOS[k] && !lidos[k]) return k;
+  return null;
+}
+
 /* E.eventosProprios só cresce, e cada id é uma string de 36 caracteres.
    O comentário original estimava "poucos milhares em anos" — estimativa
    feita quando o banco era menor e a sessão terminava ao fim de um lote

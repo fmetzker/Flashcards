@@ -275,6 +275,63 @@ def valida_topicos(B, materias):
                           f"fora da árvore do edital: {', '.join(sorted(soltos)[:4])}")
 
 
+RESUMO_MAX_PALAVRAS = 450
+
+
+def valida_resumos(B, materias):
+    """Resumo de estudo (banco/resumos/<matéria>.json, opcional): texto curto
+    que o app mostra antes do primeiro cartão novo do tópico ou subtópico.
+    Regras: o trecho tem de existir no banco (resumo de trecho sem cartão
+    nunca seria mostrado), um resumo por trecho, fonte obrigatória (regra 11:
+    sem fonte, não se escreve) e tamanho de resumo, não de apostila — reler é
+    o jeito menos eficiente de estudar, e o texto só abre a porta para os
+    cartões."""
+    pasta = os.path.join(BANCO_DIR, 'resumos')
+    if not os.path.isdir(pasta):
+        return
+    ids_mat = {m['id'] for m in materias}
+    for arq in sorted(os.listdir(pasta)):
+        if not arq.endswith('.json'):
+            continue
+        mid = arq[:-5]
+        rot = f"resumos/{arq}"
+        if mid not in ids_mat:
+            erros.append(f"{rot}: matéria '{mid}' não existe em materias.json")
+            continue
+        try:
+            lista = json.load(open(os.path.join(pasta, arq), encoding='utf-8'))
+        except Exception as ex:
+            erros.append(f"{rot}: JSON inválido ({ex})")
+            continue
+        topicos = {q['t'] for q in B if q.get('m') == mid}
+        subs = {(q['t'], q['s']) for q in B if q.get('m') == mid and q.get('s')}
+        vistos = set()
+        for i, r in enumerate(lista):
+            onde = f"{rot} #{i + 1} ({r.get('t')}{' | ' + r['s'] if r.get('s') else ''})"
+            t, s = r.get('t'), r.get('s')
+            if t not in topicos:
+                erros.append(f"{onde}: tópico não existe no banco da matéria")
+            elif s and (t, s) not in subs:
+                erros.append(f"{onde}: subtópico não existe no banco da matéria")
+            chave = (t, s or None)
+            if chave in vistos:
+                erros.append(f"{onde}: resumo repetido para o mesmo trecho")
+            vistos.add(chave)
+            texto = r.get('texto')
+            if not isinstance(texto, list) or not texto or not all(isinstance(x, str) and x.strip() for x in texto):
+                erros.append(f"{onde}: 'texto' precisa ser lista de linhas não vazias")
+                continue
+            fontes = r.get('fontes')
+            if not isinstance(fontes, list) or not fontes or not all(isinstance(x, str) and x.strip() for x in fontes):
+                erros.append(f"{onde}: sem 'fontes' — resumo sem fonte não entra (regra 11)")
+            palavras = sum(len(x.split()) for x in texto)
+            if palavras > RESUMO_MAX_PALAVRAS:
+                erros.append(f"{onde}: {palavras} palavras — resumo passa de {RESUMO_MAX_PALAVRAS}; "
+                             "é porta de entrada, não apostila")
+            if re.search(r'<[a-zA-Z/]', ' '.join(texto)):
+                erros.append(f"{onde}: 'texto' tem marcação HTML — use só '- ' para lista e **negrito**")
+
+
 def valida_requisitos(B, materias):
     """A FILA de estudo (quem abre depois de quem) e o grafo conceitual que a
     justifica precisam apontar para coisa que existe, e concordar entre si.
@@ -1374,6 +1431,7 @@ def main():
     valida_imagens(B)
     valida_migracao(B, ids)
     valida_topicos(B, materias)
+    valida_resumos(B, materias)
     valida_requisitos(B, materias)
     valida_escadas(B)
     valida_redundancia(B)

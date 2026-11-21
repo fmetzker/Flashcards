@@ -287,6 +287,16 @@ button.fechar{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;
   font-style:italic;color:var(--tinta2);opacity:.75}
 .topico .num{font-family:var(--dado);font-size:12px;color:var(--tinta2);white-space:nowrap}
 .topico .mini,.cabM .mini{width:52px;margin-left:0}
+/* resumo de estudo: texto corrido, confortável de ler no celular */
+.resumo-texto{font-size:16px;line-height:1.6;margin-top:14px}
+.resumo-texto p{margin:0 0 12px}
+.resumo-texto ul{margin:0 0 12px;padding-left:20px}
+.resumo-texto li{margin:0 0 6px}
+.resumo-fontes{margin-top:18px;padding-top:10px;border-top:1px solid var(--traco);font-size:12.5px;color:var(--tinta2);line-height:1.45}
+.resumo-fontes .rotulo{font-weight:600;margin-bottom:4px}
+.ler-resumo{flex:0 0 auto;font-size:13px;padding:6px 11px;background:transparent;color:var(--azul);
+  border:1px solid var(--azul-luz);font-weight:600;border-radius:99px}
+.subtopico .ler-resumo{font-size:12px;padding:5px 10px}
 .estudar{flex:0 0 auto;font-size:13px;padding:6px 11px;background:transparent;color:var(--verde);
   border:1px solid var(--verde-luz);font-weight:600;border-radius:99px}
 .tag.suave{background:#EDF1EE;color:var(--tinta2)}
@@ -435,6 +445,18 @@ textarea{resize:vertical;min-height:64px;font-size:16px;line-height:1.4;font-fam
   <div class="enunciado" id="q-enunciado"></div>
   <div id="q-alts"></div>
   <div id="q-expl"></div>
+</div>
+
+<!-- ============ RESUMO: texto de estudo antes do primeiro cartão novo ============ -->
+<div class="tela" id="tela-resumo">
+  <div class="cabQ">
+    <button class="fechar" aria-label="Fechar o resumo" onclick="fecharResumo()">✕</button>
+    <span class="chips"><span class="tag azul">Estudo</span><span class="tag suave" id="res-materia"></span></span>
+  </div>
+  <h1 id="res-titulo">–</h1>
+  <div class="sub" id="res-sub"></div>
+  <div class="resumo-texto" id="res-texto"></div>
+  <div class="resumo-fontes" id="res-fontes"></div>
 </div>
 
 <!-- ============ RODADA: pausa a cada RODADA respostas do "Estudar" ============ -->
@@ -746,6 +768,12 @@ let MATERIAS_CARREGANDO = new Set();
 const porId = {}, MATERIAS = {}, blocoDaMateria = {};
 /* matéria -> quantos cartões chegaram; ausente = ainda não carregou (blocosDaMeta) */
 const CARTOES_CARREGADOS = {};
+/* {"matéria|tópico" ou "matéria|tópico|subtópico": entrada} — resumos de estudo
+   (banco/resumos/<matéria>.json), lidos junto com a matéria. Ver resumoPendente(). */
+const RESUMOS = {};
+/* o que a tela de resumo está mostrando agora: chave, rótulo do botão e o
+   que fazer depois de ler (seguir para o cartão, ou voltar às Matérias) */
+let RES_CTX = null;
 
 /* fetch() sozinho não tem timeout: numa conexão ruim (não caída, só muito
    lenta), a promessa fica pendurada indefinidamente sem nunca rejeitar. Como
@@ -1004,6 +1032,12 @@ async function carregarBancoParcial(lista, aoCadaUma){
     qs.forEach(q=>{ porId[q.id] = q; if(q.img) aquecerFigura(q.img); });
     if(aoCadaUma) aoCadaUma(m);
   })));
+  /* resumos são opcionais: matéria sem arquivo de resumo segue igual, e a
+     falta dele nunca atrasa nem derruba o banco */
+  await Promise.all(lista.filter(m => !window.DADOS || DADOS["banco/resumos/"+m+".json"])
+                         .map(m => pega("banco/resumos/"+m+".json").then(rs=>{
+    (rs||[]).forEach(r=>{ RESUMOS[chaveResumo(m, r.t, r.s)] = Object.assign({m}, r); });
+  }).catch(()=>{})));
 }
 
 /* Dispara o carregamento em duas fases e cuida de repintar quem tentou
@@ -1418,7 +1452,11 @@ const padrao = {
      mostrava o aviso nascer de novo. E.metasAnunciadas[dia] = {blocos:
      [ids já avisados], todas: bool} — mesmo padrão de E.dias/E.diasMateria,
      chaveado pelo dia de hoje() (fuso de Brasília). Ver checarMetasBatidas(). */
-  metasAnunciadas: {}};
+  metasAnunciadas: {},
+  /* {"matéria|tópico|subtópico": dia} — resumos de estudo já lidos. O resumo
+     aparece antes do primeiro cartão novo do trecho só enquanto não está
+     aqui (resumoPendente, motor.js). */
+  resumosLidos: {}};
 let E = Object.assign({}, padrao, ler()||{});
 
 /* =======================================================================
@@ -2098,7 +2136,7 @@ function ir(nome){
 /* telas sem navegação: as de foco (responder questão, fazer simulado), onde
    sair no meio perde trabalho, e as de portão (login, espera, escolha do
    concurso), onde navegar para o lado é justamente o que não pode */
-const SEM_NAV = ["estudo","rodada","simulado","login","espera","escolher-concurso","editor"];
+const SEM_NAV = ["estudo","resumo","rodada","simulado","login","espera","escolher-concurso","editor"];
 /* qual aba fica acesa em cada tela — as que não estão aqui não acendem
    nenhuma (Simulado, Propor, Revisar... são destinos de dentro do Hoje) */
 const ABA_DA_TELA = {inicio:"inicio", materias:"materias", stats:"stats", ajustes:"ajustes"};
@@ -2160,6 +2198,8 @@ function rodape(nome){
     }
   } else if(nome==="estudo"){
     box.classList.remove("ativa");
+  } else if(nome==="resumo"){
+    if(RES_CTX) b(RES_CTX.rotulo, lerResumoESeguir, "verde");
   } else if(nome==="rodada"){
     if(S && S.rodada && !S.rodada.acabou){
       b("Parar", sairDoEstudo, "fantasma");
@@ -2536,7 +2576,7 @@ function travaDoSubtopico(mid, t, s, ds){
    Tópico com degrau fechado ganha uma nota dizendo quanto falta para abrir —
    e continua com botão, porque o degrau ABERTO ainda é estudável. Quem perde
    o botão é só o tópico em que nem o primeiro degrau tem cartão liberado. */
-function linhaNivel(cls, rotulo, d, aoEstudar, trava){
+function linhaNivel(cls, rotulo, d, aoEstudar, trava, chaveRes){
   const linha = document.createElement("div"); linha.className = cls;
   const vazia = !d.total;
   if(vazia) linha.classList.add("sem-cartao");
@@ -2564,6 +2604,14 @@ function linhaNivel(cls, rotulo, d, aoEstudar, trava){
   }
   /* sem botão quando o tópico está fechado por pré-requisito: a trava é sem
      saída, então oferecer o botão só produziria uma sessão vazia */
+  /* resumo à mão, antes ou depois do estudo — mas só de trecho aberto: o
+     fechado ainda não é para agora, e a trava continua sem atalho */
+  if(chaveRes && RESUMOS[chaveRes] && !fechado){
+    const br = document.createElement("button");
+    br.className = "ler-resumo"; br.textContent = "Resumo";
+    br.onclick = ev=>{ ev.stopPropagation(); mostrarResumo(chaveRes, "Voltar às matérias", ()=>ir("materias")); };
+    linha.appendChild(br);
+  }
   if(!vazia && !fechado){
     const bt = document.createElement("button");
     bt.className = "estudar"; bt.textContent = "Estudar";
@@ -2650,7 +2698,7 @@ function pintarMaterias(){
       const linha = linhaNivel("topico", t, dt, ev=>{
         ev.stopPropagation();
         iniciarSessao("filtro", {m:mid, t:t});
-      }, travaDoTopico(mid, t, dt, temSub));
+      }, travaDoTopico(mid, t, dt, temSub), chaveResumo(mid, t));
 
       if(!temSub){ corpo.appendChild(linha); return; }
 
@@ -2669,7 +2717,7 @@ function pintarMaterias(){
         dentro.appendChild(linhaNivel("subtopico", s, dt.subs[s], ev=>{
           ev.stopPropagation();
           iniciarSessao("filtro", {m:mid, t:t, s:s});
-        }, travaDoSubtopico(mid, t, s, dt.subs[s])));
+        }, travaDoSubtopico(mid, t, s, dt.subs[s]), chaveResumo(mid, t, s)));
       });
       grupo.appendChild(dentro);
       corpo.appendChild(grupo);
@@ -2813,9 +2861,65 @@ function checarMetasBatidas(){
   }
 }
 
+/* Resumo de estudo. O texto vem de banco/resumos/<matéria>.json como lista de
+   linhas: "- " abre item de lista, **assim** é negrito, o resto é parágrafo.
+   Tudo passa por textContent antes do negrito, então nada do arquivo vira HTML. */
+function pintarTextoResumo(caixa, linhas){
+  caixa.innerHTML = "";
+  let lista = null;
+  const inline = (el, txt)=>{
+    txt.split(/(\*\*[^*]+\*\*)/).forEach(parte=>{
+      if(!parte) return;
+      if(/^\*\*[^*]+\*\*$/.test(parte)){ const b = document.createElement("strong"); b.textContent = parte.slice(2, -2); el.appendChild(b); }
+      else el.appendChild(document.createTextNode(parte));
+    });
+  };
+  (linhas||[]).forEach(l=>{
+    if(l.startsWith("- ")){
+      if(!lista){ lista = document.createElement("ul"); caixa.appendChild(lista); }
+      const li = document.createElement("li"); inline(li, l.slice(2)); lista.appendChild(li);
+    } else {
+      lista = null;
+      const p = document.createElement("p"); inline(p, l); caixa.appendChild(p);
+    }
+  });
+}
+
+/* `rotulo` é o botão de baixo; `depois` roda quando a pessoa lê (ou pula pelo
+   ✕): no estudo, segue para o cartão; nas Matérias, volta para a lista. Ler
+   pela tela Matérias também conta como lido. */
+function mostrarResumo(k, rotulo, depois){
+  const r = RESUMOS[k]; if(!r){ depois(); return; }
+  RES_CTX = {k, rotulo, depois};
+  document.getElementById("res-materia").textContent = (MATERIAS[r.m] && MATERIAS[r.m].nome) || r.m;
+  document.getElementById("res-titulo").textContent = r.s || r.t;
+  document.getElementById("res-sub").textContent = r.s ? r.t : "";
+  pintarTextoResumo(document.getElementById("res-texto"), r.texto);
+  const f = document.getElementById("res-fontes");
+  f.textContent = "";
+  if(r.fontes && r.fontes.length){
+    const t = document.createElement("div"); t.className = "rotulo"; t.textContent = "Fontes"; f.appendChild(t);
+    r.fontes.forEach(x=>{ const d = document.createElement("div"); d.textContent = x; f.appendChild(d); });
+  }
+  ir("resumo");
+}
+function lerResumoESeguir(){
+  if(!RES_CTX) return;
+  const {k, depois} = RES_CTX;
+  E.resumosLidos = E.resumosLidos || {};
+  if(!E.resumosLidos[k]){ E.resumosLidos[k] = hoje(); salvar(); }
+  RES_CTX = null;
+  depois();
+}
+function fecharResumo(){ lerResumoESeguir(); }
+
 function mostrarQuestao(){
   window.scrollTo(0,0);   // cartão novo sempre começa do topo, mesmo se o anterior foi respondido rolado pra baixo
   const id = S.lista[S.pos], q = porId[id];
+  /* primeiro cartão novo de um trecho com resumo ainda não lido: o texto vem
+     antes, uma vez só. Ler e seguir volta para cá, e aí o cartão aparece. */
+  const kRes = resumoPendente(q);
+  if(kRes){ mostrarResumo(kRes, "Começar as questões", ()=>{ ir("estudo"); mostrarQuestao(); }); return; }
   S.respondida = false;
   S.perm = embaralhaOrdem(q.o.length);
   /* novo/revisão: mesma checagem que fila() usa para separar as duas listas

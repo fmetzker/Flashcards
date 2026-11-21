@@ -29,6 +29,8 @@ $arquivos = @('concursos.json', 'banco/materias.json', 'banco/indice-legado.json
                 'banco/reescritas.json', 'banco/topicos.json', 'banco/requisitos.json')
 $materias = [System.IO.File]::ReadAllText((Join-Path $dir 'materias.json'), [System.Text.Encoding]::UTF8) | ConvertFrom-Json
 foreach ($m in $materias) { $arquivos += "banco/$($m.id).json" }
+# resumos de estudo são opcionais: entra só o arquivo que existir
+foreach ($m in $materias) { if (Test-Path (Join-Path $dir "resumos\$($m.id).json")) { $arquivos += "banco/resumos/$($m.id).json" } }
 
 $partes = @()
 foreach ($a in $arquivos) {

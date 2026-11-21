@@ -757,6 +757,31 @@ escopo restrito a um só ou com todos.
 - O gráfico "Cartões estudados" usa a contagem bruta (`E.dias`) de
   propósito: ali a pergunta é "quanto você estudou", não "quanto contou".
 
+## Resumos de estudo
+
+Texto curto que ensina o tópico ou o subtópico **antes do primeiro cartão
+novo** dele, em `banco/resumos/<matéria>.json`. É porta de entrada, não
+apostila: reler é o jeito menos eficiente de estudar, e quem fixa o assunto
+continua sendo a recordação ativa dos cartões. As regras:
+
+- **Aparece uma vez, só antes de cartão NOVO** (`resumoPendente()`, motor.js).
+  Revisão nunca abre resumo. O do tópico vem antes do do subtópico: primeiro
+  o mapa, depois o detalhe. Lido fica em `E.resumosLidos` (dentro do estado
+  da conta, sem chave nova de `localStorage` — regra 1).
+- **Nunca trava.** O ✕ também conta como lido e segue para o cartão; o texto
+  fica no botão Resumo da tela Matérias, só para trecho aberto.
+- **Não conta na meta**, que continua sendo de questões, e não entra no
+  simulado.
+- **Fonte obrigatória** (regra 11), as mesmas dos cartões do trecho; até
+  **450 palavras**; trecho que não existe no banco reprova no `validar`.
+- **O cartão se sustenta sozinho.** Nenhum enunciado pode depender do
+  resumo ("como visto no resumo"): quem pula o texto ou estuda pelo simulado
+  precisa entender a questão do mesmo jeito.
+- **Não é `banco/<matéria>.json`**, então a regra 9 (três scripts) não o
+  alcança: é escrito à mão, como `topicos.json` e `requisitos.json`, e
+  quem decide se entra é o `validar`. Fato que muda (lei alterada) muda nos
+  dois lugares: no cartão pelo caminho de sempre e no resumo à mão.
+
 ## Padrão dos cartões
 
 Está em `PADRAO-DOS-CARTOES.md`: recordação ativa, um fato por cartão,
