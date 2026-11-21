@@ -44,6 +44,15 @@ function Id-Questao([string]$enunciado) {
 # então quem já estudava o cartão segue com o histórico.
 
 $REESCRITAS = @{
+  # Lei 8.142: o art. 2º não foi vetado (ele aloca os recursos do FNS); o cartão passa a cobrar o art. 1º, §5º
+  '81fcebc5a2' = @{
+    q  = 'Segundo a Lei nº 8.142/1990, a organização e as normas de funcionamento das Conferências e dos Conselhos de Saúde são definidas em:'
+    o  = @('regimento próprio, aprovado pelo respectivo conselho', 'portaria do Ministério da Saúde, igual para todo o país', 'decreto do chefe do Poder Executivo de cada esfera', 'lei aprovada pelo Legislativo municipal ou estadual', 'resolução da Comissão Intergestores Tripartite (CIT)')
+    c  = 0
+    f  = 'Lei 8.142/1990, art. 1º, §5º'
+    e  = 'O art. 1º, §5º, da Lei 8.142/1990 diz que Conferências e Conselhos de Saúde têm organização e normas de funcionamento definidas em regimento próprio, aprovadas pelo respectivo conselho. É o que dá autonomia ao controle social: quem organiza o colegiado é ele mesmo, e não o gestor que ele fiscaliza.'
+    eo = @('Correta: a própria lei manda cada Conferência e cada Conselho ter regimento próprio, aprovado pelo respectivo conselho.', 'Errada: portaria nacional única tiraria a autonomia local; a lei deixa a organização ao regimento de cada instância.', 'Errada: se o chefe do Executivo editasse as normas, o gestor fiscalizado organizaria quem o fiscaliza.', 'Errada: a Lei 8.142 não exige lei local para isso; a organização fica no regimento aprovado pelo conselho.', 'Errada: a CIT pactua a gestão entre União, estados e municípios; não organiza Conselhos nem Conferências.')
+  }
   '5b79ea650a' = @{ q = 'Qual destas palavras é um substantivo epiceno?' }
   '5e907da04e' = @{ q = 'Qual destas palavras é um substantivo deverbal?' }
   'bb11bd8a05' = @{ q = 'Assinale o substantivo deverbal:' }
