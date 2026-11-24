@@ -101,7 +101,8 @@ module.exports = function (APP, t) {
     t.ok(fora.length > 0, 'o teste precisa de cartão fora do recorte para provar alguma coisa');
     t.igual(d.total, dentro.length, 'o total da matéria devia contar só o recorte');
     for (const tt of Object.keys(d.topicos)) {
-      t.ok(alvo.bl.topicos.some(x => x === tt || x.indexOf(tt + '|') === 0),
+      t.ok(alvo.bl.topicos.some(x => x === tt || x.indexOf(tt + '|') === 0
+                                   || (x[0] === '#' && APP.porId[x.slice(1)] && APP.porId[x.slice(1)].t === tt)),
         `"${tt}" está fora do recorte e apareceu na tela`);
     }
   });

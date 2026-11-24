@@ -698,6 +698,15 @@ escopo restrito a um só ou com todos.
     e as duas precisam concordar. Cartão sem `s` só entra pela forma de
     tópico inteiro. Quem usa o recorte por subtópico hoje é `cfaq-moc-mom`
     em Matemática (810 dos 943 cartões entram).
+  - **A terceira forma é um cartão só (`"#<id>"`)**, para a prova que cobra o
+    edital inteiro mas não cabe no banco inteiro. Cortar tópico inteiro deixa
+    item do edital sem cartão (regra 11). O recorte por cartão guarda o
+    essencial de cada item: a definição de cada assunto e uma ou duas
+    aplicações das regras que mais variam, sem o exercício repetido. Quem usa
+    hoje é o GCM de Angra, em Português (299 dos 1.095, todos os itens do
+    Anexo II). A lista é julgamento, como a ordem da fila, e o `_topicos` do
+    bloco diz o critério. Cartão reescrito (regra 5) muda de `id` e sai do
+    recorte, mas o `validar` acusa o id que não existe mais.
   - Escopo pode somar ao edital o que as **provas anteriores cobraram de
     fato**, com a evidência dita no `_topicos` do bloco — é o caso de
     `cfaq-moc-mom`, cujo Anexo III é curto mas as provas de 9º ano trazem

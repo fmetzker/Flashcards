@@ -80,10 +80,14 @@ function apportion(pesos, total){
    ("Álgebra|Equações do 2º grau"): o tópico do banco pode misturar o que o
    edital pede com o que ele nem cita — Álgebra tem equação do 2º grau e
    também logaritmo, e um edital de 9º ano pede só a primeira. Cartão sem
-   subtópico só entra pela forma de tópico inteiro. */
+   subtópico só entra pela forma de tópico inteiro. A terceira forma é um
+   cartão só ("#<id>"), para a prova que cobra o edital inteiro mas cabe em
+   menos cartões do que o banco tem: o recorte fica com o essencial de cada
+   item, e não com alguns itens inteiros. */
 function noEscopo(topicos, q){
   if(!topicos) return true;
-  return topicos.indexOf(q.t) >= 0 || (!!q.s && topicos.indexOf(q.t + "|" + q.s) >= 0);
+  return topicos.indexOf(q.t) >= 0 || (!!q.s && topicos.indexOf(q.t + "|" + q.s) >= 0)
+      || topicos.indexOf("#" + q.id) >= 0;
 }
 
 function blocosDaMeta(lista){
@@ -1006,7 +1010,9 @@ function resumoDoBanco(){
     const oficial = TOPICOS_EDITAL[mid];
     if(!oficial || !oficial.topicos) return;
     /* recortada, só o tópico de edital que o recorte cita, inteiro ou por um
-       subtópico — senão o tópico que acabou de sair voltaria como "sem cartão" */
+       subtópico — senão o tópico que acabou de sair voltaria como "sem cartão".
+       O recorte por cartão ("#id") não precisa entrar aqui: o tópico do
+       cartão citado já veio do banco, no laço acima. */
     const r = recorteDaFila(mid);
     const cita = t => r === null || r.some(x=> x === t || x.indexOf(t + "|") === 0);
     const d = dados[mid] = dados[mid] || Object.assign(vazio(), {topicos:{}});

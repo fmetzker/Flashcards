@@ -79,7 +79,9 @@ module.exports = function (APP, t) {
       if (!b.topicos) continue;
       for (const tt of b.topicos) {
         const [tt0, ss] = tt.split('|');
-        const existe = APP.BANCO.some(q => b.materias.includes(q.m) && q.t === tt0
+        const existe = tt[0] === '#'
+          ? APP.BANCO.some(q => b.materias.includes(q.m) && q.id === tt.slice(1))
+          : APP.BANCO.some(q => b.materias.includes(q.m) && q.t === tt0
                                          && (ss === undefined || q.s === ss));
         t.ok(existe, `escopo de "${b.nome}" cita tópico/subtópico inexistente: "${tt}"`);
       }
@@ -96,6 +98,16 @@ module.exports = function (APP, t) {
     t.ok(!APP.noEscopo(esc, { t: 'Álgebra', s: 'Equações logarítmicas' }), 'subtópico irmão não listado entrou');
     t.ok(!APP.noEscopo(esc, { t: 'Álgebra' }), 'cartão sem subtópico entrou por um escopo só de subtópico');
     t.ok(APP.noEscopo(null, { t: 'Qualquer' }), 'sem escopo, a matéria inteira entra');
+  });
+
+  t.teste('escopo por cartão: "#id" abre só aquele cartão', () => {
+    /* a prova cobra o edital inteiro, mas cabe em menos cartões do que o
+       banco tem: o recorte guarda o essencial de cada item */
+    const esc = ['Pontuação', '#abc1234567'];
+    t.ok(APP.noEscopo(esc, { id: 'abc1234567', t: 'Crase' }), 'cartão listado tinha que entrar');
+    t.ok(!APP.noEscopo(esc, { id: 'abc1234568', t: 'Crase' }), 'cartão vizinho do mesmo tópico entrou');
+    t.ok(!APP.noEscopo(esc, { id: 'abc1234568', t: 'Crase', s: 'Antes de horas' }), 'cartão com subtópico entrou sem estar listado');
+    t.ok(APP.noEscopo(esc, { id: 'fff0000000', t: 'Pontuação' }), 'tópico inteiro continua valendo ao lado de cartões');
   });
 
   t.teste('a sessão respeita o escopo por subtópico (revisão vencida fora dele não entra)', async () => {
