@@ -307,31 +307,20 @@
           "materias": ["portugues"],
           "topicos": [
             "Interpretação de texto",
-            "Tipologia textual",
-            "Gêneros textuais",
-            "Ortografia",
             "Acentuação",
-            "Classes de palavras",
-            "Pronomes",
+            "Pronomes|Pessoal",
+            "Pronomes|Demonstrativo",
             "Colocação pronominal",
-            "Flexão verbal",
-            "Flexão nominal",
-            "Sintaxe",
+            "Flexão verbal|Tempo e modo",
+            "Flexão verbal|Vozes verbais",
             "Coordenação e subordinação",
-            "Coordenação",
-            "Subordinação",
             "Concordância",
             "Regência",
             "Crase",
             "Pontuação",
-            "Semântica",
-            "Figuras de linguagem",
-            "Coesão",
-            "Coerência",
-            "Reescrita",
-            "Ambiguidade"
+            "Coesão"
           ],
-          "_topicos": "Anexo II, Língua Portuguesa: compreensão e interpretação (ideia central, inferências, pressupostos e subentendidos), tipologia e gêneros do serviço, ortografia e acentuação, classes de palavras, emprego e colocação de pronomes, tempos, modos e vozes verbais (Flexão verbal), sintaxe com coordenação e subordinação, concordância, regência, crase, pontuação, semântica, coesão, coerência e reescrita. Flexão nominal entra por classes de palavras. Na dúvida, inclui: Figuras de linguagem pelo sentido conotativo, Ambiguidade pela reescrita sem alteração de sentido. Ficam fora o que o edital não cita: Fonética, Gramática (tipos e divisões), Variação linguística, Intertextualidade e Formação de palavras. Redação oficial é cobrada pela matéria redacao."
+          "_topicos": "Recorte enxuto, de 300 cartões, pedido pelo dono do projeto: a prova tem 10 questões de Português e o banco tem mais de mil. Tudo vem do Anexo II, que cobra compreensão e interpretação, tipologia e gêneros, ortografia e acentuação, classes de palavras, emprego e colocação de pronomes, tempos, modos e vozes verbais, sintaxe com coordenação e subordinação, concordância, regência, crase, pontuação, semântica, coesão, coerência e reescrita. Fica uma fatia de quase todo item: interpretação, acentuação, pronome pessoal e demonstrativo, colocação, tempo, modo e voz verbal, a introdução de coordenação e subordinação, concordância, regência, crase, pontuação e coesão. Ficam fora, por tamanho e não por o edital não cobrar: tipologia e gêneros, ortografia, as demais classes de palavras, sintaxe do período, semântica, coerência e reescrita. Redação oficial é cobrada pela matéria redacao."
         },
         {
           "id": "rlm",
