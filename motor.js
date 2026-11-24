@@ -388,6 +388,24 @@ function recorteDaFila(m){
   return _cacheRecorte[m] = (r === undefined ? null : r);
 }
 
+/* Nome da matéria na tela Matérias. Recortada por um bloco só, ela aparece com
+   o nome que o edital dá ao bloco: para quem segue só o GCM de Angra, a
+   Matemática recortada É o "Raciocínio Lógico-Matemático" da prova. Sem
+   recorte, ou com blocos de nomes diferentes na união (GCM e CFAQ juntos), fica
+   o nome da matéria, que é o que de fato se estuda. Bloco com mais de uma
+   matéria não empresta o nome: "Conhecimentos específicos" não diz qual é. */
+function nomeNaTela(m){
+  const proprio = (MATERIAS[m] && MATERIAS[m].nome) || m;
+  if(recorteDaFila(m) === null) return proprio;
+  const nomes = [];
+  INSCRITOS.forEach(c=> (c.blocos || []).forEach(bl=>{
+    if((bl.materias || []).indexOf(m) < 0) return;
+    if(bl.materias.length !== 1 || !bl.nome) nomes.push(proprio);
+    else if(nomes.indexOf(bl.nome) < 0) nomes.push(bl.nome);
+  }));
+  return nomes.length === 1 ? nomes[0] : proprio;
+}
+
 /* Os cartões em que se mede a base de um trecho. Recortado pela metade, só os do
    recorte; sem nenhum cartão no recorte, todos, que é a conta de sempre. */
 function cartoesDoTrecho(m, t, s, noRecorte){
@@ -935,9 +953,14 @@ function progressoPorBloco(k){
   }));
 }
 
+/* A árvore da tela Matérias. Matéria recortada pelos concursos seguidos mostra
+   só o recorte (recorteDaFila, a união dos seguidos): o que fica fora nunca
+   entra como cartão novo na sessão, e listar Cálculo para quem estuda o
+   raciocínio lógico do GCM só faz o material parecer maior do que é. */
 function resumoDoBanco(){
   const dados = {};
   BANCO.forEach(q=>{
+    if(!noEscopo(recorteDaFila(q.m), q)) return;
     const d  = dados[q.m] = dados[q.m] || Object.assign(vazio(), {topicos:{}});
     const dt = d.topicos[q.t] = d.topicos[q.t] || Object.assign(vazio(), {subs:{}});
     const ds = q.s ? (dt.subs[q.s] = dt.subs[q.s] || vazio()) : null;
@@ -982,8 +1005,12 @@ function resumoDoBanco(){
   materiasInscritas().forEach(mid=>{
     const oficial = TOPICOS_EDITAL[mid];
     if(!oficial || !oficial.topicos) return;
+    /* recortada, só o tópico de edital que o recorte cita, inteiro ou por um
+       subtópico — senão o tópico que acabou de sair voltaria como "sem cartão" */
+    const r = recorteDaFila(mid);
+    const cita = t => r === null || r.some(x=> x === t || x.indexOf(t + "|") === 0);
     const d = dados[mid] = dados[mid] || Object.assign(vazio(), {topicos:{}});
-    oficial.topicos.forEach(t=>{
+    oficial.topicos.filter(cita).forEach(t=>{
       d.topicos[t] = d.topicos[t] || Object.assign(vazio(), {subs:{}});
     });
   });
@@ -1073,8 +1100,10 @@ function montarLoteSessao(modo, filtro, excluir){
   } else if(modo==="filtro"){
     /* uma matéria ou um tópico isolado: vale a mesma ordem do estudo normal —
        o que está vencido primeiro, depois o que nunca foi visto */
+    /* dentro do recorte dos seguidos, o mesmo que a tela Matérias mostra:
+       "Estudar toda a matéria" não pode trazer o que ela escondeu */
     const alvo = BANCO.filter(x =>
-      x.m===filtro.m &&
+      x.m===filtro.m && noEscopo(recorteDaFila(x.m), x) &&
       (!filtro.t || x.t===filtro.t) &&
       (!filtro.s || x.s===filtro.s));
     const h = hoje(), nov = [];

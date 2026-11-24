@@ -76,6 +76,73 @@ module.exports = function (APP, t) {
     t.igual(nomes.length, Object.keys(d.topicos).length, 'a ordenação perdeu tópico');
   });
 
+  t.grupo('recorte na tela Matérias');
+
+  /* Um bloco de concurso real que recorta uma matéria só, tirado de
+     concursos.json na hora: escrever o id no teste travaria a saída do
+     concurso (regra 12). Sem nenhum, os testes pulam. */
+  const blocoRecortado = (filtro = () => true) => {
+    for (const c of APP.CONCURSOS)
+      for (const bl of c.blocos || [])
+        if (bl.topicos && bl.topicos.length && (bl.materias || []).length === 1 && filtro(bl))
+          return { c, bl, m: bl.materias[0] };
+    return null;
+  };
+
+  t.teste('matéria recortada mostra só o recorte, e o edital não traz de volta o que saiu', async () => {
+    if (!APP.CONCURSOS.length) await APP.carregarConfig();
+    const alvo = blocoRecortado();
+    if (!alvo) return;
+    await APP.montar({ concursos: [alvo.c.id] });
+    const d = APP.resumoDoBanco()[alvo.m];
+    t.ok(d, 'a matéria recortada sumiu da tela');
+    const dentro = APP.BANCO.filter(q => q.m === alvo.m && APP.noEscopo(alvo.bl.topicos, q));
+    const fora = APP.BANCO.filter(q => q.m === alvo.m && !APP.noEscopo(alvo.bl.topicos, q));
+    t.ok(fora.length > 0, 'o teste precisa de cartão fora do recorte para provar alguma coisa');
+    t.igual(d.total, dentro.length, 'o total da matéria devia contar só o recorte');
+    for (const tt of Object.keys(d.topicos)) {
+      t.ok(alvo.bl.topicos.some(x => x === tt || x.indexOf(tt + '|') === 0),
+        `"${tt}" está fora do recorte e apareceu na tela`);
+    }
+  });
+
+  t.teste('estudar a matéria inteira pela tela não sai do recorte', async () => {
+    if (!APP.CONCURSOS.length) await APP.carregarConfig();
+    const alvo = blocoRecortado();
+    if (!alvo) return;
+    await APP.montar({ concursos: [alvo.c.id] });
+    /* cartão fora do recorte com revisão vencida: é o que escaparia, porque o
+       cartão novo fora do recorte a escada já segura sozinha */
+    const fora = APP.BANCO.filter(q => q.m === alvo.m && !APP.noEscopo(alvo.bl.topicos, q)).slice(0, 20);
+    t.ok(fora.length > 0, 'o teste precisa de cartão fora do recorte');
+    const ontem = APP.somarDias(APP.hoje(), -1);
+    fora.forEach(q => { APP.E.cartoes[q.id] = { caixa: 3, prox: ontem, acertos: 2, erros: 0 }; });
+    APP.abrirEscada();
+    APP.E.meta = 100000;
+    const lote = APP.montarLoteSessao('filtro', { m: alvo.m }, new Set());
+    t.ok(lote.length > 0, 'a sessão da matéria veio vazia');
+    lote.forEach(id => t.ok(APP.noEscopo(alvo.bl.topicos, APP.porId[id]),
+      `"${APP.porId[id].t}|${APP.porId[id].s}" está fora do recorte e entrou na sessão`));
+  });
+
+  t.teste('recortada por um bloco só, a matéria leva o nome do bloco', async () => {
+    if (!APP.CONCURSOS.length) await APP.carregarConfig();
+    const alvo = blocoRecortado(bl => bl.nome !== (APP.MATERIAS[bl.materias[0]] || {}).nome);
+    if (!alvo) return;
+    await APP.montar({ concursos: [alvo.c.id] });
+    t.igual(APP.nomeNaTela(alvo.m), alvo.bl.nome, 'devia aparecer com o nome do bloco do edital');
+    /* outro concurso que cobre a matéria inteira desfaz o recorte, e o nome
+       volta a ser o da matéria */
+    const inteira = APP.CONCURSOS.find(c => c.id !== alvo.c.id &&
+      (c.blocos || []).some(b => (b.materias || []).includes(alvo.m) && !(b.topicos && b.topicos.length)));
+    if (!inteira) return;
+    await APP.montar({ concursos: [alvo.c.id, inteira.id] });
+    t.igual(APP.nomeNaTela(alvo.m), APP.MATERIAS[alvo.m].nome, 'sem recorte, o nome é o da matéria');
+    const fora = APP.BANCO.filter(q => q.m === alvo.m && !APP.noEscopo(alvo.bl.topicos, q));
+    t.igual(APP.resumoDoBanco()[alvo.m].total, APP.BANCO.filter(q => q.m === alvo.m).length,
+      `sem recorte, a matéria inteira volta (${fora.length} cartões fora do recorte do primeiro)`);
+  });
+
   t.grupo('revisões pendentes');
 
   t.teste('os baldes são exclusivos e somam o total', async () => {

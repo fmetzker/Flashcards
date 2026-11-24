@@ -445,7 +445,12 @@ Português e Legislação do SUS, que caem em quase toda prova da área da
 saúde, continuam compartilháveis com qualquer cargo.
 
 A tela **Matérias** mostra a árvore inteira, inclusive o que ainda não foi
-visto, e permite estudar qualquer um dos três níveis isoladamente. A tela
+visto, e permite estudar qualquer um dos três níveis isoladamente. **Matéria
+recortada pelos concursos seguidos mostra só o recorte** (`recorteDaFila()`, a
+união, a mesma da fila), e "Estudar toda a matéria" também não sai dele.
+Recortada por um bloco só, de uma matéria só, ela aparece com o nome do bloco
+(`nomeNaTela()`): quem segue só o GCM de Angra vê "Raciocínio
+Lógico-Matemático", não a Matemática com Cálculo. A tela
 **Estatísticas** ranqueia do menos dominado para o mais dominado, pelo nível
 mais fino de cada questão, considerando só o que já foi respondido. O
 critério é **caixa média do Leitner**, não acurácia: acurácia mistura

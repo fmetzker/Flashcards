@@ -2643,14 +2643,15 @@ function pintarMaterias(){
      "carregando…", sem travar a aba inteira feito o BANCO_PRONTO acima:
      o resto das matérias já carregadas continua navegável normalmente. */
   const carregando = ORDEM_MATERIAS.filter(m=>MATERIAS_CARREGANDO.has(m) && !dados[m]);
-  let nTopicos = 0, nSubs = 0;
+  let nTopicos = 0, nSubs = 0, nQuestoes = 0;
   mats.forEach(m=>{
     const ts = dados[m].topicos;
+    nQuestoes += dados[m].total;
     nTopicos += Object.keys(ts).length;
     Object.keys(ts).forEach(t=>{ nSubs += Object.keys(ts[t].subs).length; });
   });
   document.getElementById("materias-sub").textContent =
-    mats.length+" matérias · "+nTopicos+" tópicos · "+nSubs+" subtópicos · "+BANCO.length+" questões"
+    mats.length+" matérias · "+nTopicos+" tópicos · "+nSubs+" subtópicos · "+nQuestoes+" questões"
     + (carregando.length ? " · "+carregando.length+" chegando…" : "");
 
   carregando.forEach(mid=>{
@@ -2675,7 +2676,7 @@ function pintarMaterias(){
     cab.onclick = ()=>{ abertas[mid] = !abertas[mid]; cx.classList.toggle("aberta"); };
     const seta = document.createElement("span"); seta.className="seta"; seta.textContent="▶";
     const nome = document.createElement("span"); nome.className="nome";
-    nome.textContent = (MATERIAS[mid]||{}).nome || mid;
+    nome.textContent = nomeNaTela(mid);
     cab.appendChild(seta); cab.appendChild(nome);
     // % dominado (caixa 2+ sobre o total), não taxa de acerto — ver resumoDoBanco()
     const barra = miniBarra({ac: d.dominados, resp: d.total});

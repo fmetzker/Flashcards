@@ -64,7 +64,7 @@ const FUNCOES = [
   'feitasHoje', 'montarLoteSessao', 'agendarRepeticao', 'resumoDoBanco',
   'materiasInscritas', 'provaMaisProxima', 'blocoDe', 'embaralhaOrdem',
   'revisoesPorDia', 'resumoPendencias', 'aplicarFoco', 'carregarConfig', 'carregarBancoParcial',
-  'sorteia', 'disponivel', 'resumoPendente', 'chaveResumo',
+  'sorteia', 'disponivel', 'resumoPendente', 'chaveResumo', 'nomeNaTela',
   /* não são motor puro (tocam localStorage), mas o teste precisa alcançá-las */
   'salvar', 'podarEventosProprios', 'renovarSessao', 'chamarAuth',
   'sincronizarMateriasAtivas', 'zerar', 'zerarMateria', 'checarMetasBatidas',
