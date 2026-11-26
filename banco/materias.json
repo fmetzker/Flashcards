@@ -72,5 +72,10 @@
   {
     "id": "redacao",
     "nome": "Redação"
+  },
+  {
+    "id": "morfo-endocrino-renal",
+    "nome": "Morfofuncional: Endócrino e Renal",
+    "avulsa": true
   }
 ]
