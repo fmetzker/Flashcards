@@ -38,7 +38,7 @@ voltar a referenciá-la em `blocos[].materias`, **ou** até ser marcada
 por Enfermagem do Trabalho e Máquinas e Prática Marítima (nenhuma delas
 referenciada por concurso algum no momento) além das matérias de curso
 próprio, que nunca tiveram concurso: as três de Eletrotécnica, Saúde
-Pública e Morfofuncional: Endócrino e Renal. Ver regra 12.
+Pública e Morfofuncional: Digestório, Endócrino e Renal. Ver regra 12.
 
 ## Estrutura
 
